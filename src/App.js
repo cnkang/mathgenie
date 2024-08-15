@@ -106,10 +106,15 @@ function App() {
     <div className="App">
       <h1>MathGenie</h1>
       <div className="container">
-        {/* Form group for selecting operations */}
+      {/* Form group for selecting operations */}
         <div className="form-group">
-          <label>Operations: </label>
-          <select multiple value={operations} onChange={e => setOperations([...e.target.selectedOptions].map(o => o.value))}>
+          <label htmlFor="operations">Operations: </label>
+          <select
+            id="operations"
+            multiple
+            value={operations}
+            onChange={e => setOperations([...e.target.selectedOptions].map(o => o.value))}
+          >
             <option value="+">+</option>
             <option value="-">-</option>
             <option value="*">✖</option>
@@ -117,46 +122,105 @@ function App() {
           </select>
         </div>
         <div className="form-group">
-          <label>Number of Problems: </label>
-          <input type="number" value={numProblems} onChange={e => setNumProblems(Number(e.target.value))} />
+          <label htmlFor="numProblems">Number of Problems: </label>
+          <input
+            id="numProblems"
+            type="number"
+            value={numProblems}
+            onChange={e => setNumProblems(Number(e.target.value))}
+          />
         </div>
         <div className="form-group">
-          <label>Number Range: </label>
-          <input type="number" value={numRange[0]} onChange={e => setNumRange([Number(e.target.value), numRange[1]])} />
+          <label htmlFor="numRangeMin">Number Range: </label>
+          <input
+            id="numRangeMin"
+            type="number"
+            value={numRange[0]}
+            onChange={e => setNumRange([Number(e.target.value), numRange[1]])}
+          />
           -
-          <input type="number" value={numRange[1]} onChange={e => setNumRange([numRange[0], Number(e.target.value)])} />
+          <input
+            id="numRangeMax"
+            type="number"
+            value={numRange[1]}
+            onChange={e => setNumRange([numRange[0], Number(e.target.value)])}
+          />
         </div>
         <div className="form-group">
-          <label>Result Range: </label>
-          <input type="number" value={resultRange[0]} onChange={e => setResultRange([Number(e.target.value), resultRange[1]])} />
+          <label htmlFor="resultRangeMin">Result Range: </label>
+          <input
+            id="resultRangeMin"
+            type="number"
+            value={resultRange[0]}
+            onChange={e => setResultRange([Number(e.target.value), resultRange[1]])}
+          />
           -
-          <input type="number" value={resultRange[1]} onChange={e => setResultRange([resultRange[0], Number(e.target.value)])} />
+          <input
+            id="resultRangeMax"
+            type="number"
+            value={resultRange[1]}
+            onChange={e => setResultRange([resultRange[0], Number(e.target.value)])}
+          />
         </div>
         <div className="form-group">
-          <label>Number of Operands (Range): </label>
-          <input type="number" value={numOperandsRange[0]} onChange={e => setNumOperandsRange([Math.max(2, Number(e.target.value)), numOperandsRange[1]])} />  {/* 确保下限至少为 2 */}
+          <label htmlFor="numOperandsMin">Number of Operands (Range): </label>
+          <input
+            id="numOperandsMin"
+            type="number"
+            value={numOperandsRange[0]}
+            onChange={e => setNumOperandsRange([Math.max(2, Number(e.target.value)), numOperandsRange[1]])}
+          />
           -
-          <input type="number" value={numOperandsRange[1]} onChange={e => setNumOperandsRange([numOperandsRange[0], Number(e.target.value)])} />
+          <input
+            id="numOperandsMax"
+            type="number"
+            value={numOperandsRange[1]}
+            onChange={e => setNumOperandsRange([numOperandsRange[0], Number(e.target.value)])}
+          />
         </div>
         <div className="form-group">
-          <label>Allow Negative Results: </label>
-          <input type="checkbox" checked={allowNegative} onChange={e => setAllowNegative(e.target.checked)} />
+          <label htmlFor="allowNegative">Allow Negative Results: </label>
+          <input
+            id="allowNegative"
+            type="checkbox"
+            checked={allowNegative}
+            onChange={e => setAllowNegative(e.target.checked)}
+          />
         </div>
         <div className="form-group">
-          <label>Show Answers: </label>
-          <input type="checkbox" checked={showAnswers} onChange={e => setShowAnswers(e.target.checked)} />
+          <label htmlFor="showAnswers">Show Answers: </label>
+          <input
+            id="showAnswers"
+            type="checkbox"
+            checked={showAnswers}
+            onChange={e => setShowAnswers(e.target.checked)}
+          />
         </div>
         <div className="form-group">
-          <label>Font Size: </label>
-          <input type="number" value={fontSize} onChange={e => setFontSize(Number(e.target.value))} />
+          <label htmlFor="fontSize">Font Size: </label>
+          <input
+            id="fontSize"
+            type="number"
+            value={fontSize}
+            onChange={e => setFontSize(Number(e.target.value))}
+          />
         </div>
         <div className="form-group">
-          <label>Line Spacing: </label>
-          <input type="number" value={lineSpacing} onChange={e => setLineSpacing(Number(e.target.value))} />
+          <label htmlFor="lineSpacing">Line Spacing: </label>
+          <input
+            id="lineSpacing"
+            type="number"
+            value={lineSpacing}
+            onChange={e => setLineSpacing(Number(e.target.value))}
+          />
         </div>
         <div className="form-group">
-          <label>Paper Size: </label>
-          <select value={paperSize} onChange={e => setPaperSize(e.target.value)}>
+          <label htmlFor="paperSize">Paper Size: </label>
+          <select
+            id="paperSize"
+            value={paperSize}
+            onChange={e => setPaperSize(e.target.value)}
+          >
             <option value="a4">A4</option>
             <option value="letter">Letter</option>
             <option value="legal">Legal</option>
@@ -176,5 +240,3 @@ function App() {
 }
 
 export default App;
-
-
