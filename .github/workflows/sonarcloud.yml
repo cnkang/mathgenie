@@ -26,3 +26,5 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          sonar-project.properties: ${{ secrets.SONAR_PROJECTKEY }}
+
