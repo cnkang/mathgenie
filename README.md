@@ -1,70 +1,89 @@
-# Getting Started with Create React App
+# MathGenie
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+MathGenie is a small web application built using React, designed to help tutors generate math problems focusing on basic arithmetic operations. With this application, you can customize the range of numbers, the allowed operations, the number of problems, and more, then generate a PDF file with the problems to share with students.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **Select Operations**: Choose which operations (+, -, ✖, ➗) to include in the generated problems.
+- **Customize Number Range**: Define the range of numbers used as operands.
+- **Set Result Range**: Define the acceptable range for results.
+- **Number of Problems**: Specify how many problems to generate.
+- **Operands Range**: Set the range for the number of operands per problem.
+- **Negative Results**: Optionally allow negative results.
+- **Show Answers**: Choose whether to display answers next to the problems.
+- **PDF Customization**: Specify the font size, line spacing, and paper size of the generated PDF.
+- **Download PDF**: Generate and download a PDF file with the customized problems.
 
-### `npm start`
+## Installation
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+1. Clone or download this repository.
+2. Navigate to the project directory.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+    ```bash
+    cd /path/to/your/project
+    ```
 
-### `npm test`
+3. Install the necessary dependencies.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+    ```bash
+    npm install
+    ```
 
-### `npm run build`
+4. Start the development server.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+    ```bash
+    npm start
+    ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+5. Open your web browser and go to `http://localhost:3000`.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Usage
 
-### `npm run eject`
+1. Open the application in your browser.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+2. Customize the settings:
+    - **Select Operations**: Choose the arithmetic operations to be used.
+    - **Number Range**: Define the range of numbers for the operands.
+    - **Result Range**: Specify the acceptable range for calculation results.
+    - **Number of Problems**: Enter the number of problems you want to generate.
+    - **Number of Operands**: Adjust the range for the number of operands in each problem.
+    - **Allow Negative Results**: Check or uncheck to allow or disallow negative results.
+    - **Show Answers**: Check or uncheck to display or hide answers.
+    - **Font Size**: Define the font size for the PDF.
+    - **Line Spacing**: Define the line spacing for the PDF.
+    - **Paper Size**: Choose the paper size (A4, Letter, Legal).
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+3. Click `Generate Problems` to create the math problems.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+4. Review the generated problems displayed on the page.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+5. Click `Download PDF` to save the problems as a PDF file.
 
-## Learn More
+## Example
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+After configuring the settings:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+1. Set the number range from 1 to 10.
+2. Allow only addition and subtraction.
+3. Generate 10 problems.
+4. Display answers.
+5. Save the results in a PDF file.
 
-### Code Splitting
+## Contributing
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+We welcome contributions! Please fork the repository and submit a pull request for any improvements.
 
-### Analyzing the Bundle Size
+## License
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+This project is open-source and available under the [MIT License](LICENSE).
 
-### Making a Progressive Web App
+## Dependencies
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+- `react`: JavaScript library for building user interfaces.
+- `jspdf`: JavaScript library for generating PDF documents.
+- `./App.css`: Custom CSS file for styling (imported in `App.js`).
 
-### Advanced Configuration
+## Acknowledgements
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Thank you for using MathGenie! This application is designed to make math practice more accessible and efficient for both educators and students.
 
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
