@@ -85,7 +85,7 @@ function App() {
   };
 
   // Generate multiple problems
-  const gaenerateProblems = () => {
+  const generateProblems = () => {
     const generatedProblems = Array.from({ length: numProblems }, () => generateProblem()).filter(problem => problem !== '');
     setProblems(generatedProblems);
   };
