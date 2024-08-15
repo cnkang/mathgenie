@@ -14,7 +14,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "prepare": "husky install"
   },
   "eslintConfig": {
     "extends": [
@@ -36,8 +37,20 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@eslint/js": "^9.9.0",
     "@testing-library/jest-dom": "^6.4.8",
     "@testing-library/react": "^16.0.0",
-    "@testing-library/user-event": "^14.5.2"
+    "@testing-library/user-event": "^14.5.2",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.35.0",
+    "globals": "^15.9.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^15.2.9"
+  },
+  "lint-staged": {
+    "*.{js,jsx}": [
+      "eslint --fix",
+      "git add"
+    ]
   }
 }
