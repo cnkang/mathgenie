@@ -3,6 +3,11 @@ import { jsPDF } from 'jspdf'; // Import jsPDF library for PDF generation
 import { nanoid } from 'nanoid'; // Import nanoid for unique keys
 import './App.css'; // Import CSS for styling
 
+/**
+ * The main component of the MathGenie application.
+ *
+ * @return {JSX.Element} The rendered MathGenie application.
+ */
 function App() {
   const [settings, setSettings] = useState({
     operations: ['+'], // Allowed operations
@@ -24,6 +29,13 @@ function App() {
     'legal': 'legal',
   };
 
+/**
+ * Calculates the result of an expression with given operands and operators.
+ *
+ * @param {Array<number>} operands - The array of operands.
+ * @param {Array<string>} operators - The array of operators.
+ * @return {number} The result of the expression.
+ */
   const calculateExpression = (operands, operators) => {
     let result = operands[0];
 
@@ -52,6 +64,11 @@ function App() {
     return result;
   };
 
+/**
+ * Generates a math problem with random operands and operations within the specified ranges.
+ *
+ * @return {string} The generated math problem, or an empty string if no valid problem was generated in MAX_ATTEMPTS attempts.
+ */
   const generateProblem = () => {
     const numOperands = Math.floor(Math.random() * (settings.numOperandsRange[1] - settings.numOperandsRange[0] + 1)) + settings.numOperandsRange[0];
 
@@ -89,6 +106,11 @@ function App() {
     return ''; // Return an empty string if no valid problem was generated in MAX_ATTEMPTS
   };
 
+/**
+ * Generates a set of problems based on the current settings and updates the state with the generated problems.
+ *
+ * @return {void} This function does not return anything.
+ */
   const generateProblems = () => {
     const generatedProblems = Array.from({ length: settings.numProblems }, () =>
       generateProblem()
@@ -96,6 +118,16 @@ function App() {
     setProblems(generatedProblems);
   };
 
+  /**
+   * Downloads a PDF file containing the generated problems.
+   *
+   * This function creates a new instance of the jsPDF library and sets the
+   * paper size and font size based on the settings. It then iterates over
+   * the generated problems and adds each problem to the PDF document at a
+   * specific position. Finally, it saves the PDF file with the name 'problems.pdf'.
+   *
+   * @return {void} This function does not return anything.
+   */
   const downloadPdf = () => {
     const doc = new jsPDF({
       format: paperSizeOptions[settings.paperSize],

@@ -1,8 +1,10 @@
+/* Media query for devices with a max width of 768px */
 @media (max-width: 768px) {
   .container {
-    padding: 15px;
+    padding: 15px; /* Adjust padding */
   }
 
+  /* Adjust font size for form elements and list items */
   label,
   input,
   select,
@@ -11,6 +13,7 @@
     font-size: 0.9rem;
   }
 
+  /* Change flex direction to column for containers */
   .operations-container,
   .range-container,
   .result-container,
@@ -19,141 +22,160 @@
   }
 }
 
+/* Media query for devices with a max width of 480px */
 @media (max-width: 480px) {
   h1 {
-    font-size: 1.5rem;
+    font-size: 1.5rem; /* Adjust heading font size */
   }
 
   h2 {
-    font-size: 1.2rem;
+    font-size: 1.2rem; /* Adjust subheading font size */
   }
 
   button {
-    font-size: 0.9rem;
+    font-size: 0.9rem; /* Adjust button font size */
   }
 }
 
+/* General styling for the .App class */
 .App {
   text-align: center;
-  font-family: 'Arial', sans-serif;
-  background-color: #f8fafc;
-  color: #333;
-  padding: 20px;
+  font-family: "Arial", sans-serif; /* Set font family */
+  background-color: #f8fafc; /* Light background color */
+  color: #333; /* Dark text color */
+  padding: 20px; /* Padding around the app */
 }
 
+/* Style for label elements */
 label {
   display: block;
-  margin: 10px 0 5px;
-  color: #555;
-  font-weight: bold;
+  margin: 10px 0 5px; /* Spacing around labels */
+  color: #555; /* Dark grey text color */
+  font-weight: bold; /* Bold text */
 }
 
+/* Style for input, select, and button elements */
 input,
 select,
 button {
-  margin: 5px 0;
-  padding: 10px;
-  font-size: 1rem;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  width: 100%;
-  box-sizing: border-box;
-  transition: border-color 0.3s;
+  margin: 5px 0; /* Spacing around inputs, selects, and buttons */
+  padding: 10px; /* Padding inside elements */
+  font-size: 1rem; /* Base font size */
+  border-radius: 5px; /* Rounded corners */
+  border: 1px solid #ccc; /* Light grey border */
+  width: 100%; /* Full width */
+  box-sizing: border-box; /* Ensure padding and border are included in width */
+  transition: border-color 0.3s; /* Transition for border color */
 }
 
+/* Focus state for input, select, and button */
 input:focus,
 select:focus,
 button:focus {
-  outline: none;
-  border-color: #007BFF;
+  outline: none; /* Remove default focus outline */
+  border-color: #007bff; /* Blue border on focus */
 }
 
+/* Style for button elements */
 button {
-  cursor: pointer;
-  background-color: #007BFF;
-  color: white;
-  border: none;
-  transition: background-color 0.3s;
-  width: auto;
-  padding: 10px 20px;
+  cursor: pointer; /* Pointer cursor on hover */
+  background-color: #007bff; /* Blue background */
+  color: white; /* White text */
+  border: none; /* Remove default border */
+  transition: background-color 0.3s; /* Transition for background color */
+  width: auto; /* Auto width */
+  padding: 10px 20px; /* Larger padding for button */
 }
 
+/* Hover state for buttons */
 button:hover {
-  background-color: #0056b3;
+  background-color: #0056b3; /* Darker blue background on hover */
 }
 
+/* Disabled state for buttons */
 button:disabled {
-  background-color: grey;
-  cursor: not-allowed;
+  background-color: grey; /* Grey background */
+  cursor: not-allowed; /* Not-allowed cursor */
 }
 
+/* Style for h1 elements */
 h1 {
-  color: #007BFF;
-  margin-bottom: 20px;
-  line-height: 1.2;
+  color: #007bff; /* Blue text color */
+  margin-bottom: 20px; /* Space below heading */
+  line-height: 1.2; /* Line height */
 }
 
+/* Style for h2 elements */
 h2 {
-  margin-top: 20px;
-  color: #007BFF;
-  line-height: 1.2;
+  margin-top: 20px; /* Space above subheading */
+  color: #007bff; /* Blue text color */
+  line-height: 1.2; /* Line height */
 }
 
+/* Style for ul elements */
 ul {
-  list-style-type: none;
-  padding: 0;
+  list-style-type: none; /* Remove default list styling */
+  padding: 0; /* Remove default padding */
 }
 
+/* Style for ul li elements */
 ul li {
-  margin: 10px 0;
-  padding: 10px;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  line-height: 1.5;
+  margin: 10px 0; /* Space around list items */
+  padding: 10px; /* Padding inside list items */
+  background-color: #fff; /* White background */
+  border: 1px solid #ddd; /* Light grey border */
+  border-radius: 5px; /* Rounded corners */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Light shadow */
+  line-height: 1.5; /* Line height */
 }
 
+/* Style for .container class */
 .container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: 800px; /* Max width of 800px */
+  margin: 0 auto; /* Center the container horizontally */
+  padding: 20px; /* Padding inside the container */
+  background-color: #fff; /* White background color */
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Light box-shadow for depth */
 }
 
+/* Style for .form-group class */
 .form-group {
-  margin-bottom: 15px;
-  display: flex;
-  flex-direction: column;
+  margin-bottom: 15px; /* Space below each form group */
+  display: flex; /* Flexbox for layout */
+  flex-direction: column; /* Vertical layout */
 }
 
+/* Style for form elements */
 form {
-  display: grid;
-  gap: 15px;
+  display: grid; /* Grid layout for form elements */
+  gap: 15px; /* Space between grid items */
 }
 
+/* Style for .problems class */
 .problems {
-  margin-top: 20px;
-  text-align: left;
+  margin-top: 20px; /* Space above problems section */
+  text-align: left; /* Left align text */
 }
 
+/* Style for individual problem element */
 .problem {
-  display: flex;
-  justify-content: space-between;
+  display: flex; /* Flexbox for layout */
+  justify-content: space-between; /* Space between items */
 }
 
+/* Style for container elements */
 .operations-container,
 .range-container,
 .result-container,
 .operands-container {
-  display: flex;
-  gap: 5px;
+  display: flex; /* Flexbox for layout */
+  gap: 5px; /* Space between flex items */
 }
 
+/* Style for options in .operations-select */
 .operations-select option {
-  background-color: #ffffff;
-  color: #333333;
-  padding: 5px;
+  background-color: #ffffff; /* White background for options */
+  color: #333333; /* Dark text color */
+  padding: 5px; /* Padding inside options */
 }
