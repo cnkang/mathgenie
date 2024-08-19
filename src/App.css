@@ -3,7 +3,11 @@
     padding: 15px;
   }
 
-  label, input, select, button, ul li {
+  label,
+  input,
+  select,
+  button,
+  ul li {
     font-size: 0.9rem;
   }
 }
@@ -25,7 +29,7 @@
 .App {
   text-align: center;
   font-family: 'Arial', sans-serif;
-  background-color: #f0f4f8;
+  background-color: #f8fafc;
   color: #333;
   padding: 20px;
 }
@@ -37,7 +41,9 @@ label {
   font-weight: bold;
 }
 
-input, select, button {
+input,
+select,
+button {
   margin: 5px 0;
   padding: 10px;
   font-size: 1rem;
@@ -48,7 +54,9 @@ input, select, button {
   transition: border-color 0.3s;
 }
 
-input:focus, select:focus, button:focus {
+input:focus,
+select:focus,
+button:focus {
   outline: none;
   border-color: #007BFF;
 }
@@ -110,6 +118,8 @@ ul li {
 
 .form-group {
   margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
 }
 
 form {
@@ -125,4 +135,21 @@ form {
 .problem {
   display: flex;
   justify-content: space-between;
+}
+
+.operations-container, .range-container, .result-container, .operands-container {
+  display: flex;
+  gap: 5px;
+}
+
+.operations-select option {
+  background-color: #ffffff;
+  color: #333333;
+  padding: 5px;
+}
+
+@media (max-width: 768px) {
+  .operations-container, .range-container, .result-container, .operands-container {
+    flex-direction: column;
+  }
 }
