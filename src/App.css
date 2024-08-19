@@ -10,6 +10,13 @@
   ul li {
     font-size: 0.9rem;
   }
+
+  .operations-container,
+  .range-container,
+  .result-container,
+  .operands-container {
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 480px) {
@@ -137,7 +144,10 @@ form {
   justify-content: space-between;
 }
 
-.operations-container, .range-container, .result-container, .operands-container {
+.operations-container,
+.range-container,
+.result-container,
+.operands-container {
   display: flex;
   gap: 5px;
 }
@@ -146,10 +156,4 @@ form {
   background-color: #ffffff;
   color: #333333;
   padding: 5px;
-}
-
-@media (max-width: 768px) {
-  .operations-container, .range-container, .result-container, .operands-container {
-    flex-direction: column;
-  }
 }
