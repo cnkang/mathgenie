@@ -59,6 +59,8 @@ button {
   color: white;
   border: none;
   transition: background-color 0.3s;
+  width: auto;
+  padding: 10px 20px;
 }
 
 button:hover {
@@ -108,11 +110,6 @@ ul li {
 
 .form-group {
   margin-bottom: 15px;
-}
-
-button {
-  width: auto;
-  padding: 10px 20px;
 }
 
 form {
