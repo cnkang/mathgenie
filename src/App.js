@@ -53,48 +53,42 @@ function App() {
   };
 
   const generateProblem = () => {
-    // Determine the number of operands for the problem, ensuring it's within the specified range
-    const numOperands = Math.floor(Math.random() * (settings.numOperandsRange[1] - settings.numOperandsRange[0] + 1))
-      + settings.numOperandsRange[0];
+    const numOperands = Math.floor(Math.random() * (settings.numOperandsRange[1] - settings.numOperandsRange[0] + 1)) + settings.numOperandsRange[0];
   
-    // If the number of operands is less than 2, return an empty string
     if (numOperands < 2) return '';
-
-    // Set a maximum number of attempts to prevent infinite loop
+  
     const MAX_ATTEMPTS = 10000;
   
-    // Continue generating problems until a valid one within the specified result range is found
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-      // Generate a list of operands within the specified number range
       const operands = Array.from({ length: numOperands }, () =>
         Math.floor(Math.random() * (settings.numRange[1] - settings.numRange[0] + 1)) + settings.numRange[0]
       );
   
-      // Generate a list of operations between the operands
       const operationSymbols = Array.from({ length: numOperands - 1 }, () =>
         settings.operations[Math.floor(Math.random() * settings.operations.length)]
       );
   
-      // Calculate the result of the generated expression
       const result = calculateExpression(operands, operationSymbols);
   
-      // Ensure the result falls within the specified result range and handle negative results if set
       if (settings.resultRange[0] <= result && result <= settings.resultRange[1]) {
         if (settings.allowNegative || result >= 0) {
-          // Create the problem string with operands and operation symbols
-          let problem = operands.map((operand, i) =>
-            i < operationSymbols.length ? (operand + operationSymbols[i]) : operand
-          ).join(' ');
+          let problem = operands[0].toString();
+          
+          operationSymbols.forEach((operator, index) => {
+            problem += ` ${operator} ${operands[index + 1]}`;
+          });
   
           // Replace '*' and '/' with visual symbols
           problem = problem.replace(/\*/g, '✖').replace(/\//g, '➗');
   
-          // Return the problem string with the answer if showAnswers setting is true, else leave the result part empty
-          return settings.showAnswers ? problem + ` = ${result}` : problem + ' = ';
+          return settings.showAnswers ? `${problem} = ${result}` : `${problem} = `;
         }
       }
     }
+  
+    return ''; // Return an empty string if no valid problem was generated in MAX_ATTEMPTS
   };
+  
   
 
   const generateProblems = () => {
