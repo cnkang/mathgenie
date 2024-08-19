@@ -70,7 +70,22 @@ function App() {
    * @return {string} The generated math problem, or an empty string if no valid problem was generated in MAX_ATTEMPTS attempts.
    */
   const generateProblem = () => {
-    const numOperands = Math.floor(Math.random() * (settings.numOperandsRange[1] - settings.numOperandsRange[0] + 1)) + settings.numOperandsRange[0];
+    const crypto = window.crypto || window.msCrypto;
+    /**
+     * Generates a random number between the given minimum and maximum values.
+     *
+     * @param {number} min - The minimum value of the range.
+     * @param {number} max - The maximum value of the range.
+     * @return {number} The randomly generated number.
+     */
+    const random = (min, max) => {
+      const array = new Uint32Array(1);
+      crypto.getRandomValues(array);
+      const val = array[0] / (0xFFFFFFFF + 1);
+      return min + Math.floor((max - min + 1) * val);
+    };
+
+    const numOperands = random(settings.numOperandsRange[0], settings.numOperandsRange[1]);
 
     if (numOperands < 2) return '';
 
@@ -78,11 +93,11 @@ function App() {
 
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
       const operands = Array.from({ length: numOperands }, () =>
-        Math.floor(Math.random() * (settings.numRange[1] - settings.numRange[0] + 1)) + settings.numRange[0]
+        random(settings.numRange[0], settings.numRange[1])
       );
 
       const operationSymbols = Array.from({ length: numOperands - 1 }, () =>
-        settings.operations[Math.floor(Math.random() * settings.operations.length)]
+        settings.operations[random(0, settings.operations.length - 1)]
       );
 
       const result = calculateExpression(operands, operationSymbols);
