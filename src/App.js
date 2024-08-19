@@ -1,35 +1,36 @@
-import React, { useState } from 'react'; // Import React and useState hook
+import React, { useState, useEffect } from 'react'; // Import React and useState hook
 import { jsPDF } from 'jspdf'; // Import jsPDF library for PDF generation
+import { nanoid } from 'nanoid'; // Import nanoid for unique keys
 import './App.css'; // Import CSS for styling
-function App() {
-  // State variables for various settings and generated problems
-  const [operations, setOperations] = useState(['+']); // Allowed operations
-  const [numProblems, setNumProblems] = useState(10); // Number of problems to generate
-  const [numRange, setNumRange] = useState([1, 10]); // Range of numbers for operands
-  const [resultRange, setResultRange] = useState([0, 100]); // Acceptable range for results
-  const [numOperandsRange, setNumOperandsRange] = useState([2, 3]);  // Range for the number of operands
-  const [allowNegative, setAllowNegative] = useState(false); // Whether to allow negative results
-  const [showAnswers, setShowAnswers] = useState(true); // Whether to show answers
-  const [fontSize, setFontSize] = useState(12); // Font size for PDF
-  const [lineSpacing, setLineSpacing] = useState(10); // Line spacing for PDF
-  const [paperSize, setPaperSize] = useState('a4'); // Paper size for PDF
-  const [problems, setProblems] = useState([]); // Generated problems
 
-  // Options for paper size
+function App() {
+  const [settings, setSettings] = useState({
+    operations: ['+'], // Allowed operations
+    numProblems: 10, // Number of problems to generate
+    numRange: [1, 10], // Range of numbers for operands
+    resultRange: [0, 100], // Acceptable range for results
+    numOperandsRange: [2, 3], // Range for the number of operands
+    allowNegative: false, // Whether to allow negative results
+    showAnswers: true, // Whether to show answers
+    fontSize: 12, // Font size for PDF
+    lineSpacing: 10, // Line spacing for PDF
+    paperSize: 'a4', // Paper size for PDF
+  });
+  const [problems, setProblems] = useState([]);
+
   const paperSizeOptions = {
     'a4': 'a4',
     'letter': 'letter',
     'legal': 'legal',
   };
 
-  // Calculate the result of an expression given operands and operators
   const calculateExpression = (operands, operators) => {
     let result = operands[0];
 
     for (let i = 0; i < operators.length; i++) {
       const operator = operators[i];
       const operand = operands[i + 1];
-      
+
       switch (operator) {
         case '+':
           result += operand;
@@ -51,192 +52,228 @@ function App() {
     return result;
   };
 
-  // Generate a single math problem
   const generateProblem = () => {
-    const numOperands = Math.floor(Math.random() * (numOperandsRange[1] - numOperandsRange[0] + 1)) + numOperandsRange[0];
-
-    // Ensure at least two operands
+    // Determine the number of operands for the problem, ensuring it's within the specified range
+    const numOperands = Math.floor(Math.random() * (settings.numOperandsRange[1] - settings.numOperandsRange[0] + 1))
+      + settings.numOperandsRange[0];
+  
+    // If the number of operands is less than 2, return an empty string
     if (numOperands < 2) return '';
 
-    while (true) {
-      const operands = Array.from({ length: numOperands }, () => 
-        Math.floor(Math.random() * (numRange[1] - numRange[0] + 1)) + numRange[0]
+    // Set a maximum number of attempts to prevent infinite loop
+    const MAX_ATTEMPTS = 10000;
+  
+    // Continue generating problems until a valid one within the specified result range is found
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+      // Generate a list of operands within the specified number range
+      const operands = Array.from({ length: numOperands }, () =>
+        Math.floor(Math.random() * (settings.numRange[1] - settings.numRange[0] + 1)) + settings.numRange[0]
       );
+  
+      // Generate a list of operations between the operands
       const operationSymbols = Array.from({ length: numOperands - 1 }, () =>
-        operations[Math.floor(Math.random() * operations.length)]
+        settings.operations[Math.floor(Math.random() * settings.operations.length)]
       );
-
+  
+      // Calculate the result of the generated expression
       const result = calculateExpression(operands, operationSymbols);
-
-      // Check if the result is within the allowed range and satisfies conditions
-      if (resultRange[0] <= result && result <= resultRange[1]) {
-        if (allowNegative || result >= 0) {
-          let problem = operands.map((operand, i) => 
-            i < operationSymbols.length ? operand + operationSymbols[i] : operand
-          ).join('');
-
-          // Replace symbols for display
+  
+      // Ensure the result falls within the specified result range and handle negative results if set
+      if (settings.resultRange[0] <= result && result <= settings.resultRange[1]) {
+        if (settings.allowNegative || result >= 0) {
+          // Create the problem string with operands and operation symbols
+          let problem = operands.map((operand, i) =>
+            i < operationSymbols.length ? (operand + operationSymbols[i]) : operand
+          ).join(' ');
+  
+          // Replace '*' and '/' with visual symbols
           problem = problem.replace(/\*/g, '✖').replace(/\//g, '➗');
-
-          return showAnswers ? problem + ` = ${result}` : problem + " = ";
+  
+          // Return the problem string with the answer if showAnswers setting is true, else leave the result part empty
+          return settings.showAnswers ? problem + ` = ${result}` : problem + ' = ';
         }
       }
     }
   };
+  
 
-  // Generate multiple problems
   const generateProblems = () => {
-    const generatedProblems = Array.from({ length: numProblems }, () => generateProblem()).filter(problem => problem !== '');
-    setProblems(generatedProblems);
-  };
+    const generatedProblems = Array.from({ length: settings.numProblems }, () =>
+      generateProblem()
+  ).filter(problem => problem !== '').map(problem => ({ id: nanoid(), text: problem }));
+  setProblems(generatedProblems);
+};
 
-  const downloadPdf = () => {
-    const doc = new jsPDF({
-      format: paperSizeOptions[paperSize],
-    });
+const downloadPdf = () => {
+  const doc = new jsPDF({
+    format: paperSizeOptions[settings.paperSize],
+  });
 
-    doc.setFontSize(fontSize);
-    problems.forEach((problem, i) => {
-      doc.text(problem, 10, 10 + i * lineSpacing);
-    });
-    doc.save('problems.pdf');
-  };
+  doc.setFontSize(settings.fontSize);
+  problems.forEach((problem, i) => {
+    doc.text(problem.text, 10, 10 + i * settings.lineSpacing);
+  });
+  doc.save('problems.pdf');
+};
 
-  return (
-    <div className="App">
-      <h1>MathGenie</h1>
-      <div className="container">
-      {/* Form group for selecting operations */}
-        <div className="form-group">
-          <label htmlFor="operations">Operations: </label>
-          <select
-            id="operations"
-            multiple
-            value={operations}
-            onChange={e => setOperations([...e.target.selectedOptions].map(o => o.value))}
-          >
-            <option value="+">+</option>
-            <option value="-">-</option>
-            <option value="*">✖</option>
-            <option value="/">➗</option>
-          </select>
-        </div>
-        <div className="form-group">
-          <label htmlFor="numProblems">Number of Problems: </label>
-          <input
-            id="numProblems"
-            type="number"
-            value={numProblems}
-            onChange={e => setNumProblems(Number(e.target.value))}
+useEffect(() => {
+  generateProblems();
+}, [settings]);
+
+const handleChange = (field, value) => {
+  setSettings((prevSettings) => ({
+    ...prevSettings,
+    [field]: value,
+  }));
+};
+
+return (
+  <div className="App">
+    <h1>MathGenie</h1>
+    <div className="container">
+      <div className="form-group">
+        <label htmlFor="operations">Operations:</label>
+        <select
+          id="operations"
+          multiple
+          value={settings.operations}
+          onChange={(e) => handleChange('operations', [...e.target.selectedOptions].map((option) => option.value))}
+        >
+          <option value="+">+</option>
+          <option value="-">-</option>
+          <option value="*">✖</option>
+          <option value="/">➗</option>
+        </select>
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="numProblems">Number of Problems:</label>
+        <input
+          type="number"
+          id="numProblems"
+          value={settings.numProblems}
+          onChange={(e) => handleChange('numProblems', parseInt(e.target.value))}
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="numRange">Number Range:</label>
+        <input
+          type="number"
+          id="numRangeMin"
+          value={settings.numRange[0]}
+          onChange={(e) => handleChange('numRange', [parseInt(e.target.value), settings.numRange[1]])}
+          placeholder="Min"
+        />{' '}
+        <input
+          type="number"
+          id="numRangeMax"
+          value={settings.numRange[1]}
+          onChange={(e) => handleChange('numRange', [settings.numRange[0], parseInt(e.target.value)])}
+          placeholder="Max"
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="resultRange">Result Range:</label>
+        <input
+          type="number"
+          id="resultRangeMin"
+          value={settings.resultRange[0]}
+          onChange={(e) => handleChange('resultRange', [parseInt(e.target.value), settings.resultRange[1]])}
+          placeholder="Min"
+        />{' '}
+        <input
+          type="number"
+          id="resultRangeMax"
+          value={settings.resultRange[1]}
+          onChange={(e) => handleChange('resultRange', [settings.resultRange[0], parseInt(e.target.value)])}
+          placeholder="Max"
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="numOperandsRange">Number of Operands Range:</label>
+        <input
+          type="number"
+          id="numOperandsRangeMin"
+          value={settings.numOperandsRange[0]}
+          onChange={(e) => handleChange('numOperandsRange', [parseInt(e.target.value), settings.numOperandsRange[1]])}
+          placeholder="Min"
+        />{' '}
+        <input
+          type="number"
+          id="numOperandsRangeMax"
+          value={settings.numOperandsRange[1]}
+          onChange={(e) => handleChange('numOperandsRange', [settings.numOperandsRange[0], parseInt(e.target.value)])}
+          placeholder="Max"
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="allowNegative">Allow Negative Results:</label>
+        <input
+          type="checkbox"
+          id="allowNegative"
+          checked={settings.allowNegative}
+          onChange={(e) => handleChange('allowNegative', e.target.checked)}
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="showAnswers">Show Answers:</label>
+        <input
+          type="checkbox"
+          id="showAnswers"
+          checked={settings.showAnswers}
+          onChange={(e) => handleChange('showAnswers', e.target.checked)}
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="fontSize">Font Size:</label>
+        <input
+          type="number"
+          id="fontSize"
+          value={settings.fontSize}
+          onChange={(e) => handleChange('fontSize', parseInt(e.target.value))}
           />
         </div>
+
         <div className="form-group">
-          <label htmlFor="numRangeMin">Number Range: </label>
+          <label htmlFor="lineSpacing">Line Spacing (px):</label>
           <input
-            id="numRangeMin"
             type="number"
-            value={numRange[0]}
-            onChange={e => setNumRange([Number(e.target.value), numRange[1]])}
-          />
-          -
-          <input
-            id="numRangeMax"
-            type="number"
-            value={numRange[1]}
-            onChange={e => setNumRange([numRange[0], Number(e.target.value)])}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="resultRangeMin">Result Range: </label>
-          <input
-            id="resultRangeMin"
-            type="number"
-            value={resultRange[0]}
-            onChange={e => setResultRange([Number(e.target.value), resultRange[1]])}
-          />
-          -
-          <input
-            id="resultRangeMax"
-            type="number"
-            value={resultRange[1]}
-            onChange={e => setResultRange([resultRange[0], Number(e.target.value)])}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="numOperandsMin">Number of Operands (Range): </label>
-          <input
-            id="numOperandsMin"
-            type="number"
-            value={numOperandsRange[0]}
-            onChange={e => setNumOperandsRange([Math.max(2, Number(e.target.value)), numOperandsRange[1]])}
-          />
-          -
-          <input
-            id="numOperandsMax"
-            type="number"
-            value={numOperandsRange[1]}
-            onChange={e => setNumOperandsRange([numOperandsRange[0], Number(e.target.value)])}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="allowNegative">Allow Negative Results: </label>
-          <input
-            id="allowNegative"
-            type="checkbox"
-            checked={allowNegative}
-            onChange={e => setAllowNegative(e.target.checked)}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="showAnswers">Show Answers: </label>
-          <input
-            id="showAnswers"
-            type="checkbox"
-            checked={showAnswers}
-            onChange={e => setShowAnswers(e.target.checked)}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="fontSize">Font Size: </label>
-          <input
-            id="fontSize"
-            type="number"
-            value={fontSize}
-            onChange={e => setFontSize(Number(e.target.value))}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="lineSpacing">Line Spacing: </label>
-          <input
             id="lineSpacing"
-            type="number"
-            value={lineSpacing}
-            onChange={e => setLineSpacing(Number(e.target.value))}
+            value={settings.lineSpacing}
+            onChange={(e) => handleChange('lineSpacing', parseInt(e.target.value))}
           />
         </div>
+
         <div className="form-group">
-          <label htmlFor="paperSize">Paper Size: </label>
+          <label htmlFor="paperSize">Paper Size:</label>
           <select
             id="paperSize"
-            value={paperSize}
-            onChange={e => setPaperSize(e.target.value)}
+            value={settings.paperSize}
+            onChange={(e) => handleChange('paperSize', e.target.value)}
           >
             <option value="a4">A4</option>
             <option value="letter">Letter</option>
             <option value="legal">Legal</option>
           </select>
         </div>
-        <button onClick={generateProblems}>Generate Problems</button>
-        <button onClick={downloadPdf} disabled={problems.length === 0}>Download PDF</button>
-        <h2>Generated Problems:</h2>
-        <ul>
-          {problems.map((problem, index) => (
-            <li key={index}>{problem}</li>
+
+        <button onClick={generateProblems}>Generate Problems</button>{' '}
+        <button onClick={downloadPdf}>Download PDF</button>
+
+        <div className="problems">
+          {problems.map((problem) => (
+            <div key={problem.id}>{problem.text}</div>
           ))}
-        </ul>
+        </div>
       </div>
     </div>
   );
 }
 
-export default App;
+export default App; // Export the App component for use in other files

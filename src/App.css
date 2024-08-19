@@ -3,16 +3,7 @@
     padding: 15px;
   }
 
-  label {
-    font-size: 0.9rem;
-  }
-
-  input, select, button {
-    width: 100%;
-    font-size: 0.9rem;
-  }
-
-  ul li {
+  label, input, select, button, ul li {
     font-size: 0.9rem;
   }
 }
@@ -43,6 +34,7 @@ label {
   display: block;
   margin: 10px 0 5px;
   color: #555;
+  font-weight: bold;
 }
 
 input, select, button {
@@ -51,6 +43,9 @@ input, select, button {
   font-size: 1rem;
   border-radius: 5px;
   border: 1px solid #ccc;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
 }
 
 input:focus, select:focus, button:focus {
@@ -63,20 +58,28 @@ button {
   background-color: #007BFF;
   color: white;
   border: none;
+  transition: background-color 0.3s;
 }
 
 button:hover {
   background-color: #0056b3;
 }
 
+button:disabled {
+  background-color: grey;
+  cursor: not-allowed;
+}
+
 h1 {
   color: #007BFF;
   margin-bottom: 20px;
+  line-height: 1.2;
 }
 
 h2 {
   margin-top: 20px;
   color: #007BFF;
+  line-height: 1.2;
 }
 
 ul {
@@ -91,6 +94,7 @@ ul li {
   border: 1px solid #ddd;
   border-radius: 5px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  line-height: 1.5;
 }
 
 .container {
@@ -106,3 +110,22 @@ ul li {
   margin-bottom: 15px;
 }
 
+button {
+  width: auto;
+  padding: 10px 20px;
+}
+
+form {
+  display: grid;
+  gap: 15px;
+}
+
+.problems {
+  margin-top: 20px;
+  text-align: left;
+}
+
+.problem {
+  display: flex;
+  justify-content: space-between;
+}
