@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@vercel/speed-insights": "^1.0.12",
     "canvas": "^2.11.2",
     "jspdf": "^2.5.1",
     "nanoid": "^5.0.7",
