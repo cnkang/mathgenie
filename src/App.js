@@ -134,47 +134,58 @@ function App() {
   };
 
   /**
-   * Downloads a PDF file
-   * containing the generated problems.
-   *
-   * This function creates a new instance of the jsPDF library and sets the
-   * paper size and font size based on the settings. It then iterates over
-   * the generated problems and adds each problem to the PDF document at a
-   * specific position. Finally, it saves the PDF file with the name 'problems.pdf'.
-   *
-   * @return {void} This function does not return anything.
-   */
-  const downloadPdf = () => {
-    const doc = new jsPDF({
+ * Downloads a PDF file
+ * containing the generated problems.
+ *
+ * This function creates a new instance of the jsPDF library and sets the
+ * paper size and font size based on the settings. It then iterates over
+ * the generated problems and adds each problem to the PDF document at a
+ * specific position. Finally, it saves the PDF file with the name 'problems.pdf'.
+ *
+ * @return {void} This function does not return anything.
+ */
+const downloadPdf = () => {
+  const doc = new jsPDF({
       format: paperSizeOptions[settings.paperSize],
-    });
+  });
 
-    doc.setFontSize(settings.fontSize);
-    const pageHeight = doc.internal.pageSize.getHeight();
-    const pageWidth = doc.internal.pageSize.getWidth();
+  doc.setFontSize(settings.fontSize);
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const pageWidth = doc.internal.pageSize.getWidth();
 
-    let y = 10; // Initial Y coordinate
-    let x = 10; // Initial X coordinate
-    const columnGap = 10; // Gap between columns
-    const columnWidth = Math.floor(pageWidth / 2 - columnGap); // width of each column
+  const marginLeft = 10; 
+  const marginTop = 10;
+  const lineSpacing = settings.lineSpacing;
+  const colWidth = (pageWidth - 3 * marginLeft) / 2;
 
-    problems.forEach((problem) => {
-      if (y + settings.lineSpacing > pageHeight) {
-        if (x + columnWidth + columnGap < pageWidth) {
-          x += columnWidth + columnGap;
-          y = 10;
-        } else {
-          doc.addPage();
-          x = 10;
-          y = 10;
-        }
+  let currYLeft = marginTop;
+  let currYRight = marginTop;
+
+  problems.forEach((problem, index) => {
+      if (index % 2 === 0) {
+          // Left column
+          if (currYLeft + lineSpacing > pageHeight) {
+              doc.addPage();
+              currYLeft = marginTop;
+              currYRight = marginTop;
+          }
+          doc.text(problem.text, marginLeft, currYLeft);
+          currYLeft += lineSpacing;
+      } else {
+          // Right column
+          if (currYRight + lineSpacing > pageHeight) {
+              doc.addPage();
+              currYLeft = marginTop;
+              currYRight = marginTop;
+          }
+          doc.text(problem.text, marginLeft + colWidth + marginLeft, currYRight);
+          currYRight += lineSpacing;
       }
-      doc.text(problem.text, x, y);
-      y += settings.lineSpacing;
-    });
+  });
 
-    doc.save('problems.pdf');
-  };
+  doc.save('problems.pdf');
+};
+
 
   useEffect(() => {
     generateProblems();
