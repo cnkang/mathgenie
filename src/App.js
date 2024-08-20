@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'; // Import React and useState
 import { jsPDF } from 'jspdf'; // Import jsPDF library for PDF generation
 import { nanoid } from 'nanoid'; // Import nanoid for unique keys
 import './App.css'; // Import CSS for styling
-import { SpeedInsights } from "@vercel/speed-insights/react"
+import { SpeedInsights } from '@vercel/speed-insights/react'
 /**
  * The main component of the MathGenie application.
  *
