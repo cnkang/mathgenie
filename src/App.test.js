@@ -40,8 +40,10 @@ test('generates problems correctly', () => {
   render(<App />); // Renders the <App /> component
   const generateButton = screen.getByText(/Generate Problems/i); // Finds the generate button by text
   fireEvent.click(generateButton); // Simulates a click on the generate button
-  const listItems = screen.getAllByRole('listitem'); // Finds all list items
-  expect(listItems.length).toBeGreaterThan(0); // Asserts that at least one problem is generated
+
+  // Modify this line to search for divs containing "=" as problems are rendered as divs not listitems
+  const problemDivs = screen.getAllByText(/=/); // Finds all divs containing "=" which indicates a problem
+  expect(problemDivs.length).toBeGreaterThan(0); // Asserts that at least one problem is generated
 });
 
 // Test to check if the "Download PDF" button becomes enabled after problems are generated

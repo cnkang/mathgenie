@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'; // Import React and useState hook
 import { jsPDF } from 'jspdf'; // Import jsPDF library for PDF generation
-import { nanoid } from 'nanoid'; // Import nanoid for unique keys
 import './App.css'; // Import CSS for styling
 import { SpeedInsights } from '@vercel/speed-insights/react';
+
 /**
  * The main component of the MathGenie application.
  *
@@ -129,13 +129,12 @@ function App() {
   const generateProblems = () => {
     const generatedProblems = Array.from({ length: settings.numProblems }, () =>
       generateProblem()
-    ).filter(problem => problem !== '').map(problem => ({ id: nanoid(), text: problem }));
+    ).filter(problem => problem !== '').map((problem, index) => ({ id: index, text: problem }));
     setProblems(generatedProblems);
   };
 
   /**
- * Downloads a PDF file
- * containing the generated problems.
+ * Downloads a PDF file containing the generated problems.
  *
  * This function creates a new instance of the jsPDF library and sets the
  * paper size and font size based on the settings. It then iterates over
@@ -144,48 +143,47 @@ function App() {
  *
  * @return {void} This function does not return anything.
  */
-const downloadPdf = () => {
-  const doc = new jsPDF({
+  const downloadPdf = () => {
+    const doc = new jsPDF({
       format: paperSizeOptions[settings.paperSize],
-  });
+    });
 
-  doc.setFontSize(settings.fontSize);
-  const pageHeight = doc.internal.pageSize.getHeight();
-  const pageWidth = doc.internal.pageSize.getWidth();
+    doc.setFontSize(settings.fontSize);
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const pageWidth = doc.internal.pageSize.getWidth();
 
-  const marginLeft = 10; 
-  const marginTop = 10;
-  const lineSpacing = settings.lineSpacing;
-  const colWidth = (pageWidth - 3 * marginLeft) / 2;
+    const marginLeft = 10;
+    const marginTop = 10;
+    const lineSpacing = settings.lineSpacing;
+    const colWidth = (pageWidth - 3 * marginLeft) / 2;
 
-  let currYLeft = marginTop;
-  let currYRight = marginTop;
+    let currYLeft = marginTop;
+    let currYRight = marginTop;
 
-  problems.forEach((problem, index) => {
+    problems.forEach((problem, index) => {
       if (index % 2 === 0) {
-          // Left column
-          if (currYLeft + lineSpacing > pageHeight) {
-              doc.addPage();
-              currYLeft = marginTop;
-              currYRight = marginTop;
-          }
-          doc.text(problem.text, marginLeft, currYLeft);
-          currYLeft += lineSpacing;
+        // Left column
+        if (currYLeft + lineSpacing > pageHeight) {
+          doc.addPage();
+          currYLeft = marginTop;
+          currYRight = marginTop;
+        }
+        doc.text(problem.text, marginLeft, currYLeft);
+        currYLeft += lineSpacing;
       } else {
-          // Right column
-          if (currYRight + lineSpacing > pageHeight) {
-              doc.addPage();
-              currYLeft = marginTop;
-              currYRight = marginTop;
-          }
-          doc.text(problem.text, marginLeft + colWidth + marginLeft, currYRight);
-          currYRight += lineSpacing;
+        // Right column
+        if (currYRight + lineSpacing > pageHeight) {
+          doc.addPage();
+          currYLeft = marginTop;
+          currYRight = marginTop;
+        }
+        doc.text(problem.text, marginLeft + colWidth + marginLeft, currYRight);
+        currYRight += lineSpacing;
       }
-  });
+    });
 
-  doc.save('problems.pdf');
-};
-
+    doc.save('problems.pdf');
+  };
 
   useEffect(() => {
     generateProblems();
@@ -276,7 +274,7 @@ const downloadPdf = () => {
           <input
             type="number"
             id="numOperandsRangeMax"
-            value=            {settings.numOperandsRange[1]}
+            value={settings.numOperandsRange[1]}
             onChange={(e) => handleChange('numOperandsRange', [settings.numOperandsRange[0], parseInt(e.target.value)])}
             placeholder="Max"
           />
@@ -350,4 +348,3 @@ const downloadPdf = () => {
 }
 
 export default App; // Export the App component for use in other files
-
