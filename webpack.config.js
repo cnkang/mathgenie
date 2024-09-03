@@ -5,7 +5,8 @@ module.exports = {
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js'
+    filename: 'bundle.js',
+    clean: true,
   },
   mode: process.env.NODE_ENV || 'development',
   module: {
@@ -44,6 +45,7 @@ module.exports = {
   devServer: {
     static: './dist',
     historyApiFallback: true,
+    compress: true,
     port: 3000
   }
 };
