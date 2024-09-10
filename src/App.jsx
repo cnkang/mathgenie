@@ -7,15 +7,15 @@ const SpeedInsights = React.lazy(() =>
 
 function App() {
   const [settings, setSettings] = useState({
-    operations: ['+'],
-    numProblems: 10,
-    numRange: [1, 10],
-    resultRange: [0, 100],
+    operations: ['+','-'],
+    numProblems: 20,
+    numRange: [1, 20],
+    resultRange: [0, 20],
     numOperandsRange: [2, 3],
     allowNegative: false,
-    showAnswers: true,
-    fontSize: 12,
-    lineSpacing: 10,
+    showAnswers: false,
+    fontSize: 16,
+    lineSpacing: 12,
     paperSize: 'a4',
   });
   const [problems, setProblems] = useState([]);
