@@ -1,6 +1,8 @@
 #!/bin/sh
-. ~/.nvm/nvm.sh
-nvm use
+export NVM_DIR="$HOME/.nvm"
+. "$NVM_DIR/nvm.sh"
+
+nvm use || exit 1
 
 . "$(dirname "$0")/_/husky.sh"
 
