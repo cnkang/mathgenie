@@ -9,7 +9,7 @@ module.exports = {
           './src/**/*.ts',   // TypeScript files (if using TypeScript)
           './src/**/*.tsx'   // TypeScript JSX files
         ],
-        defaultExtractor: content => content.match(/[\w-/:]+(?<!:)/g) || [], // Regex to extract class names
+        defaultExtractor: content => content.match(/[\w-/:]+/) || [], // Regex to extract class names
       }),
   
       // Autoprefixer to add vendor prefixes for browser compatibility
