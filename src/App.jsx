@@ -1,5 +1,5 @@
-import React, { useState, useEffect, Suspense } from 'react'; // Suspense is needed for dynamic imports
-import './App.css'; // Import CSS for styling
+import React, { useState, useEffect, Suspense } from 'react';
+import './App.css';
 
 const SpeedInsights = React.lazy(() =>
   import('@vercel/speed-insights/react').then((module) => ({ default: module.SpeedInsights }))
@@ -64,11 +64,9 @@ function App() {
     };
 
     const numOperands = random(settings.numOperandsRange[0], settings.numOperandsRange[1]);
-
     if (numOperands < 2) return '';
 
     const MAX_ATTEMPTS = 10000;
-
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
       const operands = Array.from({ length: numOperands }, () =>
         random(settings.numRange[0], settings.numRange[1])
@@ -83,7 +81,6 @@ function App() {
       if (settings.resultRange[0] <= result && result <= settings.resultRange[1]) {
         if (settings.allowNegative || result >= 0) {
           let problem = operands[0].toString();
-
           operationSymbols.forEach((operator, index) => {
             problem += ` ${operator} ${operands[index + 1]}`;
           });
@@ -131,14 +128,14 @@ function App() {
             currYRight = marginTop;
           }
           doc.text(problem.text, marginLeft, currYLeft);
-          currYLeft          += lineSpacing;
+          currYLeft += lineSpacing;
         } else {
           if (currYRight + lineSpacing > pageHeight) {
             doc.addPage();
             currYLeft = marginTop;
             currYRight = marginTop;
           }
-          doc.text(problem.text, marginLeft + colWidth + marginLeft, currYRight);
+          doc.text(problem.text, marginLeft + colWidth + marginLeft           , currYRight);
           currYRight += lineSpacing;
         }
       });
@@ -163,7 +160,7 @@ function App() {
       <h1>MathGenie</h1>
       <div className="container">
         <div>
-          <label htmlFor="operations">Operations</label>
+          <label htmlFor="operations">Operations:</label>
           <select
             id="operations"
             multiple
@@ -183,6 +180,64 @@ function App() {
         </div>
 
         <div>
+          <label htmlFor="numProblems">Number of Problems:</label>
+          <input
+            type="number"
+            id="numProblems"
+            value={settings.numProblems}
+            onChange={(e) => handleChange('numProblems', parseInt(e.target.value, 10))}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="numRange">Number Range:</label>
+          <input
+            type="number"
+            id="numRangeFrom"
+            value={settings.numRange[0]}
+            onChange={(e) => handleChange('numRange', [parseInt(e.target.value, 10), settings.numRange[1]])}
+          />
+          <input
+            type="number"
+            id="numRangeTo"
+            value={settings.numRange[1]}
+            onChange={(e) => handleChange('numRange', [settings.numRange[0], parseInt(e.target.value, 10)])}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="resultRange">Result Range:</label>
+          <input
+            type="number"
+            id="resultRangeFrom"
+            value={settings.resultRange[0]}
+            onChange={(e) => handleChange('resultRange', [parseInt(e.target.value, 10), settings.resultRange[1]])}
+          />
+          <input
+            type="number"
+            id="resultRangeTo"
+            value={settings.resultRange[1]}
+            onChange={(e) => handleChange('resultRange', [settings.resultRange[0], parseInt(e.target.value, 10)])}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="numOperandsRange">Number of Operands Range:</label>
+          <input
+            type="number"
+            id="numOperandsRangeFrom"
+            value={settings.numOperandsRange[0]}
+            onChange={(e) => handleChange('numOperandsRange', [parseInt(e.target.value, 10), settings.numOperandsRange[1]])}
+          />
+          <input
+            type="number"
+            id="numOperandsRangeTo"
+            value={settings.numOperandsRange[1]}
+            onChange={(e) => handleChange('numOperandsRange', [settings.numOperandsRange[0], parseInt(e.target.value, 10)])}
+          />
+        </div>
+
+        <div>
           <label htmlFor="allowNegative">Allow Negative Results:</label>
           <input
             type="checkbox"
@@ -192,21 +247,68 @@ function App() {
           />
         </div>
 
-        <button onClick={generateProblems}>Generate Problems</button>{' '}
-        <button onClick={downloadPdf}>Download PDF</button>
-
-        <div className="problems">
-          {problems.map((problem) => (
-            <div key={problem.id}>{problem.text}</div>
-          ))}
+        <div>
+          <label htmlFor="showAnswers">Show Answers:</label>
+          <input
+            type="checkbox"
+            id="showAnswers"
+            checked={settings.showAnswers}
+            onChange={(e) => handleChange('showAnswers', e.target.checked)}
+          />
         </div>
-      </div>
-      <Suspense fallback={<div>Loading insights...</div>}>
-        <SpeedInsights />
-      </Suspense>
-    </div>
-  );
-}
 
-export default App;
+        <div>
+          <label htmlFor="fontSize">Font Size:</label>
+          <input
+            type="number"
+            id="fontSize"
+            value={settings.fontSize}
+            onChange={(e) => handleChange('fontSize', parseInt(e.target.value, 10))}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="lineSpacing">Line Spacing:</label>
+          <input
+            type="number"
+            id="lineSpacing"
+            value={settings.lineSpacing}
+            onChange={(e) => handleChange('lineSpacing', parseInt(e.target.value, 10))}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="paperSize">Paper Size:</label>
+          <select
+            id="paperSize"
+            value={settings.paperSize}
+            onChange={(e)            => handleChange('paperSize', e.target.value)}
+            >
+              {Object.keys(paperSizeOptions).map((size) => (
+                <option key={size} value={size}>
+                  {size.toUpperCase()}
+                </option>
+              ))}
+            </select>
+          </div>
+  
+          <button onClick={generateProblems}>Generate Problems</button>{' '}
+          <button onClick={downloadPdf}>Download PDF</button>
+  
+          <div className="problems">
+            {problems.map((problem) => (
+              <div key={problem.id}>{problem.text}</div>
+            ))}
+          </div>
+        </div>
+  
+        <Suspense fallback={<div>Loading insights...</div>}>
+          <SpeedInsights />
+        </Suspense>
+      </div>
+    );
+  }
+  
+  export default App;
+  
 
