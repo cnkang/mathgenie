@@ -4,6 +4,4 @@ export NVM_DIR="$HOME/.nvm"
 
 nvm use || exit 1
 
-. "$(dirname "$0")/_/husky.sh"
-
 npm test
