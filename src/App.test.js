@@ -1,18 +1,26 @@
 import React from 'react';
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render, fireEvent, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { act } from 'react'; // Import act to handle async operations
 import App from './App';
 
 // Test to check if the MathGenie header is rendered
-test('renders MathGenie header', () => {
-  render(<App />); // Renders the <App /> component
+test('renders MathGenie header', async () => {
+  await act(async () => {
+    render(<App />); // Renders the <App /> component
+  });
+
   const headerElement = screen.getByText(/MathGenie/i); // Finds the header element by text
   expect(headerElement).toBeInTheDocument(); // Asserts that the header element is in the document
 });
 
 // Test to check if the user can select operations from a dropdown
-test('allows user to select operations', () => {
-  render(<App />); // Renders the <App /> component
+test('allows user to select operations', async () => {
+  await act(async () => {
+    render(<App />); // Renders the <App /> component
+  });
+
+  await waitFor(() => screen.getByLabelText(/Operations/i)); // Wait for Suspense to finish
 
   const operationsSelect = screen.getByLabelText(/Operations/i); // Finds the operations dropdown by label text
 
@@ -36,28 +44,38 @@ test('allows user to select operations', () => {
 });
 
 // Test to check if problems are generated correctly
-test('generates problems correctly', () => {
-  render(<App />); // Renders the <App /> component
+test('generates problems correctly', async () => {
+  await act(async () => {
+    render(<App />); // Renders the <App /> component
+  });
+
   const generateButton = screen.getByText(/Generate Problems/i); // Finds the generate button by text
   fireEvent.click(generateButton); // Simulates a click on the generate button
 
   // Modify this line to search for divs containing "=" as problems are rendered as divs not listitems
-  const problemDivs = screen.getAllByText(/=/); // Finds all divs containing "=" which indicates a problem
+  const problemDivs = await screen.findAllByText(/=/); // Wait for problems to be generated
   expect(problemDivs.length).toBeGreaterThan(0); // Asserts that at least one problem is generated
 });
 
 // Test to check if the "Download PDF" button becomes enabled after problems are generated
-test('enables download PDF button after problems are generated', () => {
-  render(<App />); // Renders the <App /> component
+test('enables download PDF button after problems are generated', async () => {
+  await act(async () => {
+    render(<App />); // Renders the <App /> component
+  });
+
   const generateButton = screen.getByText(/Generate Problems/i); // Finds the generate button by text
   fireEvent.click(generateButton); // Simulates a click on the generate button
-  const downloadButton = screen.getByText(/Download PDF/i, { selector: 'button' }); // Finds the download button by text
+
+  const downloadButton = await screen.findByText(/Download PDF/i, { selector: 'button' }); // Wait for the download button to be enabled
   expect(downloadButton).not.toBeDisabled(); // Asserts that the download button is enabled
 });
 
 // Test to check if the "Allow Negative Results" checkbox can be toggled
-test('checks allow negative results checkbox', () => {
-  render(<App />); // Renders the <App /> component
+test('checks allow negative results checkbox', async () => {
+  await act(async () => {
+    render(<App />); // Renders the <App /> component
+  });
+
   const allowNegativeCheckbox = screen.getByLabelText(/Allow Negative Results:/i); // Finds the checkbox by label text
   fireEvent.click(allowNegativeCheckbox); // Simulates a click on the checkbox
   expect(allowNegativeCheckbox).toBeChecked(); // Asserts that the checkbox is checked
