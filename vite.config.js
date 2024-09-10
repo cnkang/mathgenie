@@ -4,19 +4,19 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   build: {
-    outDir: 'dist', // 输出目录
+    outDir: 'dist',
     rollupOptions: {
       output: {
-        assetFileNames: '[name].[hash].[ext]', // 资源文件命名
+        assetFileNames: '[name].[hash].[ext]',
       },
     },
   },
   server: {
     port: 3000,
     open: true,
-    historyApiFallback: true, // HTML5 History API 支持
+    historyApiFallback: true,
   },
   resolve: {
-    extensions: ['.js', '.jsx'], // 解析的文件扩展名
+    extensions: ['.js', '.jsx'],
   },
 });
