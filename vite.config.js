@@ -8,6 +8,17 @@ export default defineConfig({
     rollupOptions: {
       output: {
         assetFileNames: '[name].[hash].[ext]',
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
+          if (id.includes('jspdf')) {
+            return 'jspdf';
+          }
+          if (id.includes('speed-insights')) {
+            return 'speed-insights';
+          }
+        },
       },
     },
   },
