@@ -54,8 +54,8 @@ export default defineConfig({
     extensions: ['.js', '.jsx'],
   },
   test: {
+    environment: 'happy-dom',
     globals: true,
-    environment: 'jsdom',  // to support DOM-related tests
     setupFiles: './src/setupTests.js',  // load setupTests.js
     css: true,  // enable CSS imports during testing
   },  
