@@ -53,4 +53,10 @@ export default defineConfig({
   resolve: {
     extensions: ['.js', '.jsx'],
   },
+  test: {
+    globals: true,
+    environment: 'jsdom',  // to support DOM-related tests
+    setupFiles: './src/setupTests.js',  // load setupTests.js
+    css: true,  // enable CSS imports during testing
+  },  
 });
