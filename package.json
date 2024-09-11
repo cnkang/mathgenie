@@ -15,14 +15,13 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest --run  --environment jsdom",
+    "test": "vitest --run",
     "prepare": "husky",
     "coverage": "vitest --coverage"
   },
   "eslintConfig": {
     "extends": [
-      "react-app",
-      "react-app/jest"
+      "react-app"
     ]
   },
   "browserslist": {
@@ -47,7 +46,6 @@
     "@eslint/js": "^9.10.0",
     "@fullhuman/postcss-purgecss": "^6.0.0",
     "@testing-library/dom": "^10.4.0",
-    "@testing-library/jest-dom": "^6.5.0",
     "@testing-library/react": "^16.0.1",
     "@vitejs/plugin-react": "^4.3.1",
     "@vitest/coverage-v8": "^2.0.5",
@@ -58,9 +56,9 @@
     "eslint": "^9.10.0",
     "eslint-plugin-react": "^7.35.2",
     "globals": "^15.9.0",
+    "happy-dom": "^15.7.3",
     "husky": "^9.1.5",
     "identity-obj-proxy": "^3.0.0",
-    "jest-environment-jsdom": "^29.7.0",
     "lint-staged": "^15.2.10",
     "npm-force-resolutions": "^0.0.10",
     "postcss": "^8.4.45",
@@ -75,9 +73,9 @@
     ]
   },
   "resolutions": {
-      "rimraf": "^6.0.0",
-      "glob": "^11.0.0",
-      "npmlog": "^7.0.0"
-    },
+    "rimraf": "^6.0.0",
+    "glob": "^11.0.0",
+    "npmlog": "^7.0.0"
+  },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
