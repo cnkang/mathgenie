@@ -1,4 +1,6 @@
 # MathGenie
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fcnkang%2Fmathgenie.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fcnkang%2Fmathgenie?ref=badge_shield)
+
 
 MathGenie is a small web application built using React, designed to help tutors generate math problems focusing on basic arithmetic operations. With this application, you can customize the range of numbers, the allowed operations, the number of problems, and more, then generate a PDF file with the problems to share with students.
 
@@ -77,6 +79,9 @@ We welcome contributions! Please fork the repository and submit a pull request f
 
 This project is open-source and available under the [MIT License](LICENSE).
 
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fcnkang%2Fmathgenie.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fcnkang%2Fmathgenie?ref=badge_large)
+
 ## Dependencies
 
 - `react`: JavaScript library for building user interfaces.
@@ -86,4 +91,3 @@ This project is open-source and available under the [MIT License](LICENSE).
 ## Acknowledgements
 
 Thank you for using MathGenie! This application is designed to make math practice more accessible and efficient for both educators and students.
-
