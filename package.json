@@ -54,6 +54,7 @@
     "autoprefixer": "^10.4.20",
     "c8": "^10.1.2",
     "cssnano": "^7.0.6",
+    "cssnano-preset-advanced": "^7.0.6",
     "eslint": "^9.10.0",
     "eslint-plugin-react": "^7.35.2",
     "globals": "^15.9.0",
