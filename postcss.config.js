@@ -11,7 +11,9 @@ module.exports = {
           './src/**/*.ts',
           './src/**/*.tsx',
         ],
-        defaultExtractor: content => content.match(/[\w-/:]+(?<!:)/g) || [],
+        defaultExtractor: content => {
+          return (content.match(/[\w-/:]+/g) || []).filter(token => !token.endsWith(':'));
+        },
       }),
     require('autoprefixer'),
     require('cssnano')({
