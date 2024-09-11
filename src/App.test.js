@@ -1,7 +1,6 @@
 import React from 'react';
-import { render, fireEvent, screen, waitFor } from '@testing-library/react';
+import { act, render, fireEvent, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { act } from 'react'; // Import act to handle async operations
 import App from './App';
 
 // Test to check if the MathGenie header is rendered
