@@ -3404,11 +3404,6 @@ json-buffer@3.0.1:
   resolved "https://registry.yarnpkg.com/json-buffer/-/json-buffer-3.0.1.tgz#9338802a30d3b6605fbe0613e094008ca8c05a13"
   integrity sha512-4bV5BfR2mqfQTJm+V5tPPdf+ZpuhiIvTuAB5g8kcrXOZpTT/QwwVRWBywX1ozr6lEuPdbHxwaJlm9G6mI2sfSQ==
 
-json-format@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/json-format/-/json-format-1.0.1.tgz#143f67e62af129d6bffed288a46265ea23d0df0c"
-  integrity sha512-MoKIg/lBeQALqjYnqEanikfo3zBKRwclpXJexdF0FUniYAAN2ypEIXBEtpQb+9BkLFtDK1fyTLAsnGlyGfLGxw==
-
 json-schema-traverse@^0.4.1:
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/json-schema-traverse/-/json-schema-traverse-0.4.1.tgz#69f6a87d9513ab8bb8fe63bdb0979c448e684660"
@@ -3763,15 +3758,6 @@ normalize-range@^0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/normalize-range/-/normalize-range-0.1.2.tgz#2d10c06bdfd312ea9777695a4d28439456b75942"
   integrity sha512-bdok/XvKII3nUpklnV6P2hxtMNrCboOjAcyBuQnWEhO665FwrSNRxU+AqpsyvO6LgGYPspN+lu5CLtw4jPRKNA==
-
-npm-force-resolutions@^0.0.10:
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/npm-force-resolutions/-/npm-force-resolutions-0.0.10.tgz#e02c28f5d24fbf32f4c3d9a87faf375849e715ef"
-  integrity sha512-Jscex+xIU6tw3VsyrwxM1TeT+dd9Fd3UOMAjy6J1TMpuYeEqg4LQZnATQO5vjPrsARm3und6zc6Dii/GUyRE5A==
-  dependencies:
-    json-format "^1.0.1"
-    source-map-support "^0.5.5"
-    xmlhttprequest "^1.8.0"
 
 npm-run-path@^5.1.0:
   version "5.3.0"
@@ -4657,7 +4643,7 @@ source-map-js@^1.0.1, source-map-js@^1.2.0:
   resolved "https://registry.yarnpkg.com/source-map-js/-/source-map-js-1.2.1.tgz#1ce5650fddd87abc099eda37dcff024c2667ae46"
   integrity sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==
 
-source-map-support@^0.5.16, source-map-support@^0.5.5:
+source-map-support@^0.5.16:
   version "0.5.21"
   resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.5.21.tgz#04fe7c7f9e1ed2d662233c28cb2b35b9f63f6e4f"
   integrity sha512-uBHU3L3czsIyYXKX88fdrGovxdSCoTGDRZ6SYXtSRxLZUzHg5P/66Ht6uoUlHu9EZod+inXhKo3qQgwXUT/y1w==
@@ -5252,11 +5238,6 @@ wrappy@1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/wrappy/-/wrappy-1.0.2.tgz#b5243d8f3ec1aa35f1364605bc0d1036e30ab69f"
   integrity sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==
-
-xmlhttprequest@^1.8.0:
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/xmlhttprequest/-/xmlhttprequest-1.8.0.tgz#67fe075c5c24fef39f9d65f5f7b7fe75171968fc"
-  integrity sha512-58Im/U0mlVBLM38NdZjHyhuMtCqa61469k2YP/AaPbvCoV9aQGUpbJBj1QRm2ytRiVQBD/fsw7L2bJGDVQswBA==
 
 y18n@^5.0.5:
   version "5.0.8"
