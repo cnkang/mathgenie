@@ -7,6 +7,7 @@
     "@vercel/speed-insights": "^1.0.12",
     "canvas": "^2.11.2",
     "jspdf": "^2.5.1",
+    "make-dir": "^5.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "web-vitals": "^4.2.3"
@@ -48,22 +49,22 @@
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.0.1",
     "@vitejs/plugin-react": "^4.3.1",
-    "@vitest/coverage-v8": "^2.0.5",
+    "@vitest/coverage-v8": "^2.1.1",
     "autoprefixer": "^10.4.20",
     "c8": "^10.1.2",
     "cssnano": "^7.0.6",
     "cssnano-preset-advanced": "^7.0.6",
     "eslint": "^9.10.0",
-    "eslint-plugin-react": "^7.35.2",
+    "eslint-plugin-react": "^7.36.1",
     "globals": "^15.9.0",
-    "happy-dom": "^15.7.3",
-    "husky": "^9.1.5",
+    "happy-dom": "^15.7.4",
+    "husky": "^9.1.6",
     "identity-obj-proxy": "^3.0.0",
     "lint-staged": "^15.2.10",
-    "postcss": "^8.4.45",
-    "vite": "^5.4.3",
+    "postcss": "^8.4.47",
+    "vite": "^5.4.5",
     "vite-plugin-compression": "^0.5.1",
-    "vitest": "^2.0.5"
+    "vitest": "^2.1.1"
   },
   "lint-staged": {
     "*.{js,jsx}": [
