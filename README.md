@@ -28,13 +28,13 @@ MathGenie is a small web application built using React, designed to help tutors 
 3. Install the necessary dependencies.
 
     ```bash
-    npm install
+    yarn install
     ```
 
 4. Start the development server.
 
     ```bash
-    npm start
+    yarn start
     ```
 
 5. Open your web browser and go to `http://localhost:3000`.
