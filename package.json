@@ -5,7 +5,9 @@
   "type": "module",
   "dependencies": {
     "@vercel/speed-insights": "^1.0.12",
+    "brace-expansion": "^4.0.0",
     "canvas": "^2.11.2",
+    "glob": "^11.0.0",
     "jspdf": "^2.5.1",
     "make-dir": "^5.0.0",
     "react": "^18.3.1",
@@ -75,9 +77,9 @@
   "resolutions": {
     "rimraf": "^6.0.0",
     "glob": "^11.0.0",
-    "npmlog": "^7.0.0",
+    "npmlog": "^7.0.1",
     "make-dir": "^4.0.0",
-    "brace-expansion": "^4.0.0",
+    "brace-expansion": "^2.0.1",
     "chalk": "^5.3.0",
     "commander": "^12.1.0",
     "lru-cache": "^11.0.1"
