@@ -10,6 +10,7 @@
     "glob": "^11.0.0",
     "jspdf": "^2.5.1",
     "make-dir": "^5.0.0",
+    "minimatch": "^10.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "web-vitals": "^4.2.3"
@@ -96,6 +97,8 @@
     "webidl-conversions": "^7.0.0",
     "whatwg-url": "^12.0.0",
     "@mapbox/node-pre-gyp": "^1.0.11",
+    "minimatch": "^10.0.1",
+    "string-width": "^4.2.3",
     "tar": "^7.4.3"
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
