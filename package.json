@@ -61,7 +61,7 @@
     "cssnano-preset-advanced": "^7.0.6",
     "eslint": "^9.11.1",
     "eslint-plugin-react": "^7.37.0",
-    "globals": "^15.9.0",
+    "globals": "^15.11.0",
     "happy-dom": "^15.7.4",
     "husky": "^9.1.6",
     "identity-obj-proxy": "^3.0.0",
