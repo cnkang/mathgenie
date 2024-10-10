@@ -43,8 +43,8 @@
     ]
   },
   "devDependencies": {
-    "@babel/cli": "^7.25.6",
-    "@babel/core": "^7.25.2",
+    "@babel/cli": "^7.25.7",
+    "@babel/core": "^7.25.7",
     "@babel/plugin-transform-runtime": "^7.25.4",
     "@babel/preset-env": "^7.25.4",
     "@babel/preset-react": "^7.24.7",
@@ -53,7 +53,7 @@
     "@fullhuman/postcss-purgecss": "^6.0.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.0.1",
-    "@vitejs/plugin-react": "^4.3.1",
+    "@vitejs/plugin-react": "^4.3.2",
     "@vitest/coverage-v8": "^2.1.1",
     "autoprefixer": "^10.4.20",
     "c8": "^10.1.2",
@@ -61,7 +61,7 @@
     "cssnano-preset-advanced": "^7.0.6",
     "eslint": "^9.11.1",
     "eslint-plugin-react": "^7.37.1",
-    "globals": "^15.9.0",
+    "globals": "^15.11.0",
     "happy-dom": "^15.7.4",
     "husky": "^9.1.6",
     "identity-obj-proxy": "^3.0.0",
