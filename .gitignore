@@ -24,3 +24,5 @@ yarn-error.log*
 
 /dist
 .vscode/find-unused-exports.json
+
+.yarn
