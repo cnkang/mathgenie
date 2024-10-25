@@ -4,4 +4,4 @@ export NVM_DIR="$HOME/.nvm"
 
 nvm use || exit 1
 
-npm test
+yarn test
