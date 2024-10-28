@@ -30,8 +30,13 @@ jobs:
           check-latest: true
           cache: yarn
 
+      - name: Enable Corepack and install Yarn
+        run: |
+          corepack enable
+          corepack prepare yarn@4.5.1 --activate
+
       - name: Install dependencies
-        run: corepack enable && yarn set version berry && yarn install
+        run: yarn install
 
       - name: Run yarn upgrade-interactive
         run: yarn up --latest
