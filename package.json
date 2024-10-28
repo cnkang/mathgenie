@@ -108,6 +108,5 @@
     "which": "^5.0.0",
     "p-map": "^7.0.2",
     "nopt": "^8.0.0"
-  },
-  "packageManager": "yarn@4.5.1"
+  }
 }
