@@ -27,26 +27,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: Install NVM
-        run: |
-          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
-          export NVM_DIR="$HOME/.nvm"
-          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-
-      - name: Use Node.js version 20 via NVM
-        run: |
-          export NVM_DIR="$HOME/.nvm"
-          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-          nvm install --lts
-          nvm use --lts
-          node -v
+          check-latest: true
+          cache: yarn
 
       - name: Install dependencies
-        run: yarn install
+        run: corepack enable && yarn set version berry && yarn install
 
       - name: Run yarn upgrade-interactive
-        run: yarn upgrade --latest
+        run: yarn up --latest
 
       - name: Install updated dependencies
         run: yarn install
