@@ -70,8 +70,14 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/compat-data@npm:^7.26.0":
+  version: 7.26.0
+  resolution: "@babel/compat-data@npm:7.26.0"
+  checksum: 10c0/6325c9151a3c9b0a3a807e854a26255ef66d989bff331475a935af9bb18f160e0fffe6aed550e4e96b63f91efcd874bfbaab2a1f4a2f8d25645d712a0de590fb
+  languageName: node
+  linkType: hard
 
-"@babel/core@npm:^7.25.2, @babel/core@npm:^7.25.9":
+"@babel/core@npm:^7.25.2":
   version: 7.25.9
   resolution: "@babel/core@npm:7.25.9"
   dependencies:
