@@ -39,7 +39,7 @@ jobs:
         run: yarn install
 
       - name: Run yarn upgrade-interactive
-        run: yarn up --latest
+        run: yarn up
 
       - name: Install updated dependencies
         run: yarn install
