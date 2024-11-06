@@ -62,7 +62,7 @@
     "eslint": "^9.14.0",
     "eslint-plugin-react": "^7.37.2",
     "globals": "^15.12.0",
-    "happy-dom": "^15.9.0",
+    "happy-dom": "^15.10.3",
     "husky": "^9.1.6",
     "identity-obj-proxy": "^3.0.0",
     "lint-staged": "^15.2.10",
