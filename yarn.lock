@@ -2726,7 +2726,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"canvas@npm:^3.0.0":
+"canvas@npm:^3.0.1":
   version: 3.0.1
   resolution: "canvas@npm:3.0.1"
   dependencies:
@@ -5073,7 +5073,7 @@ __metadata:
     autoprefixer: "npm:^10.4.20"
     brace-expansion: "npm:^4.0.0"
     c8: "npm:^10.1.2"
-    canvas: "npm:^3.0.0"
+    canvas: "npm:^3.0.1"
     cssnano: "npm:^7.0.6"
     cssnano-preset-advanced: "npm:^7.0.6"
     eslint: "npm:^9.15.0"
