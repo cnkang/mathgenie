@@ -1,9 +1,11 @@
 const isProduction = process.env.NODE_ENV === 'production';
 
+const { purgeCSSPlugin } = require('@fullhuman/postcss-purgecss');
+
 module.exports = {
   plugins: [
     isProduction &&
-      require('@fullhuman/postcss-purgecss')({
+      purgeCSSPlugin({
         content: [
           './src/**/*.html',
           './src/**/*.js',
