@@ -1806,14 +1806,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fullhuman/postcss-purgecss@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "@fullhuman/postcss-purgecss@npm:6.0.0"
+"@fullhuman/postcss-purgecss@npm:^7.0.2":
+  version: 7.0.2
+  resolution: "@fullhuman/postcss-purgecss@npm:7.0.2"
   dependencies:
-    purgecss: "npm:^6.0.0"
+    purgecss: "npm:^7.0.2"
   peerDependencies:
     postcss: ^8.0.0
-  checksum: 10c0/817c1103c400249841cc86257fbdb1da90c75dc412ff3b63b156f72055fe43347281749432f680f7e13673473a7daebf496bd1d2f7b17370f6dafb011cbf83f7
+  checksum: 10c0/4b31c89f2c873b260f12efe92ee1b40634919f3a81f18461d8ec3499aa36e91e61f9b3d6f401bd7e67af942456b9b7f456d6307e7114321ea84e3e63bf90e12c
   languageName: node
   linkType: hard
 
@@ -5188,7 +5188,7 @@ __metadata:
     "@babel/preset-react": "npm:^7.25.9"
     "@babel/register": "npm:^7.25.9"
     "@eslint/js": "npm:^9.15.0"
-    "@fullhuman/postcss-purgecss": "npm:^6.0.0"
+    "@fullhuman/postcss-purgecss": "npm:^7.0.2"
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:^16.1.0"
     "@vercel/speed-insights": "npm:^1.1.0"
@@ -6087,7 +6087,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-selector-parser@npm:^6.0.7, postcss-selector-parser@npm:^6.1.2":
+"postcss-selector-parser@npm:^6.1.2":
   version: 6.1.2
   resolution: "postcss-selector-parser@npm:6.1.2"
   dependencies:
@@ -6136,7 +6136,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:^8.4.4, postcss@npm:^8.4.43":
+"postcss@npm:^8.4.43":
   version: 8.4.47
   resolution: "postcss@npm:8.4.47"
   dependencies:
@@ -6147,7 +6147,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:^8.4.49":
+"postcss@npm:^8.4.47, postcss@npm:^8.4.49":
   version: 8.4.49
   resolution: "postcss@npm:8.4.49"
   dependencies:
@@ -6211,17 +6211,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"purgecss@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "purgecss@npm:6.0.0"
+"purgecss@npm:^7.0.2":
+  version: 7.0.2
+  resolution: "purgecss@npm:7.0.2"
   dependencies:
-    commander: "npm:^12.0.0"
-    glob: "npm:^10.3.10"
-    postcss: "npm:^8.4.4"
-    postcss-selector-parser: "npm:^6.0.7"
+    commander: "npm:^12.1.0"
+    glob: "npm:^11.0.0"
+    postcss: "npm:^8.4.47"
+    postcss-selector-parser: "npm:^6.1.2"
   bin:
     purgecss: bin/purgecss.js
-  checksum: 10c0/24f01c1f46e7908964e0d99d48b3ed701d0b878abe111e8706ba26206bcd3747d7ae8c9c01173e5e79ae2d565c6bfc06dc683bfb999f2d00f204243edf603281
+  checksum: 10c0/d6e1df75bc98a14180db67e1de9fa61637680d75e06e8ec5ac492c07e6208f85add16da904d9f9d0e94d17fe052d5f4c152e3874c9c955baa7775782ac31ee38
   languageName: node
   linkType: hard
 
