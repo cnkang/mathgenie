@@ -87,6 +87,7 @@
     "commander": "^12.1.0",
     "lru-cache": "^11.0.1",
     "decompress-response": "^9.0.0",
+    "simple-get": "^4.0.1",
     "escape-string-regexp": "^5.0.0",
     "find-cache-dir": "^5.0.0",
     "find-up": "^7.0.0",
@@ -108,5 +109,6 @@
     "which": "^5.0.0",
     "p-map": "^7.0.2",
     "nopt": "^8.0.0"
-  }
+  },
+  "packageManager": "yarn@4.6.0"
 }
