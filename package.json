@@ -82,6 +82,7 @@
     "glob": "^11.0.0",
     "npmlog": "^7.0.1",
     "make-dir": "^4.0.0",
+    "esbuild": "^0.25.0",
     "brace-expansion": "^2.0.1",
     "chalk": "^5.3.0",
     "commander": "^12.1.0",
