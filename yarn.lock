@@ -4866,7 +4866,7 @@ __metadata:
     eslint: "npm:^9.15.0"
     eslint-plugin-react: "npm:^7.37.2"
     glob: "npm:^11.0.0"
-    globals: "npm:^15.14.0"
+    globals: "npm:^16.0.0"
     happy-dom: "npm:^15.11.7"
     husky: "npm:^9.1.7"
     identity-obj-proxy: "npm:^3.0.0"
