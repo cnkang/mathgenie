@@ -3365,7 +3365,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"entities@npm:^4.2.0, entities@npm:^4.5.0":
+"entities@npm:^4.2.0":
   version: 4.5.0
   resolution: "entities@npm:4.5.0"
   checksum: 10c0/5b039739f7621f5d1ad996715e53d964035f75ad3b9a4d38c6b3804bb226e282ffeae2443624d8fdd9c47d8e926ae9ac009c54671243f0c3294c26af7cc85250
@@ -4166,14 +4166,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"happy-dom@npm:^15.11.7":
-  version: 15.11.7
-  resolution: "happy-dom@npm:15.11.7"
+"happy-dom@npm:^17.1.9":
+  version: 17.1.9
+  resolution: "happy-dom@npm:17.1.9"
   dependencies:
-    entities: "npm:^4.5.0"
     webidl-conversions: "npm:^7.0.0"
     whatwg-mimetype: "npm:^3.0.0"
-  checksum: 10c0/22b08cac20192b08edf2e9c857ceeda8333a3301c4b5965a9550787b00db60d6d107c726390bd45a35305cd12ab086abd656bf957a408be0fcdc9fcd389f1973
+  checksum: 10c0/12d94c5949179186100288dccfb0ab58c8bc4d01c61b50d92048d89458f941349ee3db9a53dd58ee688f63aa5ff3996be0ccfb6c3568e9c07ecfad47e7ccfb62
   languageName: node
   linkType: hard
 
@@ -5081,7 +5080,7 @@ __metadata:
     eslint-plugin-react: "npm:^7.37.2"
     glob: "npm:^11.0.0"
     globals: "npm:^16.0.0"
-    happy-dom: "npm:^15.11.7"
+    happy-dom: "npm:^17.1.9"
     husky: "npm:^9.1.7"
     identity-obj-proxy: "npm:^3.0.0"
     jspdf: "npm:^3.0.0"
