@@ -5036,7 +5036,7 @@ __metadata:
     vite-plugin-compression: "npm:^0.5.1"
     vitest: "npm:^3.0.8"
     web-vitals: "npm:^4.2.4"
-    whatwg-url: "npm:^14.1.1"
+    whatwg-url: "npm:^14.2.0"
   languageName: unknown
   linkType: soft
 
