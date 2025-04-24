@@ -14,7 +14,7 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "string-width": "^7.2.0",
-    "web-vitals": "^5.0.0-rc.1",
+    "web-vitals": "^5.0.0-rc.2",
     "whatwg-url": "^14.2.0"
   },
   "scripts": {

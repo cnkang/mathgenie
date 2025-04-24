@@ -5062,7 +5062,7 @@ __metadata:
     vite: "npm:^6.3.3"
     vite-plugin-compression: "npm:^0.5.1"
     vitest: "npm:^3.1.2"
-    web-vitals: "npm:^5.0.0-rc.1"
+    web-vitals: "npm:^5.0.0-rc.2"
     whatwg-url: "npm:^14.2.0"
   languageName: unknown
   linkType: soft
@@ -7429,10 +7429,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"web-vitals@npm:^5.0.0-rc.1":
-  version: 5.0.0-rc.1
-  resolution: "web-vitals@npm:5.0.0-rc.1"
-  checksum: 10c0/f63bdb3e2501bd7df2dc4a4705e02f6bee8f698ad0a047136534aaca31cf74b63ee53b841fca80e5b4d8f36e3ee6389278102e6058bd1165c59df5762aca442f
+"web-vitals@npm:^5.0.0-rc.2":
+  version: 5.0.0-rc.2
+  resolution: "web-vitals@npm:5.0.0-rc.2"
+  checksum: 10c0/df26ae0d0ac8d224c23dde1e1cd36de21216a5394a08b067f792e25113d87b4eb0cef338eb9df13524ceb81a0ac21291f8e35b6f919942261551b0fc9dd05cb3
   languageName: node
   linkType: hard
 
