@@ -4170,13 +4170,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"happy-dom@npm:^17.4.7":
-  version: 17.4.7
-  resolution: "happy-dom@npm:17.4.7"
+"happy-dom@npm:^17.4.8":
+  version: 17.4.8
+  resolution: "happy-dom@npm:17.4.8"
   dependencies:
     webidl-conversions: "npm:^7.0.0"
     whatwg-mimetype: "npm:^3.0.0"
-  checksum: 10c0/7fd4577a6902939e6d3459cb1b6217ba35dc293942f8e8ec55c872d1a50e961a431773531e7c4b045d07b62145ec04ab965bc646f5dce2788ca604fe978636a0
+  checksum: 10c0/c3298c48aa943355da9d605c61d7664daa0f0310a72e4b6f8bf45ed5d4dba7605fd577c8ba3ccc3d0eb8b25558dea28fd3bee9a707161a240c643f4dfa9a0c8b
   languageName: node
   linkType: hard
 
@@ -5080,7 +5080,7 @@ __metadata:
     eslint-plugin-react: "npm:^7.37.5"
     glob: "npm:^11.0.2"
     globals: "npm:^16.2.0"
-    happy-dom: "npm:^17.4.7"
+    happy-dom: "npm:^17.4.8"
     husky: "npm:^9.1.7"
     identity-obj-proxy: "npm:^3.0.0"
     jspdf: "npm:^3.0.1"
