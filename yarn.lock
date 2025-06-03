@@ -2285,9 +2285,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitejs/plugin-react@npm:^4.5.0":
-  version: 4.5.0
-  resolution: "@vitejs/plugin-react@npm:4.5.0"
+"@vitejs/plugin-react@npm:^4.5.1":
+  version: 4.5.1
+  resolution: "@vitejs/plugin-react@npm:4.5.1"
   dependencies:
     "@babel/core": "npm:^7.26.10"
     "@babel/plugin-transform-react-jsx-self": "npm:^7.25.9"
@@ -2297,7 +2297,7 @@ __metadata:
     react-refresh: "npm:^0.17.0"
   peerDependencies:
     vite: ^4.2.0 || ^5.0.0 || ^6.0.0
-  checksum: 10c0/c9f75cde098b9aac62cb512103d7f898a0a173cb78dc9fcf79ca4b3f21a1458cd1955a4383c8c9e3841ce23c5e7f02ed1455e445c9574879b143d40734121fd8
+  checksum: 10c0/51b28c02905228cc5b1dd16f5d008cf08175e47d22ff37b0959a9ee20a46a5215698b20405f39e6b73ae2a63c2a005d74c94b3456083ad038b59932d682b9165
   languageName: node
   linkType: hard
 
@@ -3314,7 +3314,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debug@npm:4, debug@npm:^4.1.0, debug@npm:^4.1.1, debug@npm:^4.3.1, debug@npm:^4.3.2, debug@npm:^4.3.3, debug@npm:^4.3.4, debug@npm:^4.4.0":
+"debug@npm:4, debug@npm:^4.1.0, debug@npm:^4.1.1, debug@npm:^4.3.1, debug@npm:^4.3.2, debug@npm:^4.3.3, debug@npm:^4.3.4":
   version: 4.4.0
   resolution: "debug@npm:4.4.0"
   dependencies:
@@ -4310,13 +4310,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"happy-dom@npm:^17.5.6":
-  version: 17.5.6
-  resolution: "happy-dom@npm:17.5.6"
+"happy-dom@npm:^17.6.1":
+  version: 17.6.1
+  resolution: "happy-dom@npm:17.6.1"
   dependencies:
     webidl-conversions: "npm:^7.0.0"
     whatwg-mimetype: "npm:^3.0.0"
-  checksum: 10c0/c64b81c393719c3cf74d5fa43aaf0cc462ec6fc6946d9f53614c876683cdeb99020f81133902c0a6374bd9cc3250981ab86d7085b0dcd2e05de6bcd188ce3d04
+  checksum: 10c0/0e9495de3f06b9118297d562102db45312eacb154445861a000872b395f43cdea069420f841ef005d46e364dd64a1e5d1dc6e80aef7f78fa1a999fc99b1dfdbe
   languageName: node
   linkType: hard
 
@@ -5208,7 +5208,7 @@ __metadata:
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:^16.3.0"
     "@vercel/speed-insights": "npm:^1.2.0"
-    "@vitejs/plugin-react": "npm:^4.5.0"
+    "@vitejs/plugin-react": "npm:^4.5.1"
     "@vitest/coverage-v8": "npm:^3.2.0"
     autoprefixer: "npm:^10.4.21"
     brace-expansion: "npm:^4.0.0"
@@ -5220,7 +5220,7 @@ __metadata:
     eslint-plugin-react: "npm:^7.37.5"
     glob: "npm:^11.0.2"
     globals: "npm:^16.2.0"
-    happy-dom: "npm:^17.5.6"
+    happy-dom: "npm:^17.6.1"
     husky: "npm:^9.1.7"
     identity-obj-proxy: "npm:^3.0.0"
     jspdf: "npm:^3.0.1"
