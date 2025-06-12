@@ -5170,7 +5170,7 @@ __metadata:
     jspdf: "npm:^3.0.1"
     lint-staged: "npm:^16.1.0"
     make-dir: "npm:^5.0.0"
-    minimatch: "npm:^10.0.1"
+    minimatch: "npm:^10.0.3"
     postcss: "npm:^8.5.4"
     react: "npm:^19.1.0"
     react-dom: "npm:^19.1.0"
