@@ -5,7 +5,7 @@
   "type": "module",
   "dependencies": {
     "@vercel/speed-insights": "^1.2.0",
-    "brace-expansion": "^4.0.1",
+    "brace-expansion": "^2.0.2",
     "canvas": "^3.1.0",
     "glob": "^11.0.2",
     "jspdf": "^3.0.1",
