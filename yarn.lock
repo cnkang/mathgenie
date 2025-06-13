@@ -5162,7 +5162,7 @@ __metadata:
     cssnano-preset-advanced: "npm:^7.0.7"
     eslint: "npm:^9.28.0"
     eslint-plugin-react: "npm:^7.37.5"
-    glob: "npm:^11.0.2"
+    glob: "npm:^11.0.3"
     globals: "npm:^16.2.0"
     happy-dom: "npm:^18.0.1"
     husky: "npm:^9.1.7"
