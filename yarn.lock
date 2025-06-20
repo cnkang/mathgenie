@@ -2908,14 +2908,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"canvas@npm:^3.1.0":
-  version: 3.1.0
-  resolution: "canvas@npm:3.1.0"
+"canvas@npm:^3.1.1":
+  version: 3.1.1
+  resolution: "canvas@npm:3.1.1"
   dependencies:
     node-addon-api: "npm:^7.0.0"
     node-gyp: "npm:latest"
-    prebuild-install: "npm:^7.1.1"
-  checksum: 10c0/28da5184c1d7e97049ba6a24f10690b9ed4b303bbd25517d95c892fa3a6331417791657a3a7467068e40af0dda2dcc9120d062f7426a3d796131e69a30e3cbf1
+    prebuild-install: "npm:^7.1.3"
+  checksum: 10c0/abfd3875e6716b430f14245ba318c45a52667592aaa746644a4bb6bba7ae16f6debb9a180bdc477d5bbe2d1fe9b90191e7ad1c184233227dc434d1420b78b1ac
   languageName: node
   linkType: hard
 
@@ -5207,7 +5207,7 @@ __metadata:
     autoprefixer: "npm:^10.4.21"
     brace-expansion: "npm:^4.0.1"
     c8: "npm:^10.1.3"
-    canvas: "npm:^3.1.0"
+    canvas: "npm:^3.1.1"
     cssnano: "npm:^7.0.7"
     cssnano-preset-advanced: "npm:^7.0.7"
     eslint: "npm:^9.29.0"
@@ -6153,7 +6153,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prebuild-install@npm:^7.1.1":
+"prebuild-install@npm:^7.1.3":
   version: 7.1.3
   resolution: "prebuild-install@npm:7.1.3"
   dependencies:
