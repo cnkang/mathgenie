@@ -5301,7 +5301,7 @@ __metadata:
     react-dom: "npm:^19.1.1"
     string-width: "npm:^7.2.0"
     util: "npm:^0.12.5"
-    vite: "npm:^7.1.0"
+    vite: "npm:^7.1.1"
     vite-plugin-compression: "npm:^0.5.1"
     vitest: "npm:^3.2.4"
     web-vitals: "npm:^5.1.0"
