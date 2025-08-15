@@ -15,9 +15,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/cli@npm:^7.28.0":
-  version: 7.28.0
-  resolution: "@babel/cli@npm:7.28.0"
+"@babel/cli@npm:^7.28.3":
+  version: 7.28.3
+  resolution: "@babel/cli@npm:7.28.3"
   dependencies:
     "@jridgewell/trace-mapping": "npm:^0.3.28"
     "@nicolo-ribaudo/chokidar-2": "npm:2.1.8-no-fsevents.3"
@@ -38,7 +38,7 @@ __metadata:
   bin:
     babel: ./bin/babel.js
     babel-external-helpers: ./bin/babel-external-helpers.js
-  checksum: 10c0/963f434dcce51c0ccc3248f0e76911078b7069c01e360e7d3878762af1b5e51e92d9f47ebda42140f5faa2f4b5eadcc6a637eb70a1f8c5a797d3cce2d03f0bf9
+  checksum: 10c0/69e557eea9f4549c39e6b2d656f46c8f58bea5e9d169cd3388da416a6031477a316f63127017c67a3d5b8b01e2336d036f4b9b8eaf81c1f37f948d9f8a03df6c
   languageName: node
   linkType: hard
 
@@ -5368,7 +5368,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "mathgenie@workspace:."
   dependencies:
-    "@babel/cli": "npm:^7.28.0"
+    "@babel/cli": "npm:^7.28.3"
     "@babel/core": "npm:^7.28.3"
     "@babel/plugin-transform-runtime": "npm:^7.28.0"
     "@babel/preset-env": "npm:^7.28.3"
