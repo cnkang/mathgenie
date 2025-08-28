@@ -1,5 +1,39 @@
 #!/bin/sh
-export NVM_DIR="$HOME/.nvm"
-. "$NVM_DIR/nvm.sh"
+. "$(dirname "$0")/_/husky.sh"
 
-nvm use || exit 1
+echo "🔍 Running pre-commit checks..."
+
+# 检查Node.js版本
+if command -v node >/dev/null 2>&1; then
+  NODE_VERSION=$(node --version)
+  echo "📦 Node.js version: $NODE_VERSION"
+else
+  echo "❌ Node.js not found"
+  exit 1
+fi
+
+# 检查pnpm是否可用
+if ! command -v pnpm >/dev/null 2>&1; then
+  echo "❌ pnpm not found. Please install pnpm first."
+  exit 1
+fi
+
+echo "🧹 Running lint-staged..."
+npx lint-staged
+
+# 检查是否有未解决的merge conflicts
+echo "🔍 Checking for merge conflicts..."
+if git diff --check --cached; then
+  echo "✅ No merge conflicts found"
+else
+  echo "❌ Merge conflicts detected. Please resolve them first."
+  exit 1
+fi
+
+# 检查commit message格式（如果有staged changes）
+if git diff --cached --quiet; then
+  echo "⚠️  No staged changes found"
+  exit 1
+fi
+
+echo "✅ Pre-commit checks passed!"

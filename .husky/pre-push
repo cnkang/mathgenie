@@ -1,0 +1,50 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🚀 Running pre-push checks..."
+
+# 获取当前分支
+current_branch=$(git branch --show-current)
+echo "📍 Current branch: $current_branch"
+
+# 检查是否在main或develop分支上直接push
+if [ "$current_branch" = "main" ] || [ "$current_branch" = "develop" ]; then
+  echo "⚠️  Pushing directly to $current_branch branch"
+  echo "Consider using pull requests for better code review"
+fi
+
+# 运行类型检查
+echo "🔍 Running TypeScript type check..."
+if ! pnpm type-check; then
+  echo "❌ TypeScript type check failed"
+  exit 1
+fi
+
+# 运行测试
+echo "🧪 Running tests..."
+if ! pnpm test:unit; then
+  echo "❌ Unit tests failed"
+  exit 1
+fi
+
+# 检查构建
+echo "🏗️  Checking build..."
+if ! pnpm build; then
+  echo "❌ Build failed"
+  exit 1
+fi
+
+# 检查是否有未提交的更改
+if ! git diff --quiet; then
+  echo "❌ You have unstaged changes. Please commit or stash them first."
+  git status --porcelain
+  exit 1
+fi
+
+if ! git diff --cached --quiet; then
+  echo "❌ You have staged changes. Please commit them first."
+  git status --porcelain
+  exit 1
+fi
+
+echo "✅ Pre-push checks passed!"
