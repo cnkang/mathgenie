@@ -1,0 +1,56 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "📝 Checking commit message format..."
+
+# 读取commit message
+commit_message=$(cat "$1")
+
+# 检查commit message是否为空
+if [ -z "$commit_message" ]; then
+  echo "❌ Commit message cannot be empty"
+  exit 1
+fi
+
+# 检查commit message长度
+if [ ${#commit_message} -lt 10 ]; then
+  echo "❌ Commit message too short (minimum 10 characters)"
+  echo "Current message: '$commit_message'"
+  exit 1
+fi
+
+# 检查是否包含常见的不良模式
+case "$commit_message" in
+  *"WIP"*|*"wip"*|*"TODO"*|*"todo"*|*"FIXME"*|*"fixme"*)
+    echo "❌ Commit message contains work-in-progress markers"
+    echo "Please complete your work before committing"
+    exit 1
+    ;;
+  *"fuck"*|*"shit"*|*"damn"*)
+    echo "❌ Please use professional language in commit messages"
+    exit 1
+    ;;
+esac
+
+# 推荐的commit message格式提示
+if ! echo "$commit_message" | grep -qE "^(feat|fix|docs|style|refactor|test|chore|perf|ci|build)(\(.+\))?: .+"; then
+  echo "⚠️  Consider using conventional commit format:"
+  echo "   feat: add new feature"
+  echo "   fix: resolve bug"
+  echo "   docs: update documentation"
+  echo "   style: format code"
+  echo "   refactor: restructure code"
+  echo "   test: add tests"
+  echo "   chore: maintenance tasks"
+  echo "   perf: performance improvements"
+  echo "   ci: CI/CD changes"
+  echo "   build: build system changes"
+  echo ""
+  echo "Current message: '$commit_message'"
+  echo ""
+  echo "✅ Commit message accepted (but consider conventional format)"
+else
+  echo "✅ Commit message follows conventional format"
+fi
+
+exit 0
