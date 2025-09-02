@@ -23,7 +23,7 @@
     "verify": "node scripts/verify-pnpm.js",
     "clean": "rm -rf node_modules pnpm-lock.yaml dist coverage",
     "reinstall": "pnpm clean && pnpm install",
-    "lint": "eslint src --ext .ts,.tsx --fix && prettier --write \"src/**/*.{ts,tsx}\" --config .prettierrc.json",
+    "lint": "eslint src --ext .ts,.tsx --fix --max-warnings 0 && prettier --write \"src/**/*.{ts,tsx}\" --config .prettierrc.json",
     "format": "prettier --write \"src/**/*.{ts,tsx,css,json}\" --config .prettierrc.json",
     "type-check": "tsc --noEmit",
     "build:types": "tsc --emitDeclarationOnly",
