@@ -179,4 +179,53 @@ export default {
       needsImprovement: 'Versuchen Sie es weiter und üben Sie mehr!',
     },
   },
+  infoPanel: {
+    title: 'Übungsstatistiken',
+    stats: {
+      currentProblems: 'Aktuelle Aufgaben',
+      totalGenerated: 'Insgesamt generiert',
+      difficultyLevel: 'Schwierigkeitsgrad',
+      operationTypes: 'Rechenarten',
+    },
+    difficulty: {
+      beginner: 'Anfänger',
+      intermediate: 'Fortgeschritten',
+      advanced: 'Erweitert',
+      expert: 'Experte',
+    },
+    progress: {
+      title: 'Lernfortschritt',
+      completed: '{{percent}}% abgeschlossen (Ziel: 100 Aufgaben)',
+    },
+    quickActions: {
+      title: 'Schnellaktionen',
+      regenerate: 'Aufgaben neu generieren',
+      downloadPdf: 'PDF herunterladen',
+      startQuiz: 'Quiz starten',
+      jumpToProblems: 'Zu Aufgaben springen',
+    },
+    recentResults: {
+      title: 'Letzte Quiz-Ergebnisse',
+      score: '{{score}} Punkte',
+      grade: 'Note:',
+      accuracy: 'Genauigkeit:',
+    },
+    tips: {
+      title: 'Verwendungstipps',
+      items: {
+        '0': 'Verwenden Sie Schnellvorlagen für häufige Einstellungen',
+        '1': 'Mehr Operanden erhöhen den Schwierigkeitsgrad',
+        '2': 'Ergebnisbereich begrenzen kontrolliert die Antwortenkomplexität',
+        '3': 'Antworten anzeigen hilft beim Überprüfen des Lernerfolgs',
+        '4': 'PDF-Export unterstützt verschiedene Papierformate',
+      },
+    },
+    currentConfig: {
+      title: 'Aktuelle Konfiguration',
+      operations: 'Operationen: {{operations}}',
+      numbers: 'Zahlen: {{min}}-{{max}}',
+      results: 'Ergebnisse: {{min}}-{{max}}',
+      operands: 'Operanden: {{min}}-{{max}}',
+    },
+  },
 } as const;
