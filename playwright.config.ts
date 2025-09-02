@@ -16,12 +16,18 @@ export default defineConfig({
     process.env.CI && process.env.PLAYWRIGHT_OUTPUT_DIR
       ? process.env.PLAYWRIGHT_OUTPUT_DIR
       : "test-results",
-  reporter: [
-    ["html", { open: "never" }],
-    ["json", { outputFile: "test-results.json" }],
-    ["junit", { outputFile: "test-results.xml" }],
-    ...(process.env.CI ? [["github"] as const] : []),
-  ],
+  reporter: process.env.CI
+    ? [
+        ["html", { open: "never" }],
+        ["json", { outputFile: process.env.JSON_REPORT_FILE || "test-results.json" }],
+        ["junit", { outputFile: "test-results.xml" }],
+        ["github"],
+      ]
+    : [
+        ["html", { open: "never" }],
+        ["json", { outputFile: "test-results.json" }],
+        ["junit", { outputFile: "test-results.xml" }],
+      ],
   use: {
     baseURL: process.env.BASE_URL || "http://localhost:4173",
     trace: "on-first-retry",
