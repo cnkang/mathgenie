@@ -14,8 +14,8 @@ vi.mock('./translations/en.ts', () => ({
 
 vi.mock('./translations/zh.ts', () => ({
   default: {
-    app: { title: '数学精灵' },
-    operations: { addition: '加法 (+)' },
+    app: { title: 'MathGenie' },
+    operations: { addition: 'Addition (+)' },
   },
 }));
 
@@ -81,7 +81,7 @@ describe('I18n System', () => {
     };
 
     expect(interpolate('Download PDF ({{count}} problems)', { count: 5 })).toBe(
-      'Download PDF (5 problems)'
+      'Download PDF (5 problems)',
     );
 
     expect(interpolate('Hello {{name}}!', { name: 'World' })).toBe('Hello World!');
@@ -137,7 +137,7 @@ describe('I18n System', () => {
       render(
         <I18nProvider>
           <TestComponent />
-        </I18nProvider>
+        </I18nProvider>,
       );
     });
 
@@ -151,7 +151,7 @@ describe('I18n System', () => {
       render(
         <I18nProvider>
           <TestComponent />
-        </I18nProvider>
+        </I18nProvider>,
       );
     });
 
@@ -163,7 +163,7 @@ describe('I18n System', () => {
       render(
         <I18nProvider>
           <TestComponent />
-        </I18nProvider>
+        </I18nProvider>,
       );
     });
 
@@ -192,7 +192,7 @@ describe('I18n System', () => {
       render(
         <I18nProvider>
           <TestComponent />
-        </I18nProvider>
+        </I18nProvider>,
       );
     });
 
@@ -210,7 +210,7 @@ describe('I18n System', () => {
       render(
         <I18nProvider>
           <TestComponent />
-        </I18nProvider>
+        </I18nProvider>,
       );
     });
 
@@ -224,7 +224,7 @@ describe('I18n System', () => {
       render(
         <I18nProvider>
           <TestComponent />
-        </I18nProvider>
+        </I18nProvider>,
       );
     });
 
@@ -236,7 +236,7 @@ describe('I18n System', () => {
       render(
         <I18nProvider>
           <TestComponent />
-        </I18nProvider>
+        </I18nProvider>,
       );
     });
 
@@ -266,7 +266,7 @@ describe('I18n System', () => {
       render(
         <I18nProvider>
           <TestComponent />
-        </I18nProvider>
+        </I18nProvider>,
       );
     });
 

@@ -44,15 +44,15 @@ describe('InteractiveProblem', () => {
   test('renders input field and submit button', () => {
     render(<InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />);
 
-    expect(screen.getByPlaceholderText('输入答案')).toBeDefined();
-    expect(screen.getByRole('button', { name: '提交' })).toBeDefined();
+    expect(screen.getByPlaceholderText('Enter answer')).toBeDefined();
+    expect(screen.getByRole('button', { name: 'Submit' })).toBeDefined();
   });
 
   test('allows user to input answer', async () => {
     const user = userEvent.setup();
     render(<InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />);
 
-    const input = screen.getByPlaceholderText('输入答案');
+    const input = screen.getByPlaceholderText('Enter answer');
     await user.type(input, '5');
 
     expect(input.value).toBe('5');
@@ -62,8 +62,8 @@ describe('InteractiveProblem', () => {
     const user = userEvent.setup();
     render(<InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />);
 
-    const input = screen.getByPlaceholderText('输入答案');
-    const submitButton = screen.getByRole('button', { name: '提交' });
+    const input = screen.getByPlaceholderText('Enter answer');
+    const submitButton = screen.getByRole('button', { name: 'Submit' });
 
     await user.type(input, '5');
     await user.click(submitButton);
@@ -75,7 +75,7 @@ describe('InteractiveProblem', () => {
     const user = userEvent.setup();
     render(<InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />);
 
-    const input = screen.getByPlaceholderText('输入答案');
+    const input = screen.getByPlaceholderText('Enter answer');
     await user.type(input, '5');
     await user.keyboard('{Enter}');
 
@@ -86,7 +86,7 @@ describe('InteractiveProblem', () => {
     const user = userEvent.setup();
     render(<InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />);
 
-    const input = screen.getByPlaceholderText('输入答案');
+    const input = screen.getByPlaceholderText('Enter answer');
     await user.type(input, '5.5');
     await user.keyboard('{Enter}');
 
@@ -97,7 +97,7 @@ describe('InteractiveProblem', () => {
     const user = userEvent.setup();
     render(<InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />);
 
-    const submitButton = screen.getByRole('button', { name: '提交' });
+    const submitButton = screen.getByRole('button', { name: 'Submit' });
     await user.click(submitButton);
 
     expect(mockOnAnswerSubmit).not.toHaveBeenCalled();
@@ -107,7 +107,7 @@ describe('InteractiveProblem', () => {
     const user = userEvent.setup();
     render(<InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />);
 
-    const input = screen.getByPlaceholderText('输入答案');
+    const input = screen.getByPlaceholderText('Enter answer');
     await user.type(input, '   ');
     await user.keyboard('{Enter}');
 
@@ -118,7 +118,7 @@ describe('InteractiveProblem', () => {
     const user = userEvent.setup();
     render(<InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />);
 
-    const input = screen.getByPlaceholderText('输入答案');
+    const input = screen.getByPlaceholderText('Enter answer');
     await user.type(input, 'abc');
     await user.keyboard('{Enter}');
 
@@ -127,11 +127,11 @@ describe('InteractiveProblem', () => {
 
   test('disables input and button after submission', () => {
     render(
-      <InteractiveProblem problem={mockProblemWithAnswer} onAnswerSubmit={mockOnAnswerSubmit} />
+      <InteractiveProblem problem={mockProblemWithAnswer} onAnswerSubmit={mockOnAnswerSubmit} />,
     );
 
-    const input = screen.getByPlaceholderText('输入答案');
-    const submitButton = screen.getByRole('button', { name: '已提交' });
+    const input = screen.getByPlaceholderText('Enter answer');
+    const submitButton = screen.getByRole('button', { name: 'Submitted' });
 
     expect(input.disabled).toBe(true);
     expect(submitButton.disabled).toBe(true);
@@ -139,10 +139,10 @@ describe('InteractiveProblem', () => {
 
   test('shows user answer when problem has been answered', () => {
     render(
-      <InteractiveProblem problem={mockProblemWithAnswer} onAnswerSubmit={mockOnAnswerSubmit} />
+      <InteractiveProblem problem={mockProblemWithAnswer} onAnswerSubmit={mockOnAnswerSubmit} />,
     );
 
-    const input = screen.getByPlaceholderText('输入答案');
+    const input = screen.getByPlaceholderText('Enter answer');
     expect(input.value).toBe('20');
   });
 
@@ -152,11 +152,11 @@ describe('InteractiveProblem', () => {
         problem={mockProblemWithAnswer}
         onAnswerSubmit={mockOnAnswerSubmit}
         showResult={true}
-      />
+      />,
     );
 
     expect(screen.getByText('✅')).toBeDefined();
-    expect(screen.getByText('正确！')).toBeDefined();
+    expect(screen.getByText('Correct!')).toBeDefined();
   });
 
   test('shows incorrect result when showResult is true and answer is wrong', () => {
@@ -165,11 +165,11 @@ describe('InteractiveProblem', () => {
         problem={mockIncorrectProblem}
         onAnswerSubmit={mockOnAnswerSubmit}
         showResult={true}
-      />
+      />,
     );
 
     expect(screen.getByText('❌')).toBeDefined();
-    expect(screen.getByText('错误。正确答案是')).toBeDefined();
+    expect(screen.getByText('Incorrect. The correct answer is')).toBeDefined();
     expect(screen.getByText('7')).toBeDefined();
   });
 
@@ -179,11 +179,11 @@ describe('InteractiveProblem', () => {
         problem={mockProblemWithAnswer}
         onAnswerSubmit={mockOnAnswerSubmit}
         showResult={false}
-      />
+      />,
     );
 
     expect(screen.queryByText('✅')).toBeNull();
-    expect(screen.queryByText('正确！')).toBeNull();
+    expect(screen.queryByText('Correct!')).toBeNull();
   });
 
   test('applies correct CSS class when answer is correct', () => {
@@ -192,7 +192,7 @@ describe('InteractiveProblem', () => {
         problem={mockProblemWithAnswer}
         onAnswerSubmit={mockOnAnswerSubmit}
         showResult={true}
-      />
+      />,
     );
 
     expect((container.firstChild as Element)?.classList.contains('interactive-problem')).toBe(true);
@@ -205,7 +205,7 @@ describe('InteractiveProblem', () => {
         problem={mockIncorrectProblem}
         onAnswerSubmit={mockOnAnswerSubmit}
         showResult={true}
-      />
+      />,
     );
 
     expect((container.firstChild as Element)?.classList.contains('interactive-problem')).toBe(true);
@@ -219,11 +219,11 @@ describe('InteractiveProblem', () => {
         problem={mockProblem}
         onAnswerSubmit={mockOnAnswerSubmit}
         disabled={true}
-      />
+      />,
     );
 
-    const input = screen.getByPlaceholderText('输入答案');
-    const submitButton = screen.getByRole('button', { name: '提交' });
+    const input = screen.getByPlaceholderText('Enter answer');
+    const submitButton = screen.getByRole('button', { name: 'Submit' });
 
     expect(input.disabled).toBe(true);
     expect(submitButton.disabled).toBe(true);
@@ -234,14 +234,14 @@ describe('InteractiveProblem', () => {
 
   test('updates state when problem changes', () => {
     const { rerender } = render(
-      <InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />
+      <InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />,
     );
 
-    const input = screen.getByPlaceholderText('输入答案');
+    const input = screen.getByPlaceholderText('Enter answer');
     expect(input.value).toBe('');
 
     rerender(
-      <InteractiveProblem problem={mockProblemWithAnswer} onAnswerSubmit={mockOnAnswerSubmit} />
+      <InteractiveProblem problem={mockProblemWithAnswer} onAnswerSubmit={mockOnAnswerSubmit} />,
     );
 
     expect(input.value).toBe('20');
@@ -249,10 +249,10 @@ describe('InteractiveProblem', () => {
 
   test('resets state when problem changes to unanswered', () => {
     const { rerender } = render(
-      <InteractiveProblem problem={mockProblemWithAnswer} onAnswerSubmit={mockOnAnswerSubmit} />
+      <InteractiveProblem problem={mockProblemWithAnswer} onAnswerSubmit={mockOnAnswerSubmit} />,
     );
 
-    const input = screen.getByPlaceholderText('输入答案');
+    const input = screen.getByPlaceholderText('Enter answer');
     expect(input.value).toBe('20');
     expect(input.disabled).toBe(true);
 
@@ -265,7 +265,7 @@ describe('InteractiveProblem', () => {
   test('submit button is disabled when input is empty', () => {
     render(<InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />);
 
-    const submitButton = screen.getByRole('button', { name: '提交' });
+    const submitButton = screen.getByRole('button', { name: 'Submit' });
     expect(submitButton.disabled).toBe(true);
   });
 
@@ -273,8 +273,8 @@ describe('InteractiveProblem', () => {
     const user = userEvent.setup();
     render(<InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />);
 
-    const input = screen.getByPlaceholderText('输入答案');
-    const submitButton = screen.getByRole('button', { name: '提交' });
+    const input = screen.getByPlaceholderText('Enter answer');
+    const submitButton = screen.getByRole('button', { name: 'Submit' });
 
     await user.type(input, '5');
     expect(submitButton.disabled).toBe(false);
@@ -285,7 +285,7 @@ describe('InteractiveProblem', () => {
     render(<InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />);
 
     const form = document.querySelector('form');
-    const input = screen.getByPlaceholderText('输入答案');
+    const input = screen.getByPlaceholderText('Enter answer');
 
     await user.type(input, '5');
 
@@ -301,7 +301,7 @@ describe('InteractiveProblem', () => {
     const user = userEvent.setup();
     render(<InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />);
 
-    const input = screen.getByPlaceholderText('输入答案');
+    const input = screen.getByPlaceholderText('Enter answer');
     await user.type(input, '5');
 
     // Clear any previous calls from typing
@@ -322,7 +322,7 @@ describe('InteractiveProblem', () => {
         problem={mockProblem}
         onAnswerSubmit={mockOnAnswerSubmit}
         showResult={false}
-      />
+      />,
     );
 
     expect(screen.queryByText('✅')).toBeNull();
@@ -335,7 +335,7 @@ describe('InteractiveProblem', () => {
         problem={mockProblem}
         onAnswerSubmit={mockOnAnswerSubmit}
         showResult={false}
-      />
+      />,
     );
 
     expect((container.firstChild as Element)?.classList.contains('correct')).toBe(false);

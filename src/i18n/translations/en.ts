@@ -174,4 +174,53 @@ export default {
       needsImprovement: 'Keep trying and practice more!',
     },
   },
+  infoPanel: {
+    title: 'Practice Statistics',
+    stats: {
+      currentProblems: 'Current Problems',
+      totalGenerated: 'Total Generated',
+      difficultyLevel: 'Difficulty Level',
+      operationTypes: 'Operation Types',
+    },
+    difficulty: {
+      beginner: 'Beginner',
+      intermediate: 'Intermediate',
+      advanced: 'Advanced',
+      expert: 'Expert',
+    },
+    progress: {
+      title: 'Learning Progress',
+      completed: 'Completed {{percent}}% (Target: 100 problems)',
+    },
+    quickActions: {
+      title: 'Quick Actions',
+      regenerate: 'Regenerate Problems',
+      downloadPdf: 'Download PDF',
+      startQuiz: 'Start Quiz',
+      jumpToProblems: 'Jump to Problems',
+    },
+    recentResults: {
+      title: 'Recent Quiz Results',
+      score: '{{score}} points',
+      grade: 'Grade:',
+      accuracy: 'Accuracy:',
+    },
+    tips: {
+      title: 'Usage Tips',
+      items: {
+        '0': 'Use quick presets to rapidly configure common settings',
+        '1': 'Increasing the number of operands can increase problem difficulty',
+        '2': 'Limiting result range can control answer complexity',
+        '3': 'Enable show answers feature for easy learning effect checking',
+        '4': 'PDF export supports multiple paper formats',
+      },
+    },
+    currentConfig: {
+      title: 'Current Configuration',
+      operations: 'Operations: {{operations}}',
+      numbers: 'Numbers: {{min}}-{{max}}',
+      results: 'Results: {{min}}-{{max}}',
+      operands: 'Operands: {{min}}-{{max}}',
+    },
+  },
 } as const;

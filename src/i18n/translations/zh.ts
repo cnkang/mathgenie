@@ -171,4 +171,53 @@ export default {
       needsImprovement: '继续努力，多加练习！',
     },
   },
+  infoPanel: {
+    title: '练习统计',
+    stats: {
+      currentProblems: '当前题目',
+      totalGenerated: '累计生成',
+      difficultyLevel: '难度等级',
+      operationTypes: '运算类型',
+    },
+    difficulty: {
+      beginner: '初级',
+      intermediate: '中级',
+      advanced: '高级',
+      expert: '专家',
+    },
+    progress: {
+      title: '学习进度',
+      completed: '已完成 {{percent}}% (目标: 100题)',
+    },
+    quickActions: {
+      title: '快速操作',
+      regenerate: '重新生成题目',
+      downloadPdf: '下载PDF',
+      startQuiz: '开始答题',
+      jumpToProblems: '跳转到题目',
+    },
+    recentResults: {
+      title: '最近答题结果',
+      score: '{{score}}分',
+      grade: '等级:',
+      accuracy: '正确率:',
+    },
+    tips: {
+      title: '使用技巧',
+      items: {
+        '0': '使用快速预设可以快速配置常用设置',
+        '1': '增加操作数个数可以提高题目难度',
+        '2': '限制结果范围可以控制答案的复杂度',
+        '3': '开启显示答案功能便于检查学习效果',
+        '4': 'PDF导出支持多种纸张格式',
+      },
+    },
+    currentConfig: {
+      title: '当前配置',
+      operations: '运算: {{operations}}',
+      numbers: '数字: {{min}}-{{max}}',
+      results: '结果: {{min}}-{{max}}',
+      operands: '操作数: {{min}}-{{max}}个',
+    },
+  },
 } as const;

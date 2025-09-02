@@ -71,7 +71,7 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="输入答案"
+            placeholder="Enter answer"
             disabled={isSubmitted || disabled}
             className="answer-input"
             step="any"
@@ -81,7 +81,7 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
             disabled={isSubmitted || disabled || userInput.trim() === ''}
             className="submit-answer-btn"
           >
-            {isSubmitted ? '已提交' : '提交'}
+            {isSubmitted ? 'Submitted' : 'Submit'}
           </button>
         </div>
       </form>
@@ -91,10 +91,10 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
           <span className="result-icon">{getResultIcon()}</span>
           <span className="result-text">
             {problem.isCorrect ? (
-              '正确！'
+              'Correct!'
             ) : (
               <>
-                错误。正确答案是 <strong>{problem.correctAnswer}</strong>
+                Incorrect. The correct answer is <strong>{problem.correctAnswer}</strong>
               </>
             )}
           </span>

@@ -19,13 +19,13 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
   const [, setStartTime] = useState<number>(Date.now());
 
   useEffect(() => {
-    // 计算每个题目的正确答案
+    // Calculate the correct answer for each problem
     const problemsWithAnswers = problems.map((problem) => {
       const expression = problem.text.replace(' = ', '').replace('✖', '*').replace('➗', '/');
       let correctAnswer: number;
 
       try {
-        // 安全地计算表达式
+        // Safely calculate the expression
         correctAnswer = Function(`"use strict"; return (${expression})`)();
       } catch {
         console.error('Error calculating answer for:', expression);
@@ -72,12 +72,12 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
         return problem;
       });
 
-      // 自动跳转到下一题
+      // Automatically move to the next problem
       setTimeout(() => {
         if (currentProblemIndex < updatedProblems.length - 1) {
           setCurrentProblemIndex(currentProblemIndex + 1);
         } else {
-          // 完成所有题目，显示结果
+          // Completed all problems, show results
           finishQuiz(updatedProblems);
         }
       }, 1500);
@@ -199,7 +199,7 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
                     userAnswer: undefined,
                     isCorrect: false,
                     isAnswered: false,
-                  }))
+                  })),
                 );
                 setStartTime(Date.now());
               }}
@@ -242,7 +242,7 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
   const currentProblem = quizProblems[currentProblemIndex];
   const progress = ((currentProblemIndex + 1) / quizProblems.length) * 100;
 
-  // 如果当前题目不存在，返回加载状态
+  // If current problem doesn't exist, return loading state
   if (!currentProblem) {
     return <div className="quiz-loading">{t('quiz.loading')}</div>;
   }

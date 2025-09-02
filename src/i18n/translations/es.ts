@@ -179,4 +179,53 @@ export default {
       needsImprovement: '¡Sigue intentando y practica más!',
     },
   },
+  infoPanel: {
+    title: 'Estadísticas de Práctica',
+    stats: {
+      currentProblems: 'Problemas Actuales',
+      totalGenerated: 'Total Generado',
+      difficultyLevel: 'Nivel de Dificultad',
+      operationTypes: 'Tipos de Operación',
+    },
+    difficulty: {
+      beginner: 'Principiante',
+      intermediate: 'Intermedio',
+      advanced: 'Avanzado',
+      expert: 'Experto',
+    },
+    progress: {
+      title: 'Progreso de Aprendizaje',
+      completed: 'Completado {{percent}}% (Meta: 100 problemas)',
+    },
+    quickActions: {
+      title: 'Acciones Rápidas',
+      regenerate: 'Regenerar Problemas',
+      downloadPdf: 'Descargar PDF',
+      startQuiz: 'Iniciar Quiz',
+      jumpToProblems: 'Ir a Problemas',
+    },
+    recentResults: {
+      title: 'Resultados Recientes del Quiz',
+      score: '{{score}} puntos',
+      grade: 'Calificación:',
+      accuracy: 'Precisión:',
+    },
+    tips: {
+      title: 'Consejos de Uso',
+      items: {
+        '0': 'Usa presets rápidos para configurar ajustes comunes',
+        '1': 'Aumentar el número de operandos incrementa la dificultad',
+        '2': 'Limitar el rango de resultados controla la complejidad de respuestas',
+        '3': 'Habilitar mostrar respuestas ayuda a verificar el progreso',
+        '4': 'La exportación PDF soporta múltiples formatos de papel',
+      },
+    },
+    currentConfig: {
+      title: 'Configuración Actual',
+      operations: 'Operaciones: {{operations}}',
+      numbers: 'Números: {{min}}-{{max}}',
+      results: 'Resultados: {{min}}-{{max}}',
+      operands: 'Operandos: {{min}}-{{max}}',
+    },
+  },
 } as const;

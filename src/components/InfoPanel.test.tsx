@@ -6,7 +6,41 @@ import InfoPanel from './InfoPanel';
 // Mock the translation hook
 vi.mock('../i18n', () => ({
   useTranslation: () => ({
-    t: (key: string) => key,
+    t: (key: string, options?: any) => {
+      const translations: Record<string, string> = {
+        'infoPanel.title': 'Practice Statistics',
+        'infoPanel.stats.currentProblems': 'Current Problems',
+        'infoPanel.stats.totalGenerated': 'Total Generated',
+        'infoPanel.stats.difficultyLevel': 'Difficulty Level',
+        'infoPanel.stats.operationTypes': 'Operation Types',
+        'infoPanel.difficulty.beginner': 'Beginner',
+        'infoPanel.difficulty.intermediate': 'Intermediate',
+        'infoPanel.difficulty.advanced': 'Advanced',
+        'infoPanel.difficulty.expert': 'Expert',
+        'infoPanel.progress.title': 'Learning Progress',
+        'infoPanel.progress.completed': `Completed ${options?.percent || 0}% (Target: 100 problems)`,
+        'infoPanel.quickActions.title': 'Quick Actions',
+        'infoPanel.quickActions.regenerate': 'Regenerate Problems',
+        'infoPanel.quickActions.downloadPdf': 'Download PDF',
+        'infoPanel.quickActions.startQuiz': 'Start Quiz',
+        'infoPanel.quickActions.jumpToProblems': 'Jump to Problems',
+        'infoPanel.recentResults.title': 'Recent Quiz Results',
+        'infoPanel.recentResults.score': options?.score ? `${options.score} points` : '0 points',
+        'infoPanel.recentResults.grade': 'Grade:',
+        'infoPanel.recentResults.accuracy': 'Accuracy:',
+        'infoPanel.tips.title': 'Usage Tips',
+        'infoPanel.tips.items.0': 'Use quick presets to rapidly configure common settings',
+        'infoPanel.tips.items.1':
+          'Increasing the number of operands can increase problem difficulty',
+        'infoPanel.tips.items.2': 'Limiting result range can control answer complexity',
+        'infoPanel.currentConfig.title': 'Current Configuration',
+        'infoPanel.currentConfig.operations': `Operations: ${options?.operations || ''}`,
+        'infoPanel.currentConfig.numbers': `Numbers: ${options?.min || 0}-${options?.max || 0}`,
+        'infoPanel.currentConfig.results': `Results: ${options?.min || 0}-${options?.max || 0}`,
+        'infoPanel.currentConfig.operands': `Operands: ${options?.min || 0}-${options?.max || 0}`,
+      };
+      return translations[key] || key;
+    },
   }),
 }));
 
@@ -56,14 +90,14 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />
+      />,
     );
 
-    expect(screen.getByText('练习统计')).toBeDefined();
-    expect(screen.getByText('当前题目')).toBeDefined();
-    expect(screen.getByText('累计生成')).toBeDefined();
-    expect(screen.getByText('难度等级')).toBeDefined();
-    expect(screen.getByText('运算类型')).toBeDefined();
+    expect(screen.getByText('Practice Statistics')).toBeDefined();
+    expect(screen.getByText('Current Problems')).toBeDefined();
+    expect(screen.getByText('Total Generated')).toBeDefined();
+    expect(screen.getByText('Difficulty Level')).toBeDefined();
+    expect(screen.getByText('Operation Types')).toBeDefined();
   });
 
   test('displays correct problem count', () => {
@@ -74,7 +108,7 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />
+      />,
     );
 
     // Use more specific selector to find the current problems count
@@ -90,11 +124,11 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />
+      />,
     );
 
-    expect(screen.getByText('🎯 学习进度')).toBeDefined();
-    expect(screen.getByText(/已完成.*%/)).toBeDefined();
+    expect(screen.getByText('🎯 Learning Progress')).toBeDefined();
+    expect(screen.getByText(/Completed.*%.*Target: 100 problems/)).toBeDefined();
   });
 
   test('renders quick action buttons', () => {
@@ -105,13 +139,13 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />
+      />,
     );
 
-    expect(screen.getByText('重新生成题目')).toBeDefined();
-    expect(screen.getByText('下载PDF')).toBeDefined();
-    expect(screen.getByText('开始答题')).toBeDefined();
-    expect(screen.getByText('跳转到题目')).toBeDefined();
+    expect(screen.getByText('Regenerate Problems')).toBeDefined();
+    expect(screen.getByText('Download PDF')).toBeDefined();
+    expect(screen.getByText('Start Quiz')).toBeDefined();
+    expect(screen.getByText('Jump to Problems')).toBeDefined();
   });
 
   test('calls onGenerateProblems when regenerate button is clicked', () => {
@@ -122,10 +156,10 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />
+      />,
     );
 
-    const regenerateButton = screen.getByText('重新生成题目');
+    const regenerateButton = screen.getByText('Regenerate Problems');
     fireEvent.click(regenerateButton);
 
     expect(mockOnGenerateProblems).toHaveBeenCalledTimes(1);
@@ -139,10 +173,10 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />
+      />,
     );
 
-    const downloadButton = screen.getByText('下载PDF');
+    const downloadButton = screen.getByText('Download PDF');
     fireEvent.click(downloadButton);
 
     expect(mockOnDownloadPdf).toHaveBeenCalledTimes(1);
@@ -156,10 +190,10 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />
+      />,
     );
 
-    const startQuizButton = screen.getByText('开始答题');
+    const startQuizButton = screen.getByText('Start Quiz');
     fireEvent.click(startQuizButton);
 
     expect(mockOnStartQuiz).toHaveBeenCalledTimes(1);
@@ -173,11 +207,11 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />
+      />,
     );
 
-    const downloadButton = screen.getByText('下载PDF');
-    const startQuizButton = screen.getByText('开始答题');
+    const downloadButton = screen.getByText('Download PDF');
+    const startQuizButton = screen.getByText('Start Quiz');
 
     expect(downloadButton.disabled).toBe(true);
     expect(startQuizButton.disabled).toBe(true);
@@ -192,11 +226,11 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />
+      />,
     );
 
-    expect(screen.getByText('🏆 最近答题结果')).toBeDefined();
-    expect(screen.getByText('85分')).toBeDefined();
+    expect(screen.getByText('🏆 Recent Quiz Results')).toBeDefined();
+    expect(screen.getByText('85 points')).toBeDefined();
     expect(screen.getByText('B')).toBeDefined();
     expect(screen.getByText('80%')).toBeDefined(); // 8/10 * 100%
   });
@@ -209,14 +243,14 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />
+      />,
     );
 
-    expect(screen.getByText('⚙️ 当前配置')).toBeDefined();
-    expect(screen.getByText('运算: +, -')).toBeDefined();
-    expect(screen.getByText('数字: 1-10')).toBeDefined();
-    expect(screen.getByText('结果: 0-20')).toBeDefined();
-    expect(screen.getByText('操作数: 2-3个')).toBeDefined();
+    expect(screen.getByText('⚙️ Current Configuration')).toBeDefined();
+    expect(screen.getByText('Operations: +, -')).toBeDefined();
+    expect(screen.getByText('Numbers: 1-10')).toBeDefined();
+    expect(screen.getByText('Results: 0-20')).toBeDefined();
+    expect(screen.getByText('Operands: 2-3')).toBeDefined();
   });
 
   test('calculates difficulty level correctly for beginner', () => {
@@ -234,10 +268,10 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />
+      />,
     );
 
-    expect(screen.getByText('初级')).toBeDefined();
+    expect(screen.getByText('Beginner')).toBeDefined();
   });
 
   test('calculates difficulty level correctly for intermediate', () => {
@@ -255,10 +289,10 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />
+      />,
     );
 
-    expect(screen.getByText('中级')).toBeDefined();
+    expect(screen.getByText('Intermediate')).toBeDefined();
   });
 
   test('calculates difficulty level correctly for advanced', () => {
@@ -276,10 +310,10 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />
+      />,
     );
 
-    expect(screen.getByText('高级')).toBeDefined();
+    expect(screen.getByText('Advanced')).toBeDefined();
   });
 
   test('calculates difficulty level correctly for expert', () => {
@@ -297,10 +331,10 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />
+      />,
     );
 
-    expect(screen.getByText('专家')).toBeDefined();
+    expect(screen.getByText('Expert')).toBeDefined();
   });
 
   test('handles empty problems array correctly', () => {
@@ -311,13 +345,13 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />
+      />,
     );
 
     // Check for multiple "0" values in different stat cards
     const zeroValues = screen.getAllByText('0');
     expect(zeroValues.length).toBeGreaterThan(0); // Should have multiple "0" values
-    expect(screen.getByText('初级')).toBeDefined(); // Should default to beginner
+    expect(screen.getByText('Beginner')).toBeDefined(); // Should default to beginner
   });
 
   test('displays tips section', () => {
@@ -328,11 +362,13 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />
+      />,
     );
 
-    expect(screen.getByText('💡 使用技巧')).toBeDefined();
-    expect(screen.getByText('使用快速预设可以快速配置常用设置')).toBeDefined();
+    expect(screen.getByText('💡 Usage Tips')).toBeDefined();
+    expect(
+      screen.getByText('Use quick presets to rapidly configure common settings'),
+    ).toBeDefined();
   });
 
   test('handles scroll to problems when jump button is clicked', () => {
@@ -351,10 +387,10 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />
+      />,
     );
 
-    const jumpButton = screen.getByText('跳转到题目');
+    const jumpButton = screen.getByText('Jump to Problems');
     fireEvent.click(jumpButton);
 
     expect(mockQuerySelector).toHaveBeenCalledWith('.problems-grid');
@@ -373,10 +409,10 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />
+      />,
     );
 
-    const jumpButton = screen.getByText('跳转到题目');
+    const jumpButton = screen.getByText('Jump to Problems');
     fireEvent.click(jumpButton);
 
     expect(mockQuerySelector).toHaveBeenCalledWith('.problems-grid');
@@ -393,7 +429,7 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />
+      />,
     );
 
     // Initially should show 0 cumulative
@@ -408,7 +444,7 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />
+      />,
     );
 
     // Should update cumulative count
@@ -430,11 +466,11 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />
+      />,
     );
 
     // Should show 50% progress (50 out of 100 target)
-    expect(screen.getByText(/已完成 50%/)).toBeDefined();
+    expect(screen.getByText(/Completed 50%.*Target: 100 problems/)).toBeDefined();
   });
 
   test('caps learning progress at 100%', () => {
@@ -451,10 +487,10 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />
+      />,
     );
 
     // Should cap at 100% even with more than 100 problems
-    expect(screen.getByText(/已完成 100%/)).toBeDefined();
+    expect(screen.getByText(/Completed 100%.*Target: 100 problems/)).toBeDefined();
   });
 });

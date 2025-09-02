@@ -183,4 +183,53 @@ export default {
       needsImprovement: 'Continuez à essayer et pratiquez plus !',
     },
   },
+  infoPanel: {
+    title: 'Statistiques de Pratique',
+    stats: {
+      currentProblems: 'Problèmes Actuels',
+      totalGenerated: 'Total Généré',
+      difficultyLevel: 'Niveau de Difficulté',
+      operationTypes: 'Types d\'Opération',
+    },
+    difficulty: {
+      beginner: 'Débutant',
+      intermediate: 'Intermédiaire',
+      advanced: 'Avancé',
+      expert: 'Expert',
+    },
+    progress: {
+      title: 'Progrès d\'Apprentissage',
+      completed: 'Complété {{percent}}% (Objectif: 100 problèmes)',
+    },
+    quickActions: {
+      title: 'Actions Rapides',
+      regenerate: 'Régénérer les Problèmes',
+      downloadPdf: 'Télécharger PDF',
+      startQuiz: 'Commencer le Quiz',
+      jumpToProblems: 'Aller aux Problèmes',
+    },
+    recentResults: {
+      title: 'Résultats Récents du Quiz',
+      score: '{{score}} points',
+      grade: 'Note:',
+      accuracy: 'Précision:',
+    },
+    tips: {
+      title: 'Conseils d\'Utilisation',
+      items: {
+        '0': 'Utilisez les préréglages rapides pour configurer les paramètres courants',
+        '1': 'Augmenter le nombre d\'opérandes augmente la difficulté',
+        '2': 'Limiter la plage de résultats contrôle la complexité des réponses',
+        '3': 'Activer l\'affichage des réponses aide à vérifier les progrès',
+        '4': 'L\'export PDF supporte plusieurs formats de papier',
+      },
+    },
+    currentConfig: {
+      title: 'Configuration Actuelle',
+      operations: 'Opérations: {{operations}}',
+      numbers: 'Nombres: {{min}}-{{max}}',
+      results: 'Résultats: {{min}}-{{max}}',
+      operands: 'Opérandes: {{min}}-{{max}}',
+    },
+  },
 } as const;

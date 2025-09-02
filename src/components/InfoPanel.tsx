@@ -19,7 +19,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
   quizResult,
   onStartQuiz,
 }) => {
-  useTranslation();
+  const { t } = useTranslation();
   const [sessionStats, setSessionStats] = useState({
     totalGenerated: 0,
     sessionsCount: 1,
@@ -34,14 +34,14 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
     }
   }, [problems.length]);
 
-  // 计算统计信息
+  // Calculate statistics
   const calculateStats = () => {
     if (problems.length === 0) {
       return {
         totalProblems: 0,
         averageComplexity: 0,
         operationTypes: 0,
-        difficultyLevel: '初级',
+        difficultyLevel: t('infoPanel.difficulty.beginner'),
       };
     }
 
@@ -49,18 +49,18 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
     const numberRange = settings.numRange[1] - settings.numRange[0];
     const averageOperands = (settings.numOperandsRange[0] + settings.numOperandsRange[1]) / 2;
 
-    // 简单的难度计算
+    // Simple difficulty calculation
     const complexity = (numberRange * operationTypes * averageOperands) / 100;
 
-    let difficultyLevel = '初级';
+    let difficultyLevel = t('infoPanel.difficulty.beginner');
     if (complexity > 2) {
-      difficultyLevel = '中级';
+      difficultyLevel = t('infoPanel.difficulty.intermediate');
     }
     if (complexity > 5) {
-      difficultyLevel = '高级';
+      difficultyLevel = t('infoPanel.difficulty.advanced');
     }
     if (complexity > 10) {
-      difficultyLevel = '专家';
+      difficultyLevel = t('infoPanel.difficulty.expert');
     }
 
     return {
@@ -74,59 +74,61 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
   const stats = calculateStats();
 
   const tips = [
-    '使用快速预设可以快速配置常用设置',
-    '增加操作数个数可以提高题目难度',
-    '限制结果范围可以控制答案的复杂度',
-    '开启显示答案功能便于检查学习效果',
-    'PDF导出支持多种纸张格式',
+    t('infoPanel.tips.items.0'),
+    t('infoPanel.tips.items.1'),
+    t('infoPanel.tips.items.2'),
+    t('infoPanel.tips.items.3'),
+    t('infoPanel.tips.items.4'),
   ];
 
-  // 计算学习进度（基于题目完成度）
+  // Calculate learning progress (based on problem completion)
   const learningProgress = Math.min((sessionStats.totalGenerated / 100) * 100, 100);
 
   return (
     <div className="info-panel">
       <h3>
         <span>📊</span>
-        练习统计
+        {t('infoPanel.title')}
       </h3>
 
       <div className="stats-grid">
         <div className="stat-card">
           <span className="stat-value">{stats.totalProblems}</span>
-          <div className="stat-label">当前题目</div>
+          <div className="stat-label">{t('infoPanel.stats.currentProblems')}</div>
         </div>
 
         <div className="stat-card">
           <span className="stat-value">{sessionStats.totalGenerated}</span>
-          <div className="stat-label">累计生成</div>
+          <div className="stat-label">{t('infoPanel.stats.totalGenerated')}</div>
         </div>
 
         <div className="stat-card">
           <span className="stat-value">{stats.difficultyLevel}</span>
-          <div className="stat-label">难度等级</div>
+          <div className="stat-label">{t('infoPanel.stats.difficultyLevel')}</div>
         </div>
 
         <div className="stat-card">
           <span className="stat-value">{stats.operationTypes}</span>
-          <div className="stat-label">运算类型</div>
+          <div className="stat-label">{t('infoPanel.stats.operationTypes')}</div>
         </div>
       </div>
 
       <div className="progress-section">
-        <h4>🎯 学习进度</h4>
+        <h4>🎯 {t('infoPanel.progress.title')}</h4>
         <div className="progress-bar">
           <div className="progress-fill" style={{ width: `${learningProgress}%` }}></div>
         </div>
-        <div className="progress-text">已完成 {Math.round(learningProgress)}% (目标: 100题)</div>
+        <div className="progress-text">
+          {t('infoPanel.progress.completed', { percent: Math.round(learningProgress) })}
+        </div>
       </div>
 
       <div className="tips-section">
-        <h4>⚡ 快速操作</h4>
+        <h4>⚡ {t('infoPanel.quickActions.title')}</h4>
         <div className="quick-actions">
           <button className="quick-action-btn" onClick={onGenerateProblems}>
             <span>🔄</span>
-            重新生成题目
+            {t('infoPanel.quickActions.regenerate')}
           </button>
           <button
             className="quick-action-btn"
@@ -134,7 +136,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
             disabled={problems.length === 0}
           >
             <span>📄</span>
-            下载PDF
+            {t('infoPanel.quickActions.downloadPdf')}
           </button>
           <button
             className="quick-action-btn"
@@ -142,7 +144,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
             disabled={problems.length === 0}
           >
             <span>🎯</span>
-            开始答题
+            {t('infoPanel.quickActions.startQuiz')}
           </button>
           <button
             className="quick-action-btn"
@@ -154,25 +156,26 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
             }}
           >
             <span>📝</span>
-            跳转到题目
+            {t('infoPanel.quickActions.jumpToProblems')}
           </button>
         </div>
       </div>
 
       {quizResult && (
         <div className="tips-section">
-          <h4>🏆 最近答题结果</h4>
+          <h4>🏆 {t('infoPanel.recentResults.title')}</h4>
           <div className="quiz-result-summary">
             <div className="result-item">
-              <span className="result-label">得分:</span>
-              <span className="result-value">{quizResult.score}分</span>
+              <span className="result-label">
+                {t('infoPanel.recentResults.score', { score: quizResult.score })}
+              </span>
             </div>
             <div className="result-item">
-              <span className="result-label">等级:</span>
+              <span className="result-label">{t('infoPanel.recentResults.grade')}</span>
               <span className="result-value">{quizResult.grade}</span>
             </div>
             <div className="result-item">
-              <span className="result-label">正确率:</span>
+              <span className="result-label">{t('infoPanel.recentResults.accuracy')}</span>
               <span className="result-value">
                 {Math.round((quizResult.correctAnswers / quizResult.totalProblems) * 100)}%
               </span>
@@ -182,7 +185,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
       )}
 
       <div className="tips-section">
-        <h4>💡 使用技巧</h4>
+        <h4>💡 {t('infoPanel.tips.title')}</h4>
         <ul className="tips-list">
           {tips.slice(0, 3).map((tip, index) => (
             <li key={index}>{tip}</li>
@@ -191,17 +194,30 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
       </div>
 
       <div className="tips-section">
-        <h4>⚙️ 当前配置</h4>
+        <h4>⚙️ {t('infoPanel.currentConfig.title')}</h4>
         <ul className="tips-list">
-          <li>运算: {settings.operations.join(', ')}</li>
           <li>
-            数字: {settings.numRange[0]}-{settings.numRange[1]}
+            {t('infoPanel.currentConfig.operations', {
+              operations: settings.operations.join(', '),
+            })}
           </li>
           <li>
-            结果: {settings.resultRange[0]}-{settings.resultRange[1]}
+            {t('infoPanel.currentConfig.numbers', {
+              min: settings.numRange[0],
+              max: settings.numRange[1],
+            })}
           </li>
           <li>
-            操作数: {settings.numOperandsRange[0]}-{settings.numOperandsRange[1]}个
+            {t('infoPanel.currentConfig.results', {
+              min: settings.resultRange[0],
+              max: settings.resultRange[1],
+            })}
+          </li>
+          <li>
+            {t('infoPanel.currentConfig.operands', {
+              min: settings.numOperandsRange[0],
+              max: settings.numOperandsRange[1],
+            })}
           </li>
         </ul>
       </div>
