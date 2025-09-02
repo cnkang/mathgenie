@@ -30,7 +30,7 @@ const NumberInput: React.FC<ExtendedNumberInputProps> = ({
     value,
     (currentValue: number, newValue: number | string) => {
       return typeof newValue === 'string' ? parseInt(newValue, 10) || currentValue : newValue;
-    }
+    },
   );
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {

@@ -104,7 +104,7 @@ describe('QuizMode', () => {
 
   test('renders loading state initially', () => {
     render(
-      <QuizMode problems={[]} onQuizComplete={mockOnQuizComplete} onExitQuiz={mockOnExitQuiz} />
+      <QuizMode problems={[]} onQuizComplete={mockOnQuizComplete} onExitQuiz={mockOnExitQuiz} />,
     );
     expect(screen.getByText('Preparing quiz...')).toBeDefined();
   });
@@ -115,7 +115,7 @@ describe('QuizMode', () => {
         problems={mockProblems}
         onQuizComplete={mockOnQuizComplete}
         onExitQuiz={mockOnExitQuiz}
-      />
+      />,
     );
     expect(screen.getByText('Exit')).toBeDefined();
     expect(screen.getByText('← Previous')).toBeDefined();
@@ -131,7 +131,7 @@ describe('QuizMode', () => {
         problems={mockProblems}
         onQuizComplete={mockOnQuizComplete}
         onExitQuiz={mockOnExitQuiz}
-      />
+      />,
     );
     expect(setInterval).toHaveBeenCalled();
     unmount();
@@ -146,7 +146,7 @@ describe('QuizMode', () => {
         problems={problemsWithError}
         onQuizComplete={mockOnQuizComplete}
         onExitQuiz={mockOnExitQuiz}
-      />
+      />,
     );
     expect(screen.getByText('Exit')).toBeDefined();
     consoleSpy.mockRestore();
@@ -158,7 +158,7 @@ describe('QuizMode', () => {
         problems={mockProblems}
         onQuizComplete={mockOnQuizComplete}
         onExitQuiz={mockOnExitQuiz}
-      />
+      />,
     );
     const exitButton = screen.getByText('Exit');
     fireEvent.click(exitButton);
@@ -171,7 +171,7 @@ describe('QuizMode', () => {
         problems={mockProblems}
         onQuizComplete={mockOnQuizComplete}
         onExitQuiz={mockOnExitQuiz}
-      />
+      />,
     );
     const nextButton = screen.getByText('Next →');
     const prevButton = screen.getByText('← Previous');
@@ -197,7 +197,7 @@ describe('QuizMode', () => {
         problems={mockProblems}
         onQuizComplete={mockOnQuizComplete}
         onExitQuiz={mockOnExitQuiz}
-      />
+      />,
     );
     expect(screen.getByText('0:00')).toBeDefined();
 
@@ -214,7 +214,7 @@ describe('QuizMode', () => {
         problems={mockProblems}
         onQuizComplete={mockOnQuizComplete}
         onExitQuiz={mockOnExitQuiz}
-      />
+      />,
     );
     const submitButton = screen.getByTestId('submit-1');
     fireEvent.click(submitButton);
@@ -241,7 +241,7 @@ describe('QuizMode', () => {
         problems={mockProblems}
         onQuizComplete={mockOnQuizComplete}
         onExitQuiz={mockOnExitQuiz}
-      />
+      />,
     );
 
     // Answer first problem
@@ -289,7 +289,7 @@ describe('QuizMode', () => {
         problems={mockProblems}
         onQuizComplete={mockOnQuizComplete}
         onExitQuiz={mockOnExitQuiz}
-      />
+      />,
     );
 
     // Complete quiz by answering all problems sequentially
@@ -334,7 +334,7 @@ describe('QuizMode', () => {
         problems={mockProblems}
         onQuizComplete={mockOnQuizComplete}
         onExitQuiz={mockOnExitQuiz}
-      />
+      />,
     );
 
     // Complete quiz by answering all problems sequentially
@@ -382,7 +382,7 @@ describe('QuizMode', () => {
         problems={gradeTestProblems}
         onQuizComplete={mockOnQuizComplete}
         onExitQuiz={mockOnExitQuiz}
-      />
+      />,
     );
 
     // Complete quiz manually
@@ -422,7 +422,7 @@ describe('QuizMode', () => {
         problems={mixedProblems}
         onQuizComplete={mockOnQuizComplete}
         onExitQuiz={mockOnExitQuiz}
-      />
+      />,
     );
     expect(screen.getByText('Problem 1')).toBeDefined();
     expect(screen.getByText('1 / 4')).toBeDefined();
@@ -434,7 +434,7 @@ describe('QuizMode', () => {
         problems={mockProblems}
         onQuizComplete={mockOnQuizComplete}
         onExitQuiz={mockOnExitQuiz}
-      />
+      />,
     );
 
     // Navigate to second problem
@@ -449,7 +449,7 @@ describe('QuizMode', () => {
         problems={newProblems}
         onQuizComplete={mockOnQuizComplete}
         onExitQuiz={mockOnExitQuiz}
-      />
+      />,
     );
 
     // Should reset to first problem
@@ -463,7 +463,7 @@ describe('QuizMode', () => {
         problems={mockProblems}
         onQuizComplete={mockOnQuizComplete}
         onExitQuiz={mockOnExitQuiz}
-      />
+      />,
     );
 
     // Complete quiz by answering all problems sequentially
@@ -505,7 +505,7 @@ describe('QuizMode', () => {
         problems={[{ id: 1, text: '2 + 3 = ' }]}
         onQuizComplete={mockOnQuizComplete}
         onExitQuiz={mockOnExitQuiz}
-      />
+      />,
     );
     const submitButton = screen.getByTestId('submit-1');
     fireEvent.click(submitButton);
@@ -519,7 +519,7 @@ describe('QuizMode', () => {
         problems={mockProblems}
         onQuizComplete={mockOnQuizComplete}
         onExitQuiz={mockOnExitQuiz}
-      />
+      />,
     );
 
     // Initial time should be 0:00
@@ -549,7 +549,7 @@ describe('QuizMode', () => {
         problems={singleProblem}
         onQuizComplete={mockOnQuizComplete}
         onExitQuiz={mockOnExitQuiz}
-      />
+      />,
     );
 
     expect(screen.getByText('1 / 1')).toBeDefined();
@@ -566,7 +566,7 @@ describe('QuizMode', () => {
         problems={mockProblems}
         onQuizComplete={mockOnQuizComplete}
         onExitQuiz={mockOnExitQuiz}
-      />
+      />,
     );
 
     const progressFill = document.querySelector('.progress-fill');
@@ -594,7 +594,7 @@ describe('QuizMode', () => {
         problems={excellentProblems}
         onQuizComplete={mockOnQuizComplete}
         onExitQuiz={mockOnExitQuiz}
-      />
+      />,
     );
 
     // Answer first problem
