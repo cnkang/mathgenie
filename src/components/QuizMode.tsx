@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { useTranslation } from '../i18n';
-import type { Problem, QuizResult } from '../types';
-import InteractiveProblem from './InteractiveProblem';
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "../i18n";
+import type { Problem, QuizResult } from "../types";
+import InteractiveProblem from "./InteractiveProblem";
 
 interface QuizModeProps {
   problems: Problem[];
@@ -21,14 +21,14 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
   useEffect(() => {
     // Calculate the correct answer for each problem
     const problemsWithAnswers = problems.map((problem) => {
-      const expression = problem.text.replace(' = ', '').replace('✖', '*').replace('➗', '/');
+      const expression = problem.text.replace(" = ", "").replace("✖", "*").replace("➗", "/");
       let correctAnswer: number;
 
       try {
         // Safely calculate the expression
         correctAnswer = Function(`"use strict"; return (${expression})`)();
       } catch {
-        console.error('Error calculating answer for:', expression);
+        console.error("Error calculating answer for:", expression);
         correctAnswer = 0;
       }
 
@@ -92,21 +92,21 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
     const totalProblems = problemsToUse.length;
     const score = Math.round((correctAnswers / totalProblems) * 100);
 
-    let grade = t('quiz.grades.needsImprovement');
-    let feedback = t('quiz.feedback.needsImprovement');
+    let grade = t("quiz.grades.needsImprovement");
+    let feedback = t("quiz.feedback.needsImprovement");
 
     if (score >= 90) {
-      grade = t('quiz.grades.excellent');
-      feedback = t('quiz.feedback.excellent');
+      grade = t("quiz.grades.excellent");
+      feedback = t("quiz.feedback.excellent");
     } else if (score >= 80) {
-      grade = t('quiz.grades.good');
-      feedback = t('quiz.feedback.good');
+      grade = t("quiz.grades.good");
+      feedback = t("quiz.feedback.good");
     } else if (score >= 70) {
-      grade = t('quiz.grades.average');
-      feedback = t('quiz.feedback.average');
+      grade = t("quiz.grades.average");
+      feedback = t("quiz.feedback.average");
     } else if (score >= 60) {
-      grade = t('quiz.grades.passing');
-      feedback = t('quiz.feedback.passing');
+      grade = t("quiz.grades.passing");
+      feedback = t("quiz.feedback.passing");
     }
 
     const result: QuizResult = {
@@ -126,7 +126,7 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   const goToPrevious = () => {
@@ -145,11 +145,11 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
     return (
       <div className="quiz-results">
         <div className="results-header">
-          <h2>{t('quiz.completed')}</h2>
+          <h2>{t("quiz.completed")}</h2>
           <div className="results-summary">
             <div className="score-display">
               <span className="score-number">{quizResult.score}</span>
-              <span className="score-label">{t('quiz.score')}</span>
+              <span className="score-label">{t("quiz.score")}</span>
             </div>
             <div className="grade-display">
               <span className="grade">{quizResult.grade}</span>
@@ -161,22 +161,22 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
           <div className="result-stats">
             <div className="stat-item">
               <span className="stat-icon">📊</span>
-              <span className="stat-label">{t('quiz.stats.totalProblems')}</span>
+              <span className="stat-label">{t("quiz.stats.totalProblems")}</span>
               <span className="stat-value">{quizResult.totalProblems}</span>
             </div>
             <div className="stat-item">
               <span className="stat-icon">✅</span>
-              <span className="stat-label">{t('quiz.stats.correct')}</span>
+              <span className="stat-label">{t("quiz.stats.correct")}</span>
               <span className="stat-value">{quizResult.correctAnswers}</span>
             </div>
             <div className="stat-item">
               <span className="stat-icon">❌</span>
-              <span className="stat-label">{t('quiz.stats.incorrect')}</span>
+              <span className="stat-label">{t("quiz.stats.incorrect")}</span>
               <span className="stat-value">{quizResult.incorrectAnswers}</span>
             </div>
             <div className="stat-item">
               <span className="stat-icon">⏱️</span>
-              <span className="stat-label">{t('quiz.stats.timeUsed')}</span>
+              <span className="stat-label">{t("quiz.stats.timeUsed")}</span>
               <span className="stat-value">{formatTime(timeElapsed)}</span>
             </div>
           </div>
@@ -187,7 +187,7 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
 
           <div className="results-actions">
             <button onClick={onExitQuiz} className="exit-quiz-btn">
-              {t('quiz.backToPractice')}
+              {t("quiz.backToPractice")}
             </button>
             <button
               onClick={() => {
@@ -205,26 +205,26 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
               }}
               className="retry-quiz-btn"
             >
-              {t('quiz.retry')}
+              {t("quiz.retry")}
             </button>
           </div>
         </div>
 
         <div className="detailed-results">
-          <h3>{t('quiz.detailedResults')}</h3>
+          <h3>{t("quiz.detailedResults")}</h3>
           <div className="problems-review">
             {quizProblems.map((problem, index) => (
               <div
                 key={problem.id}
-                className={`problem-review ${problem.isCorrect ? 'correct' : 'incorrect'}`}
+                className={`problem-review ${problem.isCorrect ? "correct" : "incorrect"}`}
               >
                 <span className="problem-number">{index + 1}.</span>
-                <span className="problem-expression">{problem.text.replace(' = ', ' = ')}</span>
+                <span className="problem-expression">{problem.text}</span>
                 <span className="user-answer">{problem.userAnswer}</span>
-                <span className="result-icon">{problem.isCorrect ? '✅' : '❌'}</span>
+                <span className="result-icon">{problem.isCorrect ? "✅" : "❌"}</span>
                 {!problem.isCorrect && (
                   <span className="correct-answer">
-                    {t('quiz.correctAnswer', { answer: problem.correctAnswer ?? 0 })}
+                    {t("quiz.correctAnswer", { answer: problem.correctAnswer ?? 0 })}
                   </span>
                 )}
               </div>
@@ -236,7 +236,7 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
   }
 
   if (quizProblems.length === 0) {
-    return <div className="quiz-loading">{t('quiz.loading')}</div>;
+    return <div className="quiz-loading">{t("quiz.loading")}</div>;
   }
 
   const currentProblem = quizProblems[currentProblemIndex];
@@ -244,7 +244,7 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
 
   // If current problem doesn't exist, return loading state
   if (!currentProblem) {
-    return <div className="quiz-loading">{t('quiz.loading')}</div>;
+    return <div className="quiz-loading">{t("quiz.loading")}</div>;
   }
 
   return (
@@ -255,7 +255,7 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
             <div className="progress-fill" style={{ width: `${progress}%` }}></div>
           </div>
           <span className="progress-text">
-            {t('quiz.progress', {
+            {t("quiz.progress", {
               current: currentProblemIndex + 1,
               total: quizProblems.length,
             })}
@@ -266,13 +266,13 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
           <span className="timer-text">{formatTime(timeElapsed)}</span>
         </div>
         <button onClick={onExitQuiz} className="exit-quiz-btn-small">
-          {t('quiz.exit')}
+          {t("quiz.exit")}
         </button>
       </div>
 
       <div className="quiz-content">
         <div className="current-problem">
-          <h3>{t('quiz.problemNumber', { number: currentProblemIndex + 1 })}</h3>
+          <h3>{t("quiz.problemNumber", { number: currentProblemIndex + 1 })}</h3>
           <InteractiveProblem
             problem={currentProblem}
             onAnswerSubmit={handleAnswerSubmit}
@@ -286,14 +286,14 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
             disabled={currentProblemIndex === 0}
             className="nav-btn prev-btn"
           >
-            {t('quiz.previousProblem')}
+            {t("quiz.previousProblem")}
           </button>
           <button
             onClick={goToNext}
             disabled={currentProblemIndex === quizProblems.length - 1}
             className="nav-btn next-btn"
           >
-            {t('quiz.nextProblem')}
+            {t("quiz.nextProblem")}
           </button>
         </div>
       </div>
