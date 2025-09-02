@@ -22,7 +22,9 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   background: white;
+  color: #0f172a; /* Ensure dark text for light background */
   font-size: 0.9rem;
+  font-weight: 500; /* Enhance text weight */
   cursor: pointer;
   transition: border-color 0.2s;
 }
@@ -87,9 +89,10 @@
   }
 
   .language-select {
-    background: #334155;
-    color: #f8fafc;
+    background: #1e293b; /* Darker background for better contrast */
+    color: #ffffff; /* Pure white text for maximum contrast */
     border-color: #475569;
+    font-weight: 500; /* Enhance text weight */
   }
 
   .language-select:hover {

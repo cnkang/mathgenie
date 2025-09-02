@@ -178,16 +178,7 @@ jobs:
         run: pnpm audit --audit-level moderate
         continue-on-error: true
 
-      - name: 🔒 Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: javascript
-          queries: security-and-quality
-
-      - name: 🔒 Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
-        with:
-          category: "/language:javascript"
+      # CodeQL analysis removed - using GitHub's default setup instead
 
   # Job 4: Build & Performance (runs in parallel)
   build:
@@ -333,8 +324,9 @@ jobs:
 
           if [ -f "accessibility-report-${{ matrix.theme }}.json" ]; then
             # Parse JSON report and display results
-            violations=$(cat accessibility-report-${{ matrix.theme }}.json | jq -r '.violations | length // 0')
-            passes=$(cat accessibility-report-${{ matrix.theme }}.json | jq -r '.passes | length // 0')
+            # Safely parse JSON with error handling
+            violations=$(jq -r 'try (.violations | length) // 0' accessibility-report-${{ matrix.theme }}.json 2>/dev/null || echo "0")
+            passes=$(jq -r 'try (.passes | length) // 0' accessibility-report-${{ matrix.theme }}.json 2>/dev/null || echo "0")
 
             echo "### 📊 Test Statistics" >> $GITHUB_STEP_SUMMARY
             echo "- ✅ Passed rules: $passes" >> $GITHUB_STEP_SUMMARY
@@ -349,10 +341,9 @@ jobs:
               echo "### 🔍 Issue Details:" >> $GITHUB_STEP_SUMMARY
               
               # Safely parse violation information
-              if command -v jq >/dev/null 2>&1; then
-                jq -r '.violations[]? | "#### " + .id + " (" + (.impact // "unknown") + " impact)\n" + (.description // "No description") + "\n- Affected elements: " + (.nodes | length | tostring) + "\n- Help link: " + (.helpUrl // "N/A") + "\n"' accessibility-report-${{ matrix.theme }}.json >> $GITHUB_STEP_SUMMARY 2>/dev/null || echo "Could not parse violation details" >> $GITHUB_STEP_SUMMARY
-              else
-                echo "jq not available for detailed parsing" >> $GITHUB_STEP_SUMMARY
+              if command -v jq >/dev/null 2>&1 && [ "$violations" -gt "0" ]; then
+                echo "### 🔍 Violation Details:" >> $GITHUB_STEP_SUMMARY
+                jq -r 'try (.violations[]? | "#### " + .id + " (" + (.impact // "unknown") + " impact)\n" + (.description // "No description") + "\n- Affected elements: " + (.nodes | length | tostring) + "\n- Help link: " + (.helpUrl // "N/A") + "\n") // "Could not parse violation details"' accessibility-report-${{ matrix.theme }}.json >> $GITHUB_STEP_SUMMARY 2>/dev/null || echo "Could not parse violation details" >> $GITHUB_STEP_SUMMARY
               fi
             fi
           else
@@ -361,7 +352,7 @@ jobs:
 
           # If there are violations, set non-zero exit code (but don't block subsequent steps)
           if [ -f "accessibility-report-${{ matrix.theme }}.json" ]; then
-            violations=$(cat accessibility-report-${{ matrix.theme }}.json | jq -r '.violations | length // 0')
+            violations=$(jq -r 'try (.violations | length) // 0' accessibility-report-${{ matrix.theme }}.json 2>/dev/null || echo "0")
             if [ "$violations" -gt "0" ]; then
               echo "Found $violations accessibility violations in ${{ matrix.theme_name }}"
               # Don't exit, let tests continue running and upload reports
