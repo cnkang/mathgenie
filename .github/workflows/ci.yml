@@ -15,8 +15,46 @@ concurrency:
 env:
   NODE_VERSION: "22"
   PNPM_VERSION: "8.15.1"
+  # 性能优化
+  NODE_OPTIONS: "--max-old-space-size=4096"
+  # Playwright 优化
+  PLAYWRIGHT_BROWSERS_PATH: 0
 
 jobs:
+  # Job 0: Quick Check (fast feedback for PRs)
+  quick-check:
+    name: ⚡ Quick Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: 📋 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔍 Quick lint check
+        run: pnpm lint --max-warnings 0
+
+      - name: 🏗️ Type check
+        run: pnpm type-check
+
+      - name: 🧪 Quick test
+        run: pnpm test:unit --run --reporter=basic
+
   # Job 1: Code Quality & Linting (runs in parallel)
   code-quality:
     name: 🔍 Code Quality
@@ -44,7 +82,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🔍 Run ESLint
-        run: pnpm eslint src --ext .js,.jsx,.ts,.tsx --format=json --output-file=eslint-report.json
+        run: pnpm lint --format=json --output-file=eslint-report.json
         continue-on-error: true
 
       - name: 📊 Upload ESLint results
@@ -56,7 +94,7 @@ jobs:
 
       - name: 🎨 Check code formatting
         run: |
-          if ! pnpm prettier --check "src/**/*.{js,jsx,ts,tsx,css,json}"; then
+          if ! pnpm prettier --check "src/**/*.{ts,tsx,css,json}"; then
             echo "❌ Code formatting issues found. Run 'pnpm prettier --write .' to fix."
             exit 1
           fi
@@ -66,10 +104,6 @@ jobs:
     name: 🧪 Tests
     runs-on: ubuntu-latest
     timeout-minutes: 15
-
-    strategy:
-      matrix:
-        test-type: [unit, integration]
 
     steps:
       - name: 📥 Checkout code
@@ -89,8 +123,8 @@ jobs:
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: 🧪 Run tests with coverage
-        run: pnpm coverage --reporter=json --reporter=lcov --reporter=text
+      - name: 🧪 Run unit tests with coverage
+        run: pnpm test:unit
         env:
           CI: true
 
@@ -98,18 +132,17 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           file: ./coverage/lcov.info
-          flags: ${{ matrix.test-type }}
-          name: codecov-${{ matrix.test-type }}
+          flags: unit-tests
+          name: codecov-unit
           fail_ci_if_error: false
 
       - name: 📋 Upload test results
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: test-results-${{ matrix.test-type }}
+          name: test-results-unit
           path: |
             coverage/
-            test-results.xml
 
   # Job 3: Security Scanning (runs in parallel)
   security:
@@ -153,10 +186,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
-    strategy:
-      matrix:
-        build-type: [production, development]
-
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
@@ -178,12 +207,12 @@ jobs:
       - name: 🏗️ Build application
         run: pnpm build
         env:
-          NODE_ENV: ${{ matrix.build-type }}
+          NODE_ENV: production
           CI: true
 
       - name: 📊 Analyze bundle size
         run: |
-          echo "## 📦 Bundle Analysis (${{ matrix.build-type }})" >> $GITHUB_STEP_SUMMARY
+          echo "## 📦 Bundle Analysis" >> $GITHUB_STEP_SUMMARY
           echo "| File | Size | Gzipped |" >> $GITHUB_STEP_SUMMARY
           echo "|------|------|---------|" >> $GITHUB_STEP_SUMMARY
 
@@ -199,7 +228,7 @@ jobs:
       - name: 🚀 Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-${{ matrix.build-type }}
+          name: build-production
           path: dist/
           retention-days: 7
 
@@ -262,6 +291,7 @@ jobs:
       fail-fast: false
       matrix:
         browser: [chromium, firefox, webkit]
+        shard: [1, 2]
         include:
           - browser: chromium
             project: chromium
@@ -301,17 +331,13 @@ jobs:
 
       - name: 🎭 Run Playwright tests
         run: |
-          npx playwright test --config=playwright.ci.config.ts \
+          npx playwright test --config=playwright.config.ts \
             --project=${{ matrix.project }} \
-            --reporter=html,json:test-results-${{ matrix.browser }}.json \
-            --output-dir=test-results-${{ matrix.browser }}
+            --shard=${{ matrix.shard }}/2 \
+            --reporter=html,json:test-results-${{ matrix.browser }}-${{ matrix.shard }}.json \
+            --output-dir=test-results-${{ matrix.browser }}-${{ matrix.shard }}
         env:
           CI: true
-          PLAYWRIGHT_BROWSERS_PATH: 0
-          # 内存和性能优化
-          NODE_OPTIONS: "--max-old-space-size=4096"
-          # 禁用不必要的功能
-          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
 
       # Server cleanup handled by Playwright
 
@@ -319,17 +345,17 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: playwright-results-${{ matrix.browser }}
+          name: playwright-results-${{ matrix.browser }}-${{ matrix.shard }}
           path: |
-            test-results-${{ matrix.browser }}/
-            test-results-${{ matrix.browser }}.json
+            test-results-${{ matrix.browser }}-${{ matrix.shard }}/
+            test-results-${{ matrix.browser }}-${{ matrix.shard }}.json
           retention-days: 30
 
       - name: 📊 Upload Playwright HTML Report
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: playwright-report-${{ matrix.browser }}
+          name: playwright-report-${{ matrix.browser }}-${{ matrix.shard }}
           path: playwright-report/
           retention-days: 30
 

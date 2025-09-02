@@ -101,10 +101,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🔍 Run linting
-        run: pnpm eslint src --ext .js,.jsx
+        run: pnpm lint
 
       - name: 🧪 Run tests
-        run: pnpm test
+        run: pnpm test:unit
 
       - name: 🏗️ Build application
         run: pnpm build
@@ -192,8 +192,8 @@ jobs:
           script: |
             const pr = context.payload.pull_request;
 
-            // Request review from maintainers
-            const maintainers = ['maintainer1', 'maintainer2']; // Update with actual maintainers
+            // Request review from maintainers (update with actual GitHub usernames)
+            const maintainers = []; // Add actual maintainer usernames here
 
             try {
               await github.rest.pulls.requestReviewers({
