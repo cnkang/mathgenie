@@ -34,7 +34,7 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({ children }) => 
           const value = 'value' in entry ? (entry as any).value : entry.duration;
           console.log(`${entry.name}: ${value}ms`);
         }
-        
+
         // Report to analytics in production (if needed)
         if (process.env.NODE_ENV === 'production' && window.gtag) {
           const value = 'value' in entry ? (entry as any).value : entry.duration;
@@ -65,14 +65,14 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({ children }) => 
           console.log('Memory usage:', {
             used: Math.round(memory.usedJSHeapSize / 1048576) + ' MB',
             total: Math.round(memory.totalJSHeapSize / 1048576) + ' MB',
-            limit: Math.round(memory.jsHeapSizeLimit / 1048576) + ' MB'
+            limit: Math.round(memory.jsHeapSizeLimit / 1048576) + ' MB',
           });
         }
       };
 
       // Log memory usage every 30 seconds in development
       const memoryInterval = setInterval(logMemoryUsage, 30000);
-      
+
       return () => {
         clearInterval(memoryInterval);
         observer.disconnect();

@@ -20,14 +20,14 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
     return {
       hasError: true,
-      error
+      error,
     };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     this.setState({
       error,
-      errorInfo
+      errorInfo,
     });
 
     if (this.props.onError) {
@@ -54,29 +54,21 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
           <div className="error-content">
             <h2>🚨 Something went wrong</h2>
             <p>We&apos;re sorry, but something unexpected happened.</p>
-            
+
             {process.env.NODE_ENV === 'development' && this.state.error && (
               <details className="error-details">
                 <summary>Error Details (Development)</summary>
                 <pre>{this.state.error.toString()}</pre>
-                {this.state.errorInfo && (
-                  <pre>{this.state.errorInfo.componentStack}</pre>
-                )}
+                {this.state.errorInfo && <pre>{this.state.errorInfo.componentStack}</pre>}
               </details>
             )}
-            
+
             <div className="error-actions">
-              <button 
-                onClick={this.handleRetry}
-                className="retry-button"
-              >
+              <button onClick={this.handleRetry} className="retry-button">
                 🔄 Try Again
               </button>
-              
-              <button 
-                onClick={() => window.location.reload()}
-                className="reload-button"
-              >
+
+              <button onClick={() => window.location.reload()} className="reload-button">
                 🔃 Reload Page
               </button>
             </div>
@@ -108,7 +100,7 @@ export const useErrorHandler = (): {
 
   const handleError = React.useCallback((error: Error): void => {
     setError(error);
-    
+
     if (process.env.NODE_ENV === 'production') {
       console.error('Application error:', error);
     }
