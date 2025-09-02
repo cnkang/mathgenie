@@ -20,7 +20,7 @@
   --bg-tertiary: #f1f5f9;
   --bg-accent: #f0f9ff;
 
-  /* Text Colors */
+  /* Text Colors - Enhanced for better contrast */
   --text-primary: #0f172a;
   --text-secondary: #334155;
   --text-muted: #475569;
@@ -74,7 +74,7 @@
     --bg-accent: #1e293b;
 
     --text-primary: #ffffff;
-    --text-secondary: #f1f5f9;
+    --text-secondary: #e2e8f0;
     --text-muted: #cbd5e1;
 
     --border-color: #334155;
@@ -223,6 +223,8 @@
     display: flex;
     align-items: center;
     gap: var(--space-sm);
+    /* Ensure high contrast for accessibility */
+    font-weight: 600;
   }
 
   .stats-grid {
@@ -269,6 +271,7 @@
     margin: 0 0 var(--space-sm) 0;
     color: var(--text-primary);
     font-size: var(--font-size-base);
+    font-weight: 600; /* Enhance contrast */
   }
 
   .tips-list {
@@ -279,11 +282,12 @@
 
   .tips-list li {
     padding: var(--space-xs) 0;
-    color: var(--text-secondary);
+    color: var(--text-primary); /* Use primary text color for better contrast */
     font-size: var(--font-size-sm);
     display: flex;
     align-items: flex-start;
     gap: var(--space-sm);
+    font-weight: 500; /* Enhance readability */
   }
 
   .tips-list li::before {
