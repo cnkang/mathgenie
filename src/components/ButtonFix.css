@@ -1,4 +1,4 @@
-/* 按钮样式修复 */
+/* Button style fixes */
 .button-group {
   display: flex;
   gap: var(--space-md, 1rem);
@@ -37,7 +37,9 @@
 .button-group button:hover {
   background: var(--primary-hover, #4338ca);
   transform: translateY(-2px);
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
 
 .button-group button:active {
@@ -57,7 +59,7 @@
   transform: none;
 }
 
-/* 大屏幕优化 */
+/* Large screen optimization */
 @media (min-width: 1200px) {
   .button-group {
     justify-content: flex-start;
@@ -70,7 +72,7 @@
   }
 }
 
-/* 中等屏幕优化 */
+/* Medium screen optimization */
 @media (min-width: 768px) and (max-width: 1199px) {
   .button-group {
     justify-content: center;
@@ -82,7 +84,7 @@
   }
 }
 
-/* 移动端优化 */
+/* Mobile optimization */
 @media (max-width: 767px) {
   .button-group {
     flex-direction: column;

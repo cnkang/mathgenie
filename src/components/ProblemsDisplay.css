@@ -1,4 +1,4 @@
-/* 题目展示区域优化 */
+/* Problem display area optimization */
 .results-section {
   display: flex;
   flex-direction: column;
@@ -98,6 +98,14 @@
   max-height: 500px;
   overflow-y: auto;
   position: relative;
+  /* Add keyboard accessibility support */
+  outline: none;
+}
+
+/* Keyboard focus state */
+.problems-content:focus {
+  outline: 2px solid var(--primary-color, #4f46e5);
+  outline-offset: 2px;
 }
 
 .problems-grid {
@@ -182,7 +190,7 @@
   opacity: 0.8;
 }
 
-/* 响应式设计 */
+/* Responsive design */
 @media (min-width: 1200px) {
   .results-section {
     gap: var(--space-2xl, 3rem);
@@ -252,7 +260,7 @@
   }
 }
 
-/* 滚动条样式 */
+/* Scrollbar styles */
 .problems-content::-webkit-scrollbar {
   width: 8px;
 }
@@ -271,7 +279,7 @@
   background: var(--border-hover, #cbd5e1);
 }
 
-/* 加载动画 */
+/* Loading animation */
 .problems-loading {
   display: flex;
   align-items: center;
