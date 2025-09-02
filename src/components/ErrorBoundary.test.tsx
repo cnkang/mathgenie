@@ -26,7 +26,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={false} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText('No error')).toBeDefined();
@@ -36,14 +36,14 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText(/Something went wrong/)).toBeDefined();
     expect(screen.getByText(/Try Again/)).toBeDefined();
     expect(screen.getByText(/Reload Page/)).toBeDefined();
 
-    // 在开发环境下，错误详情应该存在
+    // In development environment, error details should exist
     if (process.env.NODE_ENV === 'development') {
       expect(screen.getByText(/Error Details/)).toBeDefined();
     }
@@ -55,7 +55,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary fallback={customFallback}>
         <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText('Custom error message')).toBeDefined();
@@ -67,14 +67,14 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary onError={onError}>
         <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(onError).toHaveBeenCalledWith(
       expect.any(Error),
       expect.objectContaining({
         componentStack: expect.any(String),
-      })
+      }),
     );
   });
 
@@ -88,7 +88,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     const reloadButton = screen.getByText(/Reload Page/);
@@ -101,7 +101,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText(/Something went wrong/)).toBeDefined();
@@ -123,7 +123,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText(/Error Details/)).toBeDefined();
@@ -139,7 +139,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.queryByText(/Error Details/)).toBeNull();
@@ -156,7 +156,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary onError={onError}>
         <CustomError />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(onError).toHaveBeenCalledWith(
@@ -165,7 +165,7 @@ describe('ErrorBoundary', () => {
       }),
       expect.objectContaining({
         componentStack: expect.any(String),
-      })
+      }),
     );
   });
 
@@ -173,7 +173,7 @@ describe('ErrorBoundary', () => {
     const { rerender } = render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText(/Something went wrong/)).toBeDefined();
@@ -182,7 +182,7 @@ describe('ErrorBoundary', () => {
     rerender(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     // Should still show error state
@@ -195,7 +195,7 @@ describe('ErrorBoundary', () => {
     const { rerender } = render(
       <ErrorBoundary onError={onError}>
         <ThrowError shouldThrow={false} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText('No error')).toBeDefined();
@@ -204,7 +204,7 @@ describe('ErrorBoundary', () => {
     rerender(
       <ErrorBoundary onError={onError}>
         <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText(/Something went wrong/)).toBeDefined();
@@ -242,7 +242,7 @@ describe('useErrorHandler', () => {
       render(
         <ErrorBoundary>
           <TestComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
     }).not.toThrow();
 

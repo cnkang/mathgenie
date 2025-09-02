@@ -342,10 +342,10 @@ describe('ErrorMessage', () => {
 
     // Both should use the default case
     expect(screen.getByTestId('invalid-type-label').getAttribute('aria-label')).toBe(
-      'Error message'
+      'Error message',
     );
     expect(screen.getByTestId('undefined-type-label').getAttribute('aria-label')).toBe(
-      'Error message'
+      'Error message',
     );
   });
 });
