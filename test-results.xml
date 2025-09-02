@@ -1,0 +1,500 @@
+<testsuites id="" name="" tests="231" failures="0" skipped="0" errors="0" time="51.951941">
+<testsuite name="accessibility.spec.ts" timestamp="2025-09-02T10:27:26.676Z" hostname="chromium" tests="19" failures="0" skipped="0" time="14.987" errors="0">
+<testcase name="Accessibility and ARIA › Axe-core Accessibility Scan › should pass WCAG 2.1 AA accessibility standards (light theme)" classname="accessibility.spec.ts" time="0.935">
+</testcase>
+<testcase name="Accessibility and ARIA › Axe-core Accessibility Scan › should pass WCAG 2.1 AA accessibility standards (dark theme)" classname="accessibility.spec.ts" time="1.876">
+</testcase>
+<testcase name="Accessibility and ARIA › Axe-core Accessibility Scan › should pass accessibility scan with form interactions" classname="accessibility.spec.ts" time="2.018">
+</testcase>
+<testcase name="Accessibility and ARIA › Axe-core Accessibility Scan › should pass accessibility scan with error states" classname="accessibility.spec.ts" time="0.941">
+</testcase>
+<testcase name="Accessibility and ARIA › should have proper ARIA attributes on error messages" classname="accessibility.spec.ts" time="0.699">
+</testcase>
+<testcase name="Accessibility and ARIA › should have proper ARIA labels on form controls" classname="accessibility.spec.ts" time="0.684">
+</testcase>
+<testcase name="Accessibility and ARIA › should have proper ARIA labels on buttons" classname="accessibility.spec.ts" time="0.306">
+</testcase>
+<testcase name="Accessibility and ARIA › should have proper ARIA labels on preset buttons" classname="accessibility.spec.ts" time="0.301">
+</testcase>
+<testcase name="Accessibility and ARIA › should have proper ARIA labels on language selector" classname="accessibility.spec.ts" time="0.296">
+</testcase>
+<testcase name="Accessibility and ARIA › should maintain focus management during error states" classname="accessibility.spec.ts" time="0.29">
+</testcase>
+<testcase name="Accessibility and ARIA › should support keyboard navigation" classname="accessibility.spec.ts" time="0.289">
+</testcase>
+<testcase name="Accessibility and ARIA › should support keyboard interaction with preset buttons" classname="accessibility.spec.ts" time="1.216">
+</testcase>
+<testcase name="Accessibility and ARIA › should support keyboard interaction with checkboxes" classname="accessibility.spec.ts" time="0.305">
+</testcase>
+<testcase name="Accessibility and ARIA › should have proper heading hierarchy" classname="accessibility.spec.ts" time="0.311">
+</testcase>
+<testcase name="Accessibility and ARIA › should have proper form labels" classname="accessibility.spec.ts" time="0.309">
+</testcase>
+<testcase name="Accessibility and ARIA › should provide meaningful error messages for screen readers" classname="accessibility.spec.ts" time="1.906">
+</testcase>
+<testcase name="Accessibility and ARIA › should support high contrast mode" classname="accessibility.spec.ts" time="0.786">
+</testcase>
+<testcase name="Accessibility and ARIA › should support reduced motion preferences" classname="accessibility.spec.ts" time="1.273">
+</testcase>
+<testcase name="Accessibility and ARIA › should have proper color contrast for error messages" classname="accessibility.spec.ts" time="0.246">
+</testcase>
+</testsuite>
+<testsuite name="basic.spec.ts" timestamp="2025-09-02T10:27:26.676Z" hostname="chromium" tests="14" failures="0" skipped="0" time="12.089" errors="0">
+<testcase name="MathGenie Basic Functionality › should load the main page" classname="basic.spec.ts" time="0.216">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should have settings controls" classname="basic.spec.ts" time="0.223">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should generate problems" classname="basic.spec.ts" time="0.267">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should change settings and regenerate" classname="basic.spec.ts" time="1.205">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should download PDF" classname="basic.spec.ts" time="0.318">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should be responsive on mobile" classname="basic.spec.ts" time="0.22">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should switch languages" classname="basic.spec.ts" time="2.245">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should apply presets" classname="basic.spec.ts" time="1.23">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should handle React 19 concurrent features" classname="basic.spec.ts" time="0.685">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should show loading states during transitions" classname="basic.spec.ts" time="1.284">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should handle errors gracefully with error boundary" classname="basic.spec.ts" time="0.311">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should use deferred values for performance" classname="basic.spec.ts" time="2.353">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should validate input ranges" classname="basic.spec.ts" time="0.239">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should persist settings in localStorage" classname="basic.spec.ts" time="1.293">
+</testcase>
+</testsuite>
+<testsuite name="error-handling.spec.ts" timestamp="2025-09-02T10:27:26.676Z" hostname="chromium" tests="11" failures="0" skipped="0" time="4.862" errors="0">
+<testcase name="Error Handling and Validation › should display error message for no operations selected" classname="error-handling.spec.ts" time="0.323">
+</testcase>
+<testcase name="Error Handling and Validation › should display error message for invalid problem count" classname="error-handling.spec.ts" time="0.232">
+</testcase>
+<testcase name="Error Handling and Validation › should display error message for invalid number range" classname="error-handling.spec.ts" time="0.231">
+</testcase>
+<testcase name="Error Handling and Validation › should display error message for invalid result range" classname="error-handling.spec.ts" time="0.248">
+</testcase>
+<testcase name="Error Handling and Validation › should display error message for invalid operands range" classname="error-handling.spec.ts" time="0.261">
+</testcase>
+<testcase name="Error Handling and Validation › should clear error message when settings become valid" classname="error-handling.spec.ts" time="0.246">
+</testcase>
+<testcase name="Error Handling and Validation › should show error when trying to download PDF with no problems" classname="error-handling.spec.ts" time="0.245">
+</testcase>
+<testcase name="Error Handling and Validation › should handle extreme values gracefully" classname="error-handling.spec.ts" time="0.258">
+</testcase>
+<testcase name="Error Handling and Validation › should validate multiple errors simultaneously" classname="error-handling.spec.ts" time="0.329">
+</testcase>
+<testcase name="Error Handling and Validation › should maintain error state during language changes" classname="error-handling.spec.ts" time="2.238">
+</testcase>
+<testcase name="Error Handling and Validation › should show error message with proper ARIA attributes" classname="error-handling.spec.ts" time="0.251">
+</testcase>
+</testsuite>
+<testsuite name="integration.spec.ts" timestamp="2025-09-02T10:27:26.676Z" hostname="chromium" tests="9" failures="0" skipped="0" time="17.147" errors="0">
+<testcase name="Integration Tests › should handle error states with localStorage persistence" classname="integration.spec.ts" time="0.816">
+</testcase>
+<testcase name="Integration Tests › should apply presets and persist them with error validation" classname="integration.spec.ts" time="2.308">
+</testcase>
+<testcase name="Integration Tests › should maintain error states across language changes with persistence" classname="integration.spec.ts" time="3.726">
+</testcase>
+<testcase name="Integration Tests › should handle preset application with validation errors" classname="integration.spec.ts" time="1.267">
+</testcase>
+<testcase name="Integration Tests › should handle complex workflow: preset -&gt; custom changes -&gt; errors -&gt; persistence" classname="integration.spec.ts" time="2.496">
+</testcase>
+<testcase name="Integration Tests › should handle localStorage corruption with preset recovery" classname="integration.spec.ts" time="1.287">
+</testcase>
+<testcase name="Integration Tests › should handle multiple validation errors with preset override" classname="integration.spec.ts" time="1.34">
+</testcase>
+<testcase name="Integration Tests › should maintain consistency across browser tabs with error states" classname="integration.spec.ts" time="1.553">
+</testcase>
+<testcase name="Integration Tests › should handle rapid interactions without breaking state" classname="integration.spec.ts" time="2.354">
+</testcase>
+</testsuite>
+<testsuite name="localstorage-persistence.spec.ts" timestamp="2025-09-02T10:27:26.676Z" hostname="chromium" tests="11" failures="0" skipped="0" time="14.41" errors="0">
+<testcase name="localStorage Persistence › should persist basic settings in localStorage" classname="localstorage-persistence.spec.ts" time="1.238">
+</testcase>
+<testcase name="localStorage Persistence › should persist range settings in localStorage" classname="localstorage-persistence.spec.ts" time="1.223">
+</testcase>
+<testcase name="localStorage Persistence › should persist checkbox settings in localStorage" classname="localstorage-persistence.spec.ts" time="1.251">
+</testcase>
+<testcase name="localStorage Persistence › should persist PDF settings in localStorage" classname="localstorage-persistence.spec.ts" time="1.719">
+</testcase>
+<testcase name="localStorage Persistence › should restore settings after page reload" classname="localstorage-persistence.spec.ts" time="1.36">
+</testcase>
+<testcase name="localStorage Persistence › should handle localStorage corruption gracefully" classname="localstorage-persistence.spec.ts" time="0.784">
+</testcase>
+<testcase name="localStorage Persistence › should persist language selection" classname="localstorage-persistence.spec.ts" time="2.299">
+</testcase>
+<testcase name="localStorage Persistence › should persist settings when applied via presets" classname="localstorage-persistence.spec.ts" time="1.322">
+</testcase>
+<testcase name="localStorage Persistence › should handle localStorage quota exceeded" classname="localstorage-persistence.spec.ts" time="0.843">
+</testcase>
+<testcase name="localStorage Persistence › should maintain settings consistency across tabs" classname="localstorage-persistence.spec.ts" time="1.584">
+</testcase>
+<testcase name="localStorage Persistence › should preserve settings during network failures" classname="localstorage-persistence.spec.ts" time="0.787">
+</testcase>
+</testsuite>
+<testsuite name="presets-functionality.spec.ts" timestamp="2025-09-02T10:27:26.676Z" hostname="chromium" tests="13" failures="0" skipped="0" time="18.598" errors="0">
+<testcase name="Presets Functionality › should display presets section after translations load" classname="presets-functionality.spec.ts" time="0.236">
+</testcase>
+<testcase name="Presets Functionality › should display all preset cards with correct content" classname="presets-functionality.spec.ts" time="0.25">
+</testcase>
+<testcase name="Presets Functionality › should apply beginner preset correctly" classname="presets-functionality.spec.ts" time="1.237">
+</testcase>
+<testcase name="Presets Functionality › should apply intermediate preset correctly" classname="presets-functionality.spec.ts" time="1.246">
+</testcase>
+<testcase name="Presets Functionality › should apply advanced preset correctly" classname="presets-functionality.spec.ts" time="1.255">
+</testcase>
+<testcase name="Presets Functionality › should apply multiplication preset correctly" classname="presets-functionality.spec.ts" time="1.252">
+</testcase>
+<testcase name="Presets Functionality › should generate problems after applying preset" classname="presets-functionality.spec.ts" time="0.401">
+</testcase>
+<testcase name="Presets Functionality › should preserve custom settings when switching between presets" classname="presets-functionality.spec.ts" time="3.235">
+</testcase>
+<testcase name="Presets Functionality › should work correctly after language change" classname="presets-functionality.spec.ts" time="4.245">
+</testcase>
+<testcase name="Presets Functionality › should have accessible preset buttons" classname="presets-functionality.spec.ts" time="0.243">
+</testcase>
+<testcase name="Presets Functionality › should handle rapid preset switching" classname="presets-functionality.spec.ts" time="1.933">
+</testcase>
+<testcase name="Presets Functionality › should persist preset settings in localStorage" classname="presets-functionality.spec.ts" time="1.318">
+</testcase>
+<testcase name="Presets Functionality › should show visual feedback when preset is applied" classname="presets-functionality.spec.ts" time="1.747">
+</testcase>
+</testsuite>
+<testsuite name="accessibility.spec.ts" timestamp="2025-09-02T10:27:26.676Z" hostname="firefox" tests="19" failures="0" skipped="0" time="19.147" errors="0">
+<testcase name="Accessibility and ARIA › Axe-core Accessibility Scan › should pass WCAG 2.1 AA accessibility standards (light theme)" classname="accessibility.spec.ts" time="1.23">
+</testcase>
+<testcase name="Accessibility and ARIA › Axe-core Accessibility Scan › should pass WCAG 2.1 AA accessibility standards (dark theme)" classname="accessibility.spec.ts" time="2.399">
+</testcase>
+<testcase name="Accessibility and ARIA › Axe-core Accessibility Scan › should pass accessibility scan with form interactions" classname="accessibility.spec.ts" time="2.684">
+</testcase>
+<testcase name="Accessibility and ARIA › Axe-core Accessibility Scan › should pass accessibility scan with error states" classname="accessibility.spec.ts" time="1.437">
+</testcase>
+<testcase name="Accessibility and ARIA › should have proper ARIA attributes on error messages" classname="accessibility.spec.ts" time="0.4">
+</testcase>
+<testcase name="Accessibility and ARIA › should have proper ARIA labels on form controls" classname="accessibility.spec.ts" time="0.941">
+</testcase>
+<testcase name="Accessibility and ARIA › should have proper ARIA labels on buttons" classname="accessibility.spec.ts" time="0.455">
+</testcase>
+<testcase name="Accessibility and ARIA › should have proper ARIA labels on preset buttons" classname="accessibility.spec.ts" time="0.435">
+</testcase>
+<testcase name="Accessibility and ARIA › should have proper ARIA labels on language selector" classname="accessibility.spec.ts" time="0.39">
+</testcase>
+<testcase name="Accessibility and ARIA › should maintain focus management during error states" classname="accessibility.spec.ts" time="0.919">
+</testcase>
+<testcase name="Accessibility and ARIA › should support keyboard navigation" classname="accessibility.spec.ts" time="0.453">
+</testcase>
+<testcase name="Accessibility and ARIA › should support keyboard interaction with preset buttons" classname="accessibility.spec.ts" time="1.424">
+</testcase>
+<testcase name="Accessibility and ARIA › should support keyboard interaction with checkboxes" classname="accessibility.spec.ts" time="0.472">
+</testcase>
+<testcase name="Accessibility and ARIA › should have proper heading hierarchy" classname="accessibility.spec.ts" time="0.431">
+</testcase>
+<testcase name="Accessibility and ARIA › should have proper form labels" classname="accessibility.spec.ts" time="0.624">
+</testcase>
+<testcase name="Accessibility and ARIA › should provide meaningful error messages for screen readers" classname="accessibility.spec.ts" time="1.95">
+</testcase>
+<testcase name="Accessibility and ARIA › should support high contrast mode" classname="accessibility.spec.ts" time="0.814">
+</testcase>
+<testcase name="Accessibility and ARIA › should support reduced motion preferences" classname="accessibility.spec.ts" time="1.345">
+</testcase>
+<testcase name="Accessibility and ARIA › should have proper color contrast for error messages" classname="accessibility.spec.ts" time="0.344">
+</testcase>
+</testsuite>
+<testsuite name="basic.spec.ts" timestamp="2025-09-02T10:27:26.676Z" hostname="firefox" tests="14" failures="0" skipped="0" time="13.441" errors="0">
+<testcase name="MathGenie Basic Functionality › should load the main page" classname="basic.spec.ts" time="0.31">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should have settings controls" classname="basic.spec.ts" time="0.333">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should generate problems" classname="basic.spec.ts" time="0.346">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should change settings and regenerate" classname="basic.spec.ts" time="1.349">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should download PDF" classname="basic.spec.ts" time="0.302">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should be responsive on mobile" classname="basic.spec.ts" time="0.324">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should switch languages" classname="basic.spec.ts" time="2.335">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should apply presets" classname="basic.spec.ts" time="1.372">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should handle React 19 concurrent features" classname="basic.spec.ts" time="0.7">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should show loading states during transitions" classname="basic.spec.ts" time="1.407">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should handle errors gracefully with error boundary" classname="basic.spec.ts" time="0.374">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should use deferred values for performance" classname="basic.spec.ts" time="2.453">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should validate input ranges" classname="basic.spec.ts" time="0.317">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should persist settings in localStorage" classname="basic.spec.ts" time="1.519">
+</testcase>
+</testsuite>
+<testsuite name="error-handling.spec.ts" timestamp="2025-09-02T10:27:26.676Z" hostname="firefox" tests="11" failures="0" skipped="0" time="6.107" errors="0">
+<testcase name="Error Handling and Validation › should display error message for no operations selected" classname="error-handling.spec.ts" time="0.392">
+</testcase>
+<testcase name="Error Handling and Validation › should display error message for invalid problem count" classname="error-handling.spec.ts" time="0.295">
+</testcase>
+<testcase name="Error Handling and Validation › should display error message for invalid number range" classname="error-handling.spec.ts" time="0.358">
+</testcase>
+<testcase name="Error Handling and Validation › should display error message for invalid result range" classname="error-handling.spec.ts" time="0.347">
+</testcase>
+<testcase name="Error Handling and Validation › should display error message for invalid operands range" classname="error-handling.spec.ts" time="0.333">
+</testcase>
+<testcase name="Error Handling and Validation › should clear error message when settings become valid" classname="error-handling.spec.ts" time="0.435">
+</testcase>
+<testcase name="Error Handling and Validation › should show error when trying to download PDF with no problems" classname="error-handling.spec.ts" time="0.354">
+</testcase>
+<testcase name="Error Handling and Validation › should handle extreme values gracefully" classname="error-handling.spec.ts" time="0.385">
+</testcase>
+<testcase name="Error Handling and Validation › should validate multiple errors simultaneously" classname="error-handling.spec.ts" time="0.612">
+</testcase>
+<testcase name="Error Handling and Validation › should maintain error state during language changes" classname="error-handling.spec.ts" time="2.306">
+</testcase>
+<testcase name="Error Handling and Validation › should show error message with proper ARIA attributes" classname="error-handling.spec.ts" time="0.29">
+</testcase>
+</testsuite>
+<testsuite name="integration.spec.ts" timestamp="2025-09-02T10:27:26.676Z" hostname="firefox" tests="9" failures="0" skipped="0" time="21.116" errors="0">
+<testcase name="Integration Tests › should handle error states with localStorage persistence" classname="integration.spec.ts" time="1.319">
+</testcase>
+<testcase name="Integration Tests › should apply presets and persist them with error validation" classname="integration.spec.ts" time="2.711">
+</testcase>
+<testcase name="Integration Tests › should maintain error states across language changes with persistence" classname="integration.spec.ts" time="4.073">
+</testcase>
+<testcase name="Integration Tests › should handle preset application with validation errors" classname="integration.spec.ts" time="1.577">
+</testcase>
+<testcase name="Integration Tests › should handle complex workflow: preset -&gt; custom changes -&gt; errors -&gt; persistence" classname="integration.spec.ts" time="2.897">
+</testcase>
+<testcase name="Integration Tests › should handle localStorage corruption with preset recovery" classname="integration.spec.ts" time="1.63">
+</testcase>
+<testcase name="Integration Tests › should handle multiple validation errors with preset override" classname="integration.spec.ts" time="1.769">
+</testcase>
+<testcase name="Integration Tests › should maintain consistency across browser tabs with error states" classname="integration.spec.ts" time="2.378">
+</testcase>
+<testcase name="Integration Tests › should handle rapid interactions without breaking state" classname="integration.spec.ts" time="2.762">
+</testcase>
+</testsuite>
+<testsuite name="localstorage-persistence.spec.ts" timestamp="2025-09-02T10:27:26.676Z" hostname="firefox" tests="11" failures="0" skipped="0" time="18.683" errors="0">
+<testcase name="localStorage Persistence › should persist basic settings in localStorage" classname="localstorage-persistence.spec.ts" time="1.555">
+</testcase>
+<testcase name="localStorage Persistence › should persist range settings in localStorage" classname="localstorage-persistence.spec.ts" time="1.54">
+</testcase>
+<testcase name="localStorage Persistence › should persist checkbox settings in localStorage" classname="localstorage-persistence.spec.ts" time="1.624">
+</testcase>
+<testcase name="localStorage Persistence › should persist PDF settings in localStorage" classname="localstorage-persistence.spec.ts" time="2.017">
+</testcase>
+<testcase name="localStorage Persistence › should restore settings after page reload" classname="localstorage-persistence.spec.ts" time="1.79">
+</testcase>
+<testcase name="localStorage Persistence › should handle localStorage corruption gracefully" classname="localstorage-persistence.spec.ts" time="1.114">
+</testcase>
+<testcase name="localStorage Persistence › should persist language selection" classname="localstorage-persistence.spec.ts" time="2.632">
+</testcase>
+<testcase name="localStorage Persistence › should persist settings when applied via presets" classname="localstorage-persistence.spec.ts" time="1.723">
+</testcase>
+<testcase name="localStorage Persistence › should handle localStorage quota exceeded" classname="localstorage-persistence.spec.ts" time="1.156">
+</testcase>
+<testcase name="localStorage Persistence › should maintain settings consistency across tabs" classname="localstorage-persistence.spec.ts" time="2.341">
+</testcase>
+<testcase name="localStorage Persistence › should preserve settings during network failures" classname="localstorage-persistence.spec.ts" time="1.191">
+</testcase>
+</testsuite>
+<testsuite name="presets-functionality.spec.ts" timestamp="2025-09-02T10:27:26.676Z" hostname="firefox" tests="13" failures="0" skipped="0" time="20.339" errors="0">
+<testcase name="Presets Functionality › should display presets section after translations load" classname="presets-functionality.spec.ts" time="0.34">
+</testcase>
+<testcase name="Presets Functionality › should display all preset cards with correct content" classname="presets-functionality.spec.ts" time="0.319">
+</testcase>
+<testcase name="Presets Functionality › should apply beginner preset correctly" classname="presets-functionality.spec.ts" time="1.404">
+</testcase>
+<testcase name="Presets Functionality › should apply intermediate preset correctly" classname="presets-functionality.spec.ts" time="1.37">
+</testcase>
+<testcase name="Presets Functionality › should apply advanced preset correctly" classname="presets-functionality.spec.ts" time="1.364">
+</testcase>
+<testcase name="Presets Functionality › should apply multiplication preset correctly" classname="presets-functionality.spec.ts" time="1.434">
+</testcase>
+<testcase name="Presets Functionality › should generate problems after applying preset" classname="presets-functionality.spec.ts" time="0.382">
+</testcase>
+<testcase name="Presets Functionality › should preserve custom settings when switching between presets" classname="presets-functionality.spec.ts" time="3.487">
+</testcase>
+<testcase name="Presets Functionality › should work correctly after language change" classname="presets-functionality.spec.ts" time="4.416">
+</testcase>
+<testcase name="Presets Functionality › should have accessible preset buttons" classname="presets-functionality.spec.ts" time="0.322">
+</testcase>
+<testcase name="Presets Functionality › should handle rapid preset switching" classname="presets-functionality.spec.ts" time="2.142">
+</testcase>
+<testcase name="Presets Functionality › should persist preset settings in localStorage" classname="presets-functionality.spec.ts" time="1.496">
+</testcase>
+<testcase name="Presets Functionality › should show visual feedback when preset is applied" classname="presets-functionality.spec.ts" time="1.863">
+</testcase>
+</testsuite>
+<testsuite name="accessibility.spec.ts" timestamp="2025-09-02T10:27:26.676Z" hostname="webkit" tests="19" failures="0" skipped="0" time="16.979" errors="0">
+<testcase name="Accessibility and ARIA › Axe-core Accessibility Scan › should pass WCAG 2.1 AA accessibility standards (light theme)" classname="accessibility.spec.ts" time="1.018">
+</testcase>
+<testcase name="Accessibility and ARIA › Axe-core Accessibility Scan › should pass WCAG 2.1 AA accessibility standards (dark theme)" classname="accessibility.spec.ts" time="1.815">
+</testcase>
+<testcase name="Accessibility and ARIA › Axe-core Accessibility Scan › should pass accessibility scan with form interactions" classname="accessibility.spec.ts" time="2.127">
+</testcase>
+<testcase name="Accessibility and ARIA › Axe-core Accessibility Scan › should pass accessibility scan with error states" classname="accessibility.spec.ts" time="0.914">
+</testcase>
+<testcase name="Accessibility and ARIA › should have proper ARIA attributes on error messages" classname="accessibility.spec.ts" time="0.414">
+</testcase>
+<testcase name="Accessibility and ARIA › should have proper ARIA labels on form controls" classname="accessibility.spec.ts" time="0.36">
+</testcase>
+<testcase name="Accessibility and ARIA › should have proper ARIA labels on buttons" classname="accessibility.spec.ts" time="0.666">
+</testcase>
+<testcase name="Accessibility and ARIA › should have proper ARIA labels on preset buttons" classname="accessibility.spec.ts" time="0.402">
+</testcase>
+<testcase name="Accessibility and ARIA › should have proper ARIA labels on language selector" classname="accessibility.spec.ts" time="0.339">
+</testcase>
+<testcase name="Accessibility and ARIA › should maintain focus management during error states" classname="accessibility.spec.ts" time="0.487">
+</testcase>
+<testcase name="Accessibility and ARIA › should support keyboard navigation" classname="accessibility.spec.ts" time="0.438">
+</testcase>
+<testcase name="Accessibility and ARIA › should support keyboard interaction with preset buttons" classname="accessibility.spec.ts" time="1.584">
+</testcase>
+<testcase name="Accessibility and ARIA › should support keyboard interaction with checkboxes" classname="accessibility.spec.ts" time="0.486">
+</testcase>
+<testcase name="Accessibility and ARIA › should have proper heading hierarchy" classname="accessibility.spec.ts" time="0.44">
+</testcase>
+<testcase name="Accessibility and ARIA › should have proper form labels" classname="accessibility.spec.ts" time="0.487">
+</testcase>
+<testcase name="Accessibility and ARIA › should provide meaningful error messages for screen readers" classname="accessibility.spec.ts" time="2.101">
+</testcase>
+<testcase name="Accessibility and ARIA › should support high contrast mode" classname="accessibility.spec.ts" time="1.007">
+</testcase>
+<testcase name="Accessibility and ARIA › should support reduced motion preferences" classname="accessibility.spec.ts" time="1.444">
+</testcase>
+<testcase name="Accessibility and ARIA › should have proper color contrast for error messages" classname="accessibility.spec.ts" time="0.45">
+</testcase>
+</testsuite>
+<testsuite name="basic.spec.ts" timestamp="2025-09-02T10:27:26.676Z" hostname="webkit" tests="14" failures="0" skipped="0" time="14.451" errors="0">
+<testcase name="MathGenie Basic Functionality › should load the main page" classname="basic.spec.ts" time="0.358">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should have settings controls" classname="basic.spec.ts" time="0.372">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should generate problems" classname="basic.spec.ts" time="0.401">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should change settings and regenerate" classname="basic.spec.ts" time="1.386">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should download PDF" classname="basic.spec.ts" time="0.434">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should be responsive on mobile" classname="basic.spec.ts" time="0.318">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should switch languages" classname="basic.spec.ts" time="2.403">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should apply presets" classname="basic.spec.ts" time="1.424">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should handle React 19 concurrent features" classname="basic.spec.ts" time="0.869">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should show loading states during transitions" classname="basic.spec.ts" time="1.487">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should handle errors gracefully with error boundary" classname="basic.spec.ts" time="0.497">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should use deferred values for performance" classname="basic.spec.ts" time="2.586">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should validate input ranges" classname="basic.spec.ts" time="0.398">
+</testcase>
+<testcase name="MathGenie Basic Functionality › should persist settings in localStorage" classname="basic.spec.ts" time="1.518">
+</testcase>
+</testsuite>
+<testsuite name="error-handling.spec.ts" timestamp="2025-09-02T10:27:26.676Z" hostname="webkit" tests="11" failures="0" skipped="0" time="7.222" errors="0">
+<testcase name="Error Handling and Validation › should display error message for no operations selected" classname="error-handling.spec.ts" time="0.451">
+</testcase>
+<testcase name="Error Handling and Validation › should display error message for invalid problem count" classname="error-handling.spec.ts" time="0.403">
+</testcase>
+<testcase name="Error Handling and Validation › should display error message for invalid number range" classname="error-handling.spec.ts" time="0.42">
+</testcase>
+<testcase name="Error Handling and Validation › should display error message for invalid result range" classname="error-handling.spec.ts" time="0.423">
+</testcase>
+<testcase name="Error Handling and Validation › should display error message for invalid operands range" classname="error-handling.spec.ts" time="0.438">
+</testcase>
+<testcase name="Error Handling and Validation › should clear error message when settings become valid" classname="error-handling.spec.ts" time="0.493">
+</testcase>
+<testcase name="Error Handling and Validation › should show error when trying to download PDF with no problems" classname="error-handling.spec.ts" time="0.453">
+</testcase>
+<testcase name="Error Handling and Validation › should handle extreme values gracefully" classname="error-handling.spec.ts" time="0.514">
+</testcase>
+<testcase name="Error Handling and Validation › should validate multiple errors simultaneously" classname="error-handling.spec.ts" time="0.621">
+</testcase>
+<testcase name="Error Handling and Validation › should maintain error state during language changes" classname="error-handling.spec.ts" time="2.478">
+</testcase>
+<testcase name="Error Handling and Validation › should show error message with proper ARIA attributes" classname="error-handling.spec.ts" time="0.528">
+</testcase>
+</testsuite>
+<testsuite name="integration.spec.ts" timestamp="2025-09-02T10:27:26.676Z" hostname="webkit" tests="9" failures="0" skipped="0" time="19.94" errors="0">
+<testcase name="Integration Tests › should handle error states with localStorage persistence" classname="integration.spec.ts" time="1.104">
+</testcase>
+<testcase name="Integration Tests › should apply presets and persist them with error validation" classname="integration.spec.ts" time="2.664">
+</testcase>
+<testcase name="Integration Tests › should maintain error states across language changes with persistence" classname="integration.spec.ts" time="4.025">
+</testcase>
+<testcase name="Integration Tests › should handle preset application with validation errors" classname="integration.spec.ts" time="1.557">
+</testcase>
+<testcase name="Integration Tests › should handle complex workflow: preset -&gt; custom changes -&gt; errors -&gt; persistence" classname="integration.spec.ts" time="2.654">
+</testcase>
+<testcase name="Integration Tests › should handle localStorage corruption with preset recovery" classname="integration.spec.ts" time="1.573">
+</testcase>
+<testcase name="Integration Tests › should handle multiple validation errors with preset override" classname="integration.spec.ts" time="1.569">
+</testcase>
+<testcase name="Integration Tests › should maintain consistency across browser tabs with error states" classname="integration.spec.ts" time="2.177">
+</testcase>
+<testcase name="Integration Tests › should handle rapid interactions without breaking state" classname="integration.spec.ts" time="2.617">
+</testcase>
+</testsuite>
+<testsuite name="localstorage-persistence.spec.ts" timestamp="2025-09-02T10:27:26.676Z" hostname="webkit" tests="11" failures="0" skipped="0" time="17.045" errors="0">
+<testcase name="localStorage Persistence › should persist basic settings in localStorage" classname="localstorage-persistence.spec.ts" time="1.44">
+</testcase>
+<testcase name="localStorage Persistence › should persist range settings in localStorage" classname="localstorage-persistence.spec.ts" time="1.441">
+</testcase>
+<testcase name="localStorage Persistence › should persist checkbox settings in localStorage" classname="localstorage-persistence.spec.ts" time="1.418">
+</testcase>
+<testcase name="localStorage Persistence › should persist PDF settings in localStorage" classname="localstorage-persistence.spec.ts" time="1.937">
+</testcase>
+<testcase name="localStorage Persistence › should restore settings after page reload" classname="localstorage-persistence.spec.ts" time="1.558">
+</testcase>
+<testcase name="localStorage Persistence › should handle localStorage corruption gracefully" classname="localstorage-persistence.spec.ts" time="0.97">
+</testcase>
+<testcase name="localStorage Persistence › should persist language selection" classname="localstorage-persistence.spec.ts" time="2.511">
+</testcase>
+<testcase name="localStorage Persistence › should persist settings when applied via presets" classname="localstorage-persistence.spec.ts" time="1.578">
+</testcase>
+<testcase name="localStorage Persistence › should handle localStorage quota exceeded" classname="localstorage-persistence.spec.ts" time="1.055">
+</testcase>
+<testcase name="localStorage Persistence › should maintain settings consistency across tabs" classname="localstorage-persistence.spec.ts" time="2.086">
+</testcase>
+<testcase name="localStorage Persistence › should preserve settings during network failures" classname="localstorage-persistence.spec.ts" time="1.051">
+</testcase>
+</testsuite>
+<testsuite name="presets-functionality.spec.ts" timestamp="2025-09-02T10:27:26.676Z" hostname="webkit" tests="13" failures="0" skipped="0" time="21.041" errors="0">
+<testcase name="Presets Functionality › should display presets section after translations load" classname="presets-functionality.spec.ts" time="0.431">
+</testcase>
+<testcase name="Presets Functionality › should display all preset cards with correct content" classname="presets-functionality.spec.ts" time="0.447">
+</testcase>
+<testcase name="Presets Functionality › should apply beginner preset correctly" classname="presets-functionality.spec.ts" time="1.497">
+</testcase>
+<testcase name="Presets Functionality › should apply intermediate preset correctly" classname="presets-functionality.spec.ts" time="1.458">
+</testcase>
+<testcase name="Presets Functionality › should apply advanced preset correctly" classname="presets-functionality.spec.ts" time="1.503">
+</testcase>
+<testcase name="Presets Functionality › should apply multiplication preset correctly" classname="presets-functionality.spec.ts" time="1.501">
+</testcase>
+<testcase name="Presets Functionality › should generate problems after applying preset" classname="presets-functionality.spec.ts" time="0.437">
+</testcase>
+<testcase name="Presets Functionality › should preserve custom settings when switching between presets" classname="presets-functionality.spec.ts" time="3.47">
+</testcase>
+<testcase name="Presets Functionality › should work correctly after language change" classname="presets-functionality.spec.ts" time="4.4">
+</testcase>
+<testcase name="Presets Functionality › should have accessible preset buttons" classname="presets-functionality.spec.ts" time="0.387">
+</testcase>
+<testcase name="Presets Functionality › should handle rapid preset switching" classname="presets-functionality.spec.ts" time="2.126">
+</testcase>
+<testcase name="Presets Functionality › should persist preset settings in localStorage" classname="presets-functionality.spec.ts" time="1.475">
+</testcase>
+<testcase name="Presets Functionality › should show visual feedback when preset is applied" classname="presets-functionality.spec.ts" time="1.909">
+</testcase>
+</testsuite>
+</testsuites>
