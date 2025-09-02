@@ -1,6 +1,6 @@
 {
   "name": "mathgenie",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "dependencies": {
@@ -16,6 +16,7 @@
     "build:fast": "vite build",
     "preview": "vite preview",
     "test": "npm-run-all test:unit",
+    "test:all": "npm-run-all test:unit test:e2e:quick",
     "test:unit": "vitest --run --coverage",
     "prepare": "husky",
     "coverage": "vitest --coverage",
@@ -41,17 +42,38 @@
     "test:e2e:presets": "playwright test tests/e2e/presets-functionality.spec.ts",
     "test:e2e:integration": "playwright test tests/e2e/integration.spec.ts",
     "test:e2e:accessibility": "playwright test tests/e2e/accessibility.spec.ts",
-    "test:accessibility": "node scripts/accessibility-test.js light",
-    "test:accessibility:dark": "node scripts/accessibility-test.js dark",
-    "test:accessibility:all": "npm run test:accessibility && npm run test:accessibility:dark",
     "test:e2e:quick": "./scripts/test-e2e.sh quick",
     "test:e2e:full": "./scripts/test-e2e.sh full",
+    "test:mobile": "./scripts/test-e2e.sh mobile all",
+    "test:mobile:iphone": "./scripts/test-e2e.sh mobile iphone",
+    "test:mobile:iphone16": "./scripts/test-e2e.sh mobile iphone16",
+    "test:mobile:iphone15": "./scripts/test-e2e.sh mobile iphone15",
+    "test:mobile:ipad": "./scripts/test-e2e.sh mobile ipad",
+    "test:mobile:portrait": "./scripts/test-e2e.sh mobile portrait",
+    "test:mobile:landscape": "./scripts/test-e2e.sh mobile landscape",
+    "test:mobile:latest": "./scripts/test-e2e.sh mobile latest",
+    "test:mobile:android": "./scripts/test-e2e.sh mobile android",
+    "test:mobile:android:phones": "./scripts/test-e2e.sh mobile android-phones",
+    "test:mobile:android:tablets": "./scripts/test-e2e.sh mobile android-tablets",
+    "test:mobile:galaxy": "./scripts/test-e2e.sh mobile galaxy",
+    "test:mobile:pixel": "./scripts/test-e2e.sh mobile pixel",
+    "test:mobile:e2e": "./scripts/test-e2e.sh mobile-e2e all",
+    "test:mobile:e2e:iphone": "./scripts/test-e2e.sh mobile-e2e iphone",
+    "test:mobile:e2e:ipad": "./scripts/test-e2e.sh mobile-e2e ipad",
+    "test:mobile:e2e:android": "./scripts/test-e2e.sh mobile-e2e android",
+    "test:mobile:e2e:galaxy": "./scripts/test-e2e.sh mobile-e2e galaxy",
+    "test:mobile:e2e:pixel": "./scripts/test-e2e.sh mobile-e2e pixel",
     "playwright:install": "playwright install --with-deps",
     "playwright:install:ci": "playwright install chromium firefox webkit --with-deps",
-    "pre-commit": "lint-staged",
+    "pre-commit": "pnpm format && lint-staged",
     "pre-push": "pnpm type-check && pnpm test:unit && pnpm build",
     "commit": "git-cz",
-    "validate": "pnpm lint && pnpm type-check && pnpm test && pnpm build && pnpm test:e2e"
+    "validate": "pnpm lint && pnpm type-check && pnpm test && pnpm build && pnpm test:e2e",
+    "lighthouse": "lhci autorun",
+    "lighthouse:ci": "lhci autorun --fatal-assert-errors",
+    "lighthouse:collect": "lhci collect",
+    "lighthouse:assert": "lhci assert --fatal-assert-errors",
+    "lighthouse:upload": "lhci upload"
   },
   "eslintConfig": {
     "extends": [
@@ -71,8 +93,10 @@
     ]
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
     "@eslint/js": "^9.34.0",
     "@fullhuman/postcss-purgecss": "^7.0.2",
+    "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.55.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.0",
@@ -100,15 +124,13 @@
     "lint-staged": "^16.1.6",
     "npm-run-all": "^4.1.5",
     "postcss": "^8.5.6",
+    "prettier": "^3.3.3",
     "terser": "^5.43.1",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2",
     "vite": "^7.1.4",
     "vite-plugin-compression": "^0.5.1",
-    "vitest": "^3.2.4",
-    "prettier": "^3.3.3",
-    "@axe-core/webdriverjs": "^4.10.2",
-    "selenium-webdriver": "^4.22.0"
+    "vitest": "^3.2.4"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -124,8 +146,12 @@
   },
   "pnpm": {
     "overrides": {
-      "glob": "^11.0.3"
+      "glob": "^11.0.3",
+      "rimraf": "^6.0.1",
+      "chrome-launcher": "^1.2.0",
+      "tmp": "^0.2.5",
+      "os-tmpdir": "^2.0.0"
     }
   },
-  "packageManager": "pnpm@8.15.1"
+  "packageManager": "pnpm@10.15.1"
 }
