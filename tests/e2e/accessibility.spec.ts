@@ -3,10 +3,163 @@ import type { Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 import { createValidationError, waitForAppLoad, waitForErrorMessage } from "./test-utils";
 
+// Import axe-core for comprehensive accessibility testing
+import { AxeBuilder } from "@axe-core/playwright";
+
 test.describe("Accessibility and ARIA", () => {
   test.beforeEach(async ({ page }: { page: Page }) => {
     await page.goto("/");
     await waitForAppLoad(page);
+  });
+
+  // Comprehensive axe-core accessibility tests
+  test.describe("Axe-core Accessibility Scan", () => {
+    test("should pass WCAG 2.1 AA accessibility standards (light theme)", async ({
+      page,
+    }: {
+      page: Page;
+    }) => {
+      // Ensure light theme is active
+      await page.evaluate(() => {
+        document.documentElement.removeAttribute("data-theme");
+        document.body.classList.remove("dark-theme");
+      });
+
+      // Run axe accessibility scan
+      const accessibilityScanResults = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+        .exclude("#webpack-dev-server-client-overlay") // Exclude dev overlay
+        .analyze();
+
+      // Log results for debugging
+      if (accessibilityScanResults.violations.length > 0) {
+        console.log("Accessibility violations found (light theme):");
+        accessibilityScanResults.violations.forEach((violation, index) => {
+          console.log(`${index + 1}. ${violation.id} (${violation.impact} impact)`);
+          console.log(`   Description: ${violation.description}`);
+          console.log(`   Help: ${violation.helpUrl}`);
+          console.log(`   Affected elements: ${violation.nodes.length}`);
+        });
+      }
+
+      // Assert no violations
+      expect(accessibilityScanResults.violations).toEqual([]);
+    });
+
+    test("should pass WCAG 2.1 AA accessibility standards (dark theme)", async ({
+      page,
+    }: {
+      page: Page;
+    }) => {
+      // Apply dark theme
+      await page.evaluate(() => {
+        document.documentElement.setAttribute("data-theme", "dark");
+        document.body.classList.add("dark-theme");
+
+        // Force dark mode styles
+        const style = document.createElement("style");
+        style.textContent = `
+          :root {
+            --bg-primary: #0f172a !important;
+            --bg-secondary: #1e293b !important;
+            --bg-tertiary: #334155 !important;
+            --text-primary: #f8fafc !important;
+            --text-secondary: #e2e8f0 !important;
+            --text-muted: #94a3b8 !important;
+            --border-color: #334155 !important;
+            color-scheme: dark !important;
+          }
+          
+          body {
+            background-color: var(--bg-primary) !important;
+            color: var(--text-primary) !important;
+          }
+        `;
+        document.head.appendChild(style);
+      });
+
+      // Wait for styles to apply
+      await page.waitForTimeout(1000);
+
+      // Run axe accessibility scan
+      const accessibilityScanResults = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+        .exclude("#webpack-dev-server-client-overlay") // Exclude dev overlay
+        .analyze();
+
+      // Log results for debugging
+      if (accessibilityScanResults.violations.length > 0) {
+        console.log("Accessibility violations found (dark theme):");
+        accessibilityScanResults.violations.forEach((violation, index) => {
+          console.log(`${index + 1}. ${violation.id} (${violation.impact} impact)`);
+          console.log(`   Description: ${violation.description}`);
+          console.log(`   Help: ${violation.helpUrl}`);
+          console.log(`   Affected elements: ${violation.nodes.length}`);
+        });
+      }
+
+      // Assert no violations
+      expect(accessibilityScanResults.violations).toEqual([]);
+    });
+
+    test("should pass accessibility scan with form interactions", async ({
+      page,
+    }: {
+      page: Page;
+    }) => {
+      // Interact with form elements to test dynamic states
+      await page.fill("#numProblems", "25");
+      await page.selectOption("#operations", ["+", "-"]);
+      await page.check("#allowNegative");
+
+      // Generate problems to test results area
+      await page.click('button[aria-label*="Generate math problems"]');
+      await page.waitForTimeout(1000);
+
+      // Run axe accessibility scan on interactive state
+      const accessibilityScanResults = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+        .exclude("#webpack-dev-server-client-overlay")
+        .analyze();
+
+      // Log results for debugging
+      if (accessibilityScanResults.violations.length > 0) {
+        console.log("Accessibility violations found (with interactions):");
+        accessibilityScanResults.violations.forEach((violation, index) => {
+          console.log(`${index + 1}. ${violation.id} (${violation.impact} impact)`);
+          console.log(`   Description: ${violation.description}`);
+          console.log(`   Help: ${violation.helpUrl}`);
+          console.log(`   Affected elements: ${violation.nodes.length}`);
+        });
+      }
+
+      expect(accessibilityScanResults.violations).toEqual([]);
+    });
+
+    test("should pass accessibility scan with error states", async ({ page }: { page: Page }) => {
+      // Create validation errors to test error state accessibility
+      await createValidationError(page, "count");
+      await waitForErrorMessage(page);
+
+      // Run axe accessibility scan on error state
+      const accessibilityScanResults = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+        .exclude("#webpack-dev-server-client-overlay")
+        .analyze();
+
+      // Log results for debugging
+      if (accessibilityScanResults.violations.length > 0) {
+        console.log("Accessibility violations found (error state):");
+        accessibilityScanResults.violations.forEach((violation, index) => {
+          console.log(`${index + 1}. ${violation.id} (${violation.impact} impact)`);
+          console.log(`   Description: ${violation.description}`);
+          console.log(`   Help: ${violation.helpUrl}`);
+          console.log(`   Affected elements: ${violation.nodes.length}`);
+        });
+      }
+
+      expect(accessibilityScanResults.violations).toEqual([]);
+    });
   });
 
   test("should have proper ARIA attributes on error messages", async ({ page }: { page: Page }) => {

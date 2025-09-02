@@ -29,12 +29,12 @@ declare global {
 export const trackEvent = (eventName: string, properties: EventProperties = {}): void => {
   try {
     // Only track in production and if user hasn't opted out
-    if (process.env.NODE_ENV !== 'production' || localStorage.getItem('analytics-opt-out')) {
+    if (process.env.NODE_ENV !== "production" || localStorage.getItem("analytics-opt-out")) {
       return;
     }
   } catch (error) {
     // Handle localStorage errors gracefully
-    console.warn('Analytics: localStorage access failed', error);
+    console.warn("Analytics: localStorage access failed", error);
     return;
   }
 
@@ -52,19 +52,19 @@ export const trackEvent = (eventName: string, properties: EventProperties = {}):
   };
 
   // Log to console in development
-  if (process.env.NODE_ENV !== 'production') {
-    console.log('Analytics Event:', event);
+  if (process.env.NODE_ENV !== "production") {
+    console.log("Analytics Event:", event);
   }
 
   // Send to analytics service (if configured)
   if (window.gtag) {
-    window.gtag('event', eventName, properties);
+    window.gtag("event", eventName, properties);
   }
 };
 
 export const trackProblemGeneration = (settings: Settings, problemCount: number): void => {
-  trackEvent('problems_generated', {
-    operations: settings.operations.join(','),
+  trackEvent("problems_generated", {
+    operations: settings.operations.join(","),
     problem_count: problemCount,
     number_range: `${settings.numRange[0]}-${settings.numRange[1]}`,
     allow_negative: settings.allowNegative,
@@ -73,22 +73,22 @@ export const trackProblemGeneration = (settings: Settings, problemCount: number)
 };
 
 export const trackPdfDownload = (problemCount: number, settings: Settings): void => {
-  trackEvent('pdf_downloaded', {
+  trackEvent("pdf_downloaded", {
     problem_count: problemCount,
-    paper_size: settings.paperSize || 'a4',
+    paper_size: settings.paperSize || "a4",
     font_size: settings.fontSize || 12,
   });
 };
 
 export const trackLanguageChange = (fromLanguage: string, toLanguage: string): void => {
-  trackEvent('language_changed', {
+  trackEvent("language_changed", {
     from: fromLanguage,
     to: toLanguage,
   });
 };
 
 export const trackPresetUsed = (presetId: string): void => {
-  trackEvent('preset_applied', {
+  trackEvent("preset_applied", {
     preset: presetId,
   });
 };

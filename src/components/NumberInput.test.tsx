@@ -1,10 +1,10 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
-import NumberInput from './NumberInput';
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import NumberInput from "./NumberInput";
 
-describe('NumberInput', () => {
+describe("NumberInput", () => {
   const defaultProps = {
-    id: 'test-input',
-    label: 'Test Input',
+    id: "test-input",
+    label: "Test Input",
     value: 10,
     onChange: vi.fn(),
     min: 1,
@@ -15,74 +15,74 @@ describe('NumberInput', () => {
     vi.clearAllMocks();
   });
 
-  test('renders with basic props', () => {
+  test("renders with basic props", () => {
     render(<NumberInput {...defaultProps} />);
 
-    expect(screen.getByDisplayValue('10')).toBeDefined();
-    expect(screen.getByText('Test Input')).toBeDefined();
+    expect(screen.getByDisplayValue("10")).toBeDefined();
+    expect(screen.getByText("Test Input")).toBeDefined();
   });
 
-  test('calls onChange when value changes', () => {
+  test("calls onChange when value changes", () => {
     render(<NumberInput {...defaultProps} />);
 
-    const input = screen.getByDisplayValue('10');
-    fireEvent.change(input, { target: { value: '25' } });
+    const input = screen.getByDisplayValue("10");
+    fireEvent.change(input, { target: { value: "25" } });
 
     expect(defaultProps.onChange).toHaveBeenCalledWith(25);
   });
 
-  test('handles empty input', () => {
+  test("handles empty input", () => {
     render(<NumberInput {...defaultProps} />);
 
-    const input = screen.getByDisplayValue('10');
-    fireEvent.change(input, { target: { value: '' } });
+    const input = screen.getByDisplayValue("10");
+    fireEvent.change(input, { target: { value: "" } });
 
     expect(defaultProps.onChange).toHaveBeenCalledWith(1);
   });
 
-  test('shows required indicator when required', () => {
+  test("shows required indicator when required", () => {
     render(<NumberInput {...defaultProps} required />);
 
-    expect(screen.getByLabelText('required')).toBeDefined();
+    expect(screen.getByLabelText("required")).toBeDefined();
   });
 
-  test('applies placeholder when provided', () => {
+  test("applies placeholder when provided", () => {
     render(<NumberInput {...defaultProps} placeholder="Enter number" />);
 
-    const input = screen.getByDisplayValue('10');
-    expect(input.getAttribute('placeholder')).toBe('Enter number');
+    const input = screen.getByDisplayValue("10");
+    expect(input.getAttribute("placeholder")).toBe("Enter number");
   });
 
-  test('handles blur event', () => {
+  test("handles blur event", () => {
     render(<NumberInput {...defaultProps} />);
 
-    const input = screen.getByDisplayValue('10');
+    const input = screen.getByDisplayValue("10");
     fireEvent.blur(input);
 
     // Should not throw error
     expect(input).toBeDefined();
   });
 
-  test('handles invalid number input', () => {
+  test("handles invalid number input", () => {
     render(<NumberInput {...defaultProps} />);
 
-    const input = screen.getByDisplayValue('10');
-    fireEvent.change(input, { target: { value: 'abc' } });
+    const input = screen.getByDisplayValue("10");
+    fireEvent.change(input, { target: { value: "abc" } });
 
     // Should handle gracefully
     expect(input).toBeDefined();
   });
 
-  test('handles blur with value below minimum', async () => {
+  test("handles blur with value below minimum", async () => {
     render(<NumberInput {...defaultProps} />);
 
-    const input = screen.getByDisplayValue('10') as HTMLInputElement;
+    const input = screen.getByDisplayValue("10") as HTMLInputElement;
 
     // Simulate user typing a value below minimum without triggering change event
     // This simulates the scenario where user types directly and then blurs
-    Object.defineProperty(input, 'value', {
+    Object.defineProperty(input, "value", {
       writable: true,
-      value: '0',
+      value: "0",
     });
 
     // Clear any previous onChange calls
@@ -97,15 +97,15 @@ describe('NumberInput', () => {
     expect(defaultProps.onChange).toHaveBeenCalledWith(1);
   });
 
-  test('handles blur with value above maximum', async () => {
+  test("handles blur with value above maximum", async () => {
     render(<NumberInput {...defaultProps} />);
 
-    const input = screen.getByDisplayValue('10') as HTMLInputElement;
+    const input = screen.getByDisplayValue("10") as HTMLInputElement;
 
     // Simulate user typing a value above maximum
-    Object.defineProperty(input, 'value', {
+    Object.defineProperty(input, "value", {
       writable: true,
-      value: '150',
+      value: "150",
     });
 
     // Clear any previous onChange calls
@@ -120,15 +120,15 @@ describe('NumberInput', () => {
     expect(defaultProps.onChange).toHaveBeenCalledWith(100);
   });
 
-  test('handles blur with invalid value', async () => {
+  test("handles blur with invalid value", async () => {
     render(<NumberInput {...defaultProps} />);
 
-    const input = screen.getByDisplayValue('10') as HTMLInputElement;
+    const input = screen.getByDisplayValue("10") as HTMLInputElement;
 
     // Simulate user typing invalid text
-    Object.defineProperty(input, 'value', {
+    Object.defineProperty(input, "value", {
       writable: true,
-      value: 'invalid',
+      value: "invalid",
     });
 
     // Clear any previous onChange calls
@@ -142,79 +142,79 @@ describe('NumberInput', () => {
     expect(defaultProps.onChange).toHaveBeenCalledWith(1); // Should reset to min
   });
 
-  test('handles blur with valid value in range', () => {
+  test("handles blur with valid value in range", () => {
     render(<NumberInput {...defaultProps} />);
 
-    const input = screen.getByDisplayValue('10');
-    fireEvent.change(input, { target: { value: '50' } });
+    const input = screen.getByDisplayValue("10");
+    fireEvent.change(input, { target: { value: "50" } });
     fireEvent.blur(input);
 
     // Should not call onChange again if value is already valid
     expect(input).toBeDefined();
   });
 
-  test('renders without label when not provided', () => {
+  test("renders without label when not provided", () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { label, ...propsWithoutLabel } = defaultProps;
 
     render(<NumberInput {...propsWithoutLabel} />);
 
-    expect(screen.queryByText('Test Input')).toBeNull();
-    expect(screen.getByDisplayValue('10')).toBeDefined();
+    expect(screen.queryByText("Test Input")).toBeNull();
+    expect(screen.getByDisplayValue("10")).toBeDefined();
   });
 
-  test('renders without required indicator when not required', () => {
+  test("renders without required indicator when not required", () => {
     render(<NumberInput {...defaultProps} required={false} />);
 
-    expect(screen.queryByLabelText('required')).toBeNull();
+    expect(screen.queryByLabelText("required")).toBeNull();
   });
 
-  test('has correct accessibility attributes', () => {
+  test("has correct accessibility attributes", () => {
     render(<NumberInput {...defaultProps} />);
 
-    const input = screen.getByDisplayValue('10');
-    expect(input.getAttribute('aria-label')).toBe('Test Input (1 to 100)');
-    expect(input.getAttribute('inputMode')).toBe('numeric');
-    expect(input.getAttribute('pattern')).toBe('[0-9]*');
+    const input = screen.getByDisplayValue("10");
+    expect(input.getAttribute("aria-label")).toBe("Test Input (1 to 100)");
+    expect(input.getAttribute("inputMode")).toBe("numeric");
+    expect(input.getAttribute("pattern")).toBe("[0-9]*");
   });
 
-  test('handles value at minimum boundary', () => {
+  test("handles value at minimum boundary", () => {
     render(<NumberInput {...defaultProps} />);
 
-    const input = screen.getByDisplayValue('10');
-    fireEvent.change(input, { target: { value: '1' } });
+    const input = screen.getByDisplayValue("10");
+    fireEvent.change(input, { target: { value: "1" } });
 
     expect(defaultProps.onChange).toHaveBeenCalledWith(1);
   });
 
-  test('handles value at maximum boundary', () => {
+  test("handles value at maximum boundary", () => {
     render(<NumberInput {...defaultProps} />);
 
-    const input = screen.getByDisplayValue('10');
-    fireEvent.change(input, { target: { value: '100' } });
+    const input = screen.getByDisplayValue("10");
+    fireEvent.change(input, { target: { value: "100" } });
 
     expect(defaultProps.onChange).toHaveBeenCalledWith(100);
   });
 
-  test('does not call onChange for out of range values during change', () => {
+  test("does not call onChange for out of range values during change", () => {
     render(<NumberInput {...defaultProps} />);
 
-    const input = screen.getByDisplayValue('10');
+    const input = screen.getByDisplayValue("10");
 
     // Clear previous calls
     defaultProps.onChange.mockClear();
 
-    fireEvent.change(input, { target: { value: '150' } });
+    fireEvent.change(input, { target: { value: "150" } });
 
     // Should not call onChange for out of range value during change
     expect(defaultProps.onChange).not.toHaveBeenCalled();
   });
 
-  test('passes through additional props', () => {
+  test("passes through additional props", () => {
     render(<NumberInput {...defaultProps} className="custom-class" data-testid="custom-input" />);
 
-    const input = screen.getByDisplayValue('10');
-    expect(input.getAttribute('class')).toContain('custom-class');
-    expect(input.getAttribute('data-testid')).toBe('custom-input');
+    const input = screen.getByDisplayValue("10");
+    expect(input.getAttribute("class")).toContain("custom-class");
+    expect(input.getAttribute("data-testid")).toBe("custom-input");
   });
 });

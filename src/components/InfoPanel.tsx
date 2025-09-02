@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { useTranslation } from '../i18n';
-import type { Problem, QuizResult, Settings } from '../types';
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "../i18n";
+import type { Problem, QuizResult, Settings } from "../types";
 
 interface InfoPanelProps {
   problems: Problem[];
@@ -41,7 +41,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
         totalProblems: 0,
         averageComplexity: 0,
         operationTypes: 0,
-        difficultyLevel: t('infoPanel.difficulty.beginner'),
+        difficultyLevel: t("infoPanel.difficulty.beginner"),
       };
     }
 
@@ -52,15 +52,15 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
     // Simple difficulty calculation
     const complexity = (numberRange * operationTypes * averageOperands) / 100;
 
-    let difficultyLevel = t('infoPanel.difficulty.beginner');
+    let difficultyLevel = t("infoPanel.difficulty.beginner");
     if (complexity > 2) {
-      difficultyLevel = t('infoPanel.difficulty.intermediate');
+      difficultyLevel = t("infoPanel.difficulty.intermediate");
     }
     if (complexity > 5) {
-      difficultyLevel = t('infoPanel.difficulty.advanced');
+      difficultyLevel = t("infoPanel.difficulty.advanced");
     }
     if (complexity > 10) {
-      difficultyLevel = t('infoPanel.difficulty.expert');
+      difficultyLevel = t("infoPanel.difficulty.expert");
     }
 
     return {
@@ -74,11 +74,11 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
   const stats = calculateStats();
 
   const tips = [
-    t('infoPanel.tips.items.0'),
-    t('infoPanel.tips.items.1'),
-    t('infoPanel.tips.items.2'),
-    t('infoPanel.tips.items.3'),
-    t('infoPanel.tips.items.4'),
+    t("infoPanel.tips.items.0"),
+    t("infoPanel.tips.items.1"),
+    t("infoPanel.tips.items.2"),
+    t("infoPanel.tips.items.3"),
+    t("infoPanel.tips.items.4"),
   ];
 
   // Calculate learning progress (based on problem completion)
@@ -88,47 +88,47 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
     <div className="info-panel">
       <h3>
         <span>📊</span>
-        {t('infoPanel.title')}
+        {t("infoPanel.title")}
       </h3>
 
       <div className="stats-grid">
         <div className="stat-card">
           <span className="stat-value">{stats.totalProblems}</span>
-          <div className="stat-label">{t('infoPanel.stats.currentProblems')}</div>
+          <div className="stat-label">{t("infoPanel.stats.currentProblems")}</div>
         </div>
 
         <div className="stat-card">
           <span className="stat-value">{sessionStats.totalGenerated}</span>
-          <div className="stat-label">{t('infoPanel.stats.totalGenerated')}</div>
+          <div className="stat-label">{t("infoPanel.stats.totalGenerated")}</div>
         </div>
 
         <div className="stat-card">
           <span className="stat-value">{stats.difficultyLevel}</span>
-          <div className="stat-label">{t('infoPanel.stats.difficultyLevel')}</div>
+          <div className="stat-label">{t("infoPanel.stats.difficultyLevel")}</div>
         </div>
 
         <div className="stat-card">
           <span className="stat-value">{stats.operationTypes}</span>
-          <div className="stat-label">{t('infoPanel.stats.operationTypes')}</div>
+          <div className="stat-label">{t("infoPanel.stats.operationTypes")}</div>
         </div>
       </div>
 
       <div className="progress-section">
-        <h4>🎯 {t('infoPanel.progress.title')}</h4>
+        <h4>🎯 {t("infoPanel.progress.title")}</h4>
         <div className="progress-bar">
           <div className="progress-fill" style={{ width: `${learningProgress}%` }}></div>
         </div>
         <div className="progress-text">
-          {t('infoPanel.progress.completed', { percent: Math.round(learningProgress) })}
+          {t("infoPanel.progress.completed", { percent: Math.round(learningProgress) })}
         </div>
       </div>
 
       <div className="tips-section">
-        <h4>⚡ {t('infoPanel.quickActions.title')}</h4>
+        <h4>⚡ {t("infoPanel.quickActions.title")}</h4>
         <div className="quick-actions">
           <button className="quick-action-btn" onClick={onGenerateProblems}>
             <span>🔄</span>
-            {t('infoPanel.quickActions.regenerate')}
+            {t("infoPanel.quickActions.regenerate")}
           </button>
           <button
             className="quick-action-btn"
@@ -136,7 +136,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
             disabled={problems.length === 0}
           >
             <span>📄</span>
-            {t('infoPanel.quickActions.downloadPdf')}
+            {t("infoPanel.quickActions.downloadPdf")}
           </button>
           <button
             className="quick-action-btn"
@@ -144,38 +144,38 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
             disabled={problems.length === 0}
           >
             <span>🎯</span>
-            {t('infoPanel.quickActions.startQuiz')}
+            {t("infoPanel.quickActions.startQuiz")}
           </button>
           <button
             className="quick-action-btn"
             onClick={() => {
-              const element = document.querySelector('.problems-grid');
+              const element = document.querySelector(".problems-grid");
               if (element) {
-                element.scrollIntoView({ behavior: 'smooth' });
+                element.scrollIntoView({ behavior: "smooth" });
               }
             }}
           >
             <span>📝</span>
-            {t('infoPanel.quickActions.jumpToProblems')}
+            {t("infoPanel.quickActions.jumpToProblems")}
           </button>
         </div>
       </div>
 
       {quizResult && (
         <div className="tips-section">
-          <h4>🏆 {t('infoPanel.recentResults.title')}</h4>
+          <h4>🏆 {t("infoPanel.recentResults.title")}</h4>
           <div className="quiz-result-summary">
             <div className="result-item">
               <span className="result-label">
-                {t('infoPanel.recentResults.score', { score: quizResult.score })}
+                {t("infoPanel.recentResults.score", { score: quizResult.score })}
               </span>
             </div>
             <div className="result-item">
-              <span className="result-label">{t('infoPanel.recentResults.grade')}</span>
+              <span className="result-label">{t("infoPanel.recentResults.grade")}</span>
               <span className="result-value">{quizResult.grade}</span>
             </div>
             <div className="result-item">
-              <span className="result-label">{t('infoPanel.recentResults.accuracy')}</span>
+              <span className="result-label">{t("infoPanel.recentResults.accuracy")}</span>
               <span className="result-value">
                 {Math.round((quizResult.correctAnswers / quizResult.totalProblems) * 100)}%
               </span>
@@ -185,7 +185,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
       )}
 
       <div className="tips-section">
-        <h4>💡 {t('infoPanel.tips.title')}</h4>
+        <h4>💡 {t("infoPanel.tips.title")}</h4>
         <ul className="tips-list">
           {tips.slice(0, 3).map((tip, index) => (
             <li key={index}>{tip}</li>
@@ -194,27 +194,27 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
       </div>
 
       <div className="tips-section">
-        <h4>⚙️ {t('infoPanel.currentConfig.title')}</h4>
+        <h4>⚙️ {t("infoPanel.currentConfig.title")}</h4>
         <ul className="tips-list">
           <li>
-            {t('infoPanel.currentConfig.operations', {
-              operations: settings.operations.join(', '),
+            {t("infoPanel.currentConfig.operations", {
+              operations: settings.operations.join(", "),
             })}
           </li>
           <li>
-            {t('infoPanel.currentConfig.numbers', {
+            {t("infoPanel.currentConfig.numbers", {
               min: settings.numRange[0],
               max: settings.numRange[1],
             })}
           </li>
           <li>
-            {t('infoPanel.currentConfig.results', {
+            {t("infoPanel.currentConfig.results", {
               min: settings.resultRange[0],
               max: settings.resultRange[1],
             })}
           </li>
           <li>
-            {t('infoPanel.currentConfig.operands', {
+            {t("infoPanel.currentConfig.operands", {
               min: settings.numOperandsRange[0],
               max: settings.numOperandsRange[1],
             })}
