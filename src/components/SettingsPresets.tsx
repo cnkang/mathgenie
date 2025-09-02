@@ -23,8 +23,8 @@ const SettingsPresets: React.FC<SettingsPresetsProps> = ({ onApplyPreset }) => {
         showAnswers: false,
         fontSize: 18,
         lineSpacing: 16,
-        paperSize: 'a4'
-      }
+        paperSize: 'a4',
+      },
     },
     {
       name: t('presets.intermediate.name') || 'Intermediate (1-50)',
@@ -39,8 +39,8 @@ const SettingsPresets: React.FC<SettingsPresetsProps> = ({ onApplyPreset }) => {
         showAnswers: false,
         fontSize: 16,
         lineSpacing: 14,
-        paperSize: 'a4'
-      }
+        paperSize: 'a4',
+      },
     },
     {
       name: t('presets.advanced.name') || 'Advanced (1-100)',
@@ -55,8 +55,8 @@ const SettingsPresets: React.FC<SettingsPresetsProps> = ({ onApplyPreset }) => {
         showAnswers: false,
         fontSize: 14,
         lineSpacing: 12,
-        paperSize: 'a4'
-      }
+        paperSize: 'a4',
+      },
     },
     {
       name: t('presets.multiplication.name') || 'Multiplication Tables',
@@ -71,9 +71,9 @@ const SettingsPresets: React.FC<SettingsPresetsProps> = ({ onApplyPreset }) => {
         showAnswers: false,
         fontSize: 16,
         lineSpacing: 14,
-        paperSize: 'a4'
-      }
-    }
+        paperSize: 'a4',
+      },
+    },
   ];
 
   const handleApplyPreset = (settings: Partial<Settings>): void => {

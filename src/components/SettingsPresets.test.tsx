@@ -15,7 +15,7 @@ describe('SettingsPresets', () => {
     render(
       <I18nProvider>
         <SettingsPresets onApplyPreset={mockOnApplyPreset} />
-      </I18nProvider>
+      </I18nProvider>,
     );
 
     const buttons = screen.getAllByRole('button');
@@ -26,7 +26,7 @@ describe('SettingsPresets', () => {
     render(
       <I18nProvider>
         <SettingsPresets onApplyPreset={mockOnApplyPreset} />
-      </I18nProvider>
+      </I18nProvider>,
     );
 
     const buttons = screen.getAllByRole('button');
@@ -37,7 +37,7 @@ describe('SettingsPresets', () => {
         operations: ['+', '-'] as Operation[],
         numProblems: 15,
         numRange: [1, 10],
-      })
+      }),
     );
   });
 
@@ -45,7 +45,7 @@ describe('SettingsPresets', () => {
     render(
       <I18nProvider>
         <SettingsPresets onApplyPreset={mockOnApplyPreset} />
-      </I18nProvider>
+      </I18nProvider>,
     );
 
     const buttons = screen.getAllByRole('button');
@@ -56,7 +56,7 @@ describe('SettingsPresets', () => {
         operations: ['+', '-', '*'] as Operation[],
         numProblems: 20,
         numRange: [1, 50],
-      })
+      }),
     );
   });
 
@@ -64,7 +64,7 @@ describe('SettingsPresets', () => {
     render(
       <I18nProvider>
         <SettingsPresets onApplyPreset={mockOnApplyPreset} />
-      </I18nProvider>
+      </I18nProvider>,
     );
 
     const buttons = screen.getAllByRole('button');
@@ -75,7 +75,7 @@ describe('SettingsPresets', () => {
         operations: ['+', '-', '*', '/'] as Operation[],
         numProblems: 25,
         numRange: [1, 100],
-      })
+      }),
     );
   });
 
@@ -83,7 +83,7 @@ describe('SettingsPresets', () => {
     render(
       <I18nProvider>
         <SettingsPresets onApplyPreset={mockOnApplyPreset} />
-      </I18nProvider>
+      </I18nProvider>,
     );
 
     const buttons = screen.getAllByRole('button');
@@ -94,7 +94,7 @@ describe('SettingsPresets', () => {
         operations: ['*'] as Operation[],
         numProblems: 30,
         numRange: [1, 12],
-      })
+      }),
     );
   });
 
@@ -102,7 +102,7 @@ describe('SettingsPresets', () => {
     render(
       <I18nProvider>
         <SettingsPresets onApplyPreset={mockOnApplyPreset} />
-      </I18nProvider>
+      </I18nProvider>,
     );
 
     const buttons = screen.getAllByRole('button');
@@ -118,7 +118,7 @@ describe('SettingsPresets', () => {
     render(
       <I18nProvider>
         <SettingsPresets onApplyPreset={mockOnApplyPreset} />
-      </I18nProvider>
+      </I18nProvider>,
     );
 
     // Check that all presets are rendered
@@ -215,19 +215,19 @@ describe('SettingsPresets', () => {
     expect(screen.getByTestId('title')).toHaveTextContent('Quick Presets');
     expect(screen.getByTestId('beginner-name')).toHaveTextContent('Beginner (1-10)');
     expect(screen.getByTestId('beginner-desc')).toHaveTextContent(
-      'Simple addition and subtraction'
+      'Simple addition and subtraction',
     );
     expect(screen.getByTestId('intermediate-name')).toHaveTextContent('Intermediate (1-50)');
     expect(screen.getByTestId('intermediate-desc')).toHaveTextContent(
-      'All operations with medium numbers'
+      'All operations with medium numbers',
     );
     expect(screen.getByTestId('advanced-name')).toHaveTextContent('Advanced (1-100)');
     expect(screen.getByTestId('advanced-desc')).toHaveTextContent(
-      'All operations including division'
+      'All operations including division',
     );
     expect(screen.getByTestId('multiplication-name')).toHaveTextContent('Multiplication Tables');
     expect(screen.getByTestId('multiplication-desc')).toHaveTextContent(
-      'Focus on multiplication practice'
+      'Focus on multiplication practice',
     );
     expect(screen.getByTestId('apply')).toHaveTextContent('Apply');
   });
@@ -236,7 +236,7 @@ describe('SettingsPresets', () => {
     render(
       <I18nProvider>
         <SettingsPresets onApplyPreset={mockOnApplyPreset} />
-      </I18nProvider>
+      </I18nProvider>,
     );
 
     const buttons = screen.getAllByRole('button');
@@ -377,7 +377,7 @@ describe('SettingsPresets', () => {
     render(
       <I18nProvider>
         <SettingsPresets onApplyPreset={mockOnApplyPreset} />
-      </I18nProvider>
+      </I18nProvider>,
     );
 
     const buttons = screen.getAllByRole('button');
@@ -394,7 +394,7 @@ describe('SettingsPresets', () => {
     render(
       <I18nProvider>
         <SettingsPresets onApplyPreset={mockOnApplyPreset} />
-      </I18nProvider>
+      </I18nProvider>,
     );
 
     const buttons = screen.getAllByRole('button');

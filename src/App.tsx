@@ -13,7 +13,7 @@ import { useTranslation } from './i18n';
 import type { Operation, PaperSizeOptions, Problem, QuizResult, Settings } from './types';
 
 const SpeedInsights = React.lazy(() =>
-  import('@vercel/speed-insights/react').then((module) => ({ default: module.SpeedInsights }))
+  import('@vercel/speed-insights/react').then((module) => ({ default: module.SpeedInsights })),
 );
 
 function App(): React.JSX.Element {
@@ -37,10 +37,32 @@ function App(): React.JSX.Element {
     try {
       const saved = localStorage.getItem('mathgenie-settings');
       if (saved) {
-        return { ...defaultSettings, ...JSON.parse(saved) };
+        const parsed = JSON.parse(saved);
+        // Validate parsed settings to prevent errors
+        return {
+          ...defaultSettings,
+          ...parsed,
+          operations: Array.isArray(parsed.operations)
+            ? parsed.operations
+            : defaultSettings.operations,
+          numRange:
+            Array.isArray(parsed.numRange) && parsed.numRange.length === 2
+              ? parsed.numRange
+              : defaultSettings.numRange,
+          resultRange:
+            Array.isArray(parsed.resultRange) && parsed.resultRange.length === 2
+              ? parsed.resultRange
+              : defaultSettings.resultRange,
+          numOperandsRange:
+            Array.isArray(parsed.numOperandsRange) && parsed.numOperandsRange.length === 2
+              ? parsed.numOperandsRange
+              : defaultSettings.numOperandsRange,
+        };
       }
     } catch (error) {
-      console.warn('Failed to load settings from localStorage:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Failed to load settings from localStorage:', error);
+      }
     }
     return defaultSettings;
   };
@@ -64,7 +86,9 @@ function App(): React.JSX.Element {
     try {
       localStorage.setItem('mathgenie-settings', JSON.stringify(newSettings));
     } catch (error) {
-      console.warn('Failed to save settings to localStorage:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Failed to save settings to localStorage:', error);
+      }
     }
   };
 
@@ -145,12 +169,12 @@ function App(): React.JSX.Element {
     const MAX_ATTEMPTS = 10000;
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
       const operands = Array.from({ length: numOperands }, () =>
-        random(settings.numRange[0], settings.numRange[1])
+        random(settings.numRange[0], settings.numRange[1]),
       );
 
       const operationSymbols = Array.from(
         { length: numOperands - 1 },
-        () => settings.operations[random(0, settings.operations.length - 1)]
+        () => settings.operations[random(0, settings.operations.length - 1)],
       );
 
       const result = calculateExpression(operands, operationSymbols);
@@ -192,7 +216,7 @@ function App(): React.JSX.Element {
 
     try {
       const generatedProblems = Array.from({ length: settings.numProblems }, () =>
-        generateProblem()
+        generateProblem(),
       )
         .filter((problem) => problem !== '')
         .map((problem, index) => ({ id: index, text: problem }));
@@ -205,13 +229,13 @@ function App(): React.JSX.Element {
           t('errors.partialGeneration', {
             generated: generatedProblems.length,
             requested: settings.numProblems,
-          })
+          }),
         );
         setProblems(generatedProblems);
       } else {
         // Full success
         setSuccessMessage(
-          t('messages.success.problemsGenerated', { count: generatedProblems.length })
+          t('messages.success.problemsGenerated', { count: generatedProblems.length }),
         );
         setProblems(generatedProblems);
 
@@ -220,7 +244,9 @@ function App(): React.JSX.Element {
       }
     } catch (err) {
       setError(t('errors.generationFailed'));
-      console.error('Problem generation error:', err);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Problem generation error:', err);
+      }
     }
   };
 
@@ -281,7 +307,9 @@ function App(): React.JSX.Element {
       });
     } catch (err) {
       setError(t('errors.pdfFailed'));
-      console.error('PDF generation error:', err);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('PDF generation error:', err);
+      }
     }
   };
 
@@ -346,7 +374,7 @@ function App(): React.JSX.Element {
 
   const startQuizMode = (): void => {
     if (problems.length === 0) {
-      setError('请先生成题目再开始答题模式');
+      setError('Please generate problems first before starting quiz mode');
       return;
     }
     setIsQuizMode(true);
@@ -359,7 +387,7 @@ function App(): React.JSX.Element {
 
   const handleQuizComplete = (result: QuizResult): void => {
     setQuizResult(result);
-    // 可以在这里保存答题记录到localStorage
+    // Save quiz results to localStorage
     try {
       const savedResults = localStorage.getItem('mathgenie-quiz-results');
       const results = savedResults ? JSON.parse(savedResults) : [];
@@ -368,13 +396,15 @@ function App(): React.JSX.Element {
         timestamp: new Date().toISOString(),
         settings: settings,
       });
-      // 只保留最近20次记录
+      // Keep only the last 20 records
       if (results.length > 20) {
         results.splice(0, results.length - 20);
       }
       localStorage.setItem('mathgenie-quiz-results', JSON.stringify(results));
     } catch (error) {
-      console.warn('Failed to save quiz result:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Failed to save quiz result:', error);
+      }
     }
   };
 
@@ -435,7 +465,7 @@ function App(): React.JSX.Element {
                     onChange={(e) =>
                       handleChange(
                         'operations',
-                        Array.from(e.target.selectedOptions, (option) => option.value as Operation)
+                        Array.from(e.target.selectedOptions, (option) => option.value as Operation),
                       )
                     }
                     aria-label={t('accessibility.selectOperations')}
@@ -634,9 +664,9 @@ function App(): React.JSX.Element {
                     onClick={startQuizMode}
                     disabled={problems.length === 0}
                     className="quiz-mode-btn"
-                    aria-label="开始答题模式"
+                    aria-label="Start quiz mode"
                   >
-                    🎯 开始答题
+                    🎯 Start Quiz
                   </button>
                 </div>
 
@@ -660,7 +690,12 @@ function App(): React.JSX.Element {
                       </div>
                     )}
                   </div>
-                  <div className="problems-content">
+                  <div
+                    className="problems-content"
+                    tabIndex={0}
+                    role="region"
+                    aria-label="Math problems list"
+                  >
                     {problems.length > 0 ? (
                       <div className="problems-grid">
                         {problems.map((problem) => (
