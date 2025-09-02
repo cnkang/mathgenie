@@ -24,7 +24,7 @@ export default defineConfig({
     video: "retain-on-failure",
     // Increased action timeout for slower operations
     actionTimeout: 10000,
-    // CI环境优化
+    // CI environment optimization
     ...(process.env.CI && {
       headless: true,
       launchOptions: {

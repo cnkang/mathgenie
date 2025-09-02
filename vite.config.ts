@@ -6,108 +6,93 @@ import viteCompression from "vite-plugin-compression";
 export default defineConfig(({ mode }) => ({
   plugins: [
     react({
-      // 优化 JSX 运行时
+      // Optimize JSX runtime
       jsxRuntime: "automatic",
     }),
-    // Brotli 压缩 (更好的压缩率)
+    // Brotli compression (better compression ratio)
     viteCompression({
       algorithm: "brotliCompress",
       ext: ".br",
-      threshold: 1024, // 只压缩大于 1KB 的文件
+      threshold: 1024, // Only compress files larger than 1KB
       compressionOptions: {
-        level: 11, // 最高压缩级别
+        level: 11, // Highest compression level
       },
       deleteOriginFile: false,
       verbose: false,
     }),
-    // Gzip 压缩 (兼容性更好)
+    // Gzip compression (better compatibility)
     viteCompression({
       algorithm: "gzip",
       ext: ".gz",
       threshold: 1024,
       compressionOptions: {
-        level: 9, // 最高压缩级别
+        level: 9, // Highest compression level
       },
       deleteOriginFile: false,
       verbose: false,
     }),
   ],
   build: {
-    // 输出目录
+    // Output directory
     outDir: "dist",
-    // 启用源码映射 (仅在开发环境)
+    // Enable source maps (development environment only)
     sourcemap: process.env.NODE_ENV !== "production",
-    // 构建目标
+    // Build target - use ES2020 for better compatibility
     target: ["es2020", "edge88", "firefox78", "chrome87", "safari14"],
-    // 启用 CSS 代码分割
+    // Enable CSS code splitting
     cssCodeSplit: true,
-    // 设置 chunk 大小警告限制
+    // Set chunk size warning limit
     chunkSizeWarningLimit: 1000,
-    // CommonJS 选项
+    // CommonJS options
     commonjsOptions: {
       transformMixedEsModules: true,
     },
-    // Rollup 选项
+    // Rollup options
     rollupOptions: {
       output: {
-        // 资源文件命名
+        // Asset file naming
         assetFileNames: "assets/[name]-[hash].[ext]",
         chunkFileNames: "assets/[name]-[hash].js",
         entryFileNames: "assets/[name]-[hash].js",
-        // 手动分包策略
+        // Manual chunk splitting strategy
         manualChunks(id: string) {
-          // React 相关库单独打包
+          // Bundle React-related libraries separately
           if (id.includes("react") || id.includes("react-dom")) {
             return "react-vendor";
           }
-          // PDF 生成库单独打包 (较大)
+          // Bundle PDF generation library separately (large)
           if (id.includes("jspdf")) {
             return "jspdf";
           }
-          // 分析工具单独打包
+          // Bundle analytics tools separately
           if (id.includes("speed-insights") || id.includes("web-vitals")) {
             return "analytics";
           }
-          // 其他第三方库
+          // Other third-party libraries
           if (id.includes("node_modules")) {
             return "vendor";
           }
         },
       },
-      // 外部依赖 (如果需要 CDN)
+      // External dependencies (if CDN is needed)
       external: [],
     },
-    // 使用 Terser 进行代码压缩
+    // Use terser for better compatibility
     minify: "terser",
+    // Terser minification options
     terserOptions: {
       compress: {
-        // 生产环境移除 console
         drop_console: process.env.NODE_ENV === "production",
         drop_debugger: true,
-        // 移除未使用的代码
         dead_code: true,
-        // 移除纯函数调用
-        pure_funcs:
-          process.env.NODE_ENV === "production"
-            ? ["console.log", "console.info", "console.debug"]
-            : [],
-        // 压缩选项
-        passes: 2, // 多次压缩以获得更好效果
-        unsafe: false, // 安全压缩
-        unsafe_comps: false,
-        unsafe_math: false,
-        unsafe_proto: false,
+        passes: 2,
       },
       mangle: {
-        // 混淆变量名
         toplevel: true,
         safari10: true,
       },
       format: {
-        // 移除注释
         comments: false,
-        // 保留许可证注释
-        preserve_annotations: false,
       },
     },
   },
@@ -130,18 +115,21 @@ export default defineConfig(({ mode }) => ({
       "@/types": resolve(__dirname, "./src/types"),
     },
   },
-  // 优化依赖预构建
+  // Optimize dependency pre-bundling
   optimizeDeps: {
     include: ["react", "react-dom", "jspdf"],
     exclude: ["@vercel/speed-insights"],
+    esbuildOptions: {
+      target: "es2022",
+    },
   },
-  // 环境变量
+  // Environment variables
   define: {
     __DEV__: mode !== "production",
     __PROD__: mode === "production",
     global: "globalThis",
   },
-  // CSS 优化
+  // CSS optimization
   css: {
     devSourcemap: mode !== "production",
   },

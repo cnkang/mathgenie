@@ -23,18 +23,21 @@ export const useOptimisticState = <T>(initialValue: T) => {
     setIsPending(false);
   }, []);
 
-  const performOptimistic = useCallback(async (value: T, asyncFn: () => Promise<T>) => {
-    updateOptimistic(value);
-    try {
-      const result = await asyncFn();
-      setActualState(result);
-      setOptimisticState(null);
-      setIsPending(false);
-    } catch (error) {
-      rollback();
-      throw error;
-    }
-  }, [updateOptimistic, rollback]);
+  const performOptimistic = useCallback(
+    async (value: T, asyncFn: () => Promise<T>) => {
+      updateOptimistic(value);
+      try {
+        const result = await asyncFn();
+        setActualState(result);
+        setOptimisticState(null);
+        setIsPending(false);
+      } catch (error) {
+        rollback();
+        throw error;
+      }
+    },
+    [updateOptimistic, rollback],
+  );
 
   return {
     state: optimisticState !== null ? optimisticState : actualState,
