@@ -17,8 +17,11 @@ export default {
     numberRange: 'Number Range',
     resultRange: 'Result Range',
     operandsRange: 'Number of Operands',
+    options: 'Problem Options',
     allowNegative: 'Allow Negative Results',
+    allowNegativeDesc: 'Allow calculation results to be negative numbers',
     showAnswers: 'Show Answers',
+    showAnswersDesc: 'Display answers directly next to problems',
     from: 'From',
     to: 'to',
     manager: {
@@ -39,7 +42,7 @@ export default {
   buttons: {
     generate: 'Generate Problems',
     generating: 'Generating Problems...',
-    download: 'Download PDF ({{count}} problems)',
+    download: 'Download PDF',
     downloadEmpty: 'Download PDF',
   },
   results: {
@@ -47,21 +50,41 @@ export default {
     noProblems: 'No problems generated yet',
   },
   errors: {
-    noOperations:
-      'Please select at least one mathematical operation to continue.',
+    noOperations: 'Please select at least one mathematical operation to continue.',
+    invalidProblemCount: 'Number of problems must be between 1 and 100.',
     invalidProblemsCount: 'Number of problems must be between 1 and 100.',
     invalidNumberRange: 'Number range minimum cannot be greater than maximum.',
     invalidResultRange: 'Result range minimum cannot be greater than maximum.',
-    generationFailed:
-      'Unable to generate problems with current settings. Try adjusting the number ranges or allowing negative results.',
+    invalidOperandsRange:
+      'Invalid operands range: minimum must be at least 2 and not greater than maximum.',
+    noProblemsGenerated:
+      'No problems could be generated with current settings. Try adjusting the ranges.',
+    generationFailed: 'Failed to generate problems. Please try again.',
+    noProblemsToPdf: 'No problems to download. Generate problems first.',
+    pdfFailed: 'Failed to generate PDF. Please try again.',
     partialGeneration:
       'Generated {{generated}} out of {{requested}} requested problems. Consider adjusting your settings for better results.',
-    downloadFailed:
-      'No problems available to download. Please generate problems first.',
-    pdfError:
-      'Failed to generate PDF. Please try again or check your browser settings.',
-    generalError:
-      'An error occurred while generating problems. Please try again.',
+    downloadFailed: 'No problems available to download. Please generate problems first.',
+    pdfError: 'Failed to generate PDF. Please try again or check your browser settings.',
+    generalError: 'An error occurred while generating problems. Please try again.',
+  },
+  warnings: {
+    settingsChanged: 'Settings have been updated. Problems will be regenerated automatically.',
+    largeNumberOfProblems: 'Generating {{count}} problems may take a moment. Please wait...',
+    restrictiveSettings:
+      'Current settings are quite restrictive. You might get fewer problems than requested.',
+  },
+  messages: {
+    success: {
+      problemsGenerated: 'Successfully generated {{count}} problems!',
+      settingsImported: 'Settings imported successfully!',
+      settingsExported: 'Settings exported successfully!',
+    },
+    info: {
+      autoGeneration: 'Problems are automatically generated when you change settings.',
+      pdfTip: 'Tip: Adjust font size and line spacing for better PDF layout.',
+      presetApplied: 'Preset \'{{name}}\' has been applied to your settings.',
+    },
   },
   accessibility: {
     selectOperations: 'Select mathematical operations to include',
@@ -80,6 +103,10 @@ export default {
     generateButton: 'Generate math problems with current settings',
     downloadButton: 'Download generated problems as PDF file',
     languageSelect: 'Select interface language',
+    errorMessage: 'Error message',
+    warningMessage: 'Warning message',
+    infoMessage: 'Information message',
+    dismissMessage: 'Dismiss message',
   },
   language: {
     select: 'Language',
@@ -112,5 +139,39 @@ export default {
   preview: {
     title: 'Preview',
     info: 'Sample problems based on current settings',
+  },
+  quiz: {
+    loading: 'Preparing quiz...',
+    exit: 'Exit',
+    previousProblem: '← Previous',
+    nextProblem: 'Next →',
+    problemNumber: 'Problem {{number}}',
+    progress: '{{current}} / {{total}}',
+    completed: '🎉 Quiz Completed!',
+    score: 'points',
+    retry: 'Retry Quiz',
+    backToPractice: 'Back to Practice',
+    detailedResults: 'Detailed Results',
+    correctAnswer: 'Correct answer: {{answer}}',
+    stats: {
+      totalProblems: 'Total Problems',
+      correct: 'Correct',
+      incorrect: 'Incorrect',
+      timeUsed: 'Time Used',
+    },
+    grades: {
+      excellent: 'Excellent',
+      good: 'Good',
+      average: 'Average',
+      passing: 'Passing',
+      needsImprovement: 'Needs Improvement',
+    },
+    feedback: {
+      excellent: 'Amazing! You have strong math skills!',
+      good: 'Well done! Keep it up!',
+      average: 'Nice work! There\'s room for improvement!',
+      passing: 'Good foundation! Practice more!',
+      needsImprovement: 'Keep trying and practice more!',
+    },
   },
 } as const;

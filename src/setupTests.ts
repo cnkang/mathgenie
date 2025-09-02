@@ -1,6 +1,43 @@
 // Setup for testing environment with happy-dom only
 import { vi } from 'vitest';
 
+// Extend expect with custom matchers
+declare global {
+  namespace Vi {
+    interface Assertion<T = any> {
+      toBeInTheDocument(): T;
+      toHaveTextContent(text: string): T;
+      toHaveValue(value: any): T;
+    }
+  }
+}
+
+// Also extend the global expect interface
+declare module 'vitest' {
+  interface Assertion<T = any> {
+    toBeInTheDocument(): T;
+    toHaveTextContent(text: string): T;
+    toHaveValue(value: any): T;
+  }
+}
+
+// Extend HTMLElement interface for testing
+declare global {
+  interface HTMLElement {
+    value?: string;
+    disabled?: boolean;
+  }
+
+  interface HTMLInputElement {
+    value: string;
+    disabled: boolean;
+  }
+
+  interface HTMLButtonElement {
+    disabled: boolean;
+  }
+}
+
 // Custom matchers for happy-dom
 expect.extend({
   toBeInTheDocument(received) {
@@ -70,7 +107,7 @@ Object.defineProperty(window, 'crypto', {
   value: {
     getRandomValues: vi.fn((arr: Uint32Array) => {
       for (let i = 0; i < arr.length; i++) {
-        arr[i] = Math.floor(Math.random() * 0xFFFFFFFF);
+        arr[i] = Math.floor(Math.random() * 0xffffffff);
       }
       return arr;
     }),
@@ -80,7 +117,7 @@ Object.defineProperty(window, 'crypto', {
 // Mock localStorage
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
-  
+
   return {
     getItem: vi.fn((key: string) => store[key] || null),
     setItem: vi.fn((key: string, value: string) => {

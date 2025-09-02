@@ -1,13 +1,13 @@
-import React, { useRef } from 'react';
+import React, { ChangeEvent, useRef } from 'react';
 import { useTranslation } from '../i18n';
 import type { Settings } from '../types';
 import {
+  createDownloadBlob,
   createSettingsData,
   generateFilename,
-  serializeSettings,
   parseSettingsFile,
+  serializeSettings,
   validateSettingsData,
-  createDownloadBlob
 } from '../utils/settingsManager';
 
 interface SettingsManagerProps {
@@ -27,7 +27,7 @@ const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onImportSet
     const settingsData = createSettingsData(settings);
     const dataStr = serializeSettings(settingsData);
     const dataBlob = createDownloadBlob(dataStr);
-    
+
     const url = URL.createObjectURL(dataBlob);
     const link = document.createElement('a');
     link.href = url;
@@ -38,9 +38,11 @@ const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onImportSet
     URL.revokeObjectURL(url);
   };
 
-  const importSettings = (event: React.ChangeEvent<HTMLInputElement>): void => {
+  const importSettings = (event: ChangeEvent<HTMLInputElement>): void => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = (e: ProgressEvent<FileReader>) => {
@@ -60,7 +62,7 @@ const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onImportSet
       }
     };
     reader.readAsText(file);
-    
+
     // Reset file input
     event.target.value = '';
   };
@@ -69,22 +71,22 @@ const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onImportSet
     <div className="settings-manager">
       <h3>{t('settings.manager.title') || 'Settings Manager'}</h3>
       <div className="settings-actions">
-        <button 
+        <button
           onClick={exportSettings}
           className="export-button"
           aria-label={t('settings.manager.exportLabel') || 'Export current settings'}
         >
           📤 {t('settings.manager.export') || 'Export Settings'}
         </button>
-        
-        <button 
+
+        <button
           onClick={() => fileInputRef.current?.click()}
           className="import-button"
           aria-label={t('settings.manager.importLabel') || 'Import settings from file'}
         >
           📥 {t('settings.manager.import') || 'Import Settings'}
         </button>
-        
+
         <input
           ref={fileInputRef}
           type="file"

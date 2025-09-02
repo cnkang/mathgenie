@@ -1,31 +1,31 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import type { Settings } from '../types';
 import {
+  createDownloadBlob,
   createSettingsData,
   generateFilename,
-  serializeSettings,
   parseSettingsFile,
+  serializeSettings,
   validateSettingsData,
-  createDownloadBlob
 } from './settingsManager';
-import type { Settings } from '../types';
 
 describe('Settings Manager Utils', () => {
   const mockSettings: Settings = {
     operations: ['+', '-'],
     numProblems: 10,
-    numberRange: { min: 1, max: 10 },
-    resultRange: { min: 0, max: 20 },
-    operandsRange: { min: 2, max: 2 },
+    numRange: [1, 10],
+    resultRange: [0, 20],
+    numOperandsRange: [2, 2],
     allowNegative: false,
     showAnswers: true,
     fontSize: 12,
     lineSpacing: 18,
-    paperSize: 'A4',
+    paperSize: 'a4',
   };
 
   it('creates settings data with correct structure', () => {
     const result = createSettingsData(mockSettings);
-    
+
     expect(result.version).toBe('1.0');
     expect(result.settings).toEqual(mockSettings);
     expect(result.timestamp).toBeDefined();
@@ -35,20 +35,20 @@ describe('Settings Manager Utils', () => {
   it('generates filename with correct format', () => {
     const testDate = new Date('2023-01-01T12:00:00.000Z');
     const filename = generateFilename(testDate);
-    
+
     expect(filename).toBe('mathgenie-settings-2023-01-01.json');
   });
 
   it('generates filename with current date when no date provided', () => {
     const filename = generateFilename();
-    
+
     expect(filename).toMatch(/^mathgenie-settings-\d{4}-\d{2}-\d{2}\.json$/);
   });
 
   it('serializes settings data to JSON string', () => {
     const settingsData = createSettingsData(mockSettings);
     const serialized = serializeSettings(settingsData);
-    
+
     expect(typeof serialized).toBe('string');
     expect(serialized).toContain('"version": "1.0"');
     expect(serialized).toContain('"operations"');
@@ -58,7 +58,7 @@ describe('Settings Manager Utils', () => {
     const settingsData = createSettingsData(mockSettings);
     const serialized = serializeSettings(settingsData);
     const parsed = parseSettingsFile(serialized);
-    
+
     expect(parsed).toEqual(settingsData);
   });
 
@@ -68,7 +68,7 @@ describe('Settings Manager Utils', () => {
 
   it('validates correct settings data', () => {
     const validData = createSettingsData(mockSettings);
-    
+
     expect(validateSettingsData(validData)).toBe(true);
   });
 
@@ -83,7 +83,7 @@ describe('Settings Manager Utils', () => {
   it('creates download blob with correct type', () => {
     const data = '{"test": "data"}';
     const blob = createDownloadBlob(data);
-    
+
     expect(blob).toBeInstanceOf(Blob);
     expect(blob.type).toBe('application/json');
     expect(blob.size).toBe(data.length);

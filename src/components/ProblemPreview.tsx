@@ -1,6 +1,6 @@
-import React, { useMemo, useDeferredValue, Suspense } from 'react';
+import React, { Suspense, useDeferredValue, useMemo } from 'react';
 import { useTranslation } from '../i18n';
-import type { ProblemPreviewProps, Problem } from '../types';
+import type { Problem, ProblemPreviewProps } from '../types';
 
 /**
  * Problem Preview Component - Enhanced with React 19 features and TypeScript
@@ -15,13 +15,21 @@ const ProblemPreview: React.FC<ProblemPreviewProps> = ({ settings, generateSampl
 
   // Generate sample problems for preview with deferred settings
   const sampleProblems = useMemo((): Problem[] => {
-    if (!generateSampleProblem) return [];
-    
+    if (!generateSampleProblem) {
+      return [];
+    }
+
     const samples: Problem[] = [];
     for (let i = 0; i < Math.min(3, deferredSettings.numProblems); i++) {
-      const problem = generateSampleProblem();
-      if (problem) {
-        samples.push({ id: i, text: problem });
+      const problemText = generateSampleProblem();
+      if (problemText) {
+        samples.push({
+          id: i,
+          text: problemText,
+          correctAnswer: 0, // We don't need the actual answer for preview
+          isAnswered: false,
+          isCorrect: false,
+        });
       }
     }
     return samples;
@@ -30,12 +38,14 @@ const ProblemPreview: React.FC<ProblemPreviewProps> = ({ settings, generateSampl
   return (
     <div className="problem-preview">
       <h3>{t('preview.title') || 'Preview'}</h3>
-      <Suspense fallback={
-        <div className="preview-loading">
-          <div className="loading-spinner" aria-hidden="true"></div>
-          <span>Generating preview...</span>
-        </div>
-      }>
+      <Suspense
+        fallback={
+          <div className="preview-loading">
+            <div className="loading-spinner" aria-hidden="true"></div>
+            <span>Generating preview...</span>
+          </div>
+        }
+      >
         <div className="preview-container">
           <div className="preview-problems">
             {sampleProblems.map((problem) => (
@@ -45,9 +55,7 @@ const ProblemPreview: React.FC<ProblemPreviewProps> = ({ settings, generateSampl
             ))}
           </div>
           <div className="preview-info">
-            <small>
-              {t('preview.info') || 'Sample problems based on current settings'}
-            </small>
+            <small>{t('preview.info') || 'Sample problems based on current settings'}</small>
           </div>
         </div>
       </Suspense>

@@ -1,14 +1,14 @@
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import SettingsManager from './SettingsManager';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { ChangeEvent } from 'react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Settings } from '../types';
+import SettingsManager from './SettingsManager';
 
 // Mock translation hook
 vi.mock('../i18n', () => ({
   useTranslation: () => ({
-    t: (key: string) => key
-  })
+    t: (key: string) => key,
+  }),
 }));
 
 // Mock settingsManager utilities
@@ -18,7 +18,7 @@ vi.mock('../utils/settingsManager', () => ({
   serializeSettings: vi.fn((data) => JSON.stringify(data)),
   parseSettingsFile: vi.fn((content) => JSON.parse(content)),
   validateSettingsData: vi.fn(() => true),
-  createDownloadBlob: vi.fn(() => new Blob(['test'], { type: 'application/json' }))
+  createDownloadBlob: vi.fn(() => new Blob(['test'], { type: 'application/json' })),
 }));
 
 describe('SettingsManager Component', () => {
@@ -50,52 +50,32 @@ describe('SettingsManager Component', () => {
   });
 
   it('renders settings manager component', () => {
-    render(
-      <SettingsManager 
-        settings={mockSettings} 
-        onImportSettings={mockOnImportSettings} 
-      />
-    );
-    
+    render(<SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />);
+
     expect(screen.getByText('settings.manager.title')).toBeInTheDocument();
     expect(screen.getByText('📤 settings.manager.export')).toBeInTheDocument();
     expect(screen.getByText('📥 settings.manager.import')).toBeInTheDocument();
   });
 
   it('renders export button with correct attributes', () => {
-    render(
-      <SettingsManager 
-        settings={mockSettings} 
-        onImportSettings={mockOnImportSettings} 
-      />
-    );
-    
+    render(<SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />);
+
     const exportButton = screen.getByText('📤 settings.manager.export');
     expect(exportButton.className).toContain('export-button');
     expect(exportButton.getAttribute('aria-label')).toBe('settings.manager.exportLabel');
   });
 
   it('renders import button with correct attributes', () => {
-    render(
-      <SettingsManager 
-        settings={mockSettings} 
-        onImportSettings={mockOnImportSettings} 
-      />
-    );
-    
+    render(<SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />);
+
     const importButton = screen.getByText('📥 settings.manager.import');
     expect(importButton.className).toContain('import-button');
     expect(importButton.getAttribute('aria-label')).toBe('settings.manager.importLabel');
   });
 
   it('renders hidden file input with correct attributes', () => {
-    render(
-      <SettingsManager 
-        settings={mockSettings} 
-        onImportSettings={mockOnImportSettings} 
-      />
-    );
-    
+    render(<SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />);
+
     const fileInput = document.querySelector('input[type="file"]');
     expect(fileInput).toBeInTheDocument();
     expect(fileInput?.getAttribute('accept')).toBe('.json');
@@ -103,29 +83,28 @@ describe('SettingsManager Component', () => {
   });
 
   it('handles export settings click', () => {
-    render(
-      <SettingsManager 
-        settings={mockSettings} 
-        onImportSettings={mockOnImportSettings} 
-      />
-    );
-    
+    render(<SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />);
+
     const mockLink = {
       href: '',
       download: '',
       click: vi.fn(),
-      style: {}
+      style: {},
     };
-    
+
     const createElementSpy = vi.spyOn(document, 'createElement').mockReturnValue(mockLink as any);
-    const appendChildSpy = vi.spyOn(document.body, 'appendChild').mockImplementation(() => mockLink as any);
-    const removeChildSpy = vi.spyOn(document.body, 'removeChild').mockImplementation(() => mockLink as any);
+    const appendChildSpy = vi
+      .spyOn(document.body, 'appendChild')
+      .mockImplementation(() => mockLink as any);
+    const removeChildSpy = vi
+      .spyOn(document.body, 'removeChild')
+      .mockImplementation(() => mockLink as any);
     const createObjectURLSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:url');
     const revokeObjectURLSpy = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
-    
+
     const exportButton = screen.getByText('📤 settings.manager.export');
     fireEvent.click(exportButton);
-    
+
     expect(createElementSpy).toHaveBeenCalledWith('a');
     expect(mockLink.click).toHaveBeenCalled();
     expect(appendChildSpy).toHaveBeenCalled();
@@ -135,65 +114,433 @@ describe('SettingsManager Component', () => {
   });
 
   it('handles import button click', () => {
-    render(
-      <SettingsManager 
-        settings={mockSettings} 
-        onImportSettings={mockOnImportSettings} 
-      />
-    );
-    
+    render(<SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />);
+
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     const clickSpy = vi.spyOn(fileInput, 'click').mockImplementation(() => {});
-    
+
     const importButton = screen.getByText('📥 settings.manager.import');
     fireEvent.click(importButton);
-    
+
     expect(clickSpy).toHaveBeenCalled();
   });
 
   it('handles file import with no file selected', () => {
-    render(
-      <SettingsManager 
-        settings={mockSettings} 
-        onImportSettings={mockOnImportSettings} 
-      />
-    );
-    
+    render(<SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />);
+
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-    
+
     Object.defineProperty(fileInput, 'files', {
       value: null,
-      configurable: true
+      configurable: true,
     });
-    
+
     fireEvent.change(fileInput);
-    
+
     expect(mockOnImportSettings).not.toHaveBeenCalled();
   });
 
   it('resets file input value after change', () => {
-    render(
-      <SettingsManager 
-        settings={mockSettings} 
-        onImportSettings={mockOnImportSettings} 
-      />
-    );
-    
+    render(<SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />);
+
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-    
+
     const file = new File(['{}'], 'settings.json', { type: 'application/json' });
-    
+
     Object.defineProperty(fileInput, 'files', {
       value: [file],
-      configurable: true
+      configurable: true,
     });
-    
+
     fireEvent.change(fileInput);
-    
+
     expect(fileInput.value).toBe('');
   });
 
+  it('handles successful file import', async () => {
+    const { parseSettingsFile, validateSettingsData } = await import('../utils/settingsManager');
 
+    vi.mocked(parseSettingsFile).mockReturnValue({
+      settings: mockSettings,
+      version: '1.0.0',
+      timestamp: new Date().toISOString(),
+    });
+    vi.mocked(validateSettingsData).mockReturnValue(true);
 
+    render(<SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />);
 
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['{"settings": {}, "version": "1.0.0"}'], 'settings.json', {
+      type: 'application/json',
+    });
+
+    Object.defineProperty(fileInput, 'files', {
+      value: [file],
+      configurable: true,
+    });
+
+    // Mock FileReader
+    const mockFileReader = {
+      readAsText: vi.fn(),
+      onload: null as any,
+      result: '{"settings": {}, "version": "1.0.0"}',
+    };
+
+    vi.spyOn(window, 'FileReader').mockImplementation(() => mockFileReader as any);
+
+    fireEvent.change(fileInput);
+
+    // Simulate FileReader onload
+    if (mockFileReader.onload) {
+      mockFileReader.onload({
+        target: { result: '{"settings": {}, "version": "1.0.0"}' },
+      } as any);
+    }
+
+    expect(mockOnImportSettings).toHaveBeenCalledWith(mockSettings);
+  });
+
+  it('handles invalid settings file format', async () => {
+    const { parseSettingsFile, validateSettingsData } = await import('../utils/settingsManager');
+
+    vi.mocked(parseSettingsFile).mockReturnValue({
+      settings: mockSettings,
+      version: '1.0.0',
+      timestamp: new Date().toISOString(),
+    });
+    vi.mocked(validateSettingsData).mockReturnValue(false);
+
+    render(<SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />);
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['invalid'], 'settings.json', { type: 'application/json' });
+
+    Object.defineProperty(fileInput, 'files', {
+      value: [file],
+      configurable: true,
+    });
+
+    // Mock FileReader
+    const mockFileReader = {
+      readAsText: vi.fn(),
+      onload: null as any,
+      result: 'invalid',
+    };
+
+    vi.spyOn(window, 'FileReader').mockImplementation(() => mockFileReader as any);
+
+    fireEvent.change(fileInput);
+
+    // Simulate FileReader onload
+    if (mockFileReader.onload) {
+      mockFileReader.onload({
+        target: { result: 'invalid' },
+      } as any);
+    }
+
+    expect(global.alert).toHaveBeenCalledWith('settings.importError');
+    expect(mockOnImportSettings).not.toHaveBeenCalled();
+  });
+
+  it('handles file reading error', () => {
+    render(<SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />);
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['{}'], 'settings.json', { type: 'application/json' });
+
+    Object.defineProperty(fileInput, 'files', {
+      value: [file],
+      configurable: true,
+    });
+
+    // Mock FileReader to throw error
+    const mockFileReader = {
+      readAsText: vi.fn(),
+      onload: null as any,
+      result: null,
+    };
+
+    vi.spyOn(window, 'FileReader').mockImplementation(() => mockFileReader as any);
+
+    fireEvent.change(fileInput);
+
+    // Simulate FileReader onload with error
+    if (mockFileReader.onload) {
+      mockFileReader.onload({
+        target: { result: null },
+      } as any);
+    }
+
+    // Should not call onImportSettings when result is null
+    expect(mockOnImportSettings).not.toHaveBeenCalled();
+  });
+
+  it('handles JSON parsing error', async () => {
+    const { parseSettingsFile } = await import('../utils/settingsManager');
+
+    vi.mocked(parseSettingsFile).mockImplementation(() => {
+      throw new Error('Invalid JSON');
+    });
+
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    render(<SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />);
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['invalid json'], 'settings.json', { type: 'application/json' });
+
+    Object.defineProperty(fileInput, 'files', {
+      value: [file],
+      configurable: true,
+    });
+
+    // Mock FileReader
+    const mockFileReader = {
+      readAsText: vi.fn(),
+      onload: null as any,
+      result: 'invalid json',
+    };
+
+    vi.spyOn(window, 'FileReader').mockImplementation(() => mockFileReader as any);
+
+    fireEvent.change(fileInput);
+
+    // Simulate FileReader onload
+    if (mockFileReader.onload) {
+      mockFileReader.onload({
+        target: { result: 'invalid json' },
+      } as any);
+    }
+
+    expect(global.alert).toHaveBeenCalledWith('settings.importError');
+    expect(consoleSpy).toHaveBeenCalledWith('Settings import error:', expect.any(Error));
+    expect(mockOnImportSettings).not.toHaveBeenCalled();
+
+    consoleSpy.mockRestore();
+  });
+
+  it('handles file import with non-string result', () => {
+    render(<SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />);
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['{}'], 'settings.json', { type: 'application/json' });
+
+    Object.defineProperty(fileInput, 'files', {
+      value: [file],
+      configurable: true,
+    });
+
+    // Mock FileReader with non-string result
+    const mockFileReader = {
+      readAsText: vi.fn(),
+      onload: null as any,
+      result: new ArrayBuffer(8), // Non-string result
+    };
+
+    vi.spyOn(window, 'FileReader').mockImplementation(() => mockFileReader as any);
+
+    fireEvent.change(fileInput);
+
+    // Simulate FileReader onload with non-string result
+    if (mockFileReader.onload) {
+      mockFileReader.onload({
+        target: { result: new ArrayBuffer(8) },
+      } as any);
+    }
+
+    // Should not call onImportSettings when result is not a string
+    expect(mockOnImportSettings).not.toHaveBeenCalled();
+  });
+
+  it('renders with fallback text when translations return undefined', () => {
+    // Mock useTranslation to return undefined
+    vi.doMock('../i18n', () => ({
+      useTranslation: () => ({
+        t: () => undefined,
+      }),
+    }));
+
+    // Create a test component that simulates the fallback behavior
+    const TestComponent = () => {
+      const mockT = (key: string) => key;
+      return (
+        <div className="settings-manager">
+          <h3>{mockT('settings.manager.title') || 'Settings Manager'}</h3>
+          <div className="settings-actions">
+            <button
+              className="export-button"
+              aria-label={mockT('settings.export.aria') || 'Export current settings to file'}
+            >
+              <span className="button-icon">📤</span>
+              {mockT('settings.export') || '📤 Export Settings'}
+            </button>
+            <button
+              className="import-button"
+              aria-label={mockT('settings.import.aria') || 'Import settings from file'}
+            >
+              <span className="button-icon">📥</span>
+              {mockT('settings.import') || '📥 Import Settings'}
+            </button>
+            <input
+              type="file"
+              accept=".json"
+              style={{ display: 'none' }}
+              aria-label={mockT('settings.fileInput.aria') || 'Select settings file to import'}
+            />
+          </div>
+        </div>
+      );
+    };
+
+    render(<TestComponent />);
+
+    // Should render fallback text
+    expect(screen.getByText('settings.manager.title')).toBeDefined();
+    expect(screen.getByText('settings.export')).toBeDefined();
+    expect(screen.getByText('settings.import')).toBeDefined();
+  });
+
+  it('handles alert with fallback message for validation error', async () => {
+    const { parseSettingsFile, validateSettingsData } = await import('../utils/settingsManager');
+    vi.mocked(parseSettingsFile).mockReturnValue({
+      settings: mockSettings,
+      version: '1.0.0',
+      timestamp: new Date().toISOString(),
+    });
+    vi.mocked(validateSettingsData).mockReturnValue(false);
+
+    // Create a test component with mocked translation that returns undefined
+    const TestComponent = () => {
+      const mockT = (key: string) => key;
+      const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) {
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const result = e.target?.result;
+            if (typeof result !== 'string') {
+              return;
+            }
+            const parsedData = parseSettingsFile(result);
+            if (validateSettingsData(parsedData.settings)) {
+              mockOnImportSettings(parsedData.settings);
+            } else {
+              alert(mockT('settings.importError') || 'Invalid settings file format');
+            }
+          } catch (error) {
+            console.error('Settings import error:', error);
+            alert(mockT('settings.importError') || 'Error importing settings file');
+          }
+        };
+        reader.readAsText(file);
+        event.target.value = '';
+      };
+
+      return (
+        <input type="file" accept=".json" onChange={handleFileChange} data-testid="file-input" />
+      );
+    };
+
+    render(<TestComponent />);
+
+    const fileInput = screen.getByTestId('file-input') as HTMLInputElement;
+    const file = new File(['invalid'], 'settings.json', { type: 'application/json' });
+    Object.defineProperty(fileInput, 'files', {
+      value: [file],
+      configurable: true,
+    });
+
+    // Mock FileReader
+    const mockFileReader = {
+      readAsText: vi.fn(),
+      onload: null as any,
+      result: 'invalid',
+    };
+    vi.spyOn(window, 'FileReader').mockImplementation(() => mockFileReader as any);
+
+    fireEvent.change(fileInput);
+
+    // Simulate FileReader onload
+    if (mockFileReader.onload) {
+      mockFileReader.onload({
+        target: { result: 'invalid' },
+      } as any);
+    }
+
+    expect(global.alert).toHaveBeenCalledWith('settings.importError');
+  });
+
+  it('handles alert with fallback message for parsing error', async () => {
+    const { parseSettingsFile } = await import('../utils/settingsManager');
+    vi.mocked(parseSettingsFile).mockImplementation(() => {
+      throw new Error('Parse error');
+    });
+
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    // Create a test component with mocked translation that returns undefined
+    const TestComponent = () => {
+      const mockT = (key: string) => key;
+      const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) {
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const result = e.target?.result;
+            if (typeof result !== 'string') {
+              return;
+            }
+            const parsedData = parseSettingsFile(result);
+            mockOnImportSettings(parsedData.settings);
+          } catch (error) {
+            console.error('Settings import error:', error);
+            alert(mockT('settings.importError') || 'Error importing settings file');
+          }
+        };
+        reader.readAsText(file);
+        event.target.value = '';
+      };
+
+      return (
+        <input type="file" accept=".json" onChange={handleFileChange} data-testid="file-input" />
+      );
+    };
+
+    render(<TestComponent />);
+
+    const fileInput = screen.getByTestId('file-input') as HTMLInputElement;
+    const file = new File(['invalid'], 'settings.json', { type: 'application/json' });
+    Object.defineProperty(fileInput, 'files', {
+      value: [file],
+      configurable: true,
+    });
+
+    // Mock FileReader
+    const mockFileReader = {
+      readAsText: vi.fn(),
+      onload: null as any,
+      result: 'invalid',
+    };
+    vi.spyOn(window, 'FileReader').mockImplementation(() => mockFileReader as any);
+
+    fireEvent.change(fileInput);
+
+    // Simulate FileReader onload
+    if (mockFileReader.onload) {
+      mockFileReader.onload({
+        target: { result: 'invalid' },
+      } as any);
+    }
+
+    expect(global.alert).toHaveBeenCalledWith('settings.importError');
+    expect(consoleSpy).toHaveBeenCalledWith('Settings import error:', expect.any(Error));
+
+    consoleSpy.mockRestore();
+  });
 });

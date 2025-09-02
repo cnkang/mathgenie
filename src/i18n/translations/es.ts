@@ -2,8 +2,7 @@
 export default {
   app: {
     title: 'MathGenie',
-    subtitle:
-      'Genera problemas de matemáticas personalizados para practicar y aprender',
+    subtitle: 'Genera problemas de matemáticas personalizados para practicar y aprender',
   },
   operations: {
     title: 'Seleccionar Operaciones',
@@ -18,8 +17,11 @@ export default {
     numberRange: 'Rango de Números',
     resultRange: 'Rango de Resultados',
     operandsRange: 'Número de Operandos',
+    options: 'Opciones de Problemas',
     allowNegative: 'Permitir Resultados Negativos',
+    allowNegativeDesc: 'Permitir que los resultados de cálculos sean números negativos',
     showAnswers: 'Mostrar Respuestas',
+    showAnswersDesc: 'Mostrar respuestas directamente junto a los problemas',
     from: 'Desde',
     to: 'hasta',
     manager: {
@@ -40,7 +42,7 @@ export default {
   buttons: {
     generate: 'Generar Problemas',
     generating: 'Generando Problemas...',
-    download: 'Descargar PDF ({{count}} problemas)',
+    download: 'Descargar PDF',
     downloadEmpty: 'Descargar PDF',
   },
   results: {
@@ -48,23 +50,46 @@ export default {
     noProblems: 'Aún no se han generado problemas',
   },
   errors: {
-    noOperations:
-      'Por favor selecciona al menos una operación matemática para continuar.',
+    noOperations: 'Por favor selecciona al menos una operación matemática para continuar.',
+    invalidProblemCount: 'El número de problemas debe estar entre 1 y 100.',
     invalidProblemsCount: 'El número de problemas debe estar entre 1 y 100.',
-    invalidNumberRange:
-      'El mínimo del rango de números no puede ser mayor que el máximo.',
-    invalidResultRange:
-      'El mínimo del rango de resultados no puede ser mayor que el máximo.',
-    generationFailed:
-      'No se pueden generar problemas con la configuración actual. Intenta ajustar los rangos de números o permitir resultados negativos.',
+    invalidNumberRange: 'El mínimo del rango de números no puede ser mayor que el máximo.',
+    invalidResultRange: 'El mínimo del rango de resultados no puede ser mayor que el máximo.',
+    invalidOperandsRange:
+      'Rango de operandos inválido: el mínimo debe ser al menos 2 y no mayor que el máximo.',
+    noProblemsGenerated:
+      'No se pudieron generar problemas con la configuración actual. Intenta ajustar los rangos.',
+    generationFailed: 'Error al generar problemas. Por favor intenta de nuevo.',
+    noProblemsToPdf: 'No hay problemas para descargar. Genera problemas primero.',
+    pdfFailed: 'Error al generar PDF. Por favor intenta de nuevo.',
     partialGeneration:
       'Se generaron {{generated}} de {{requested}} problemas solicitados. Considera ajustar tu configuración para mejores resultados.',
     downloadFailed:
       'No hay problemas disponibles para descargar. Por favor genera problemas primero.',
     pdfError:
       'Error al generar PDF. Por favor intenta de nuevo o verifica la configuración de tu navegador.',
-    generalError:
-      'Ocurrió un error al generar problemas. Por favor intenta de nuevo.',
+    generalError: 'Ocurrió un error al generar problemas. Por favor intenta de nuevo.',
+  },
+  warnings: {
+    settingsChanged:
+      'La configuración ha sido actualizada. Los problemas se regenerarán automáticamente.',
+    largeNumberOfProblems:
+      'Generar {{count}} problemas puede tomar un momento. Por favor espera...',
+    restrictiveSettings:
+      'La configuración actual es bastante restrictiva. Podrías obtener menos problemas de los solicitados.',
+  },
+  messages: {
+    success: {
+      problemsGenerated: '¡Se generaron {{count}} problemas exitosamente!',
+      settingsImported: '¡Configuración importada exitosamente!',
+      settingsExported: '¡Configuración exportada exitosamente!',
+    },
+    info: {
+      autoGeneration: 'Los problemas se generan automáticamente cuando cambias la configuración.',
+      pdfTip:
+        'Consejo: Ajusta el tamaño de fuente y espaciado de línea para un mejor diseño del PDF.',
+      presetApplied: 'El preset \'{{name}}\' ha sido aplicado a tu configuración.',
+    },
   },
   accessibility: {
     selectOperations: 'Seleccionar operaciones matemáticas a incluir',
@@ -83,6 +108,10 @@ export default {
     generateButton: 'Generar problemas de matemáticas con configuración actual',
     downloadButton: 'Descargar problemas generados como archivo PDF',
     languageSelect: 'Seleccionar idioma de la interfaz',
+    errorMessage: 'Mensaje de error',
+    warningMessage: 'Mensaje de advertencia',
+    infoMessage: 'Mensaje de información',
+    dismissMessage: 'Descartar mensaje',
   },
   language: {
     select: 'Idioma',
@@ -115,5 +144,39 @@ export default {
   preview: {
     title: 'Vista Previa',
     info: 'Problemas de muestra basados en la configuración actual',
+  },
+  quiz: {
+    loading: 'Preparando cuestionario...',
+    exit: 'Salir',
+    previousProblem: '← Anterior',
+    nextProblem: 'Siguiente →',
+    problemNumber: 'Problema {{number}}',
+    progress: '{{current}} / {{total}}',
+    completed: '🎉 ¡Cuestionario Completado!',
+    score: 'puntos',
+    retry: 'Reintentar Cuestionario',
+    backToPractice: 'Volver a Práctica',
+    detailedResults: 'Resultados Detallados',
+    correctAnswer: 'Respuesta correcta: {{answer}}',
+    stats: {
+      totalProblems: 'Problemas Totales',
+      correct: 'Correctas',
+      incorrect: 'Incorrectas',
+      timeUsed: 'Tiempo Usado',
+    },
+    grades: {
+      excellent: 'Excelente',
+      good: 'Bueno',
+      average: 'Promedio',
+      passing: 'Aprobado',
+      needsImprovement: 'Necesita Mejorar',
+    },
+    feedback: {
+      excellent: '¡Increíble! ¡Tienes habilidades matemáticas muy fuertes!',
+      good: '¡Bien hecho! ¡Sigue así!',
+      average: '¡Buen trabajo! ¡Hay espacio para mejorar!',
+      passing: '¡Buena base! ¡Practica más!',
+      needsImprovement: '¡Sigue intentando y practica más!',
+    },
   },
 } as const;

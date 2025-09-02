@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
 import App from './App';
+import { I18nProvider } from './i18n';
+import './index.css';
 import reportWebVitals from './reportWebVitals';
 import * as serviceWorker from './utils/serviceWorker';
 
@@ -13,7 +14,9 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    <App />
+    <I18nProvider>
+      <App />
+    </I18nProvider>
   </React.StrictMode>
 );
 
@@ -24,7 +27,7 @@ serviceWorker.register({
   },
   onUpdate: () => {
     console.log('New version available! Please refresh the page.');
-  }
+  },
 });
 
 // If you want to start measuring performance in your app, pass a function

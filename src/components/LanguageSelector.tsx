@@ -1,32 +1,28 @@
 import React from 'react';
 import { useTranslation } from '../i18n';
-import type { LanguageSelectorProps } from '../types';
+import './LanguageSelector.css';
 
-/**
- * Language Selector Component with TypeScript support
- * Provides a dropdown to switch between available languages
- */
-const LanguageSelector: React.FC<LanguageSelectorProps> = ({ className }) => {
-  const { currentLanguage, languages, changeLanguage, t } = useTranslation();
+const LanguageSelector: React.FC = () => {
+  const { currentLanguage, languages, changeLanguage, t, isLoading } = useTranslation();
 
-  const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
-    changeLanguage(e.target.value);
-  };
+  if (isLoading) {
+    return <div className="language-selector loading">{t('loading.translations')}</div>;
+  }
 
   return (
-    <div className={`language-selector ${className || ''}`}>
+    <div className="language-selector">
       <label htmlFor="language-select" className="language-label">
         {t('language.select')}:
       </label>
       <select
         id="language-select"
         value={currentLanguage}
-        onChange={handleLanguageChange}
-        className="language-dropdown"
+        onChange={(e) => changeLanguage(e.target.value)}
+        className="language-select"
         aria-label={t('accessibility.languageSelect')}
       >
-        {Object.entries(languages).map(([code, language]) => (
-          <option key={code} value={code}>
+        {Object.values(languages).map((language) => (
+          <option key={language.code} value={language.code}>
             {language.flag} {language.name}
           </option>
         ))}

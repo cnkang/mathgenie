@@ -17,8 +17,11 @@ export default {
     numberRange: '数字范围',
     resultRange: '结果范围',
     operandsRange: '操作数个数',
+    options: '题目选项',
     allowNegative: '允许负数结果',
+    allowNegativeDesc: '允许题目的计算结果为负数',
     showAnswers: '显示答案',
+    showAnswersDesc: '在题目旁边直接显示答案',
     from: '从',
     to: '到',
     manager: {
@@ -39,7 +42,7 @@ export default {
   buttons: {
     generate: '生成题目',
     generating: '正在生成题目...',
-    download: '下载 PDF ({{count}} 道题)',
+    download: '下载 PDF',
     downloadEmpty: '下载 PDF',
   },
   results: {
@@ -48,16 +51,37 @@ export default {
   },
   errors: {
     noOperations: '请至少选择一种数学运算才能继续。',
+    invalidProblemCount: '题目数量必须在 1 到 100 之间。',
     invalidProblemsCount: '题目数量必须在 1 到 100 之间。',
     invalidNumberRange: '数字范围的最小值不能大于最大值。',
     invalidResultRange: '结果范围的最小值不能大于最大值。',
-    generationFailed:
-      '无法使用当前设置生成题目。请尝试调整数字范围或允许负数结果。',
+    invalidOperandsRange: '操作数个数范围无效：最小值必须至少为 2，且不能大于最大值。',
+    noProblemsGenerated: '无法使用当前设置生成题目。请尝试调整数字范围或允许负数结果。',
+    generationFailed: '生成题目失败。请重试。',
+    noProblemsToPdf: '没有可下载的题目。请先生成题目。',
+    pdfFailed: '生成 PDF 失败。请重试。',
     partialGeneration:
       '生成了 {{generated}} 道题目，共请求 {{requested}} 道。请考虑调整设置以获得更好的结果。',
     downloadFailed: '没有可下载的题目。请先生成题目。',
     pdfError: '生成 PDF 失败。请重试或检查浏览器设置。',
     generalError: '生成题目时发生错误。请重试。',
+  },
+  warnings: {
+    settingsChanged: '设置已更新。题目将自动重新生成。',
+    largeNumberOfProblems: '正在生成 {{count}} 道题目，可能需要一些时间。请稍候...',
+    restrictiveSettings: '当前设置比较严格，可能生成的题目数量少于请求数量。',
+  },
+  messages: {
+    success: {
+      problemsGenerated: '成功生成了 {{count}} 道题目！',
+      settingsImported: '设置导入成功！',
+      settingsExported: '设置导出成功！',
+    },
+    info: {
+      autoGeneration: '当您更改设置时，题目会自动重新生成。',
+      pdfTip: '提示：调整字体大小和行间距可以获得更好的 PDF 布局。',
+      presetApplied: '预设 "{{name}}" 已应用到您的设置中。',
+    },
   },
   accessibility: {
     selectOperations: '选择要包含的数学运算',
@@ -76,6 +100,10 @@ export default {
     generateButton: '使用当前设置生成数学题目',
     downloadButton: '将生成的题目下载为 PDF 文件',
     languageSelect: '选择界面语言',
+    errorMessage: '错误消息',
+    warningMessage: '警告消息',
+    infoMessage: '信息消息',
+    dismissMessage: '关闭消息',
   },
   language: {
     select: '语言',
@@ -90,23 +118,57 @@ export default {
     apply: '应用',
     beginner: {
       name: '初级 (1-10)',
-      description: '简单的加法和减法'
+      description: '简单的加法和减法',
     },
     intermediate: {
-      name: '中级 (1-50)', 
-      description: '包含中等数字的所有运算'
+      name: '中级 (1-50)',
+      description: '包含中等数字的所有运算',
     },
     advanced: {
       name: '高级 (1-100)',
-      description: '包括除法在内的所有运算'
+      description: '包括除法在内的所有运算',
     },
     multiplication: {
       name: '乘法表',
-      description: '专注于乘法练习'
-    }
+      description: '专注于乘法练习',
+    },
   },
   preview: {
     title: '预览',
-    info: '基于当前设置的示例题目'
-  }
+    info: '基于当前设置的示例题目',
+  },
+  quiz: {
+    loading: '准备答题中...',
+    exit: '退出',
+    previousProblem: '← 上一题',
+    nextProblem: '下一题 →',
+    problemNumber: '第 {{number}} 题',
+    progress: '{{current}} / {{total}}',
+    completed: '🎉 答题完成！',
+    score: '分',
+    retry: '重新答题',
+    backToPractice: '返回练习',
+    detailedResults: '详细结果',
+    correctAnswer: '正确答案: {{answer}}',
+    stats: {
+      totalProblems: '总题数',
+      correct: '正确',
+      incorrect: '错误',
+      timeUsed: '用时',
+    },
+    grades: {
+      excellent: '优秀',
+      good: '良好',
+      average: '中等',
+      passing: '及格',
+      needsImprovement: '需要加强',
+    },
+    feedback: {
+      excellent: '太棒了！你的数学能力很强！',
+      good: '做得很好！继续保持！',
+      average: '不错的表现，还有提升空间！',
+      passing: '基础还可以，需要多练习！',
+      needsImprovement: '继续努力，多加练习！',
+    },
+  },
 } as const;

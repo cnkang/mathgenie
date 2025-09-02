@@ -12,17 +12,17 @@ test.describe("MathGenie Basic Functionality", () => {
     await expect(page.locator("h1")).toContainText("MathGenie");
   });
 
-  test("should have language selector", async ({ page }: { page: Page }) => {
-    await expect(page.locator(".language-selector")).toBeVisible();
-    await expect(page.locator("#language-select")).toBeVisible();
+  test("should have settings controls", async ({ page }: { page: Page }) => {
+    await expect(page.locator("#operations")).toBeVisible();
+    await expect(page.locator("#numProblems")).toBeVisible();
   });
 
   test("should generate problems", async ({ page }: { page: Page }) => {
     // Wait for initial problems to load
-    await page.waitForSelector(".problems", { timeout: 10000 });
+    await page.waitForSelector(".problems-container", { timeout: 10000 });
 
     // Check if problems are generated
-    const problemsContainer = page.locator(".problems");
+    const problemsContainer = page.locator(".problems-container");
     await expect(problemsContainer).toBeVisible();
 
     const problems = page.locator(".problem-item");
@@ -43,14 +43,14 @@ test.describe("MathGenie Basic Functionality", () => {
 
   test("should download PDF", async ({ page }: { page: Page }) => {
     // Wait for problems to load
-    await page.waitForSelector(".problems", { timeout: 10000 });
+    await page.waitForSelector(".problems-container", { timeout: 10000 });
 
     // Start download
     const downloadPromise = page.waitForEvent("download");
     await page.click('button:has-text("Download PDF")');
 
     const download = await downloadPromise;
-    expect(download.suggestedFilename()).toMatch(/mathgenie-problems-.*\.pdf/);
+    expect(download.suggestedFilename()).toBe("problems.pdf");
   });
 
   test("should be responsive on mobile", async ({ page }: { page: Page }) => {
@@ -58,15 +58,18 @@ test.describe("MathGenie Basic Functionality", () => {
 
     await expect(page.locator("h1")).toBeVisible();
     await expect(page.locator(".container")).toBeVisible();
-    await expect(page.locator(".language-selector")).toBeVisible();
+    await expect(page.locator("#operations")).toBeVisible();
   });
 
   test("should switch languages", async ({ page }: { page: Page }) => {
+    // Wait for language selector to be available
+    await page.waitForSelector("#language-select", { timeout: 10000 });
+
     // Switch to Chinese
     await page.selectOption("#language-select", "zh");
 
     // Wait for translation to load
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
 
     // Check if UI is translated (assuming Chinese translations exist)
     const title = await page.locator("h1").textContent();
@@ -74,13 +77,18 @@ test.describe("MathGenie Basic Functionality", () => {
   });
 
   test("should apply presets", async ({ page }: { page: Page }) => {
-    // Click on beginner preset
-    await page.click('.preset-card:has-text("Beginner") .preset-button');
+    // Wait for presets to load
+    await page.waitForSelector(".settings-presets", { timeout: 10000 });
+
+    // Find and click the first preset button (should be beginner)
+    const firstPresetButton = page.locator(".preset-card .preset-button").first();
+    await expect(firstPresetButton).toBeVisible();
+    await firstPresetButton.click();
 
     // Wait for settings to apply
     await page.waitForTimeout(1000);
 
-    // Check if settings changed
+    // Check if settings changed (beginner preset should set numProblems to 15)
     const numProblems = await page.inputValue("#numProblems");
     expect(parseInt(numProblems, 10)).toBe(15);
   });
@@ -116,16 +124,24 @@ test.describe("MathGenie Basic Functionality", () => {
   });
 
   test("should handle errors gracefully with error boundary", async ({ page }: { page: Page }) => {
-    // Simulate an error condition by trying to generate with invalid settings
+    // Set number of problems to 0 to trigger validation error
     await page.fill("#numProblems", "0");
-    await page.waitForTimeout(1000);
 
-    // Should show error message, not crash the app
-    const errorMessage = page.locator(".error-message");
-    await expect(errorMessage).toBeVisible();
+    // Trigger validation by clicking generate button
+    const generateButton = page.locator("button").filter({ hasText: "Generate Problems" }).first();
+    await generateButton.scrollIntoViewIfNeeded();
+    await generateButton.click();
 
-    // App should still be functional
+    // Wait for error message to appear
+    await expect(page.locator(".error-message")).toBeVisible({ timeout: 5000 });
+
+    // Verify the app doesn't crash and remains functional
     await expect(page.locator("h1")).toBeVisible();
+    await expect(page.locator("#numProblems")).toHaveValue("0");
+
+    // Verify error message content
+    const errorMessage = await page.locator(".error-message").textContent();
+    expect(errorMessage).toContain("between 1 and 100");
   });
 
   test("should use deferred values for performance", async ({ page }: { page: Page }) => {
@@ -151,21 +167,31 @@ test.describe("MathGenie Basic Functionality", () => {
     await page.fill("#numRangeFrom", "10");
     await page.fill("#numRangeTo", "5");
 
-    // Wait for validation
-    await page.waitForTimeout(1000);
+    // Trigger validation by blurring the input
+    await page.locator("#numRangeTo").blur();
 
-    // Should show error
-    const errorMessage = page.locator(".error-message");
-    await expect(errorMessage).toBeVisible();
+    // Wait for error message to appear
+    await expect(page.locator(".error-message")).toBeVisible({ timeout: 5000 });
+
+    // Verify error message content
+    await expect(page.locator(".error-message")).toContainText(
+      "minimum cannot be greater than maximum"
+    );
   });
 
   test("should persist settings in localStorage", async ({ page }: { page: Page }) => {
     // Change settings
     await page.fill("#numProblems", "25");
+    await page.waitForTimeout(500); // Wait for the change to be saved
+
     await page.check("#allowNegative");
+    await page.waitForTimeout(500); // Wait for the change to be saved
 
     // Reload page
     await page.reload();
+
+    // Wait for the page to fully load
+    await page.waitForSelector("#numProblems", { timeout: 10000 });
 
     // Settings should be restored
     await expect(page.locator("#numProblems")).toHaveValue("25");

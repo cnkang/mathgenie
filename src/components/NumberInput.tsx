@@ -1,4 +1,4 @@
-import React, { useOptimistic, useTransition } from 'react';
+import React, { ChangeEvent, useOptimistic, useTransition } from 'react';
 import type { NumberInputProps } from '../types';
 
 interface ExtendedNumberInputProps extends NumberInputProps {
@@ -11,20 +11,20 @@ interface ExtendedNumberInputProps extends NumberInputProps {
  * Enhanced with React 19 features for better UX
  * Provides a consistent number input experience across devices
  */
-const NumberInput: React.FC<ExtendedNumberInputProps> = ({ 
-  id, 
-  label, 
-  value, 
-  onChange, 
-  min = 1, 
-  max = 1000, 
+const NumberInput: React.FC<ExtendedNumberInputProps> = ({
+  id,
+  label,
+  value,
+  onChange,
+  min = 1,
+  max = 1000,
   required = false,
   placeholder = '',
-  ...props 
+  ...props
 }) => {
   // React 19: Use transitions for smooth updates
   const [isPending, startTransition] = useTransition();
-  
+
   // React 19: Optimistic updates for better perceived performance
   const [optimisticValue, setOptimisticValue] = useOptimistic(
     value,
@@ -33,13 +33,13 @@ const NumberInput: React.FC<ExtendedNumberInputProps> = ({
     }
   );
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const inputValue = e.target.value;
     const newValue = parseInt(inputValue, 10);
-    
+
     // Optimistically update the UI immediately
     setOptimisticValue(inputValue);
-    
+
     // Then validate and update the actual state
     startTransition(() => {
       if (!isNaN(newValue) && newValue >= min && newValue <= max) {
@@ -66,7 +66,11 @@ const NumberInput: React.FC<ExtendedNumberInputProps> = ({
       {label && (
         <label htmlFor={id} className="number-input-label">
           {label}
-          {required && <span className="required-indicator" aria-label="required">*</span>}
+          {required && (
+            <span className="required-indicator" aria-label="required">
+              *
+            </span>
+          )}
         </label>
       )}
       <input

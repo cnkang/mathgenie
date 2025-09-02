@@ -1,10 +1,7 @@
-/**
- * Core type definitions for MathGenie application
- */
-import React from 'react';
+import { ReactNode } from 'react';
 
-export type Operation = '+' | '-' | '*' | '/';
-
+// Application types
+export type Operation = '+' | '-' | '*' | '/' | '×' | '÷';
 export type PaperSize = 'a4' | 'letter' | 'legal';
 
 export interface Settings {
@@ -23,8 +20,58 @@ export interface Settings {
 export interface Problem {
   id: number;
   text: string;
+  correctAnswer?: number;
+  userAnswer?: number;
+  isCorrect?: boolean;
+  isAnswered?: boolean;
 }
 
+// Component Props interfaces
+export interface NumberInputProps {
+  id: string;
+  label?: string;
+  value: number;
+  onChange: (value: number) => void;
+  min?: number;
+  max?: number;
+  required?: boolean;
+  className?: string;
+  'data-testid'?: string;
+}
+
+export interface PerformanceMonitorProps {
+  children: ReactNode;
+}
+
+export interface ProblemPreviewProps {
+  settings: Settings;
+  generateSampleProblem?: () => string;
+}
+
+export interface SettingsPresetsProps {
+  onApplyPreset: (settings: Settings) => void;
+}
+
+export interface SettingsPreset {
+  name: string;
+  description: string;
+  settings: Settings;
+}
+
+export interface QuizResult {
+  totalProblems: number;
+  correctAnswers: number;
+  incorrectAnswers: number;
+  score: number;
+  grade: string;
+  feedback: string;
+}
+
+export type PaperSizeOptions = {
+  [K in Settings['paperSize']]: K;
+};
+
+// Language and i18n types
 export interface Language {
   code: string;
   name: string;
@@ -41,24 +88,7 @@ export interface I18nContextType {
   translations: Translations;
   isLoading: boolean;
   t: (key: string, params?: Record<string, string | number>) => string;
-  changeLanguage: (language: string) => void;
-}
-
-export interface ErrorInfo {
-  componentStack: string;
-}
-
-export interface SettingsPreset {
-  name: string;
-  description: string;
-  settings: Partial<Settings>;
-}
-
-// React 19 specific types
-export interface OptimisticState<T> {
-  current: T;
-  pending: T | null;
-  isPending: boolean;
+  changeLanguage: (lang: string) => void;
 }
 
 // Utility types
@@ -66,43 +96,19 @@ export type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
 };
 
-export type LocalStorageValue<T> = T | null;
+// Error Boundary types
+export interface ErrorInfo {
+  componentStack: string;
+}
 
-// Component prop types
 export interface ErrorBoundaryProps {
-  children: React.ReactNode;
-  fallback?: React.ReactNode;
+  children: ReactNode;
+  fallback?: ReactNode;
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
 }
 
-export interface NumberInputProps {
-  value: number;
-  onChange: (value: number) => void;
-  min?: number;
-  max?: number;
-  label: string;
-  id: string;
-  'aria-label'?: string;
-}
-
-export interface ProblemPreviewProps {
-  settings: Settings;
-  generateSampleProblem: (() => string) | null;
-}
-
-export interface SettingsManagerProps {
-  settings: Settings;
-  onSettingsChange: (settings: Settings) => void;
-}
-
-export interface SettingsPresetsProps {
-  onApplyPreset: (settings: Settings) => void;
-}
-
-export interface LanguageSelectorProps {
-  className?: string;
-}
-
-export interface PerformanceMonitorProps {
-  children: React.ReactNode;
+export interface OptimisticState<T> {
+  current: T;
+  pending: T | null;
+  isPending: boolean;
 }
