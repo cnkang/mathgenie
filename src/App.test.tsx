@@ -70,7 +70,7 @@ describe('App Component', () => {
         const problemDivs = screen.queryAllByText(/=/);
         expect(problemDivs.length).toBeGreaterThan(0);
       },
-      { timeout: 3000 }
+      { timeout: 3000 },
     );
   });
 
@@ -80,10 +80,12 @@ describe('App Component', () => {
     // Wait for problems to be auto-generated
     await waitFor(
       () => {
-        const downloadButton = screen.getByText(/Download PDF/i) as HTMLButtonElement;
+        const downloadButton = screen.getByRole('button', {
+          name: /Download generated problems as PDF file/i,
+        }) as HTMLButtonElement;
         expect(downloadButton.disabled).toBe(false);
       },
-      { timeout: 3000 }
+      { timeout: 3000 },
     );
   });
 
@@ -92,7 +94,7 @@ describe('App Component', () => {
 
     await waitFor(() => {
       const allowNegativeCheckbox = screen.getByLabelText(
-        /Allow Negative Results/i
+        /Allow Negative Results/i,
       ) as HTMLInputElement;
 
       fireEvent.click(allowNegativeCheckbox);
@@ -130,7 +132,9 @@ describe('App Component', () => {
 
     // Just check that the app renders with basic functionality
     await waitFor(() => {
-      const generateButton = screen.getByText(/Generate Problems/i);
+      const generateButton = screen.getByRole('button', {
+        name: /Generate math problems with current settings/i,
+      });
       expect(generateButton).toBeTruthy();
     });
   });
@@ -148,7 +152,9 @@ describe('App Component', () => {
       fireEvent.change(maxNumberInput, { target: { value: '5' } });
 
       // Trigger validation by trying to generate problems
-      const generateButton = screen.getByText(/Generate Problems/i);
+      const generateButton = screen.getByRole('button', {
+        name: /Generate math problems with current settings/i,
+      });
       fireEvent.click(generateButton);
     });
 
@@ -160,10 +166,12 @@ describe('App Component', () => {
 
     await waitFor(
       () => {
-        const downloadButton = screen.getByText(/Download PDF/i) as HTMLButtonElement;
+        const downloadButton = screen.getByRole('button', {
+          name: /Download generated problems as PDF file/i,
+        }) as HTMLButtonElement;
         fireEvent.click(downloadButton);
       },
-      { timeout: 3000 }
+      { timeout: 3000 },
     );
   });
 
@@ -198,7 +206,9 @@ describe('App Component', () => {
       }
       fireEvent.change(operationsSelect);
 
-      const generateButton = screen.getByText(/Generate Problems/i);
+      const generateButton = screen.getByRole('button', {
+        name: /Generate math problems with current settings/i,
+      });
       fireEvent.click(generateButton);
     });
   });
@@ -210,7 +220,9 @@ describe('App Component', () => {
       const numProblemsInput = screen.getByLabelText(/Number of problems/i) as HTMLInputElement;
       fireEvent.change(numProblemsInput, { target: { value: '101' } });
 
-      const generateButton = screen.getByText(/Generate Problems/i);
+      const generateButton = screen.getByRole('button', {
+        name: /Generate math problems with current settings/i,
+      });
       fireEvent.click(generateButton);
     });
   });
@@ -225,7 +237,9 @@ describe('App Component', () => {
       fireEvent.change(resultRangeFrom, { target: { value: '100' } });
       fireEvent.change(resultRangeTo, { target: { value: '50' } });
 
-      const generateButton = screen.getByText(/Generate Problems/i);
+      const generateButton = screen.getByRole('button', {
+        name: /Generate math problems with current settings/i,
+      });
       fireEvent.click(generateButton);
     });
   });
@@ -302,12 +316,16 @@ describe('App Component', () => {
       }
       fireEvent.change(operationsSelect);
 
-      const generateButton = screen.getByText(/Generate Problems/i);
+      const generateButton = screen.getByRole('button', {
+        name: /Generate math problems with current settings/i,
+      });
       fireEvent.click(generateButton);
     });
 
     await waitFor(() => {
-      const downloadButton = screen.getByText(/Download PDF/i) as HTMLButtonElement;
+      const downloadButton = screen.getByRole('button', {
+        name: /Download generated problems as PDF file/i,
+      }) as HTMLButtonElement;
       fireEvent.click(downloadButton);
     });
   });
@@ -327,7 +345,9 @@ describe('App Component', () => {
     renderWithProvider(<App />);
 
     await waitFor(() => {
-      const generateButton = screen.getByText(/Generate Problems/i);
+      const generateButton = screen.getByRole('button', {
+        name: /Generate math problems with current settings/i,
+      });
       fireEvent.click(generateButton);
     });
 
@@ -391,7 +411,9 @@ describe('App Component', () => {
       const operandsFrom = screen.getByDisplayValue('2') as HTMLInputElement;
       fireEvent.change(operandsFrom, { target: { value: '1' } });
 
-      const generateButton = screen.getByText(/Generate Problems/i);
+      const generateButton = screen.getByRole('button', {
+        name: /Generate math problems with current settings/i,
+      });
       fireEvent.click(generateButton);
     });
   });
@@ -400,7 +422,9 @@ describe('App Component', () => {
     renderWithProvider(<App />);
 
     await waitFor(() => {
-      const generateButton = screen.getByText(/Generate Problems/i);
+      const generateButton = screen.getByRole('button', {
+        name: /Generate math problems with current settings/i,
+      });
       fireEvent.click(generateButton);
       expect(generateButton).not.toBeNull();
     });
@@ -411,13 +435,15 @@ describe('App Component', () => {
 
     await waitFor(
       () => {
-        const downloadButton = screen.getByText(/Download PDF/i) as HTMLButtonElement;
+        const downloadButton = screen.getByRole('button', {
+          name: /Download generated problems as PDF file/i,
+        }) as HTMLButtonElement;
         if (!downloadButton.disabled) {
           fireEvent.click(downloadButton);
         }
         expect(downloadButton).not.toBeNull();
       },
-      { timeout: 3000 }
+      { timeout: 3000 },
     );
   });
 
@@ -425,7 +451,9 @@ describe('App Component', () => {
     renderWithProvider(<App />);
 
     await waitFor(() => {
-      const generateButton = screen.getByText(/Generate Problems/i);
+      const generateButton = screen.getByRole('button', {
+        name: /Generate math problems with current settings/i,
+      });
       fireEvent.click(generateButton);
       expect(generateButton).not.toBeNull();
     });
@@ -438,13 +466,19 @@ describe('App Component', () => {
       const numProblemsInput = screen.getByLabelText(/Number of problems/i) as HTMLInputElement;
       fireEvent.change(numProblemsInput, { target: { value: '50' } });
 
-      const generateButton = screen.getByText(/Generate Problems/i);
+      const generateButton = screen.getByRole('button', {
+        name: /Generate math problems with current settings/i,
+      });
       fireEvent.click(generateButton);
       expect(generateButton).not.toBeNull();
     });
   });
 
   it('handles localStorage save errors gracefully', async () => {
+    // Set NODE_ENV to development to enable error logging
+    const originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'development';
+
     // Mock localStorage.setItem to throw an error
     const originalSetItem = localStorage.setItem;
     localStorage.setItem = vi.fn().mockImplementation(() => {
@@ -462,11 +496,12 @@ describe('App Component', () => {
 
     expect(consoleSpy).toHaveBeenCalledWith(
       'Failed to save settings to localStorage:',
-      expect.any(Error)
+      expect.any(Error),
     );
 
-    // Restore original localStorage
+    // Restore original values
     localStorage.setItem = originalSetItem;
+    process.env.NODE_ENV = originalNodeEnv;
     consoleSpy.mockRestore();
   });
 });
