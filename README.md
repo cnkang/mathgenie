@@ -1,12 +1,13 @@
 # 🧮 MathGenie
 
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fcnkang%2Fmathgenie.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fcnkang%2Fmathgenie?ref=badge_shield)
-[![Node.js 22](https://img.shields.io/badge/Node.js-22-green.svg)](https://nodejs.org/)
-[![React 19](https://img.shields.io/badge/React-19-blue.svg)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
+[![Node.js 22.19.1](https://img.shields.io/badge/Node.js-22.19.1-green.svg)](https://nodejs.org/)
+[![React 19.1.1](https://img.shields.io/badge/React-19.1.1-blue.svg)](https://reactjs.org/)
+[![TypeScript 5.9](https://img.shields.io/badge/TypeScript-5.9-blue.svg)](https://www.typescriptlang.org/)
+[![Version 1.0.0](https://img.shields.io/badge/Version-1.0.0-brightgreen.svg)](https://github.com/cnkang/mathgenie)
 [![CI/CD](https://github.com/cnkang/mathgenie/workflows/CI%2FCD%20Pipeline/badge.svg)](https://github.com/cnkang/mathgenie/actions)
 
-MathGenie is a modern web application built with **React 19**, **TypeScript 5.7**, and **Node.js 22**, designed to help tutors generate math problems focusing on basic arithmetic operations. Enhanced with the latest React concurrent features and full TypeScript support for optimal performance, type safety, and developer experience.
+MathGenie is a modern web application built with **React 19.1.1**, **TypeScript 5.9**, and **Node.js 22.19.1**, designed to help tutors generate math problems focusing on basic arithmetic operations. Enhanced with the latest React concurrent features and full TypeScript support for optimal performance, type safety, and developer experience.
 
 ## ✨ Features
 
@@ -37,15 +38,15 @@ MathGenie is a modern web application built with **React 19**, **TypeScript 5.7*
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React 19.1.1 with concurrent features and TypeScript 5.7
-- **Runtime**: Node.js 22 with enhanced performance
+- **Frontend**: React 19.1.1 with concurrent features and TypeScript 5.9
+- **Runtime**: Node.js 22.19.1 with enhanced performance
 - **Build Tool**: Vite 7.1.3 for lightning-fast development with TypeScript support
-- **Package Manager**: pnpm 8.15.1 for optimal performance and disk efficiency
+- **Package Manager**: pnpm 10.15.1 for optimal performance and disk efficiency
 - **Testing**: Vitest + Playwright for comprehensive testing with TypeScript
 - **Styling**: Modern CSS with mobile-first responsive design
 - **PDF Generation**: jsPDF for client-side PDF creation
 - **Internationalization**: Custom i18n system with React 19 optimizations and TypeScript
-- **Type Checking**: TypeScript 5.7 with strict configuration
+- **Type Checking**: TypeScript 5.9 with strict configuration
 
 ## 📊 Performance Metrics
 
@@ -60,9 +61,9 @@ MathGenie is a modern web application built with **React 19**, **TypeScript 5.7*
 
 ### Prerequisites
 
-- **Node.js 22** or higher
-- **pnpm 8.15.1** or higher (install globally: `npm install -g pnpm`)
-- **TypeScript 5.7** (installed automatically with dependencies)
+- **Node.js 22.19.1** or higher
+- **pnpm 10.15.1** or higher (install globally: `npm install -g pnpm`)
+- **TypeScript 5.9** (installed automatically with dependencies)
 
 ### Setup
 
@@ -149,7 +150,6 @@ The project uses a strict TypeScript configuration with the following features:
 1. Open the application in your browser.
 
 2. Customize the settings:
-
    - **Select Operations**: Choose the arithmetic operations to be used.
    - **Number Range**: Define the range of numbers for the operands.
    - **Result Range**: Specify the acceptable range for calculation results.
@@ -188,15 +188,79 @@ After configuring the settings:
 
 ## 🧪 Testing
 
+### Unit & Integration Tests
+
 ```bash
 # Unit tests with coverage
 pnpm test
 
-# E2E tests
+# Watch mode for development
+pnpm test:watch
+```
+
+### E2E Tests
+
+```bash
+# Desktop E2E tests
 pnpm test:e2e
 
 # Smoke tests
 pnpm test:smoke
+
+# E2E with UI
+pnpm test:e2e:ui
+```
+
+### Mobile Device Testing
+
+Test on the latest iPhone and iPad devices with both portrait and landscape orientations:
+
+```bash
+# All mobile devices
+pnpm test:mobile
+
+# iPhone tests
+pnpm test:mobile:iphone
+pnpm test:mobile:iphone16    # iPhone 16 series
+pnpm test:mobile:iphone15    # iPhone 15 series
+
+# iPad tests
+pnpm test:mobile:ipad
+pnpm test:mobile:portrait    # Portrait orientation
+pnpm test:mobile:landscape   # Landscape orientation
+
+# Latest devices only
+pnpm test:mobile:latest
+
+# Enhanced E2E mobile tests
+pnpm test:mobile:e2e
+pnpm test:mobile:e2e:iphone
+pnpm test:mobile:e2e:ipad
+```
+
+### Supported Mobile Devices
+
+**iPhone Models:**
+
+- iPhone 16 Pro Max, iPhone 16 Pro, iPhone 16
+- iPhone 15 Pro Max, iPhone 15 Pro, iPhone 15
+- iPhone 14 Pro Max, iPhone 14 Pro
+- iPhone 13 Pro
+
+**iPad Models:**
+
+- iPad Pro 12.9" (2024) - Portrait & Landscape
+- iPad Pro 11" (2024) - Portrait & Landscape
+- iPad Air (2024) - Portrait & Landscape
+- iPad (2024) - Portrait & Landscape
+
+### Advanced Testing
+
+```bash
+# Using the test script directly
+./scripts/test-e2e.sh mobile iphone16     # iPhone 16 series
+./scripts/test-e2e.sh mobile ipad         # All iPads
+./scripts/test-e2e.sh mobile-e2e latest  # E2E on latest devices
 ```
 
 ## 🚀 Deployment
@@ -283,8 +347,8 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 ### Code Standards
 
-- **React 19** patterns and hooks with TypeScript
-- **TypeScript 5.7** with strict configuration
+- **React 19.1.1** patterns and hooks with TypeScript
+- **TypeScript 5.9** with strict configuration
 - **ESLint** and **Prettier** for code formatting
 - **Accessibility** compliance (WCAG 2.1 AA)
 - **Performance** optimization with React 19 features
@@ -355,4 +419,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Built with ❤️ using React 19, TypeScript 5.7, and Node.js 22**
+**Built with ❤️ using React 19.1.1, TypeScript 5.9, and Node.js 22.19.1**
