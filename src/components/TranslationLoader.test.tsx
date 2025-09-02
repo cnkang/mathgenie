@@ -52,7 +52,7 @@ describe('TranslationLoader', () => {
     render(
       <TranslationLoader>
         <div data-testid="child-content">Test Content</div>
-      </TranslationLoader>
+      </TranslationLoader>,
     );
 
     expect(screen.getByTestId('child-content')).toBeDefined();
@@ -66,7 +66,7 @@ describe('TranslationLoader', () => {
     render(
       <TranslationLoader>
         <div data-testid="child-content">Test Content</div>
-      </TranslationLoader>
+      </TranslationLoader>,
     );
 
     expect(screen.queryByTestId('child-content')).toBeNull();
@@ -82,7 +82,7 @@ describe('TranslationLoader', () => {
     render(
       <TranslationLoader>
         <div>Test Content</div>
-      </TranslationLoader>
+      </TranslationLoader>,
     );
 
     const spinner = screen.getByLabelText('Loading...');
@@ -103,7 +103,7 @@ describe('TranslationLoader', () => {
     render(
       <TranslationLoader>
         <div>Test Content</div>
-      </TranslationLoader>
+      </TranslationLoader>,
     );
 
     expect(mockT).toHaveBeenCalledWith('loading.translations');
@@ -119,7 +119,7 @@ describe('TranslationLoader', () => {
     render(
       <TranslationLoader>
         <div>Test Content</div>
-      </TranslationLoader>
+      </TranslationLoader>,
     );
 
     expect(screen.getByText('Loading translations...')).toBeDefined();
@@ -135,7 +135,7 @@ describe('TranslationLoader', () => {
     render(
       <TranslationLoader>
         <div>Test Content</div>
-      </TranslationLoader>
+      </TranslationLoader>,
     );
 
     expect(screen.getByText('Loading translations...')).toBeDefined();
@@ -151,13 +151,13 @@ describe('TranslationLoader', () => {
     const { container } = render(
       <TranslationLoader>
         <div>Test Content</div>
-      </TranslationLoader>
+      </TranslationLoader>,
     );
 
     expect((container.firstChild as Element)?.classList.contains('translation-loader')).toBe(true);
     expect(screen.getByText('MathGenie').classList.contains('translation-loader-title')).toBe(true);
     expect(
-      screen.getByText('Loading translations...').classList.contains('translation-loader-message')
+      screen.getByText('Loading translations...').classList.contains('translation-loader-message'),
     ).toBe(true);
 
     const content = container.querySelector('.translation-loader-content');
@@ -179,7 +179,7 @@ describe('TranslationLoader', () => {
         <div data-testid="child-1">First Child</div>
         <div data-testid="child-2">Second Child</div>
         <span data-testid="child-3">Third Child</span>
-      </TranslationLoader>
+      </TranslationLoader>,
     );
 
     expect(screen.getByTestId('child-1')).toBeDefined();
@@ -236,7 +236,7 @@ describe('TranslationLoader', () => {
     const { rerender } = render(
       <TranslationLoader>
         <div data-testid="child-content">Test Content</div>
-      </TranslationLoader>
+      </TranslationLoader>,
     );
 
     // Verify loading state
@@ -252,7 +252,7 @@ describe('TranslationLoader', () => {
     rerender(
       <TranslationLoader>
         <div data-testid="child-content">Test Content</div>
-      </TranslationLoader>
+      </TranslationLoader>,
     );
 
     // Verify loaded state
@@ -280,7 +280,7 @@ describe('TranslationLoader', () => {
             </section>
           </main>
         </div>
-      </TranslationLoader>
+      </TranslationLoader>,
     );
 
     expect(screen.getByText('Title')).toBeDefined();
@@ -302,7 +302,7 @@ describe('TranslationLoader', () => {
         <button onClick={handleClick} data-testid="test-button">
           Click me
         </button>
-      </TranslationLoader>
+      </TranslationLoader>,
     );
 
     const button = screen.getByTestId('test-button');
@@ -321,7 +321,7 @@ describe('TranslationLoader', () => {
     render(
       <TranslationLoader>
         <div>Test Content</div>
-      </TranslationLoader>
+      </TranslationLoader>,
     );
 
     const spinner = screen.getByLabelText('Loading...');
@@ -338,7 +338,7 @@ describe('TranslationLoader', () => {
       <TranslationLoader>
         {true}
         {false}
-      </TranslationLoader>
+      </TranslationLoader>,
     );
 
     // Boolean children should not render anything
@@ -368,7 +368,7 @@ describe('TranslationLoader', () => {
           <span>Fragment child 1</span>
           <span>Fragment child 2</span>
         </React.Fragment>
-      </TranslationLoader>
+      </TranslationLoader>,
     );
 
     expect(screen.getByText('Fragment child 1')).toBeDefined();

@@ -31,7 +31,7 @@ describe('ProblemPreview', () => {
 
   it('renders preview component', () => {
     renderWithI18n(
-      <ProblemPreview settings={mockSettings} generateSampleProblem={mockGenerateSampleProblem} />
+      <ProblemPreview settings={mockSettings} generateSampleProblem={mockGenerateSampleProblem} />,
     );
 
     expect(screen.getByRole('heading', { level: 3 })).toBeInTheDocument();
@@ -39,7 +39,7 @@ describe('ProblemPreview', () => {
 
   it('generates sample problems', async () => {
     renderWithI18n(
-      <ProblemPreview settings={mockSettings} generateSampleProblem={mockGenerateSampleProblem} />
+      <ProblemPreview settings={mockSettings} generateSampleProblem={mockGenerateSampleProblem} />,
     );
 
     const problems = await screen.findAllByText('2 + 3 = 5');
@@ -56,7 +56,7 @@ describe('ProblemPreview', () => {
       <ProblemPreview
         settings={settingsWithManyProblems}
         generateSampleProblem={mockGenerateSampleProblem}
-      />
+      />,
     );
 
     const problems = await screen.findAllByText('2 + 3 = 5');
@@ -73,7 +73,7 @@ describe('ProblemPreview', () => {
       <ProblemPreview
         settings={settingsWithFewProblems}
         generateSampleProblem={mockGenerateSampleProblem}
-      />
+      />,
     );
 
     const problems = await screen.findAllByText('2 + 3 = 5');
@@ -84,7 +84,7 @@ describe('ProblemPreview', () => {
     const mockGenerateNull = vi.fn(() => '');
 
     renderWithI18n(
-      <ProblemPreview settings={mockSettings} generateSampleProblem={mockGenerateNull} />
+      <ProblemPreview settings={mockSettings} generateSampleProblem={mockGenerateNull} />,
     );
 
     expect(screen.getByRole('heading', { level: 3 })).toBeInTheDocument();
@@ -98,7 +98,7 @@ describe('ProblemPreview', () => {
 
   it('displays preview info', () => {
     renderWithI18n(
-      <ProblemPreview settings={mockSettings} generateSampleProblem={mockGenerateSampleProblem} />
+      <ProblemPreview settings={mockSettings} generateSampleProblem={mockGenerateSampleProblem} />,
     );
 
     expect(screen.getByText('preview.info')).toBeInTheDocument();
@@ -106,7 +106,7 @@ describe('ProblemPreview', () => {
 
   it('uses deferred values for performance', () => {
     const { rerender } = renderWithI18n(
-      <ProblemPreview settings={mockSettings} generateSampleProblem={mockGenerateSampleProblem} />
+      <ProblemPreview settings={mockSettings} generateSampleProblem={mockGenerateSampleProblem} />,
     );
 
     const updatedSettings = {
@@ -120,7 +120,7 @@ describe('ProblemPreview', () => {
           settings={updatedSettings}
           generateSampleProblem={mockGenerateSampleProblem}
         />
-      </I18nProvider>
+      </I18nProvider>,
     );
 
     expect(screen.getByRole('heading', { level: 3 })).toBeInTheDocument();
@@ -130,7 +130,7 @@ describe('ProblemPreview', () => {
     const mockGenerateEmpty = vi.fn(() => '');
 
     renderWithI18n(
-      <ProblemPreview settings={mockSettings} generateSampleProblem={mockGenerateEmpty} />
+      <ProblemPreview settings={mockSettings} generateSampleProblem={mockGenerateEmpty} />,
     );
 
     expect(screen.getByRole('heading', { level: 3 })).toBeInTheDocument();
@@ -138,7 +138,7 @@ describe('ProblemPreview', () => {
 
   it('regenerates problems when settings change', () => {
     const { rerender } = renderWithI18n(
-      <ProblemPreview settings={mockSettings} generateSampleProblem={mockGenerateSampleProblem} />
+      <ProblemPreview settings={mockSettings} generateSampleProblem={mockGenerateSampleProblem} />,
     );
 
     vi.clearAllMocks();
@@ -151,7 +151,7 @@ describe('ProblemPreview', () => {
     rerender(
       <I18nProvider>
         <ProblemPreview settings={newSettings} generateSampleProblem={mockGenerateSampleProblem} />
-      </I18nProvider>
+      </I18nProvider>,
     );
 
     expect(mockGenerateSampleProblem).toHaveBeenCalled();
