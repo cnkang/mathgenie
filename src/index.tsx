@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import App from './App';
 import { I18nProvider } from './i18n';
 import './index.css';
@@ -11,26 +11,32 @@ if (!rootElement) {
   throw new Error('Root element not found');
 }
 
-const root = ReactDOM.createRoot(rootElement);
+const root = createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <I18nProvider>
       <App />
     </I18nProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );
 
 // Register service worker for offline functionality
-serviceWorker.register({
-  onSuccess: () => {
-    console.log('MathGenie is now available offline!');
-  },
-  onUpdate: () => {
-    console.log('New version available! Please refresh the page.');
-  },
-});
+if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
+  serviceWorker.register({
+    onSuccess: () => {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('MathGenie is now available offline!');
+      }
+    },
+    onUpdate: () => {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('New version available! Please refresh the page.');
+      }
+    },
+  });
+}
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+// Load web vitals reporting
+if (process.env.NODE_ENV === 'production') {
+  reportWebVitals();
+}
