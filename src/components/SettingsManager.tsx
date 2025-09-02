@@ -1,6 +1,6 @@
-import React, { ChangeEvent, useRef } from "react";
-import { useTranslation } from "../i18n";
-import type { Settings } from "../types";
+import React, { ChangeEvent, useRef } from 'react';
+import { useTranslation } from '../i18n';
+import type { Settings } from '../types';
 import {
   createDownloadBlob,
   createSettingsData,
@@ -8,7 +8,7 @@ import {
   parseSettingsFile,
   serializeSettings,
   validateSettingsData,
-} from "../utils/settingsManager";
+} from '../utils/settingsManager';
 
 interface SettingsManagerProps {
   settings: Settings;
@@ -29,7 +29,7 @@ const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onImportSet
     const dataBlob = createDownloadBlob(dataStr);
 
     const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
     link.download = generateFilename();
     document.body.appendChild(link);
@@ -48,43 +48,43 @@ const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onImportSet
     reader.onload = (e: ProgressEvent<FileReader>) => {
       try {
         const result = e.target?.result;
-        if (typeof result === "string") {
+        if (typeof result === 'string') {
           const importedData = parseSettingsFile(result);
           if (validateSettingsData(importedData)) {
             onImportSettings(importedData.settings);
           } else {
-            alert(t("settings.importError") || "Invalid settings file format");
+            alert(t('settings.importError') || 'Invalid settings file format');
           }
         }
       } catch (error) {
-        alert(t("settings.importError") || "Error reading settings file");
-        console.error("Settings import error:", error);
+        alert(t('settings.importError') || 'Error reading settings file');
+        console.error('Settings import error:', error);
       }
     };
     reader.readAsText(file);
 
     // Reset file input
-    event.target.value = "";
+    event.target.value = '';
   };
 
   return (
     <div className="settings-manager">
-      <h3>{t("settings.manager.title") || "Settings Manager"}</h3>
+      <h3>{t('settings.manager.title') || 'Settings Manager'}</h3>
       <div className="settings-actions">
         <button
           onClick={exportSettings}
           className="export-button"
-          aria-label={t("settings.manager.exportLabel") || "Export current settings"}
+          aria-label={t('settings.manager.exportLabel') || 'Export current settings'}
         >
-          📤 {t("settings.manager.export") || "Export Settings"}
+          📤 {t('settings.manager.export') || 'Export Settings'}
         </button>
 
         <button
           onClick={() => fileInputRef.current?.click()}
           className="import-button"
-          aria-label={t("settings.manager.importLabel") || "Import settings from file"}
+          aria-label={t('settings.manager.importLabel') || 'Import settings from file'}
         >
-          📥 {t("settings.manager.import") || "Import Settings"}
+          📥 {t('settings.manager.import') || 'Import Settings'}
         </button>
 
         <input
@@ -92,7 +92,7 @@ const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onImportSet
           type="file"
           accept=".json"
           onChange={importSettings}
-          style={{ display: "none" }}
+          style={{ display: 'none' }}
           aria-hidden="true"
         />
       </div>

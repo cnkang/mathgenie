@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import type { PerformanceMonitorProps } from "../types";
+import React, { useEffect } from 'react';
+import type { PerformanceMonitorProps } from '../types';
 
 // Extend Window interface for gtag
 declare global {
@@ -30,16 +30,16 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({ children }) => 
     const observer = new PerformanceObserver((list) => {
       list.getEntries().forEach((entry) => {
         // Log performance metrics in development
-        if (process.env.NODE_ENV === "development") {
-          const value = "value" in entry ? (entry as any).value : entry.duration;
+        if (process.env.NODE_ENV === 'development') {
+          const value = 'value' in entry ? (entry as any).value : entry.duration;
           console.log(`${entry.name}: ${value}ms`);
         }
 
         // Report to analytics in production (if needed)
-        if (process.env.NODE_ENV === "production" && window.gtag) {
-          const value = "value" in entry ? (entry as any).value : entry.duration;
-          window.gtag("event", "web_vitals", {
-            event_category: "Performance",
+        if (process.env.NODE_ENV === 'production' && window.gtag) {
+          const value = 'value' in entry ? (entry as any).value : entry.duration;
+          window.gtag('event', 'web_vitals', {
+            event_category: 'Performance',
             event_label: entry.name,
             value: Math.round(value || 0),
             non_interaction: true,
@@ -50,10 +50,10 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({ children }) => 
 
     // Observe different performance metrics
     try {
-      observer.observe({ entryTypes: ["measure", "navigation", "paint"] });
+      observer.observe({ entryTypes: ['measure', 'navigation', 'paint'] });
     } catch (error) {
       // Fallback for browsers that don't support all entry types
-      console.warn("Performance observer not fully supported:", error);
+      console.warn('Performance observer not fully supported:', error);
     }
 
     // Memory usage monitoring (if available)
@@ -61,11 +61,11 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({ children }) => 
     if (extendedPerformance.memory) {
       const logMemoryUsage = (): void => {
         const memory = extendedPerformance.memory!;
-        if (process.env.NODE_ENV === "development") {
-          console.log("Memory usage:", {
-            used: Math.round(memory.usedJSHeapSize / 1048576) + " MB",
-            total: Math.round(memory.totalJSHeapSize / 1048576) + " MB",
-            limit: Math.round(memory.jsHeapSizeLimit / 1048576) + " MB",
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Memory usage:', {
+            used: Math.round(memory.usedJSHeapSize / 1048576) + ' MB',
+            total: Math.round(memory.totalJSHeapSize / 1048576) + ' MB',
+            limit: Math.round(memory.jsHeapSizeLimit / 1048576) + ' MB',
           });
         }
       };
