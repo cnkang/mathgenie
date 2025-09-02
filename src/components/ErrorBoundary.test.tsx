@@ -1,17 +1,17 @@
-import { fireEvent, render, renderHook, screen } from "@testing-library/react";
-import React, { act } from "react";
-import { afterAll, beforeAll, describe, expect, vi } from "vitest";
-import ErrorBoundary, { useErrorHandler } from "./ErrorBoundary";
+import { fireEvent, render, renderHook, screen } from '@testing-library/react';
+import React, { act } from 'react';
+import { afterAll, beforeAll, describe, expect, vi } from 'vitest';
+import ErrorBoundary, { useErrorHandler } from './ErrorBoundary';
 
 // Create a component that throws errors
 const ThrowError = ({ shouldThrow }: { shouldThrow: boolean }) => {
   if (shouldThrow) {
-    throw new Error("Test error");
+    throw new Error('Test error');
   }
   return <div>No error</div>;
 };
 
-describe("ErrorBoundary", () => {
+describe('ErrorBoundary', () => {
   // Suppress console error output since we're intentionally throwing errors
   const originalError = console.error;
   beforeAll(() => {
@@ -22,17 +22,17 @@ describe("ErrorBoundary", () => {
     console.error = originalError;
   });
 
-  test("renders children when there is no error", () => {
+  test('renders children when there is no error', () => {
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={false} />
       </ErrorBoundary>,
     );
 
-    expect(screen.getByText("No error")).toBeDefined();
+    expect(screen.getByText('No error')).toBeDefined();
   });
 
-  test("renders error fallback when there is an error", () => {
+  test('renders error fallback when there is an error', () => {
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
@@ -44,12 +44,12 @@ describe("ErrorBoundary", () => {
     expect(screen.getByText(/Reload Page/)).toBeDefined();
 
     // In development environment, error details should exist
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV === 'development') {
       expect(screen.getByText(/Error Details/)).toBeDefined();
     }
   });
 
-  test("renders custom fallback when provided", () => {
+  test('renders custom fallback when provided', () => {
     const customFallback = <div>Custom error message</div>;
 
     render(
@@ -58,10 +58,10 @@ describe("ErrorBoundary", () => {
       </ErrorBoundary>,
     );
 
-    expect(screen.getByText("Custom error message")).toBeDefined();
+    expect(screen.getByText('Custom error message')).toBeDefined();
   });
 
-  test("calls onError callback when error occurs", () => {
+  test('calls onError callback when error occurs', () => {
     const onError = vi.fn();
 
     render(
@@ -78,9 +78,9 @@ describe("ErrorBoundary", () => {
     );
   });
 
-  test("handles try again button click", () => {
+  test('handles try again button click', () => {
     const mockReload = vi.fn();
-    Object.defineProperty(window, "location", {
+    Object.defineProperty(window, 'location', {
       value: { reload: mockReload },
       writable: true,
     });
@@ -97,7 +97,7 @@ describe("ErrorBoundary", () => {
     expect(mockReload).toHaveBeenCalled();
   });
 
-  test("handles retry button click", () => {
+  test('handles retry button click', () => {
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
@@ -116,9 +116,9 @@ describe("ErrorBoundary", () => {
     expect(screen.getByText(/Something went wrong/)).toBeDefined();
   });
 
-  test("shows error details in development mode", () => {
+  test('shows error details in development mode', () => {
     const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = "development";
+    process.env.NODE_ENV = 'development';
 
     render(
       <ErrorBoundary>
@@ -132,9 +132,9 @@ describe("ErrorBoundary", () => {
     process.env.NODE_ENV = originalEnv;
   });
 
-  test("hides error details in production mode", () => {
+  test('hides error details in production mode', () => {
     const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = "production";
+    process.env.NODE_ENV = 'production';
 
     render(
       <ErrorBoundary>
@@ -147,10 +147,10 @@ describe("ErrorBoundary", () => {
     process.env.NODE_ENV = originalEnv;
   });
 
-  test("handles error with custom error info", () => {
+  test('handles error with custom error info', () => {
     const onError = vi.fn();
     const CustomError = () => {
-      throw new Error("Custom test error");
+      throw new Error('Custom test error');
     };
 
     render(
@@ -161,7 +161,7 @@ describe("ErrorBoundary", () => {
 
     expect(onError).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: "Custom test error",
+        message: 'Custom test error',
       }),
       expect.objectContaining({
         componentStack: expect.any(String),
@@ -169,7 +169,7 @@ describe("ErrorBoundary", () => {
     );
   });
 
-  test("maintains error state consistently", () => {
+  test('maintains error state consistently', () => {
     const { rerender } = render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
@@ -189,7 +189,7 @@ describe("ErrorBoundary", () => {
     expect(screen.getByText(/Something went wrong/)).toBeDefined();
   });
 
-  test("handles multiple error scenarios", () => {
+  test('handles multiple error scenarios', () => {
     const onError = vi.fn();
 
     const { rerender } = render(
@@ -198,7 +198,7 @@ describe("ErrorBoundary", () => {
       </ErrorBoundary>,
     );
 
-    expect(screen.getByText("No error")).toBeDefined();
+    expect(screen.getByText('No error')).toBeDefined();
 
     // Trigger error
     rerender(
@@ -212,26 +212,26 @@ describe("ErrorBoundary", () => {
   });
 });
 
-describe("useErrorHandler", () => {
-  test("initializes with no error", () => {
+describe('useErrorHandler', () => {
+  test('initializes with no error', () => {
     const { result } = renderHook(() => useErrorHandler());
 
     expect(result.current.error).toBeNull();
-    expect(typeof result.current.handleError).toBe("function");
-    expect(typeof result.current.resetError).toBe("function");
+    expect(typeof result.current.handleError).toBe('function');
+    expect(typeof result.current.resetError).toBe('function');
   });
 
-  test("handles error in production", () => {
+  test('handles error in production', () => {
     const originalEnv = process.env.NODE_ENV;
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-    process.env.NODE_ENV = "production";
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    process.env.NODE_ENV = 'production';
 
     const TestComponent = () => {
       const { handleError, error } = useErrorHandler();
 
       React.useEffect(() => {
         if (!error) {
-          handleError(new Error("Test error"));
+          handleError(new Error('Test error'));
         }
       }, [handleError, error]);
 
@@ -246,13 +246,13 @@ describe("useErrorHandler", () => {
       );
     }).not.toThrow();
 
-    expect(consoleSpy).toHaveBeenCalledWith("Application error:", expect.any(Error));
+    expect(consoleSpy).toHaveBeenCalledWith('Application error:', expect.any(Error));
 
     process.env.NODE_ENV = originalEnv;
     consoleSpy.mockRestore();
   });
 
-  test("resets error state", () => {
+  test('resets error state', () => {
     let hookResult: any;
 
     const TestComponent = () => {
@@ -271,14 +271,14 @@ describe("useErrorHandler", () => {
     expect(hookResult.error).toBeNull();
   });
 
-  test("throws error in useEffect when error is set", () => {
+  test('throws error in useEffect when error is set', () => {
     const { result } = renderHook(() => useErrorHandler());
-    const testError = new Error("Test error");
+    const testError = new Error('Test error');
 
     expect(() => {
       act(() => {
         result.current.handleError(testError);
       });
-    }).toThrow("Test error");
+    }).toThrow('Test error');
   });
 });
