@@ -173,6 +173,10 @@ desktop.ini
 
 # Temporary build artifacts
 lighthouserc.ts
+# lighthouserc.cjs is needed for CI and should be committed
+
+# Lighthouse CI results directory
+.lighthouseci/
 sonar-project.properties
 babel.config.ts
 postcss.config.ts
