@@ -1,26 +1,26 @@
-import React, { Suspense, useEffect, useState } from "react";
-import "./App.css";
-import "./components/ButtonFix.css";
-import ErrorMessage from "./components/ErrorMessage";
-import InfoPanel from "./components/InfoPanel";
-import LanguageSelector from "./components/LanguageSelector";
-import "./components/ProblemsDisplay.css";
-import QuizMode from "./components/QuizMode";
-import "./components/QuizMode.css";
-import SettingsPresets from "./components/SettingsPresets";
-import TranslationLoader from "./components/TranslationLoader";
-import { useTranslation } from "./i18n";
-import type { Operation, PaperSizeOptions, Problem, QuizResult, Settings } from "./types";
+import React, { Suspense, useEffect, useState } from 'react';
+import './App.css';
+import './components/ButtonFix.css';
+import ErrorMessage from './components/ErrorMessage';
+import InfoPanel from './components/InfoPanel';
+import LanguageSelector from './components/LanguageSelector';
+import './components/ProblemsDisplay.css';
+import QuizMode from './components/QuizMode';
+import './components/QuizMode.css';
+import SettingsPresets from './components/SettingsPresets';
+import TranslationLoader from './components/TranslationLoader';
+import { useTranslation } from './i18n';
+import type { Operation, PaperSizeOptions, Problem, QuizResult, Settings } from './types';
 
 const SpeedInsights = React.lazy(() =>
-  import("@vercel/speed-insights/react").then((module) => ({ default: module.SpeedInsights })),
+  import('@vercel/speed-insights/react').then((module) => ({ default: module.SpeedInsights })),
 );
 
 function App(): React.JSX.Element {
   const { t, isLoading } = useTranslation();
 
   const defaultSettings: Settings = {
-    operations: ["+", "-"],
+    operations: ['+', '-'],
     numProblems: 20,
     numRange: [1, 20],
     resultRange: [0, 20],
@@ -29,13 +29,13 @@ function App(): React.JSX.Element {
     showAnswers: false,
     fontSize: 16,
     lineSpacing: 12,
-    paperSize: "a4",
+    paperSize: 'a4',
   };
 
   // Load settings from localStorage or use defaults
   const loadSettings = (): Settings => {
     try {
-      const saved = localStorage.getItem("mathgenie-settings");
+      const saved = localStorage.getItem('mathgenie-settings');
       if (saved) {
         const parsed = JSON.parse(saved);
         // Validate parsed settings to prevent errors
@@ -60,8 +60,8 @@ function App(): React.JSX.Element {
         };
       }
     } catch (error) {
-      if (process.env.NODE_ENV === "development") {
-        console.warn("Failed to load settings from localStorage:", error);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Failed to load settings from localStorage:', error);
       }
     }
     return defaultSettings;
@@ -69,25 +69,25 @@ function App(): React.JSX.Element {
 
   const [settings, setSettings] = useState<Settings>(() => loadSettings());
   const [problems, setProblems] = useState<Problem[]>([]);
-  const [error, setError] = useState<string>("");
-  const [warning, setWarning] = useState<string>("");
-  const [successMessage, setSuccessMessage] = useState<string>("");
+  const [error, setError] = useState<string>('');
+  const [warning, setWarning] = useState<string>('');
+  const [successMessage, setSuccessMessage] = useState<string>('');
   const [isQuizMode, setIsQuizMode] = useState<boolean>(false);
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
 
   const paperSizeOptions: PaperSizeOptions = {
-    a4: "a4",
-    letter: "letter",
-    legal: "legal",
+    a4: 'a4',
+    letter: 'letter',
+    legal: 'legal',
   };
 
   // Save settings to localStorage
   const saveSettings = (newSettings: Settings): void => {
     try {
-      localStorage.setItem("mathgenie-settings", JSON.stringify(newSettings));
+      localStorage.setItem('mathgenie-settings', JSON.stringify(newSettings));
     } catch (error) {
-      if (process.env.NODE_ENV === "development") {
-        console.warn("Failed to save settings to localStorage:", error);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Failed to save settings to localStorage:', error);
       }
     }
   };
@@ -95,21 +95,21 @@ function App(): React.JSX.Element {
   // Validate settings
   const validateSettings = (newSettings: Settings): string => {
     if (newSettings.operations.length === 0) {
-      return t("errors.noOperations") || "Please select at least one operation.";
+      return t('errors.noOperations') || 'Please select at least one operation.';
     }
     if (newSettings.numProblems <= 0 || newSettings.numProblems > 100) {
-      return t("errors.invalidProblemCount") || "Number of problems must be between 1 and 100.";
+      return t('errors.invalidProblemCount') || 'Number of problems must be between 1 and 100.';
     }
     if (newSettings.numRange[0] > newSettings.numRange[1]) {
       return (
-        t("errors.invalidNumberRange") ||
-        "Invalid number range: minimum cannot be greater than maximum."
+        t('errors.invalidNumberRange') ||
+        'Invalid number range: minimum cannot be greater than maximum.'
       );
     }
     if (newSettings.resultRange[0] > newSettings.resultRange[1]) {
       return (
-        t("errors.invalidResultRange") ||
-        "Invalid result range: minimum cannot be greater than maximum."
+        t('errors.invalidResultRange') ||
+        'Invalid result range: minimum cannot be greater than maximum.'
       );
     }
     if (
@@ -117,11 +117,11 @@ function App(): React.JSX.Element {
       newSettings.numOperandsRange[0] < 2
     ) {
       return (
-        t("errors.invalidOperandsRange") ||
-        "Invalid operands range: minimum must be at least 2 and not greater than maximum."
+        t('errors.invalidOperandsRange') ||
+        'Invalid operands range: minimum must be at least 2 and not greater than maximum.'
       );
     }
-    return "";
+    return '';
   };
 
   const calculateExpression = (operands: number[], operators: string[]): number => {
@@ -132,16 +132,16 @@ function App(): React.JSX.Element {
       const operand = operands[i + 1];
 
       switch (operator) {
-        case "+":
+        case '+':
           result += operand;
           break;
-        case "-":
+        case '-':
           result -= operand;
           break;
-        case "*":
+        case '*':
           result *= operand;
           break;
-        case "/":
+        case '/':
           result = result / operand;
           break;
         default:
@@ -163,7 +163,7 @@ function App(): React.JSX.Element {
 
     const numOperands = random(settings.numOperandsRange[0], settings.numOperandsRange[1]);
     if (numOperands < 2) {
-      return "";
+      return '';
     }
 
     const MAX_ATTEMPTS = 10000;
@@ -186,21 +186,21 @@ function App(): React.JSX.Element {
             problem += ` ${operator} ${operands[index + 1]}`;
           });
 
-          problem = problem.replace(/\*/g, "✖").replace(/\//g, "➗");
+          problem = problem.replace(/\*/g, '✖').replace(/\//g, '➗');
 
           return settings.showAnswers ? `${problem} = ${result}` : `${problem} = `;
         }
       }
     }
 
-    return "";
+    return '';
   };
 
   const generateProblems = (): void => {
     // Clear previous messages
-    setError("");
-    setWarning("");
-    setSuccessMessage("");
+    setError('');
+    setWarning('');
+    setSuccessMessage('');
 
     // Validate settings first
     const validationError = validateSettings(settings);
@@ -211,22 +211,22 @@ function App(): React.JSX.Element {
 
     // Show warning for large number of problems
     if (settings.numProblems > 50) {
-      setWarning(t("warnings.largeNumberOfProblems", { count: settings.numProblems }));
+      setWarning(t('warnings.largeNumberOfProblems', { count: settings.numProblems }));
     }
 
     try {
       const generatedProblems = Array.from({ length: settings.numProblems }, () =>
         generateProblem(),
       )
-        .filter((problem) => problem !== "")
+        .filter((problem) => problem !== '')
         .map((problem, index) => ({ id: index, text: problem }));
 
       if (generatedProblems.length === 0) {
-        setError(t("errors.noProblemsGenerated"));
+        setError(t('errors.noProblemsGenerated'));
       } else if (generatedProblems.length < settings.numProblems) {
         // Partial generation - show warning
         setWarning(
-          t("errors.partialGeneration", {
+          t('errors.partialGeneration', {
             generated: generatedProblems.length,
             requested: settings.numProblems,
           }),
@@ -235,34 +235,34 @@ function App(): React.JSX.Element {
       } else {
         // Full success
         setSuccessMessage(
-          t("messages.success.problemsGenerated", { count: generatedProblems.length }),
+          t('messages.success.problemsGenerated', { count: generatedProblems.length }),
         );
         setProblems(generatedProblems);
 
         // Clear success message after 3 seconds
-        setTimeout(() => setSuccessMessage(""), 3000);
+        setTimeout(() => setSuccessMessage(''), 3000);
       }
     } catch (err) {
-      setError(t("errors.generationFailed"));
-      if (process.env.NODE_ENV === "development") {
-        console.error("Problem generation error:", err);
+      setError(t('errors.generationFailed'));
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Problem generation error:', err);
       }
     }
   };
 
   const downloadPdf = (): void => {
     if (problems.length === 0) {
-      setError(t("errors.noProblemsToPdf"));
+      setError(t('errors.noProblemsToPdf'));
       return;
     }
 
     // Clear previous messages
-    setError("");
-    setWarning("");
-    setSuccessMessage("");
+    setError('');
+    setWarning('');
+    setSuccessMessage('');
 
     try {
-      import("jspdf").then(({ default: jsPDF }) => {
+      import('jspdf').then(({ default: jsPDF }) => {
         const doc = new jsPDF({
           format: paperSizeOptions[settings.paperSize],
         });
@@ -299,16 +299,16 @@ function App(): React.JSX.Element {
           }
         });
 
-        doc.save("problems.pdf");
+        doc.save('problems.pdf');
 
         // Show success message
-        setSuccessMessage(t("messages.success.settingsExported"));
-        setTimeout(() => setSuccessMessage(""), 3000);
+        setSuccessMessage(t('messages.success.settingsExported'));
+        setTimeout(() => setSuccessMessage(''), 3000);
       });
     } catch (err) {
-      setError(t("errors.pdfFailed"));
-      if (process.env.NODE_ENV === "development") {
-        console.error("PDF generation error:", err);
+      setError(t('errors.pdfFailed'));
+      if (process.env.NODE_ENV === 'development') {
+        console.error('PDF generation error:', err);
       }
     }
   };
@@ -330,17 +330,17 @@ function App(): React.JSX.Element {
     };
 
     // Clear previous messages
-    setError("");
-    setWarning("");
-    setSuccessMessage("");
+    setError('');
+    setWarning('');
+    setSuccessMessage('');
 
     // Validate immediately for validation-sensitive fields
     if (
-      field === "numProblems" ||
-      field === "numRange" ||
-      field === "resultRange" ||
-      field === "numOperandsRange" ||
-      field === "operations"
+      field === 'numProblems' ||
+      field === 'numRange' ||
+      field === 'resultRange' ||
+      field === 'numOperandsRange' ||
+      field === 'operations'
     ) {
       const validationError = validateSettings(newSettings);
       if (validationError) {
@@ -352,7 +352,7 @@ function App(): React.JSX.Element {
           newSettings.numRange[1] - newSettings.numRange[0] < 5;
 
         if (isRestrictive && newSettings.numProblems > 20) {
-          setWarning(t("warnings.restrictiveSettings"));
+          setWarning(t('warnings.restrictiveSettings'));
         }
       }
     }
@@ -366,15 +366,15 @@ function App(): React.JSX.Element {
     saveSettings(presetSettings);
 
     // Clear messages and show success
-    setError("");
-    setWarning("");
-    setSuccessMessage(t("messages.info.presetApplied", { name: "Preset" }));
-    setTimeout(() => setSuccessMessage(""), 3000);
+    setError('');
+    setWarning('');
+    setSuccessMessage(t('messages.info.presetApplied', { name: 'Preset' }));
+    setTimeout(() => setSuccessMessage(''), 3000);
   };
 
   const startQuizMode = (): void => {
     if (problems.length === 0) {
-      setError("Please generate problems first before starting quiz mode");
+      setError('Please generate problems first before starting quiz mode');
       return;
     }
     setIsQuizMode(true);
@@ -389,7 +389,7 @@ function App(): React.JSX.Element {
     setQuizResult(result);
     // Save quiz results to localStorage
     try {
-      const savedResults = localStorage.getItem("mathgenie-quiz-results");
+      const savedResults = localStorage.getItem('mathgenie-quiz-results');
       const results = savedResults ? JSON.parse(savedResults) : [];
       results.push({
         ...result,
@@ -400,10 +400,10 @@ function App(): React.JSX.Element {
       if (results.length > 20) {
         results.splice(0, results.length - 20);
       }
-      localStorage.setItem("mathgenie-quiz-results", JSON.stringify(results));
+      localStorage.setItem('mathgenie-quiz-results', JSON.stringify(results));
     } catch (error) {
-      if (process.env.NODE_ENV === "development") {
-        console.warn("Failed to save quiz result:", error);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Failed to save quiz result:', error);
       }
     }
   };
@@ -412,8 +412,8 @@ function App(): React.JSX.Element {
     return (
       <div className="App">
         <div className="loading-container">
-          <h1>{t("app.title")}</h1>
-          <p>{t("loading.translations")}</p>
+          <h1>{t('app.title')}</h1>
+          <p>{t('loading.translations')}</p>
           <div className="loading-spinner" aria-label="Loading..."></div>
         </div>
       </div>
@@ -426,8 +426,8 @@ function App(): React.JSX.Element {
         <header className="app-header">
           <div className="header-content">
             <div className="title-section">
-              <h1>{t("app.title")}</h1>
-              <p className="subtitle">{t("app.subtitle")}</p>
+              <h1>{t('app.title')}</h1>
+              <p className="subtitle">{t('app.subtitle')}</p>
             </div>
             <LanguageSelector />
           </div>
@@ -436,12 +436,12 @@ function App(): React.JSX.Element {
         <main className="main-content">
           {/* Message display area */}
           <div className="messages-container">
-            <ErrorMessage error={error} type="error" onDismiss={() => setError("")} />
-            <ErrorMessage error={warning} type="warning" onDismiss={() => setWarning("")} />
+            <ErrorMessage error={error} type="error" onDismiss={() => setError('')} />
+            <ErrorMessage error={warning} type="warning" onDismiss={() => setWarning('')} />
             <ErrorMessage
               error={successMessage}
               type="info"
-              onDismiss={() => setSuccessMessage("")}
+              onDismiss={() => setSuccessMessage('')}
             />
           </div>
 
@@ -457,186 +457,186 @@ function App(): React.JSX.Element {
                 <SettingsPresets onApplyPreset={handleApplyPreset} />
 
                 <div>
-                  <label htmlFor="operations">{t("operations.title")}:</label>
+                  <label htmlFor="operations">{t('operations.title')}:</label>
                   <select
                     id="operations"
                     multiple
                     value={settings.operations}
                     onChange={(e) =>
                       handleChange(
-                        "operations",
+                        'operations',
                         Array.from(e.target.selectedOptions, (option) => option.value as Operation),
                       )
                     }
-                    aria-label={t("accessibility.selectOperations")}
-                    title={t("operations.help")}
+                    aria-label={t('accessibility.selectOperations')}
+                    title={t('operations.help')}
                   >
-                    <option value="+">{t("operations.addition")}</option>
-                    <option value="-">{t("operations.subtraction")}</option>
-                    <option value="*">{t("operations.multiplication")}</option>
-                    <option value="/">{t("operations.division")}</option>
+                    <option value="+">{t('operations.addition')}</option>
+                    <option value="-">{t('operations.subtraction')}</option>
+                    <option value="*">{t('operations.multiplication')}</option>
+                    <option value="/">{t('operations.division')}</option>
                   </select>
-                  <small className="help-text">{t("operations.help")}</small>
+                  <small className="help-text">{t('operations.help')}</small>
                 </div>
                 <div>
-                  <label htmlFor="numProblems">{t("settings.numProblems")}:</label>
+                  <label htmlFor="numProblems">{t('settings.numProblems')}:</label>
                   <input
                     type="number"
                     id="numProblems"
                     value={settings.numProblems}
-                    onChange={(e) => handleChange("numProblems", parseInt(e.target.value, 10))}
-                    aria-label={t("accessibility.numProblemsInput")}
+                    onChange={(e) => handleChange('numProblems', parseInt(e.target.value, 10))}
+                    aria-label={t('accessibility.numProblemsInput')}
                   />
                 </div>
                 <div>
-                  <label htmlFor="numRange">{t("settings.numberRange")}:</label>
+                  <label htmlFor="numRange">{t('settings.numberRange')}:</label>
                   <div className="range-inputs">
                     <input
                       type="number"
                       id="numRangeFrom"
                       value={settings.numRange[0]}
                       onChange={(e) =>
-                        handleChange("numRange", [
+                        handleChange('numRange', [
                           parseInt(e.target.value, 10),
                           settings.numRange[1],
                         ])
                       }
-                      aria-label={t("accessibility.minNumber")}
-                      placeholder={t("settings.from")}
+                      aria-label={t('accessibility.minNumber')}
+                      placeholder={t('settings.from')}
                     />
-                    <span>{t("settings.to")}</span>
+                    <span>{t('settings.to')}</span>
                     <input
                       type="number"
                       id="numRangeTo"
                       value={settings.numRange[1]}
                       onChange={(e) =>
-                        handleChange("numRange", [
+                        handleChange('numRange', [
                           settings.numRange[0],
                           parseInt(e.target.value, 10),
                         ])
                       }
-                      aria-label={t("accessibility.maxNumber")}
-                      placeholder={t("settings.to")}
+                      aria-label={t('accessibility.maxNumber')}
+                      placeholder={t('settings.to')}
                     />
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="resultRange">{t("settings.resultRange")}:</label>
+                  <label htmlFor="resultRange">{t('settings.resultRange')}:</label>
                   <div className="range-inputs">
                     <input
                       type="number"
                       id="resultRangeFrom"
                       value={settings.resultRange[0]}
                       onChange={(e) =>
-                        handleChange("resultRange", [
+                        handleChange('resultRange', [
                           parseInt(e.target.value, 10),
                           settings.resultRange[1],
                         ])
                       }
-                      aria-label={t("accessibility.minResult")}
-                      placeholder={t("settings.from")}
+                      aria-label={t('accessibility.minResult')}
+                      placeholder={t('settings.from')}
                     />
-                    <span>{t("settings.to")}</span>
+                    <span>{t('settings.to')}</span>
                     <input
                       type="number"
                       id="resultRangeTo"
                       value={settings.resultRange[1]}
                       onChange={(e) =>
-                        handleChange("resultRange", [
+                        handleChange('resultRange', [
                           settings.resultRange[0],
                           parseInt(e.target.value, 10),
                         ])
                       }
-                      aria-label={t("accessibility.maxResult")}
-                      placeholder={t("settings.to")}
+                      aria-label={t('accessibility.maxResult')}
+                      placeholder={t('settings.to')}
                     />
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="numOperandsRange">{t("settings.operandsRange")}:</label>
+                  <label htmlFor="numOperandsRange">{t('settings.operandsRange')}:</label>
                   <div className="range-inputs">
                     <input
                       type="number"
                       id="numOperandsRangeFrom"
                       value={settings.numOperandsRange[0]}
                       onChange={(e) =>
-                        handleChange("numOperandsRange", [
+                        handleChange('numOperandsRange', [
                           parseInt(e.target.value, 10),
                           settings.numOperandsRange[1],
                         ])
                       }
-                      aria-label={t("accessibility.minOperands")}
-                      placeholder={t("settings.from")}
+                      aria-label={t('accessibility.minOperands')}
+                      placeholder={t('settings.from')}
                     />
-                    <span>{t("settings.to")}</span>
+                    <span>{t('settings.to')}</span>
                     <input
                       type="number"
                       id="numOperandsRangeTo"
                       value={settings.numOperandsRange[1]}
                       onChange={(e) =>
-                        handleChange("numOperandsRange", [
+                        handleChange('numOperandsRange', [
                           settings.numOperandsRange[0],
                           parseInt(e.target.value, 10),
                         ])
                       }
-                      aria-label={t("accessibility.maxOperands")}
-                      placeholder={t("settings.to")}
+                      aria-label={t('accessibility.maxOperands')}
+                      placeholder={t('settings.to')}
                     />
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="allowNegative">{t("settings.allowNegative")}:</label>
+                  <label htmlFor="allowNegative">{t('settings.allowNegative')}:</label>
                   <input
                     type="checkbox"
                     id="allowNegative"
                     checked={settings.allowNegative}
-                    onChange={(e) => handleChange("allowNegative", e.target.checked)}
-                    aria-label={t("accessibility.allowNegativeLabel")}
+                    onChange={(e) => handleChange('allowNegative', e.target.checked)}
+                    aria-label={t('accessibility.allowNegativeLabel')}
                   />
-                  <small className="help-text">{t("settings.allowNegativeDesc")}</small>
+                  <small className="help-text">{t('settings.allowNegativeDesc')}</small>
                 </div>
                 <div>
-                  <label htmlFor="showAnswers">{t("settings.showAnswers")}:</label>
+                  <label htmlFor="showAnswers">{t('settings.showAnswers')}:</label>
                   <input
                     type="checkbox"
                     id="showAnswers"
                     checked={settings.showAnswers}
-                    onChange={(e) => handleChange("showAnswers", e.target.checked)}
-                    aria-label={t("accessibility.showAnswersLabel")}
+                    onChange={(e) => handleChange('showAnswers', e.target.checked)}
+                    aria-label={t('accessibility.showAnswersLabel')}
                   />
-                  <small className="help-text">{t("settings.showAnswersDesc")}</small>
+                  <small className="help-text">{t('settings.showAnswersDesc')}</small>
                 </div>
                 <fieldset className="pdf-settings">
-                  <legend>{t("pdf.title")}</legend>
+                  <legend>{t('pdf.title')}</legend>
                   <div>
-                    <label htmlFor="fontSize">{t("pdf.fontSize")}:</label>
+                    <label htmlFor="fontSize">{t('pdf.fontSize')}:</label>
                     <input
                       type="number"
                       id="fontSize"
                       value={settings.fontSize}
-                      onChange={(e) => handleChange("fontSize", parseInt(e.target.value, 10))}
-                      aria-label={t("accessibility.fontSizeInput")}
+                      onChange={(e) => handleChange('fontSize', parseInt(e.target.value, 10))}
+                      aria-label={t('accessibility.fontSizeInput')}
                     />
                   </div>
                   <div>
-                    <label htmlFor="lineSpacing">{t("pdf.lineSpacing")}:</label>
+                    <label htmlFor="lineSpacing">{t('pdf.lineSpacing')}:</label>
                     <input
                       type="number"
                       id="lineSpacing"
                       value={settings.lineSpacing}
-                      onChange={(e) => handleChange("lineSpacing", parseInt(e.target.value, 10))}
-                      aria-label={t("accessibility.lineSpacingInput")}
+                      onChange={(e) => handleChange('lineSpacing', parseInt(e.target.value, 10))}
+                      aria-label={t('accessibility.lineSpacingInput')}
                     />
                   </div>
                   <div>
-                    <label htmlFor="paperSize">{t("pdf.paperSize")}:</label>
+                    <label htmlFor="paperSize">{t('pdf.paperSize')}:</label>
                     <select
                       id="paperSize"
                       value={settings.paperSize}
                       onChange={(e) =>
-                        handleChange("paperSize", e.target.value as Settings["paperSize"])
+                        handleChange('paperSize', e.target.value as Settings['paperSize'])
                       }
-                      aria-label={t("accessibility.paperSizeSelect")}
+                      aria-label={t('accessibility.paperSizeSelect')}
                     >
                       {Object.keys(paperSizeOptions).map((size) => (
                         <option key={size} value={size}>
@@ -652,16 +652,16 @@ function App(): React.JSX.Element {
                 <div className="button-group">
                   <button
                     onClick={generateProblems}
-                    aria-label={`${t("buttons.generate")} - ${t("accessibility.generateButton")}`}
+                    aria-label={`${t('buttons.generate')} - ${t('accessibility.generateButton')}`}
                   >
-                    {t("buttons.generate")}
+                    {t('buttons.generate')}
                   </button>
                   <button
                     onClick={downloadPdf}
-                    aria-label={`${t("buttons.download")} - ${t("accessibility.downloadButton")}`}
+                    aria-label={`${t('buttons.download')} - ${t('accessibility.downloadButton')}`}
                     disabled={problems.length === 0}
                   >
-                    {t("buttons.download")}
+                    {t('buttons.download')}
                   </button>
                   <button
                     onClick={startQuizMode}
@@ -677,8 +677,8 @@ function App(): React.JSX.Element {
                   <div className="problems-header">
                     <h2 className="problems-title">
                       {problems.length > 0
-                        ? t("results.title", { count: problems.length })
-                        : t("results.noProblems")}
+                        ? t('results.title', { count: problems.length })
+                        : t('results.noProblems')}
                     </h2>
                     {problems.length > 0 && (
                       <div className="problems-stats">
@@ -688,7 +688,7 @@ function App(): React.JSX.Element {
                         </div>
                         <div className="problems-stat">
                           <span>⚙️</span>
-                          <span>{settings.operations.join(", ")}</span>
+                          <span>{settings.operations.join(', ')}</span>
                         </div>
                       </div>
                     )}
@@ -710,9 +710,9 @@ function App(): React.JSX.Element {
                     ) : (
                       <div className="no-problems">
                         <div className="no-problems-icon">🎯</div>
-                        <div className="no-problems-text">{t("results.noProblems")}</div>
+                        <div className="no-problems-text">{t('results.noProblems')}</div>
                         <div className="no-problems-hint">
-                          Click &ldquo;{t("buttons.generate")}&rdquo; to start
+                          Click &ldquo;{t('buttons.generate')}&rdquo; to start
                         </div>
                       </div>
                     )}
@@ -731,8 +731,8 @@ function App(): React.JSX.Element {
             </div>
           )}
 
-          {process.env.NODE_ENV === "production" && (
-            <Suspense fallback={<div>{t("loading.insights")}</div>}>
+          {process.env.NODE_ENV === 'production' && (
+            <Suspense fallback={<div>{t('loading.insights')}</div>}>
               <SpeedInsights />
             </Suspense>
           )}
