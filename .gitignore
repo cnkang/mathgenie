@@ -129,6 +129,44 @@ test-results.xml
 playwright-report/
 smoke-test-results.json
 coverage/
+*.junit.xml
+*.test-results.xml
+
+# Package manager lock files (keep only pnpm-lock.yaml)
+yarn.lock
+package-lock.json
+
+# Vite specific
+.vite/
+.vite-temp/
+
+# TypeScript
+*.tsbuildinfo
+
+# Build artifacts
+*.tgz
+*.tar.gz
+
+# Editor backup files
+*~
+*.bak
+*.tmp
+*.temp
+
+# macOS specific
+.AppleDouble
+.LSOverride
+Icon?
+
+# Windows specific
+*.lnk
+desktop.ini
+
+# Linux specific
+*~
+.fuse_hidden*
+.directory
+.Trash-*
 
 # Temporary build artifacts
 lighthouserc.ts
@@ -138,4 +176,33 @@ postcss.config.ts
 pnpm-workspace.yaml
 playwright.ci.config.ts
 playwright.smoke.config.ts
+playwright.*.config.ts
+!playwright.config.ts
+!playwright.e2e.config.ts
 TESTING_SUMMARY.md
+
+# Code quality and analysis
+.sonarjs/
+.nyc_output/
+.coverage/
+
+# Yarn (project uses pnpm)
+.yarnrc.yml
+.yarn/
+yarn-error.log
+
+# IDE and editor files
+.vscode/launch.json
+.vscode/tasks.json
+.idea/
+*.sublime-*
+*.code-workspace
+
+# OS and system files
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini

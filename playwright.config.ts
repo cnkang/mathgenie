@@ -15,7 +15,7 @@ export default defineConfig({
     ["html", { open: "never" }],
     ["json", { outputFile: "test-results.json" }],
     ["junit", { outputFile: "test-results.xml" }],
-    ...(process.env.CI ? [["github"]] : []),
+    ...(process.env.CI ? [["github"] as const] : []),
   ],
   use: {
     baseURL: process.env.BASE_URL || "http://localhost:4173",
@@ -107,5 +107,7 @@ export default defineConfig({
         port: 4173,
         reuseExistingServer: !process.env.CI,
         timeout: 120000,
+        // 让Playwright等待服务器在任何端口上启动
+        // 如果4173被占用，vite会自动选择下一个可用端口
       },
 });
