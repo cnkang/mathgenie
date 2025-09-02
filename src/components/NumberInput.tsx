@@ -1,5 +1,5 @@
-import React, { ChangeEvent, useOptimistic, useTransition } from "react";
-import type { NumberInputProps } from "../types";
+import React, { ChangeEvent, useOptimistic, useTransition } from 'react';
+import type { NumberInputProps } from '../types';
 
 interface ExtendedNumberInputProps extends NumberInputProps {
   required?: boolean;
@@ -19,7 +19,7 @@ const NumberInput: React.FC<ExtendedNumberInputProps> = ({
   min = 1,
   max = 1000,
   required = false,
-  placeholder = "",
+  placeholder = '',
   ...props
 }) => {
   // React 19: Use transitions for smooth updates
@@ -29,7 +29,7 @@ const NumberInput: React.FC<ExtendedNumberInputProps> = ({
   const [optimisticValue, setOptimisticValue] = useOptimistic(
     value,
     (currentValue: number, newValue: number | string) => {
-      return typeof newValue === "string" ? parseInt(newValue, 10) || currentValue : newValue;
+      return typeof newValue === 'string' ? parseInt(newValue, 10) || currentValue : newValue;
     },
   );
 
@@ -44,7 +44,7 @@ const NumberInput: React.FC<ExtendedNumberInputProps> = ({
     startTransition(() => {
       if (!isNaN(newValue) && newValue >= min && newValue <= max) {
         onChange(newValue);
-      } else if (inputValue === "") {
+      } else if (inputValue === '') {
         onChange(min); // Reset to minimum value for empty input
       }
     });

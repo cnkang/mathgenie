@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import type { Problem } from "../types";
+import React, { useEffect, useState } from 'react';
+import type { Problem } from '../types';
 
 interface InteractiveProblemProps {
   problem: Problem;
@@ -14,7 +14,7 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
   showResult = false,
   disabled = false,
 }) => {
-  const [userInput, setUserInput] = useState<string>("");
+  const [userInput, setUserInput] = useState<string>('');
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   useEffect(() => {
@@ -22,14 +22,14 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
       setUserInput(problem.userAnswer.toString());
       setIsSubmitted(true);
     } else {
-      setUserInput("");
+      setUserInput('');
       setIsSubmitted(false);
     }
   }, [problem.userAnswer]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (userInput.trim() === "" || isSubmitted || disabled) {
+    if (userInput.trim() === '' || isSubmitted || disabled) {
       return;
     }
 
@@ -41,7 +41,7 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       handleSubmit(e);
     }
   };
@@ -50,14 +50,14 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
     if (!showResult || !problem.isAnswered) {
       return null;
     }
-    return problem.isCorrect ? "✅" : "❌";
+    return problem.isCorrect ? '✅' : '❌';
   };
 
   const getResultClass = () => {
     if (!showResult || !problem.isAnswered) {
-      return "";
+      return '';
     }
-    return problem.isCorrect ? "correct" : "incorrect";
+    return problem.isCorrect ? 'correct' : 'incorrect';
   };
 
   return (
@@ -78,10 +78,10 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
           />
           <button
             type="submit"
-            disabled={isSubmitted || disabled || userInput.trim() === ""}
+            disabled={isSubmitted || disabled || userInput.trim() === ''}
             className="submit-answer-btn"
           >
-            {isSubmitted ? "Submitted" : "Submit"}
+            {isSubmitted ? 'Submitted' : 'Submit'}
           </button>
         </div>
       </form>
@@ -91,7 +91,7 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
           <span className="result-icon">{getResultIcon()}</span>
           <span className="result-text">
             {problem.isCorrect ? (
-              "Correct!"
+              'Correct!'
             ) : (
               <>
                 Incorrect. The correct answer is <strong>{problem.correctAnswer}</strong>
