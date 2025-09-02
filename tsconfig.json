@@ -20,7 +20,6 @@
     "sourceMap": true,
     "outDir": "./dist/types",
     "baseUrl": ".",
-    "types": ["vitest/globals", "node"],
     "paths": {
       "@/*": ["./src/*"],
       "@/components/*": ["./src/components/*"],

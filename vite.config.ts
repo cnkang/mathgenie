@@ -56,6 +56,13 @@ export default defineConfig(({ mode }) => ({
         entryFileNames: "assets/[name]-[hash].js",
         // Manual chunk splitting strategy
         manualChunks(id: string) {
+          // Keep translation files as separate chunks for dynamic loading
+          if (id.includes("src/i18n/translations/")) {
+            const match = id.match(/translations\/([a-z]{2})\.ts$/);
+            if (match) {
+              return match[1]; // Return language code as chunk name
+            }
+          }
           // Bundle React-related libraries separately
           if (id.includes("react") || id.includes("react-dom")) {
             return "react-vendor";
@@ -158,6 +165,7 @@ export default defineConfig(({ mode }) => ({
         "**/coverage/**",
         "**/dist/**",
         "**/node_modules/**",
+        "**/scripts/**",
         "**/src/index.tsx",
         "**/src/setupTests.ts",
         "**/src/reportWebVitals.ts",
@@ -167,7 +175,7 @@ export default defineConfig(({ mode }) => ({
         "**/src/i18n/translations/**",
         "**/src/types/**",
         "**/src/utils/serviceWorker.ts",
-        "**/lighthouserc.ts",
+        "**/lighthouserc.{js,ts,cjs}",
         "**/playwright-report/**",
         "**/test-results/**",
         "**/postcss.config.cjs",
