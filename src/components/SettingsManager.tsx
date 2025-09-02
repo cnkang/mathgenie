@@ -68,12 +68,12 @@ const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onImportSet
   };
 
   return (
-    <div className="settings-manager">
+    <div className='settings-manager'>
       <h3>{t('settings.manager.title') || 'Settings Manager'}</h3>
-      <div className="settings-actions">
+      <div className='settings-actions'>
         <button
           onClick={exportSettings}
-          className="export-button"
+          className='export-button'
           aria-label={t('settings.manager.exportLabel') || 'Export current settings'}
         >
           📤 {t('settings.manager.export') || 'Export Settings'}
@@ -81,7 +81,7 @@ const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onImportSet
 
         <button
           onClick={() => fileInputRef.current?.click()}
-          className="import-button"
+          className='import-button'
           aria-label={t('settings.manager.importLabel') || 'Import settings from file'}
         >
           📥 {t('settings.manager.import') || 'Import Settings'}
@@ -89,11 +89,11 @@ const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onImportSet
 
         <input
           ref={fileInputRef}
-          type="file"
-          accept=".json"
+          type='file'
+          accept='.json'
           onChange={importSettings}
           style={{ display: 'none' }}
-          aria-hidden="true"
+          aria-hidden='true'
         />
       </div>
     </div>

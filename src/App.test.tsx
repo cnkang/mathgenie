@@ -6,7 +6,7 @@ import { I18nProvider } from './i18n';
 
 // Mock Speed Insights component
 vi.mock('@vercel/speed-insights/react', () => ({
-  SpeedInsights: () => <div data-testid="mocked-speed-insights">Mocked Speed Insights</div>,
+  SpeedInsights: () => <div data-testid='mocked-speed-insights'>Mocked Speed Insights</div>,
 }));
 
 // Mock jsPDF for PDF generation tests
@@ -57,7 +57,7 @@ describe('App Component', () => {
 
     fireEvent.change(operationsSelect);
 
-    const selectedOptions = Array.from(operationsSelect.selectedOptions).map((opt) => opt.value);
+    const selectedOptions = Array.from(operationsSelect.selectedOptions).map(opt => opt.value);
     expect(selectedOptions).toEqual(['*', '/']);
   });
 
@@ -70,7 +70,7 @@ describe('App Component', () => {
         const problemDivs = screen.queryAllByText(/=/);
         expect(problemDivs.length).toBeGreaterThan(0);
       },
-      { timeout: 3000 },
+      { timeout: 3000 }
     );
   });
 
@@ -85,7 +85,7 @@ describe('App Component', () => {
         }) as HTMLButtonElement;
         expect(downloadButton.disabled).toBe(false);
       },
-      { timeout: 3000 },
+      { timeout: 3000 }
     );
   });
 
@@ -94,7 +94,7 @@ describe('App Component', () => {
 
     await waitFor(() => {
       const allowNegativeCheckbox = screen.getByLabelText(
-        /Allow Negative Results/i,
+        /Allow Negative Results/i
       ) as HTMLInputElement;
 
       fireEvent.click(allowNegativeCheckbox);
@@ -171,7 +171,7 @@ describe('App Component', () => {
         }) as HTMLButtonElement;
         fireEvent.click(downloadButton);
       },
-      { timeout: 3000 },
+      { timeout: 3000 }
     );
   });
 
@@ -337,7 +337,7 @@ describe('App Component', () => {
 
     delete (window as any).crypto;
     (window as any).msCrypto = {
-      getRandomValues: vi.fn().mockImplementation((array) => {
+      getRandomValues: vi.fn().mockImplementation(array => {
         array[0] = Math.floor(Math.random() * 0xffffffff);
       }),
     };
@@ -443,7 +443,7 @@ describe('App Component', () => {
         }
         expect(downloadButton).not.toBeNull();
       },
-      { timeout: 3000 },
+      { timeout: 3000 }
     );
   });
 
@@ -496,7 +496,7 @@ describe('App Component', () => {
 
     expect(consoleSpy).toHaveBeenCalledWith(
       'Failed to save settings to localStorage:',
-      expect.any(Error),
+      expect.any(Error)
     );
 
     // Restore original values

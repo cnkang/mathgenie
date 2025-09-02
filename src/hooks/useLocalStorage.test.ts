@@ -89,7 +89,7 @@ describe('useLocalStorage', () => {
     const { result } = renderHook(() => useLocalStorage('test-key', 0));
 
     act(() => {
-      result.current[1]((prev) => prev + 1);
+      result.current[1](prev => prev + 1);
     });
 
     expect(result.current[0]).toBe(6);
@@ -262,7 +262,7 @@ describe('useLocalStorage', () => {
     expect(result.current[0]).toBe('initial');
     expect(consoleSpy).toHaveBeenCalledWith(
       'Error parsing localStorage change for key "test-key":',
-      expect.any(Error),
+      expect.any(Error)
     );
 
     consoleSpy.mockRestore();

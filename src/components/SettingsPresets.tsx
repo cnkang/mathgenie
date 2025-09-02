@@ -81,16 +81,16 @@ const SettingsPresets: React.FC<SettingsPresetsProps> = ({ onApplyPreset }) => {
   };
 
   return (
-    <div className="settings-presets">
+    <div className='settings-presets'>
       <h3>{t('presets.title') || 'Quick Presets'}</h3>
-      <div className="presets-grid">
+      <div className='presets-grid'>
         {presets.map((preset, index) => (
-          <div key={index} className="preset-card">
+          <div key={index} className='preset-card'>
             <h4>{preset.name}</h4>
             <p>{preset.description}</p>
             <button
               onClick={() => handleApplyPreset(preset.settings)}
-              className="preset-button"
+              className='preset-button'
               aria-label={`${t('presets.apply') || 'Apply'} ${preset.name} preset`}
             >
               {t('presets.apply') || 'Apply'}

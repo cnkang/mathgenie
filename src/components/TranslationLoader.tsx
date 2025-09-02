@@ -11,17 +11,17 @@ const TranslationLoader: React.FC<TranslationLoaderProps> = ({ children }) => {
 
   if (isLoading) {
     return (
-      <div className="translation-loader">
-        <div className="translation-loader-content">
-          <div className="translation-loader-icon">🌐</div>
-          <h1 className="translation-loader-title">MathGenie</h1>
-          <p className="translation-loader-message">
+      <div className='translation-loader'>
+        <div className='translation-loader-content'>
+          <div className='translation-loader-icon'>🌐</div>
+          <h1 className='translation-loader-title'>MathGenie</h1>
+          <p className='translation-loader-message'>
             {t('loading.translations') || 'Loading translations...'}
           </p>
-          <div className="translation-loader-spinner" aria-label="Loading...">
-            <div className="spinner-dot"></div>
-            <div className="spinner-dot"></div>
-            <div className="spinner-dot"></div>
+          <div className='translation-loader-spinner' aria-label='Loading...'>
+            <div className='spinner-dot'></div>
+            <div className='spinner-dot'></div>
+            <div className='spinner-dot'></div>
           </div>
         </div>
       </div>

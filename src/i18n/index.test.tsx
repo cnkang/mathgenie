@@ -36,12 +36,12 @@ const TestComponent: React.FC = () => {
 
   return (
     <div>
-      <div data-testid="current-language">{currentLanguage}</div>
-      <div data-testid="app-title">{t('app.title')}</div>
-      <div data-testid="missing-key">{t('missing.key')}</div>
-      <div data-testid="interpolation">{t('test.interpolation', { name: 'World' })}</div>
-      <div data-testid="loading">{isLoading ? 'loading' : 'loaded'}</div>
-      <div data-testid="languages-count">{Object.keys(languages).length}</div>
+      <div data-testid='current-language'>{currentLanguage}</div>
+      <div data-testid='app-title'>{t('app.title')}</div>
+      <div data-testid='missing-key'>{t('missing.key')}</div>
+      <div data-testid='interpolation'>{t('test.interpolation', { name: 'World' })}</div>
+      <div data-testid='loading'>{isLoading ? 'loading' : 'loaded'}</div>
+      <div data-testid='languages-count'>{Object.keys(languages).length}</div>
       <button onClick={() => changeLanguage('zh')}>Change to Chinese</button>
       <button onClick={() => changeLanguage('invalid')}>Change to Invalid</button>
     </div>
@@ -81,7 +81,7 @@ describe('I18n System', () => {
     };
 
     expect(interpolate('Download PDF ({{count}} problems)', { count: 5 })).toBe(
-      'Download PDF (5 problems)',
+      'Download PDF (5 problems)'
     );
 
     expect(interpolate('Hello {{name}}!', { name: 'World' })).toBe('Hello World!');
@@ -137,7 +137,7 @@ describe('I18n System', () => {
       render(
         <I18nProvider>
           <TestComponent />
-        </I18nProvider>,
+        </I18nProvider>
       );
     });
 
@@ -151,7 +151,7 @@ describe('I18n System', () => {
       render(
         <I18nProvider>
           <TestComponent />
-        </I18nProvider>,
+        </I18nProvider>
       );
     });
 
@@ -163,7 +163,7 @@ describe('I18n System', () => {
       render(
         <I18nProvider>
           <TestComponent />
-        </I18nProvider>,
+        </I18nProvider>
       );
     });
 
@@ -192,7 +192,7 @@ describe('I18n System', () => {
       render(
         <I18nProvider>
           <TestComponent />
-        </I18nProvider>,
+        </I18nProvider>
       );
     });
 
@@ -210,7 +210,7 @@ describe('I18n System', () => {
       render(
         <I18nProvider>
           <TestComponent />
-        </I18nProvider>,
+        </I18nProvider>
       );
     });
 
@@ -224,7 +224,7 @@ describe('I18n System', () => {
       render(
         <I18nProvider>
           <TestComponent />
-        </I18nProvider>,
+        </I18nProvider>
       );
     });
 
@@ -236,7 +236,7 @@ describe('I18n System', () => {
       render(
         <I18nProvider>
           <TestComponent />
-        </I18nProvider>,
+        </I18nProvider>
       );
     });
 
@@ -266,7 +266,7 @@ describe('I18n System', () => {
       render(
         <I18nProvider>
           <TestComponent />
-        </I18nProvider>,
+        </I18nProvider>
       );
     });
 

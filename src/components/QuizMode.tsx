@@ -20,7 +20,7 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
 
   useEffect(() => {
     // Calculate the correct answer for each problem
-    const problemsWithAnswers = problems.map((problem) => {
+    const problemsWithAnswers = problems.map(problem => {
       const expression = problem.text.replace(' = ', '').replace('✖', '*').replace('➗', '/');
       let correctAnswer: number;
 
@@ -51,15 +51,15 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setTimeElapsed((prev) => prev + 1);
+      setTimeElapsed(prev => prev + 1);
     }, 1000);
 
     return () => clearInterval(timer);
   }, []);
 
   const handleAnswerSubmit = (problemId: number, answer: number) => {
-    setQuizProblems((prev) => {
-      const updatedProblems = prev.map((problem) => {
+    setQuizProblems(prev => {
+      const updatedProblems = prev.map(problem => {
         if (problem.id === problemId) {
           const isCorrect = Math.abs(answer - (problem.correctAnswer || 0)) < 0.001;
           return {
@@ -88,7 +88,7 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
 
   const finishQuiz = (problems?: Problem[]) => {
     const problemsToUse = problems || quizProblems;
-    const correctAnswers = problemsToUse.filter((p) => p.isCorrect).length;
+    const correctAnswers = problemsToUse.filter(p => p.isCorrect).length;
     const totalProblems = problemsToUse.length;
     const score = Math.round((correctAnswers / totalProblems) * 100);
 
@@ -143,87 +143,87 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
 
   if (showResults && quizResult) {
     return (
-      <div className="quiz-results">
-        <div className="results-header">
+      <div className='quiz-results'>
+        <div className='results-header'>
           <h2>{t('quiz.completed')}</h2>
-          <div className="results-summary">
-            <div className="score-display">
-              <span className="score-number">{quizResult.score}</span>
-              <span className="score-label">{t('quiz.score')}</span>
+          <div className='results-summary'>
+            <div className='score-display'>
+              <span className='score-number'>{quizResult.score}</span>
+              <span className='score-label'>{t('quiz.score')}</span>
             </div>
-            <div className="grade-display">
-              <span className="grade">{quizResult.grade}</span>
+            <div className='grade-display'>
+              <span className='grade'>{quizResult.grade}</span>
             </div>
           </div>
         </div>
 
-        <div className="results-details">
-          <div className="result-stats">
-            <div className="stat-item">
-              <span className="stat-icon">📊</span>
-              <span className="stat-label">{t('quiz.stats.totalProblems')}</span>
-              <span className="stat-value">{quizResult.totalProblems}</span>
+        <div className='results-details'>
+          <div className='result-stats'>
+            <div className='stat-item'>
+              <span className='stat-icon'>📊</span>
+              <span className='stat-label'>{t('quiz.stats.totalProblems')}</span>
+              <span className='stat-value'>{quizResult.totalProblems}</span>
             </div>
-            <div className="stat-item">
-              <span className="stat-icon">✅</span>
-              <span className="stat-label">{t('quiz.stats.correct')}</span>
-              <span className="stat-value">{quizResult.correctAnswers}</span>
+            <div className='stat-item'>
+              <span className='stat-icon'>✅</span>
+              <span className='stat-label'>{t('quiz.stats.correct')}</span>
+              <span className='stat-value'>{quizResult.correctAnswers}</span>
             </div>
-            <div className="stat-item">
-              <span className="stat-icon">❌</span>
-              <span className="stat-label">{t('quiz.stats.incorrect')}</span>
-              <span className="stat-value">{quizResult.incorrectAnswers}</span>
+            <div className='stat-item'>
+              <span className='stat-icon'>❌</span>
+              <span className='stat-label'>{t('quiz.stats.incorrect')}</span>
+              <span className='stat-value'>{quizResult.incorrectAnswers}</span>
             </div>
-            <div className="stat-item">
-              <span className="stat-icon">⏱️</span>
-              <span className="stat-label">{t('quiz.stats.timeUsed')}</span>
-              <span className="stat-value">{formatTime(timeElapsed)}</span>
+            <div className='stat-item'>
+              <span className='stat-icon'>⏱️</span>
+              <span className='stat-label'>{t('quiz.stats.timeUsed')}</span>
+              <span className='stat-value'>{formatTime(timeElapsed)}</span>
             </div>
           </div>
 
-          <div className="feedback-section">
-            <p className="feedback-text">{quizResult.feedback}</p>
+          <div className='feedback-section'>
+            <p className='feedback-text'>{quizResult.feedback}</p>
           </div>
 
-          <div className="results-actions">
-            <button onClick={onExitQuiz} className="exit-quiz-btn">
+          <div className='results-actions'>
+            <button onClick={onExitQuiz} className='exit-quiz-btn'>
               {t('quiz.backToPractice')}
             </button>
             <button
               onClick={() => {
                 setShowResults(false);
                 setCurrentProblemIndex(0);
-                setQuizProblems((prev) =>
-                  prev.map((p) => ({
+                setQuizProblems(prev =>
+                  prev.map(p => ({
                     ...p,
                     userAnswer: undefined,
                     isCorrect: false,
                     isAnswered: false,
-                  })),
+                  }))
                 );
                 setStartTime(Date.now());
               }}
-              className="retry-quiz-btn"
+              className='retry-quiz-btn'
             >
               {t('quiz.retry')}
             </button>
           </div>
         </div>
 
-        <div className="detailed-results">
+        <div className='detailed-results'>
           <h3>{t('quiz.detailedResults')}</h3>
-          <div className="problems-review">
+          <div className='problems-review'>
             {quizProblems.map((problem, index) => (
               <div
                 key={problem.id}
                 className={`problem-review ${problem.isCorrect ? 'correct' : 'incorrect'}`}
               >
-                <span className="problem-number">{index + 1}.</span>
-                <span className="problem-expression">{problem.text}</span>
-                <span className="user-answer">{problem.userAnswer}</span>
-                <span className="result-icon">{problem.isCorrect ? '✅' : '❌'}</span>
+                <span className='problem-number'>{index + 1}.</span>
+                <span className='problem-expression'>{problem.text}</span>
+                <span className='user-answer'>{problem.userAnswer}</span>
+                <span className='result-icon'>{problem.isCorrect ? '✅' : '❌'}</span>
                 {!problem.isCorrect && (
-                  <span className="correct-answer">
+                  <span className='correct-answer'>
                     {t('quiz.correctAnswer', { answer: problem.correctAnswer ?? 0 })}
                   </span>
                 )}
@@ -236,7 +236,7 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
   }
 
   if (quizProblems.length === 0) {
-    return <div className="quiz-loading">{t('quiz.loading')}</div>;
+    return <div className='quiz-loading'>{t('quiz.loading')}</div>;
   }
 
   const currentProblem = quizProblems[currentProblemIndex];
@@ -244,34 +244,34 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
 
   // If current problem doesn't exist, return loading state
   if (!currentProblem) {
-    return <div className="quiz-loading">{t('quiz.loading')}</div>;
+    return <div className='quiz-loading'>{t('quiz.loading')}</div>;
   }
 
   return (
-    <div className="quiz-mode">
-      <div className="quiz-header">
-        <div className="quiz-progress">
-          <div className="progress-bar">
-            <div className="progress-fill" style={{ width: `${progress}%` }}></div>
+    <div className='quiz-mode'>
+      <div className='quiz-header'>
+        <div className='quiz-progress'>
+          <div className='progress-bar'>
+            <div className='progress-fill' style={{ width: `${progress}%` }}></div>
           </div>
-          <span className="progress-text">
+          <span className='progress-text'>
             {t('quiz.progress', {
               current: currentProblemIndex + 1,
               total: quizProblems.length,
             })}
           </span>
         </div>
-        <div className="quiz-timer">
-          <span className="timer-icon">⏱️</span>
-          <span className="timer-text">{formatTime(timeElapsed)}</span>
+        <div className='quiz-timer'>
+          <span className='timer-icon'>⏱️</span>
+          <span className='timer-text'>{formatTime(timeElapsed)}</span>
         </div>
-        <button onClick={onExitQuiz} className="exit-quiz-btn-small">
+        <button onClick={onExitQuiz} className='exit-quiz-btn-small'>
           {t('quiz.exit')}
         </button>
       </div>
 
-      <div className="quiz-content">
-        <div className="current-problem">
+      <div className='quiz-content'>
+        <div className='current-problem'>
           <h3>{t('quiz.problemNumber', { number: currentProblemIndex + 1 })}</h3>
           <InteractiveProblem
             problem={currentProblem}
@@ -280,18 +280,18 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
           />
         </div>
 
-        <div className="quiz-navigation">
+        <div className='quiz-navigation'>
           <button
             onClick={goToPrevious}
             disabled={currentProblemIndex === 0}
-            className="nav-btn prev-btn"
+            className='nav-btn prev-btn'
           >
             {t('quiz.previousProblem')}
           </button>
           <button
             onClick={goToNext}
             disabled={currentProblemIndex === quizProblems.length - 1}
-            className="nav-btn next-btn"
+            className='nav-btn next-btn'
           >
             {t('quiz.nextProblem')}
           </button>

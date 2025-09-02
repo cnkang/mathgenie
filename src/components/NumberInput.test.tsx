@@ -47,7 +47,7 @@ describe('NumberInput', () => {
   });
 
   test('applies placeholder when provided', () => {
-    render(<NumberInput {...defaultProps} placeholder="Enter number" />);
+    render(<NumberInput {...defaultProps} placeholder='Enter number' />);
 
     const input = screen.getByDisplayValue('10');
     expect(input.getAttribute('placeholder')).toBe('Enter number');
@@ -211,7 +211,7 @@ describe('NumberInput', () => {
   });
 
   test('passes through additional props', () => {
-    render(<NumberInput {...defaultProps} className="custom-class" data-testid="custom-input" />);
+    render(<NumberInput {...defaultProps} className='custom-class' data-testid='custom-input' />);
 
     const input = screen.getByDisplayValue('10');
     expect(input.getAttribute('class')).toContain('custom-class');

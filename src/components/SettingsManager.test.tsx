@@ -13,10 +13,10 @@ vi.mock('../i18n', () => ({
 
 // Mock settingsManager utilities
 vi.mock('../utils/settingsManager', () => ({
-  createSettingsData: vi.fn((settings) => ({ settings, version: '1.0.0' })),
+  createSettingsData: vi.fn(settings => ({ settings, version: '1.0.0' })),
   generateFilename: vi.fn(() => 'settings.json'),
-  serializeSettings: vi.fn((data) => JSON.stringify(data)),
-  parseSettingsFile: vi.fn((content) => JSON.parse(content)),
+  serializeSettings: vi.fn(data => JSON.stringify(data)),
+  parseSettingsFile: vi.fn(content => JSON.parse(content)),
   validateSettingsData: vi.fn(() => true),
   createDownloadBlob: vi.fn(() => new Blob(['test'], { type: 'application/json' })),
 }));
@@ -364,26 +364,26 @@ describe('SettingsManager Component', () => {
     const TestComponent = () => {
       const mockT = (key: string) => key;
       return (
-        <div className="settings-manager">
+        <div className='settings-manager'>
           <h3>{mockT('settings.manager.title') || 'Settings Manager'}</h3>
-          <div className="settings-actions">
+          <div className='settings-actions'>
             <button
-              className="export-button"
+              className='export-button'
               aria-label={mockT('settings.export.aria') || 'Export current settings to file'}
             >
-              <span className="button-icon">📤</span>
+              <span className='button-icon'>📤</span>
               {mockT('settings.export') || '📤 Export Settings'}
             </button>
             <button
-              className="import-button"
+              className='import-button'
               aria-label={mockT('settings.import.aria') || 'Import settings from file'}
             >
-              <span className="button-icon">📥</span>
+              <span className='button-icon'>📥</span>
               {mockT('settings.import') || '📥 Import Settings'}
             </button>
             <input
-              type="file"
-              accept=".json"
+              type='file'
+              accept='.json'
               style={{ display: 'none' }}
               aria-label={mockT('settings.fileInput.aria') || 'Select settings file to import'}
             />
@@ -418,7 +418,7 @@ describe('SettingsManager Component', () => {
           return;
         }
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = e => {
           try {
             const result = e.target?.result;
             if (typeof result !== 'string') {
@@ -440,7 +440,7 @@ describe('SettingsManager Component', () => {
       };
 
       return (
-        <input type="file" accept=".json" onChange={handleFileChange} data-testid="file-input" />
+        <input type='file' accept='.json' onChange={handleFileChange} data-testid='file-input' />
       );
     };
 
@@ -490,7 +490,7 @@ describe('SettingsManager Component', () => {
           return;
         }
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = e => {
           try {
             const result = e.target?.result;
             if (typeof result !== 'string') {
@@ -508,7 +508,7 @@ describe('SettingsManager Component', () => {
       };
 
       return (
-        <input type="file" accept=".json" onChange={handleFileChange} data-testid="file-input" />
+        <input type='file' accept='.json' onChange={handleFileChange} data-testid='file-input' />
       );
     };
 

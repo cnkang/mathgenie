@@ -62,24 +62,24 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
 
   return (
     <div className={`interactive-problem ${getResultClass()}`}>
-      <div className="problem-expression">{problem.text}</div>
+      <div className='problem-expression'>{problem.text}</div>
 
-      <form onSubmit={handleSubmit} className="answer-form">
-        <div className="answer-input-group">
+      <form onSubmit={handleSubmit} className='answer-form'>
+        <div className='answer-input-group'>
           <input
-            type="number"
+            type='number'
             value={userInput}
-            onChange={(e) => setUserInput(e.target.value)}
+            onChange={e => setUserInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Enter answer"
+            placeholder='Enter answer'
             disabled={isSubmitted || disabled}
-            className="answer-input"
-            step="any"
+            className='answer-input'
+            step='any'
           />
           <button
-            type="submit"
+            type='submit'
             disabled={isSubmitted || disabled || userInput.trim() === ''}
-            className="submit-answer-btn"
+            className='submit-answer-btn'
           >
             {isSubmitted ? 'Submitted' : 'Submit'}
           </button>
@@ -87,9 +87,9 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
       </form>
 
       {showResult && problem.isAnswered && (
-        <div className="answer-result">
-          <span className="result-icon">{getResultIcon()}</span>
-          <span className="result-text">
+        <div className='answer-result'>
+          <span className='result-icon'>{getResultIcon()}</span>
+          <span className='result-text'>
             {problem.isCorrect ? (
               'Correct!'
             ) : (

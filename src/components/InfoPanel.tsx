@@ -27,7 +27,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
 
   useEffect(() => {
     if (problems.length > 0) {
-      setSessionStats((prev) => ({
+      setSessionStats(prev => ({
         totalGenerated: prev.totalGenerated + problems.length,
         sessionsCount: prev.sessionsCount + (problems.length > 0 ? 1 : 0),
       }));
@@ -85,53 +85,53 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
   const learningProgress = Math.min((sessionStats.totalGenerated / 100) * 100, 100);
 
   return (
-    <div className="info-panel">
+    <div className='info-panel'>
       <h3>
         <span>📊</span>
         {t('infoPanel.title')}
       </h3>
 
-      <div className="stats-grid">
-        <div className="stat-card">
-          <span className="stat-value">{stats.totalProblems}</span>
-          <div className="stat-label">{t('infoPanel.stats.currentProblems')}</div>
+      <div className='stats-grid'>
+        <div className='stat-card'>
+          <span className='stat-value'>{stats.totalProblems}</span>
+          <div className='stat-label'>{t('infoPanel.stats.currentProblems')}</div>
         </div>
 
-        <div className="stat-card">
-          <span className="stat-value">{sessionStats.totalGenerated}</span>
-          <div className="stat-label">{t('infoPanel.stats.totalGenerated')}</div>
+        <div className='stat-card'>
+          <span className='stat-value'>{sessionStats.totalGenerated}</span>
+          <div className='stat-label'>{t('infoPanel.stats.totalGenerated')}</div>
         </div>
 
-        <div className="stat-card">
-          <span className="stat-value">{stats.difficultyLevel}</span>
-          <div className="stat-label">{t('infoPanel.stats.difficultyLevel')}</div>
+        <div className='stat-card'>
+          <span className='stat-value'>{stats.difficultyLevel}</span>
+          <div className='stat-label'>{t('infoPanel.stats.difficultyLevel')}</div>
         </div>
 
-        <div className="stat-card">
-          <span className="stat-value">{stats.operationTypes}</span>
-          <div className="stat-label">{t('infoPanel.stats.operationTypes')}</div>
+        <div className='stat-card'>
+          <span className='stat-value'>{stats.operationTypes}</span>
+          <div className='stat-label'>{t('infoPanel.stats.operationTypes')}</div>
         </div>
       </div>
 
-      <div className="progress-section">
+      <div className='progress-section'>
         <h4>🎯 {t('infoPanel.progress.title')}</h4>
-        <div className="progress-bar">
-          <div className="progress-fill" style={{ width: `${learningProgress}%` }}></div>
+        <div className='progress-bar'>
+          <div className='progress-fill' style={{ width: `${learningProgress}%` }}></div>
         </div>
-        <div className="progress-text">
+        <div className='progress-text'>
           {t('infoPanel.progress.completed', { percent: Math.round(learningProgress) })}
         </div>
       </div>
 
-      <div className="tips-section">
+      <div className='tips-section'>
         <h4>⚡ {t('infoPanel.quickActions.title')}</h4>
-        <div className="quick-actions">
-          <button className="quick-action-btn" onClick={onGenerateProblems}>
+        <div className='quick-actions'>
+          <button className='quick-action-btn' onClick={onGenerateProblems}>
             <span>🔄</span>
             {t('infoPanel.quickActions.regenerate')}
           </button>
           <button
-            className="quick-action-btn"
+            className='quick-action-btn'
             onClick={onDownloadPdf}
             disabled={problems.length === 0}
           >
@@ -139,7 +139,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
             {t('infoPanel.quickActions.downloadPdf')}
           </button>
           <button
-            className="quick-action-btn"
+            className='quick-action-btn'
             onClick={onStartQuiz}
             disabled={problems.length === 0}
           >
@@ -147,7 +147,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
             {t('infoPanel.quickActions.startQuiz')}
           </button>
           <button
-            className="quick-action-btn"
+            className='quick-action-btn'
             onClick={() => {
               const element = document.querySelector('.problems-grid');
               if (element) {
@@ -162,21 +162,21 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
       </div>
 
       {quizResult && (
-        <div className="tips-section">
+        <div className='tips-section'>
           <h4>🏆 {t('infoPanel.recentResults.title')}</h4>
-          <div className="quiz-result-summary">
-            <div className="result-item">
-              <span className="result-label">
+          <div className='quiz-result-summary'>
+            <div className='result-item'>
+              <span className='result-label'>
                 {t('infoPanel.recentResults.score', { score: quizResult.score })}
               </span>
             </div>
-            <div className="result-item">
-              <span className="result-label">{t('infoPanel.recentResults.grade')}</span>
-              <span className="result-value">{quizResult.grade}</span>
+            <div className='result-item'>
+              <span className='result-label'>{t('infoPanel.recentResults.grade')}</span>
+              <span className='result-value'>{quizResult.grade}</span>
             </div>
-            <div className="result-item">
-              <span className="result-label">{t('infoPanel.recentResults.accuracy')}</span>
-              <span className="result-value">
+            <div className='result-item'>
+              <span className='result-label'>{t('infoPanel.recentResults.accuracy')}</span>
+              <span className='result-value'>
                 {Math.round((quizResult.correctAnswers / quizResult.totalProblems) * 100)}%
               </span>
             </div>
@@ -184,18 +184,18 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
         </div>
       )}
 
-      <div className="tips-section">
+      <div className='tips-section'>
         <h4>💡 {t('infoPanel.tips.title')}</h4>
-        <ul className="tips-list">
+        <ul className='tips-list'>
           {tips.slice(0, 3).map((tip, index) => (
             <li key={index}>{tip}</li>
           ))}
         </ul>
       </div>
 
-      <div className="tips-section">
+      <div className='tips-section'>
         <h4>⚙️ {t('infoPanel.currentConfig.title')}</h4>
-        <ul className="tips-list">
+        <ul className='tips-list'>
           <li>
             {t('infoPanel.currentConfig.operations', {
               operations: settings.operations.join(', '),

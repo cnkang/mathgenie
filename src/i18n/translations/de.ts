@@ -88,7 +88,7 @@ export default {
     info: {
       autoGeneration: 'Aufgaben werden automatisch generiert, wenn Sie Einstellungen ändern.',
       pdfTip: 'Tipp: Passen Sie Schriftgröße und Zeilenabstand für ein besseres PDF-Layout an.',
-      presetApplied: 'Vorlage \'{{name}}\' wurde auf Ihre Einstellungen angewendet.',
+      presetApplied: "Vorlage '{{name}}' wurde auf Ihre Einstellungen angewendet.",
     },
   },
   accessibility: {

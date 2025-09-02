@@ -33,8 +33,7 @@
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg:
-    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 
   /* Spacing */
   --space-xs: 0.25rem;
@@ -216,9 +215,7 @@
 
   .info-panel h3 {
     margin: 0 0 var(--space-md) 0;
-    color: var(
-      --text-primary
-    ) !important; /* Force primary text color to ensure contrast */
+    color: var(--text-primary) !important; /* Force primary text color to ensure contrast */
     font-size: var(--font-size-lg);
     display: flex;
     align-items: center;
@@ -291,7 +288,7 @@
   }
 
   .tips-list li::before {
-    content: "💡";
+    content: '💡';
     flex-shrink: 0;
   }
 
@@ -323,11 +320,7 @@
 
   .progress-fill {
     height: 100%;
-    background: linear-gradient(
-      90deg,
-      var(--success-color),
-      var(--primary-color)
-    );
+    background: linear-gradient(90deg, var(--success-color), var(--primary-color));
     border-radius: var(--radius-sm);
     transition: width var(--transition-normal);
   }
@@ -393,11 +386,7 @@
 
   /* Quiz mode button styles */
   .quiz-mode-btn {
-    background: linear-gradient(
-      135deg,
-      var(--success-color),
-      var(--primary-color)
-    );
+    background: linear-gradient(135deg, var(--success-color), var(--primary-color));
     color: white;
     border: none;
     font-weight: 600;
@@ -739,8 +728,8 @@ html {
 
 body {
   font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
-    "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
+    'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   background-color: var(--bg-secondary);
   color: var(--text-primary);
   overflow-x: hidden;
@@ -749,11 +738,7 @@ body {
 /* Main App Container */
 .App {
   min-height: 100vh;
-  background: linear-gradient(
-    135deg,
-    var(--bg-secondary) 0%,
-    var(--bg-tertiary) 100%
-  );
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
   padding: var(--space-md);
   display: flex;
   flex-direction: column;
@@ -789,7 +774,7 @@ h3 {
 }
 
 h3::before {
-  content: "";
+  content: '';
   width: 4px;
   height: 1.2em;
   background: var(--primary-color);
@@ -967,17 +952,13 @@ ul li {
 }
 
 .container::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(
-    90deg,
-    var(--primary-color),
-    var(--success-color)
-  );
+  background: linear-gradient(90deg, var(--primary-color), var(--success-color));
 }
 
 /* ===== FORM LAYOUT ===== */
@@ -1010,7 +991,7 @@ ul li {
 }
 
 .form-row label::before {
-  content: "•";
+  content: '•';
   color: var(--primary-color);
   font-weight: bold;
 }
@@ -1088,17 +1069,13 @@ small {
 }
 
 .problems::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(
-    90deg,
-    var(--success-color),
-    var(--primary-color)
-  );
+  background: linear-gradient(90deg, var(--success-color), var(--primary-color));
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
@@ -1112,7 +1089,7 @@ small {
 }
 
 .problems h3::before {
-  content: "📝";
+  content: '📝';
   font-size: var(--font-size-lg);
   width: auto;
   height: auto;
@@ -1126,7 +1103,7 @@ small {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  font-family: "SF Mono", "Monaco", "Inconsolata", "Roboto Mono", monospace;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
   font-size: var(--font-size-lg);
   font-weight: 500;
   color: var(--text-primary);
@@ -1165,18 +1142,13 @@ small {
 }
 
 .button-group button::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.2),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
   transition: left 0.5s;
 }
 
@@ -1217,7 +1189,7 @@ small {
 }
 
 .error-message::before {
-  content: "⚠️";
+  content: '⚠️';
   font-size: var(--font-size-lg);
   margin-right: var(--space-sm);
 }
@@ -1235,7 +1207,7 @@ small {
 }
 
 .success-message::before {
-  content: "✅";
+  content: '✅';
   font-size: var(--font-size-lg);
   margin-right: var(--space-sm);
 }
@@ -1291,17 +1263,13 @@ small {
 }
 
 .settings-group::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(
-    90deg,
-    var(--primary-color),
-    var(--success-color)
-  );
+  background: linear-gradient(90deg, var(--primary-color), var(--success-color));
 }
 
 .settings-group h3 {
@@ -1315,7 +1283,7 @@ small {
 }
 
 .settings-group h3::before {
-  content: "⚙️";
+  content: '⚙️';
   font-size: var(--font-size-lg);
   width: auto;
   height: auto;
@@ -1346,18 +1314,13 @@ small {
 }
 
 .checkbox-item::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(79, 70, 229, 0.05),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(79, 70, 229, 0.05), transparent);
   transition: left 0.5s ease;
 }
 
@@ -1378,7 +1341,7 @@ small {
 }
 
 /* Modern Checkbox Design */
-.checkbox-item input[type="checkbox"] {
+.checkbox-item input[type='checkbox'] {
   width: 24px;
   height: 24px;
   margin: 0;
@@ -1394,19 +1357,19 @@ small {
   flex-shrink: 0;
 }
 
-.checkbox-item input[type="checkbox"]:hover {
+.checkbox-item input[type='checkbox']:hover {
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
-.checkbox-item input[type="checkbox"]:checked {
+.checkbox-item input[type='checkbox']:checked {
   background: var(--primary-color);
   border-color: var(--primary-color);
   transform: scale(1.05);
 }
 
-.checkbox-item input[type="checkbox"]:checked::after {
-  content: "✓";
+.checkbox-item input[type='checkbox']:checked::after {
+  content: '✓';
   position: absolute;
   top: 50%;
   left: 50%;
@@ -1417,7 +1380,7 @@ small {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-.checkbox-item input[type="checkbox"]:focus {
+.checkbox-item input[type='checkbox']:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
 }
@@ -1449,7 +1412,7 @@ small {
 }
 
 /* Legacy checkbox styling for backward compatibility */
-input[type="checkbox"] {
+input[type='checkbox'] {
   width: 18px;
   height: 18px;
   margin: 0 8px 0 0;
@@ -1464,13 +1427,13 @@ input[type="checkbox"] {
   transition: all 0.2s ease;
 }
 
-input[type="checkbox"]:checked {
+input[type='checkbox']:checked {
   background-color: #007bff;
   border-color: #007bff;
 }
 
-input[type="checkbox"]:checked::after {
-  content: "✓";
+input[type='checkbox']:checked::after {
+  content: '✓';
   position: absolute;
   top: 50%;
   left: 50%;
@@ -1480,12 +1443,12 @@ input[type="checkbox"]:checked::after {
   font-weight: bold;
 }
 
-input[type="checkbox"]:hover {
+input[type='checkbox']:hover {
   border-color: #0056b3;
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
-input[type="checkbox"]:focus {
+input[type='checkbox']:focus {
   outline: none;
   border-color: #0056b3;
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5);
@@ -1546,16 +1509,16 @@ input[type="checkbox"]:focus {
     border: 2px solid #000;
   }
 
-  input[type="checkbox"] {
+  input[type='checkbox'] {
     border: 2px solid #000;
   }
 
-  input[type="checkbox"]:checked {
+  input[type='checkbox']:checked {
     background-color: #000;
     border-color: #000;
   }
 
-  input[type="checkbox"]:checked::after {
+  input[type='checkbox']:checked::after {
     color: #fff;
   }
 }
@@ -1579,7 +1542,7 @@ h3 {
 .problem-item {
   padding: 8px 0;
   border-bottom: 1px solid #eee;
-  font-family: "Courier New", monospace;
+  font-family: 'Courier New', monospace;
   font-size: 1rem;
 }
 
@@ -1661,7 +1624,7 @@ select[multiple] option:checked {
     gap: var(--space-sm);
   }
 
-  .checkbox-item input[type="checkbox"] {
+  .checkbox-item input[type='checkbox'] {
     width: 22px;
     height: 22px;
   }
@@ -1709,7 +1672,7 @@ select[multiple] option:checked {
     gap: var(--space-sm);
   }
 
-  .checkbox-item input[type="checkbox"] {
+  .checkbox-item input[type='checkbox'] {
     width: 20px;
     height: 20px;
   }
@@ -1753,13 +1716,13 @@ select[multiple] option:checked {
     border-width: 2px;
   }
 
-  .checkbox-item input[type="checkbox"] {
+  .checkbox-item input[type='checkbox'] {
     width: 28px;
     height: 28px;
     border-width: 3px;
   }
 
-  .checkbox-item input[type="checkbox"]:checked::after {
+  .checkbox-item input[type='checkbox']:checked::after {
     font-size: 18px;
   }
 
@@ -1884,17 +1847,17 @@ select:focus-visible {
     color: #cccccc;
   }
 
-  input[type="checkbox"] {
+  input[type='checkbox'] {
     border-color: #4da6ff;
     background-color: #404040;
   }
 
-  input[type="checkbox"]:checked {
+  input[type='checkbox']:checked {
     background-color: #4da6ff;
     border-color: #4da6ff;
   }
 
-  input[type="checkbox"]:hover {
+  input[type='checkbox']:hover {
     border-color: #66b3ff;
     box-shadow: 0 0 0 2px rgba(77, 166, 255, 0.25);
   }
@@ -1984,17 +1947,13 @@ select:focus-visible {
 }
 
 .settings-presets::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(
-    90deg,
-    var(--warning-color),
-    var(--primary-color)
-  );
+  background: linear-gradient(90deg, var(--warning-color), var(--primary-color));
 }
 
 .settings-presets h3 {
@@ -2008,7 +1967,7 @@ select:focus-visible {
 }
 
 .settings-presets h3::before {
-  content: "🎯";
+  content: '🎯';
   font-size: var(--font-size-lg);
   width: auto;
   height: auto;
@@ -2035,18 +1994,13 @@ select:focus-visible {
 }
 
 .preset-card::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(79, 70, 229, 0.05),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, rgba(79, 70, 229, 0.05), transparent);
   transition: left 0.5s ease;
 }
 
@@ -2071,7 +2025,7 @@ select:focus-visible {
 }
 
 .preset-card h4::before {
-  content: "📋";
+  content: '📋';
   font-size: var(--font-size-sm);
 }
 
@@ -2100,7 +2054,7 @@ select:focus-visible {
 }
 
 .preset-button::before {
-  content: "✨";
+  content: '✨';
   font-size: var(--font-size-sm);
 }
 
@@ -2146,7 +2100,7 @@ select:focus-visible {
 }
 
 .preview-problem {
-  font-family: "Courier New", monospace;
+  font-family: 'Courier New', monospace;
   font-size: 1rem;
   color: #495057;
   padding: 6px 10px;
@@ -2686,7 +2640,7 @@ select:focus-visible {
 }
 
 .form-field.pending::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 50%;
   right: 10px;
@@ -2751,7 +2705,7 @@ select:focus-visible {
 }
 
 .transition-pending::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
@@ -2907,11 +2861,7 @@ select:focus-visible {
   gap: var(--space-lg);
   text-align: center;
   padding: var(--space-xl);
-  background: linear-gradient(
-    135deg,
-    var(--bg-secondary) 0%,
-    var(--bg-tertiary) 100%
-  );
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
 }
 
 .loading-container h1 {
@@ -2955,11 +2905,7 @@ select:focus-visible {
 
 .loading-bar {
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    var(--primary-color),
-    var(--success-color)
-  );
+  background: linear-gradient(90deg, var(--primary-color), var(--success-color));
   border-radius: var(--radius-sm);
   animation: loadingProgress 2s ease-in-out infinite;
 }
@@ -3069,20 +3015,20 @@ select:focus-visible {
 }
 
 /* RTL language support */
-[dir="rtl"] .container {
+[dir='rtl'] .container {
   direction: rtl;
 }
 
-[dir="rtl"] .language-selector {
+[dir='rtl'] .language-selector {
   left: var(--space-lg);
   right: auto;
 }
 
-[dir="rtl"] .range-inputs {
+[dir='rtl'] .range-inputs {
   flex-direction: row-reverse;
 }
 
-[dir="rtl"] .button-group {
+[dir='rtl'] .button-group {
   flex-direction: row-reverse;
 }
 
@@ -3234,7 +3180,7 @@ select:focus-visible {
   background: var(--bg-primary);
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
-  font-family: "Courier New", monospace;
+  font-family: 'Courier New', monospace;
   font-size: var(--font-size-lg);
   font-weight: 500;
   transition: all var(--transition-fast);
@@ -3271,8 +3217,8 @@ select:focus-visible {
 }
 
 /* Input and select styling improvements */
-input[type="number"],
-input[type="text"],
+input[type='number'],
+input[type='text'],
 select {
   padding: var(--space-sm) var(--space-md);
   border: 2px solid var(--border-color);
@@ -3283,15 +3229,15 @@ select {
   transition: all var(--transition-fast);
 }
 
-input[type="number"]:focus,
-input[type="text"]:focus,
+input[type='number']:focus,
+input[type='text']:focus,
 select:focus {
   outline: none;
   border-color: var(--border-focus);
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
-input[type="checkbox"] {
+input[type='checkbox'] {
   width: 18px;
   height: 18px;
   margin-right: var(--space-sm);
