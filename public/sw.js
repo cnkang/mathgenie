@@ -1,65 +1,86 @@
 // Service Worker for MathGenie
-// Provides offline functionality and caching
-
-const CACHE_NAME = "mathgenie-v1";
-const urlsToCache = [
-  "/",
-  "/static/js/bundle.js",
-  "/static/css/main.css",
-  "/manifest.json",
-  "/favicon.ico",
-  "/logo192.png",
-  "/logo512.png",
+const CACHE_NAME = 'mathgenie-v1';
+const STATIC_CACHE_URLS = [
+  '/',
+  '/index.html',
+  '/favicon.ico',
+  '/logo192.png',
+  '/logo512.png',
+  '/manifest.json'
 ];
 
-// Install event - cache resources
-self.addEventListener("install", (event) => {
+// Install event - cache static assets
+self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches
-      .open(CACHE_NAME)
+    caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log("Opened cache");
-        return cache.addAll(urlsToCache);
+        return cache.addAll(STATIC_CACHE_URLS);
       })
-      .catch((error) => {
-        console.error("Failed to cache resources:", error);
-      })
-  );
-});
-
-// Fetch event - serve from cache when offline
-self.addEventListener("fetch", (event) => {
-  event.respondWith(
-    caches
-      .match(event.request)
-      .then((response) => {
-        // Return cached version or fetch from network
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      })
-      .catch(() => {
-        // If both cache and network fail, return offline page
-        if (event.request.destination === "document") {
-          return caches.match("/");
-        }
+      .then(() => {
+        return self.skipWaiting();
       })
   );
 });
 
 // Activate event - clean up old caches
-self.addEventListener("activate", (event) => {
+self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log("Deleting old cache:", cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
+    caches.keys()
+      .then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((cacheName) => {
+            if (cacheName !== CACHE_NAME) {
+              return caches.delete(cacheName);
+            }
+          })
+        );
+      })
+      .then(() => {
+        return self.clients.claim();
+      })
+  );
+});
+
+// Fetch event - serve from cache, fallback to network
+self.addEventListener('fetch', (event) => {
+  // Skip non-GET requests
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
+  // Skip external requests
+  if (!event.request.url.startsWith(self.location.origin)) {
+    return;
+  }
+
+  event.respondWith(
+    caches.match(event.request)
+      .then((response) => {
+        // Return cached version or fetch from network
+        return response || fetch(event.request)
+          .then((fetchResponse) => {
+            // Don't cache non-successful responses
+            if (!fetchResponse || fetchResponse.status !== 200 || fetchResponse.type !== 'basic') {
+              return fetchResponse;
+            }
+
+            // Clone the response
+            const responseToCache = fetchResponse.clone();
+
+            // Cache the response for future use
+            caches.open(CACHE_NAME)
+              .then((cache) => {
+                cache.put(event.request, responseToCache);
+              });
+
+            return fetchResponse;
+          });
+      })
+      .catch(() => {
+        // Fallback for offline scenarios
+        if (event.request.destination === 'document') {
+          return caches.match('/index.html');
+        }
+      })
   );
 });
