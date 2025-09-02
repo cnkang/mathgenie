@@ -1,17 +1,17 @@
-import React from "react";
-import { useTranslation } from "../i18n";
-import "./ErrorMessage.css";
+import React from 'react';
+import { useTranslation } from '../i18n';
+import './ErrorMessage.css';
 
 export interface ErrorMessageProps {
   error: string;
-  type?: "error" | "warning" | "info";
+  type?: 'error' | 'warning' | 'info';
   onDismiss?: () => void;
   showIcon?: boolean;
 }
 
 const ErrorMessage: React.FC<ErrorMessageProps> = ({
   error,
-  type = "error",
+  type = 'error',
   onDismiss,
   showIcon = true,
 }) => {
@@ -23,33 +23,33 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
 
   const getIcon = () => {
     switch (type) {
-      case "error":
-        return "⚠️";
-      case "warning":
-        return "⚡";
-      case "info":
-        return "ℹ️";
+      case 'error':
+        return '⚠️';
+      case 'warning':
+        return '⚡';
+      case 'info':
+        return 'ℹ️';
       default:
-        return "⚠️";
+        return '⚠️';
     }
   };
 
   const getAriaLabel = () => {
     switch (type) {
-      case "error":
-        return t("accessibility.errorMessage") || "Error message";
-      case "warning":
-        return t("accessibility.warningMessage") || "Warning message";
-      case "info":
-        return t("accessibility.infoMessage") || "Information message";
+      case 'error':
+        return t('accessibility.errorMessage') || 'Error message';
+      case 'warning':
+        return t('accessibility.warningMessage') || 'Warning message';
+      case 'info':
+        return t('accessibility.infoMessage') || 'Information message';
       default:
-        return t("accessibility.errorMessage") || "Error message";
+        return t('accessibility.errorMessage') || 'Error message';
     }
   };
 
   return (
     <div
-      className={`message-container message-${type} ${type === "error" ? "error-message" : ""}`}
+      className={`message-container message-${type} ${type === 'error' ? 'error-message' : ''}`}
       role="alert"
       aria-live="polite"
       aria-atomic="true"
@@ -63,7 +63,7 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
         <button
           className="message-dismiss"
           onClick={onDismiss}
-          aria-label={t("accessibility.dismissMessage") || "Dismiss message"}
+          aria-label={t('accessibility.dismissMessage') || 'Dismiss message'}
           type="button"
         >
           ✕
