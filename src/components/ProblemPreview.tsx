@@ -1,6 +1,6 @@
-import React, { Suspense, useDeferredValue, useMemo } from 'react';
-import { useTranslation } from '../i18n';
-import type { Problem, ProblemPreviewProps } from '../types';
+import React, { Suspense, useDeferredValue, useMemo } from "react";
+import { useTranslation } from "../i18n";
+import type { Problem, ProblemPreviewProps } from "../types";
 
 /**
  * Problem Preview Component - Enhanced with React 19 features and TypeScript
@@ -37,7 +37,7 @@ const ProblemPreview: React.FC<ProblemPreviewProps> = ({ settings, generateSampl
 
   return (
     <div className="problem-preview">
-      <h3>{t('preview.title') || 'Preview'}</h3>
+      <h3>{t("preview.title") || "Preview"}</h3>
       <Suspense
         fallback={
           <div className="preview-loading">
@@ -55,7 +55,7 @@ const ProblemPreview: React.FC<ProblemPreviewProps> = ({ settings, generateSampl
             ))}
           </div>
           <div className="preview-info">
-            <small>{t('preview.info') || 'Sample problems based on current settings'}</small>
+            <small>{t("preview.info") || "Sample problems based on current settings"}</small>
           </div>
         </div>
       </Suspense>

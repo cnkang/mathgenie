@@ -1,30 +1,30 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import React from 'react';
-import { vi } from 'vitest';
-import type { I18nContextType } from '../types';
-import TranslationLoader from './TranslationLoader';
+import { render, screen, waitFor } from "@testing-library/react";
+import React from "react";
+import { vi } from "vitest";
+import type { I18nContextType } from "../types";
+import TranslationLoader from "./TranslationLoader";
 
 // Mock the useTranslation hook
 const mockUseTranslation = vi.fn();
 
-vi.mock('../i18n', () => ({
+vi.mock("../i18n", () => ({
   useTranslation: () => mockUseTranslation(),
 }));
 
-describe('TranslationLoader', () => {
+describe("TranslationLoader", () => {
   const mockT = vi.fn();
 
   const createMockI18nContext = (isLoading: boolean): I18nContextType => ({
     t: mockT,
     isLoading,
-    currentLanguage: 'en',
+    currentLanguage: "en",
     languages: {
-      en: { code: 'en', name: 'English', flag: '🇺🇸' },
-      zh: { code: 'zh', name: '中文', flag: '🇨🇳' },
-      es: { code: 'es', name: 'Español', flag: '🇪🇸' },
-      fr: { code: 'fr', name: 'Français', flag: '🇫🇷' },
-      de: { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-      ja: { code: 'ja', name: '日本語', flag: '🇯🇵' },
+      en: { code: "en", name: "English", flag: "🇺🇸" },
+      zh: { code: "zh", name: "中文", flag: "🇨🇳" },
+      es: { code: "es", name: "Español", flag: "🇪🇸" },
+      fr: { code: "fr", name: "Français", flag: "🇫🇷" },
+      de: { code: "de", name: "Deutsch", flag: "🇩🇪" },
+      ja: { code: "ja", name: "日本語", flag: "🇯🇵" },
     },
     translations: {},
     changeLanguage: vi.fn(),
@@ -33,9 +33,9 @@ describe('TranslationLoader', () => {
   const createMockI18nContextWithT = (isLoading: boolean, t: any): I18nContextType => ({
     t,
     isLoading,
-    currentLanguage: 'en',
+    currentLanguage: "en",
     languages: {
-      en: { code: 'en', name: 'English', flag: '🇺🇸' },
+      en: { code: "en", name: "English", flag: "🇺🇸" },
     },
     translations: {},
     changeLanguage: vi.fn(),
@@ -46,7 +46,7 @@ describe('TranslationLoader', () => {
     mockUseTranslation.mockClear();
   });
 
-  test('renders children when not loading', () => {
+  test("renders children when not loading", () => {
     mockUseTranslation.mockReturnValue(createMockI18nContext(false));
 
     render(
@@ -55,12 +55,12 @@ describe('TranslationLoader', () => {
       </TranslationLoader>,
     );
 
-    expect(screen.getByTestId('child-content')).toBeDefined();
-    expect(screen.getByText('Test Content')).toBeDefined();
+    expect(screen.getByTestId("child-content")).toBeDefined();
+    expect(screen.getByText("Test Content")).toBeDefined();
   });
 
-  test('renders loading screen when loading', () => {
-    mockT.mockReturnValue('Loading translations...');
+  test("renders loading screen when loading", () => {
+    mockT.mockReturnValue("Loading translations...");
     mockUseTranslation.mockReturnValue(createMockI18nContextWithT(true, mockT));
 
     render(
@@ -69,14 +69,14 @@ describe('TranslationLoader', () => {
       </TranslationLoader>,
     );
 
-    expect(screen.queryByTestId('child-content')).toBeNull();
-    expect(screen.getByText('🌐')).toBeDefined();
-    expect(screen.getByText('MathGenie')).toBeDefined();
-    expect(screen.getByText('Loading translations...')).toBeDefined();
+    expect(screen.queryByTestId("child-content")).toBeNull();
+    expect(screen.getByText("🌐")).toBeDefined();
+    expect(screen.getByText("MathGenie")).toBeDefined();
+    expect(screen.getByText("Loading translations...")).toBeDefined();
   });
 
-  test('displays loading spinner when loading', () => {
-    mockT.mockReturnValue('Loading translations...');
+  test("displays loading spinner when loading", () => {
+    mockT.mockReturnValue("Loading translations...");
     mockUseTranslation.mockReturnValue(createMockI18nContextWithT(true, mockT));
 
     render(
@@ -85,16 +85,16 @@ describe('TranslationLoader', () => {
       </TranslationLoader>,
     );
 
-    const spinner = screen.getByLabelText('Loading...');
+    const spinner = screen.getByLabelText("Loading...");
     expect(spinner).toBeDefined();
-    expect(spinner.classList.contains('translation-loader-spinner')).toBe(true);
+    expect(spinner.classList.contains("translation-loader-spinner")).toBe(true);
 
-    const spinnerDots = document.querySelectorAll('.spinner-dot');
+    const spinnerDots = document.querySelectorAll(".spinner-dot");
     expect(spinnerDots).toHaveLength(3);
   });
 
-  test('calls translation function with correct key', () => {
-    mockT.mockReturnValue('Chargement des traductions...');
+  test("calls translation function with correct key", () => {
+    mockT.mockReturnValue("Chargement des traductions...");
     mockUseTranslation.mockReturnValue({
       t: mockT,
       isLoading: true,
@@ -106,10 +106,10 @@ describe('TranslationLoader', () => {
       </TranslationLoader>,
     );
 
-    expect(mockT).toHaveBeenCalledWith('loading.translations');
+    expect(mockT).toHaveBeenCalledWith("loading.translations");
   });
 
-  test('falls back to default text when translation is not available', () => {
+  test("falls back to default text when translation is not available", () => {
     mockT.mockReturnValue(null);
     mockUseTranslation.mockReturnValue({
       t: mockT,
@@ -122,10 +122,10 @@ describe('TranslationLoader', () => {
       </TranslationLoader>,
     );
 
-    expect(screen.getByText('Loading translations...')).toBeDefined();
+    expect(screen.getByText("Loading translations...")).toBeDefined();
   });
 
-  test('falls back to default text when translation returns undefined', () => {
+  test("falls back to default text when translation returns undefined", () => {
     mockT.mockReturnValue(undefined);
     mockUseTranslation.mockReturnValue({
       t: mockT,
@@ -138,11 +138,11 @@ describe('TranslationLoader', () => {
       </TranslationLoader>,
     );
 
-    expect(screen.getByText('Loading translations...')).toBeDefined();
+    expect(screen.getByText("Loading translations...")).toBeDefined();
   });
 
-  test('applies correct CSS classes to loading elements', () => {
-    mockT.mockReturnValue('Loading translations...');
+  test("applies correct CSS classes to loading elements", () => {
+    mockT.mockReturnValue("Loading translations...");
     mockUseTranslation.mockReturnValue({
       t: mockT,
       isLoading: true,
@@ -154,21 +154,21 @@ describe('TranslationLoader', () => {
       </TranslationLoader>,
     );
 
-    expect((container.firstChild as Element)?.classList.contains('translation-loader')).toBe(true);
-    expect(screen.getByText('MathGenie').classList.contains('translation-loader-title')).toBe(true);
+    expect((container.firstChild as Element)?.classList.contains("translation-loader")).toBe(true);
+    expect(screen.getByText("MathGenie").classList.contains("translation-loader-title")).toBe(true);
     expect(
-      screen.getByText('Loading translations...').classList.contains('translation-loader-message'),
+      screen.getByText("Loading translations...").classList.contains("translation-loader-message"),
     ).toBe(true);
 
-    const content = container.querySelector('.translation-loader-content');
+    const content = container.querySelector(".translation-loader-content");
     expect(content).toBeDefined();
 
-    const icon = container.querySelector('.translation-loader-icon');
+    const icon = container.querySelector(".translation-loader-icon");
     expect(icon).toBeDefined();
-    expect(icon?.textContent).toBe('🌐');
+    expect(icon?.textContent).toBe("🌐");
   });
 
-  test('renders multiple children correctly when not loading', () => {
+  test("renders multiple children correctly when not loading", () => {
     mockUseTranslation.mockReturnValue({
       t: mockT,
       isLoading: false,
@@ -182,15 +182,15 @@ describe('TranslationLoader', () => {
       </TranslationLoader>,
     );
 
-    expect(screen.getByTestId('child-1')).toBeDefined();
-    expect(screen.getByTestId('child-2')).toBeDefined();
-    expect(screen.getByTestId('child-3')).toBeDefined();
-    expect(screen.getByText('First Child')).toBeDefined();
-    expect(screen.getByText('Second Child')).toBeDefined();
-    expect(screen.getByText('Third Child')).toBeDefined();
+    expect(screen.getByTestId("child-1")).toBeDefined();
+    expect(screen.getByTestId("child-2")).toBeDefined();
+    expect(screen.getByTestId("child-3")).toBeDefined();
+    expect(screen.getByText("First Child")).toBeDefined();
+    expect(screen.getByText("Second Child")).toBeDefined();
+    expect(screen.getByText("Third Child")).toBeDefined();
   });
 
-  test('handles empty children when not loading', () => {
+  test("handles empty children when not loading", () => {
     mockUseTranslation.mockReturnValue({
       t: mockT,
       isLoading: false,
@@ -199,10 +199,10 @@ describe('TranslationLoader', () => {
     const { container } = render(<TranslationLoader>{null}</TranslationLoader>);
 
     // Should render empty fragment - container should be empty or have empty text
-    expect(container.textContent).toBe('');
+    expect(container.textContent).toBe("");
   });
 
-  test('handles string children when not loading', () => {
+  test("handles string children when not loading", () => {
     mockUseTranslation.mockReturnValue({
       t: mockT,
       isLoading: false,
@@ -210,10 +210,10 @@ describe('TranslationLoader', () => {
 
     render(<TranslationLoader>Just a string</TranslationLoader>);
 
-    expect(screen.getByText('Just a string')).toBeDefined();
+    expect(screen.getByText("Just a string")).toBeDefined();
   });
 
-  test('handles number children when not loading', () => {
+  test("handles number children when not loading", () => {
     mockUseTranslation.mockReturnValue({
       t: mockT,
       isLoading: false,
@@ -221,11 +221,11 @@ describe('TranslationLoader', () => {
 
     render(<TranslationLoader>{42}</TranslationLoader>);
 
-    expect(screen.getByText('42')).toBeDefined();
+    expect(screen.getByText("42")).toBeDefined();
   });
 
-  test('transitions from loading to loaded state', async () => {
-    mockT.mockReturnValue('Loading translations...');
+  test("transitions from loading to loaded state", async () => {
+    mockT.mockReturnValue("Loading translations...");
 
     // Start with loading state
     mockUseTranslation.mockReturnValue({
@@ -240,8 +240,8 @@ describe('TranslationLoader', () => {
     );
 
     // Verify loading state
-    expect(screen.getByText('Loading translations...')).toBeDefined();
-    expect(screen.queryByTestId('child-content')).toBeNull();
+    expect(screen.getByText("Loading translations...")).toBeDefined();
+    expect(screen.queryByTestId("child-content")).toBeNull();
 
     // Change to loaded state
     mockUseTranslation.mockReturnValue({
@@ -257,12 +257,12 @@ describe('TranslationLoader', () => {
 
     // Verify loaded state
     await waitFor(() => {
-      expect(screen.queryByText('Loading translations...')).toBeNull();
-      expect(screen.getByTestId('child-content')).toBeDefined();
+      expect(screen.queryByText("Loading translations...")).toBeNull();
+      expect(screen.getByTestId("child-content")).toBeDefined();
     });
   });
 
-  test('handles complex nested children when not loading', () => {
+  test("handles complex nested children when not loading", () => {
     mockUseTranslation.mockReturnValue({
       t: mockT,
       isLoading: false,
@@ -283,13 +283,13 @@ describe('TranslationLoader', () => {
       </TranslationLoader>,
     );
 
-    expect(screen.getByText('Title')).toBeDefined();
-    expect(screen.getByText('Paragraph content')).toBeDefined();
-    expect(screen.getByRole('banner')).toBeDefined();
-    expect(screen.getByRole('main')).toBeDefined();
+    expect(screen.getByText("Title")).toBeDefined();
+    expect(screen.getByText("Paragraph content")).toBeDefined();
+    expect(screen.getByRole("banner")).toBeDefined();
+    expect(screen.getByRole("main")).toBeDefined();
   });
 
-  test('preserves event handlers in children when not loading', async () => {
+  test("preserves event handlers in children when not loading", async () => {
     mockUseTranslation.mockReturnValue({
       t: mockT,
       isLoading: false,
@@ -305,14 +305,14 @@ describe('TranslationLoader', () => {
       </TranslationLoader>,
     );
 
-    const button = screen.getByTestId('test-button');
+    const button = screen.getByTestId("test-button");
     button.click();
 
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
-  test('loading screen has proper accessibility attributes', () => {
-    mockT.mockReturnValue('Loading translations...');
+  test("loading screen has proper accessibility attributes", () => {
+    mockT.mockReturnValue("Loading translations...");
     mockUseTranslation.mockReturnValue({
       t: mockT,
       isLoading: true,
@@ -324,11 +324,11 @@ describe('TranslationLoader', () => {
       </TranslationLoader>,
     );
 
-    const spinner = screen.getByLabelText('Loading...');
-    expect(spinner.getAttribute('aria-label')).toBe('Loading...');
+    const spinner = screen.getByLabelText("Loading...");
+    expect(spinner.getAttribute("aria-label")).toBe("Loading...");
   });
 
-  test('handles boolean children when not loading', () => {
+  test("handles boolean children when not loading", () => {
     mockUseTranslation.mockReturnValue({
       t: mockT,
       isLoading: false,
@@ -342,21 +342,21 @@ describe('TranslationLoader', () => {
     );
 
     // Boolean children should not render anything
-    expect(container.textContent).toBe('');
+    expect(container.textContent).toBe("");
   });
 
-  test('handles array children when not loading', () => {
+  test("handles array children when not loading", () => {
     mockUseTranslation.mockReturnValue({
       t: mockT,
       isLoading: false,
     } as unknown as I18nContextType);
 
-    render(<TranslationLoader>{['Item 1', 'Item 2', 'Item 3']}</TranslationLoader>);
+    render(<TranslationLoader>{["Item 1", "Item 2", "Item 3"]}</TranslationLoader>);
 
-    expect(screen.getByText('Item 1Item 2Item 3')).toBeDefined();
+    expect(screen.getByText("Item 1Item 2Item 3")).toBeDefined();
   });
 
-  test('handles React fragment children when not loading', () => {
+  test("handles React fragment children when not loading", () => {
     mockUseTranslation.mockReturnValue({
       t: mockT,
       isLoading: false,
@@ -371,7 +371,7 @@ describe('TranslationLoader', () => {
       </TranslationLoader>,
     );
 
-    expect(screen.getByText('Fragment child 1')).toBeDefined();
-    expect(screen.getByText('Fragment child 2')).toBeDefined();
+    expect(screen.getByText("Fragment child 1")).toBeDefined();
+    expect(screen.getByText("Fragment child 2")).toBeDefined();
   });
 });
