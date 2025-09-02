@@ -3,7 +3,7 @@ export default {
   app: {
     title: 'MathGenie',
     subtitle:
-      'Générez des problèmes de mathématiques personnalisés pour la pratique et l\'apprentissage',
+      "Générez des problèmes de mathématiques personnalisés pour la pratique et l'apprentissage",
   },
   operations: {
     title: 'Sélectionner les opérations',
@@ -17,7 +17,7 @@ export default {
     numProblems: 'Nombre de problèmes',
     numberRange: 'Plage de nombres',
     resultRange: 'Plage de résultats',
-    operandsRange: 'Nombre d\'opérandes',
+    operandsRange: "Nombre d'opérandes",
     options: 'Options des problèmes',
     allowNegative: 'Autoriser les résultats négatifs',
     allowNegativeDesc: 'Autoriser que les résultats de calculs soient des nombres négatifs',
@@ -58,20 +58,20 @@ export default {
     invalidResultRange:
       'Le minimum de la plage de résultats ne peut pas être supérieur au maximum.',
     invalidOperandsRange:
-      'Plage d\'opérandes invalide : le minimum doit être au moins 2 et ne pas être supérieur au maximum.',
+      "Plage d'opérandes invalide : le minimum doit être au moins 2 et ne pas être supérieur au maximum.",
     noProblemsGenerated:
-      'Aucun problème n\'a pu être généré avec les paramètres actuels. Essayez d\'ajuster les plages.',
+      "Aucun problème n'a pu être généré avec les paramètres actuels. Essayez d'ajuster les plages.",
     generationFailed: 'Échec de la génération des problèmes. Veuillez réessayer.',
-    noProblemsToPdf: 'Aucun problème à télécharger. Générez d\'abord des problèmes.',
+    noProblemsToPdf: "Aucun problème à télécharger. Générez d'abord des problèmes.",
     pdfFailed: 'Échec de la génération du PDF. Veuillez réessayer.',
     partialGeneration:
       'Généré {{generated}} sur {{requested}} problèmes demandés. Considérez ajuster vos paramètres pour de meilleurs résultats.',
     downloadFailed:
-      'Aucun problème disponible à télécharger. Veuillez d\'abord générer des problèmes.',
+      "Aucun problème disponible à télécharger. Veuillez d'abord générer des problèmes.",
     pdfError:
       'Échec de la génération du PDF. Veuillez réessayer ou vérifier les paramètres de votre navigateur.',
     generalError:
-      'Une erreur s\'est produite lors de la génération des problèmes. Veuillez réessayer.',
+      "Une erreur s'est produite lors de la génération des problèmes. Veuillez réessayer.",
   },
   warnings: {
     settingsChanged:
@@ -91,8 +91,8 @@ export default {
       autoGeneration:
         'Les problèmes sont générés automatiquement lorsque vous modifiez les paramètres.',
       pdfTip:
-        'Astuce : Ajustez la taille de police et l\'espacement des lignes pour une meilleure mise en page PDF.',
-      presetApplied: 'Le préréglage \'{{name}}\' a été appliqué à vos paramètres.',
+        "Astuce : Ajustez la taille de police et l'espacement des lignes pour une meilleure mise en page PDF.",
+      presetApplied: "Le préréglage '{{name}}' a été appliqué à vos paramètres.",
     },
   },
   accessibility: {
@@ -102,8 +102,8 @@ export default {
     maxNumber: 'Nombre maximum pour les opérandes',
     minResult: 'Valeur minimale du résultat',
     maxResult: 'Valeur maximale du résultat',
-    minOperands: 'Nombre minimum d\'opérandes par problème',
-    maxOperands: 'Nombre maximum d\'opérandes par problème',
+    minOperands: "Nombre minimum d'opérandes par problème",
+    maxOperands: "Nombre maximum d'opérandes par problème",
     allowNegativeLabel: 'Autoriser les résultats négatifs dans les problèmes',
     showAnswersLabel: 'Afficher les réponses à côté des problèmes',
     fontSizeInput: 'Taille de police pour la sortie PDF',
@@ -111,10 +111,10 @@ export default {
     paperSizeSelect: 'Taille du papier pour la sortie PDF',
     generateButton: 'Générer des problèmes de mathématiques avec les paramètres actuels',
     downloadButton: 'Télécharger les problèmes générés en tant que fichier PDF',
-    languageSelect: 'Sélectionner la langue de l\'interface',
-    errorMessage: 'Message d\'erreur',
-    warningMessage: 'Message d\'avertissement',
-    infoMessage: 'Message d\'information',
+    languageSelect: "Sélectionner la langue de l'interface",
+    errorMessage: "Message d'erreur",
+    warningMessage: "Message d'avertissement",
+    infoMessage: "Message d'information",
     dismissMessage: 'Ignorer le message',
   },
   language: {
@@ -178,7 +178,7 @@ export default {
     feedback: {
       excellent: 'Fantastique ! Vous avez de solides compétences en mathématiques !',
       good: 'Bien joué ! Continuez comme ça !',
-      average: 'Bon travail ! Il y a de la place pour s\'améliorer !',
+      average: "Bon travail ! Il y a de la place pour s'améliorer !",
       passing: 'Bonne base ! Pratiquez davantage !',
       needsImprovement: 'Continuez à essayer et pratiquez plus !',
     },
@@ -189,7 +189,7 @@ export default {
       currentProblems: 'Problèmes Actuels',
       totalGenerated: 'Total Généré',
       difficultyLevel: 'Niveau de Difficulté',
-      operationTypes: 'Types d\'Opération',
+      operationTypes: "Types d'Opération",
     },
     difficulty: {
       beginner: 'Débutant',
@@ -198,7 +198,7 @@ export default {
       expert: 'Expert',
     },
     progress: {
-      title: 'Progrès d\'Apprentissage',
+      title: "Progrès d'Apprentissage",
       completed: 'Complété {{percent}}% (Objectif: 100 problèmes)',
     },
     quickActions: {
@@ -215,13 +215,13 @@ export default {
       accuracy: 'Précision:',
     },
     tips: {
-      title: 'Conseils d\'Utilisation',
+      title: "Conseils d'Utilisation",
       items: {
         '0': 'Utilisez les préréglages rapides pour configurer les paramètres courants',
-        '1': 'Augmenter le nombre d\'opérandes augmente la difficulté',
+        '1': "Augmenter le nombre d'opérandes augmente la difficulté",
         '2': 'Limiter la plage de résultats contrôle la complexité des réponses',
-        '3': 'Activer l\'affichage des réponses aide à vérifier les progrès',
-        '4': 'L\'export PDF supporte plusieurs formats de papier',
+        '3': "Activer l'affichage des réponses aide à vérifier les progrès",
+        '4': "L'export PDF supporte plusieurs formats de papier",
       },
     },
     currentConfig: {

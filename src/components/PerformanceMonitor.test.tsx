@@ -40,7 +40,7 @@ describe('PerformanceMonitor', () => {
     render(
       <PerformanceMonitor>
         <div>Test Child</div>
-      </PerformanceMonitor>,
+      </PerformanceMonitor>
     );
 
     expect(screen.getByText('Test Child')).toBeInTheDocument();
@@ -55,7 +55,7 @@ describe('PerformanceMonitor', () => {
     render(
       <PerformanceMonitor>
         <div>Test</div>
-      </PerformanceMonitor>,
+      </PerformanceMonitor>
     );
 
     expect(MockPerformanceObserver).toBeDefined();
@@ -75,12 +75,12 @@ describe('PerformanceMonitor', () => {
     render(
       <PerformanceMonitor>
         <div>Test</div>
-      </PerformanceMonitor>,
+      </PerformanceMonitor>
     );
 
     expect(consoleWarnSpy).toHaveBeenCalledWith(
       'Performance observer not fully supported:',
-      expect.any(Error),
+      expect.any(Error)
     );
   });
 
@@ -92,7 +92,7 @@ describe('PerformanceMonitor', () => {
       render(
         <PerformanceMonitor>
           <div>Test</div>
-        </PerformanceMonitor>,
+        </PerformanceMonitor>
       );
     }).not.toThrow();
 
@@ -114,7 +114,7 @@ describe('PerformanceMonitor', () => {
     render(
       <PerformanceMonitor>
         <div>Test</div>
-      </PerformanceMonitor>,
+      </PerformanceMonitor>
     );
 
     process.env.NODE_ENV = originalNodeEnv;
@@ -138,7 +138,7 @@ describe('PerformanceMonitor', () => {
     const { unmount } = render(
       <PerformanceMonitor>
         <div>Test</div>
-      </PerformanceMonitor>,
+      </PerformanceMonitor>
     );
 
     // Fast-forward time to trigger memory logging
@@ -164,7 +164,7 @@ describe('PerformanceMonitor', () => {
     render(
       <PerformanceMonitor>
         <div>Test</div>
-      </PerformanceMonitor>,
+      </PerformanceMonitor>
     );
 
     process.env.NODE_ENV = originalNodeEnv;
@@ -192,7 +192,7 @@ describe('PerformanceMonitor', () => {
     render(
       <PerformanceMonitor>
         <div>Test</div>
-      </PerformanceMonitor>,
+      </PerformanceMonitor>
     );
 
     process.env.NODE_ENV = originalNodeEnv;
@@ -222,7 +222,7 @@ describe('PerformanceMonitor', () => {
     const { unmount } = render(
       <PerformanceMonitor>
         <div>Test</div>
-      </PerformanceMonitor>,
+      </PerformanceMonitor>
     );
 
     unmount();
@@ -256,7 +256,7 @@ describe('PerformanceMonitor', () => {
     render(
       <PerformanceMonitor>
         <div>Test</div>
-      </PerformanceMonitor>,
+      </PerformanceMonitor>
     );
 
     const mockEntries = [
@@ -302,7 +302,7 @@ describe('PerformanceMonitor', () => {
     render(
       <PerformanceMonitor>
         <div>Test</div>
-      </PerformanceMonitor>,
+      </PerformanceMonitor>
     );
 
     const mockEntries = [{ name: 'test-metric', value: 150 }];
@@ -348,7 +348,7 @@ describe('PerformanceMonitor', () => {
     render(
       <PerformanceMonitor>
         <div>Test</div>
-      </PerformanceMonitor>,
+      </PerformanceMonitor>
     );
 
     const mockEntries = [{ name: 'test-metric', value: 150 }];
@@ -390,7 +390,7 @@ describe('PerformanceMonitor', () => {
     render(
       <PerformanceMonitor>
         <div>Test</div>
-      </PerformanceMonitor>,
+      </PerformanceMonitor>
     );
 
     const mockEntries = [

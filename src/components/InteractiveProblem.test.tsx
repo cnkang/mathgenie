@@ -127,7 +127,7 @@ describe('InteractiveProblem', () => {
 
   test('disables input and button after submission', () => {
     render(
-      <InteractiveProblem problem={mockProblemWithAnswer} onAnswerSubmit={mockOnAnswerSubmit} />,
+      <InteractiveProblem problem={mockProblemWithAnswer} onAnswerSubmit={mockOnAnswerSubmit} />
     );
 
     const input = screen.getByPlaceholderText('Enter answer');
@@ -139,7 +139,7 @@ describe('InteractiveProblem', () => {
 
   test('shows user answer when problem has been answered', () => {
     render(
-      <InteractiveProblem problem={mockProblemWithAnswer} onAnswerSubmit={mockOnAnswerSubmit} />,
+      <InteractiveProblem problem={mockProblemWithAnswer} onAnswerSubmit={mockOnAnswerSubmit} />
     );
 
     const input = screen.getByPlaceholderText('Enter answer');
@@ -152,7 +152,7 @@ describe('InteractiveProblem', () => {
         problem={mockProblemWithAnswer}
         onAnswerSubmit={mockOnAnswerSubmit}
         showResult={true}
-      />,
+      />
     );
 
     expect(screen.getByText('✅')).toBeDefined();
@@ -165,7 +165,7 @@ describe('InteractiveProblem', () => {
         problem={mockIncorrectProblem}
         onAnswerSubmit={mockOnAnswerSubmit}
         showResult={true}
-      />,
+      />
     );
 
     expect(screen.getByText('❌')).toBeDefined();
@@ -179,7 +179,7 @@ describe('InteractiveProblem', () => {
         problem={mockProblemWithAnswer}
         onAnswerSubmit={mockOnAnswerSubmit}
         showResult={false}
-      />,
+      />
     );
 
     expect(screen.queryByText('✅')).toBeNull();
@@ -192,7 +192,7 @@ describe('InteractiveProblem', () => {
         problem={mockProblemWithAnswer}
         onAnswerSubmit={mockOnAnswerSubmit}
         showResult={true}
-      />,
+      />
     );
 
     expect((container.firstChild as Element)?.classList.contains('interactive-problem')).toBe(true);
@@ -205,7 +205,7 @@ describe('InteractiveProblem', () => {
         problem={mockIncorrectProblem}
         onAnswerSubmit={mockOnAnswerSubmit}
         showResult={true}
-      />,
+      />
     );
 
     expect((container.firstChild as Element)?.classList.contains('interactive-problem')).toBe(true);
@@ -219,7 +219,7 @@ describe('InteractiveProblem', () => {
         problem={mockProblem}
         onAnswerSubmit={mockOnAnswerSubmit}
         disabled={true}
-      />,
+      />
     );
 
     const input = screen.getByPlaceholderText('Enter answer');
@@ -234,14 +234,14 @@ describe('InteractiveProblem', () => {
 
   test('updates state when problem changes', () => {
     const { rerender } = render(
-      <InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />,
+      <InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />
     );
 
     const input = screen.getByPlaceholderText('Enter answer');
     expect(input.value).toBe('');
 
     rerender(
-      <InteractiveProblem problem={mockProblemWithAnswer} onAnswerSubmit={mockOnAnswerSubmit} />,
+      <InteractiveProblem problem={mockProblemWithAnswer} onAnswerSubmit={mockOnAnswerSubmit} />
     );
 
     expect(input.value).toBe('20');
@@ -249,7 +249,7 @@ describe('InteractiveProblem', () => {
 
   test('resets state when problem changes to unanswered', () => {
     const { rerender } = render(
-      <InteractiveProblem problem={mockProblemWithAnswer} onAnswerSubmit={mockOnAnswerSubmit} />,
+      <InteractiveProblem problem={mockProblemWithAnswer} onAnswerSubmit={mockOnAnswerSubmit} />
     );
 
     const input = screen.getByPlaceholderText('Enter answer');
@@ -322,7 +322,7 @@ describe('InteractiveProblem', () => {
         problem={mockProblem}
         onAnswerSubmit={mockOnAnswerSubmit}
         showResult={false}
-      />,
+      />
     );
 
     expect(screen.queryByText('✅')).toBeNull();
@@ -335,7 +335,7 @@ describe('InteractiveProblem', () => {
         problem={mockProblem}
         onAnswerSubmit={mockOnAnswerSubmit}
         showResult={false}
-      />,
+      />
     );
 
     expect((container.firstChild as Element)?.classList.contains('correct')).toBe(false);

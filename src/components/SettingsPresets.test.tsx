@@ -15,7 +15,7 @@ describe('SettingsPresets', () => {
     render(
       <I18nProvider>
         <SettingsPresets onApplyPreset={mockOnApplyPreset} />
-      </I18nProvider>,
+      </I18nProvider>
     );
 
     const buttons = screen.getAllByRole('button');
@@ -26,7 +26,7 @@ describe('SettingsPresets', () => {
     render(
       <I18nProvider>
         <SettingsPresets onApplyPreset={mockOnApplyPreset} />
-      </I18nProvider>,
+      </I18nProvider>
     );
 
     const buttons = screen.getAllByRole('button');
@@ -37,7 +37,7 @@ describe('SettingsPresets', () => {
         operations: ['+', '-'] as Operation[],
         numProblems: 15,
         numRange: [1, 10],
-      }),
+      })
     );
   });
 
@@ -45,7 +45,7 @@ describe('SettingsPresets', () => {
     render(
       <I18nProvider>
         <SettingsPresets onApplyPreset={mockOnApplyPreset} />
-      </I18nProvider>,
+      </I18nProvider>
     );
 
     const buttons = screen.getAllByRole('button');
@@ -56,7 +56,7 @@ describe('SettingsPresets', () => {
         operations: ['+', '-', '*'] as Operation[],
         numProblems: 20,
         numRange: [1, 50],
-      }),
+      })
     );
   });
 
@@ -64,7 +64,7 @@ describe('SettingsPresets', () => {
     render(
       <I18nProvider>
         <SettingsPresets onApplyPreset={mockOnApplyPreset} />
-      </I18nProvider>,
+      </I18nProvider>
     );
 
     const buttons = screen.getAllByRole('button');
@@ -75,7 +75,7 @@ describe('SettingsPresets', () => {
         operations: ['+', '-', '*', '/'] as Operation[],
         numProblems: 25,
         numRange: [1, 100],
-      }),
+      })
     );
   });
 
@@ -83,7 +83,7 @@ describe('SettingsPresets', () => {
     render(
       <I18nProvider>
         <SettingsPresets onApplyPreset={mockOnApplyPreset} />
-      </I18nProvider>,
+      </I18nProvider>
     );
 
     const buttons = screen.getAllByRole('button');
@@ -94,7 +94,7 @@ describe('SettingsPresets', () => {
         operations: ['*'] as Operation[],
         numProblems: 30,
         numRange: [1, 12],
-      }),
+      })
     );
   });
 
@@ -102,7 +102,7 @@ describe('SettingsPresets', () => {
     render(
       <I18nProvider>
         <SettingsPresets onApplyPreset={mockOnApplyPreset} />
-      </I18nProvider>,
+      </I18nProvider>
     );
 
     const buttons = screen.getAllByRole('button');
@@ -118,7 +118,7 @@ describe('SettingsPresets', () => {
     render(
       <I18nProvider>
         <SettingsPresets onApplyPreset={mockOnApplyPreset} />
-      </I18nProvider>,
+      </I18nProvider>
     );
 
     // Check that all presets are rendered
@@ -126,7 +126,7 @@ describe('SettingsPresets', () => {
     expect(presetCards).toHaveLength(4);
 
     // Check that each card has title, description, and button
-    presetCards.forEach((card) => {
+    presetCards.forEach(card => {
       expect(card.querySelector('h4')).toBeDefined();
       expect(card.querySelector('p')).toBeDefined();
       expect(card.querySelector('button')).toBeDefined();
@@ -146,11 +146,11 @@ describe('SettingsPresets', () => {
       ];
 
       return (
-        <div className="settings-presets">
+        <div className='settings-presets'>
           <h3>{mockT('presets.title') || 'Quick Presets'}</h3>
-          <div className="presets-grid">
+          <div className='presets-grid'>
             {presets.map((preset, index) => (
-              <div key={index} className="preset-card">
+              <div key={index} className='preset-card'>
                 <h4>{preset.name}</h4>
                 <p>{preset.description}</p>
                 <button onClick={() => mockOnApplyPreset(preset.settings)}>
@@ -179,32 +179,32 @@ describe('SettingsPresets', () => {
 
       return (
         <div>
-          <div data-testid="title">{mockT('presets.title') || 'Quick Presets'}</div>
-          <div data-testid="beginner-name">
+          <div data-testid='title'>{mockT('presets.title') || 'Quick Presets'}</div>
+          <div data-testid='beginner-name'>
             {mockT('presets.beginner.name') || 'Beginner (1-10)'}
           </div>
-          <div data-testid="beginner-desc">
+          <div data-testid='beginner-desc'>
             {mockT('presets.beginner.description') || 'Simple addition and subtraction'}
           </div>
-          <div data-testid="intermediate-name">
+          <div data-testid='intermediate-name'>
             {mockT('presets.intermediate.name') || 'Intermediate (1-50)'}
           </div>
-          <div data-testid="intermediate-desc">
+          <div data-testid='intermediate-desc'>
             {mockT('presets.intermediate.description') || 'All operations with medium numbers'}
           </div>
-          <div data-testid="advanced-name">
+          <div data-testid='advanced-name'>
             {mockT('presets.advanced.name') || 'Advanced (1-100)'}
           </div>
-          <div data-testid="advanced-desc">
+          <div data-testid='advanced-desc'>
             {mockT('presets.advanced.description') || 'All operations including division'}
           </div>
-          <div data-testid="multiplication-name">
+          <div data-testid='multiplication-name'>
             {mockT('presets.multiplication.name') || 'Multiplication Tables'}
           </div>
-          <div data-testid="multiplication-desc">
+          <div data-testid='multiplication-desc'>
             {mockT('presets.multiplication.description') || 'Focus on multiplication practice'}
           </div>
-          <div data-testid="apply">{mockT('presets.apply') || 'Apply'}</div>
+          <div data-testid='apply'>{mockT('presets.apply') || 'Apply'}</div>
         </div>
       );
     };
@@ -215,19 +215,19 @@ describe('SettingsPresets', () => {
     expect(screen.getByTestId('title')).toHaveTextContent('Quick Presets');
     expect(screen.getByTestId('beginner-name')).toHaveTextContent('Beginner (1-10)');
     expect(screen.getByTestId('beginner-desc')).toHaveTextContent(
-      'Simple addition and subtraction',
+      'Simple addition and subtraction'
     );
     expect(screen.getByTestId('intermediate-name')).toHaveTextContent('Intermediate (1-50)');
     expect(screen.getByTestId('intermediate-desc')).toHaveTextContent(
-      'All operations with medium numbers',
+      'All operations with medium numbers'
     );
     expect(screen.getByTestId('advanced-name')).toHaveTextContent('Advanced (1-100)');
     expect(screen.getByTestId('advanced-desc')).toHaveTextContent(
-      'All operations including division',
+      'All operations including division'
     );
     expect(screen.getByTestId('multiplication-name')).toHaveTextContent('Multiplication Tables');
     expect(screen.getByTestId('multiplication-desc')).toHaveTextContent(
-      'Focus on multiplication practice',
+      'Focus on multiplication practice'
     );
     expect(screen.getByTestId('apply')).toHaveTextContent('Apply');
   });
@@ -236,7 +236,7 @@ describe('SettingsPresets', () => {
     render(
       <I18nProvider>
         <SettingsPresets onApplyPreset={mockOnApplyPreset} />
-      </I18nProvider>,
+      </I18nProvider>
     );
 
     const buttons = screen.getAllByRole('button');
@@ -337,16 +337,16 @@ describe('SettingsPresets', () => {
       };
 
       return (
-        <div className="settings-presets">
+        <div className='settings-presets'>
           <h3>{mockT('presets.title') || 'Quick Presets'}</h3>
-          <div className="presets-grid">
+          <div className='presets-grid'>
             {presets.map((preset, index) => (
-              <div key={index} className="preset-card">
+              <div key={index} className='preset-card'>
                 <h4>{preset.name}</h4>
                 <p>{preset.description}</p>
                 <button
                   onClick={() => handleApplyPreset(preset.settings)}
-                  className="preset-button"
+                  className='preset-button'
                   aria-label={`Apply ${preset.name} preset`}
                 >
                   {mockT('presets.apply') || 'Apply'}
@@ -377,7 +377,7 @@ describe('SettingsPresets', () => {
     render(
       <I18nProvider>
         <SettingsPresets onApplyPreset={mockOnApplyPreset} />
-      </I18nProvider>,
+      </I18nProvider>
     );
 
     const buttons = screen.getAllByRole('button');
@@ -394,7 +394,7 @@ describe('SettingsPresets', () => {
     render(
       <I18nProvider>
         <SettingsPresets onApplyPreset={mockOnApplyPreset} />
-      </I18nProvider>,
+      </I18nProvider>
     );
 
     const buttons = screen.getAllByRole('button');

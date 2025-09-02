@@ -7,7 +7,7 @@ describe('LanguageSelector', () => {
     render(
       <I18nProvider>
         <LanguageSelector />
-      </I18nProvider>,
+      </I18nProvider>
     );
 
     // Wait for loading to complete
@@ -20,7 +20,7 @@ describe('LanguageSelector', () => {
     render(
       <I18nProvider>
         <LanguageSelector />
-      </I18nProvider>,
+      </I18nProvider>
     );
 
     // Wait for loading to complete
@@ -35,7 +35,7 @@ describe('LanguageSelector', () => {
     render(
       <I18nProvider>
         <LanguageSelector />
-      </I18nProvider>,
+      </I18nProvider>
     );
 
     // Wait for loading to complete

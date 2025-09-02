@@ -13,7 +13,7 @@ import { useTranslation } from './i18n';
 import type { Operation, PaperSizeOptions, Problem, QuizResult, Settings } from './types';
 
 const SpeedInsights = React.lazy(() =>
-  import('@vercel/speed-insights/react').then((module) => ({ default: module.SpeedInsights })),
+  import('@vercel/speed-insights/react').then(module => ({ default: module.SpeedInsights }))
 );
 
 function App(): React.JSX.Element {
@@ -169,12 +169,12 @@ function App(): React.JSX.Element {
     const MAX_ATTEMPTS = 10000;
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
       const operands = Array.from({ length: numOperands }, () =>
-        random(settings.numRange[0], settings.numRange[1]),
+        random(settings.numRange[0], settings.numRange[1])
       );
 
       const operationSymbols = Array.from(
         { length: numOperands - 1 },
-        () => settings.operations[random(0, settings.operations.length - 1)],
+        () => settings.operations[random(0, settings.operations.length - 1)]
       );
 
       const result = calculateExpression(operands, operationSymbols);
@@ -216,9 +216,9 @@ function App(): React.JSX.Element {
 
     try {
       const generatedProblems = Array.from({ length: settings.numProblems }, () =>
-        generateProblem(),
+        generateProblem()
       )
-        .filter((problem) => problem !== '')
+        .filter(problem => problem !== '')
         .map((problem, index) => ({ id: index, text: problem }));
 
       if (generatedProblems.length === 0) {
@@ -229,13 +229,13 @@ function App(): React.JSX.Element {
           t('errors.partialGeneration', {
             generated: generatedProblems.length,
             requested: settings.numProblems,
-          }),
+          })
         );
         setProblems(generatedProblems);
       } else {
         // Full success
         setSuccessMessage(
-          t('messages.success.problemsGenerated', { count: generatedProblems.length }),
+          t('messages.success.problemsGenerated', { count: generatedProblems.length })
         );
         setProblems(generatedProblems);
 
@@ -410,11 +410,11 @@ function App(): React.JSX.Element {
 
   if (isLoading) {
     return (
-      <div className="App">
-        <div className="loading-container">
+      <div className='App'>
+        <div className='loading-container'>
           <h1>{t('app.title')}</h1>
           <p>{t('loading.translations')}</p>
-          <div className="loading-spinner" aria-label="Loading..."></div>
+          <div className='loading-spinner' aria-label='Loading...'></div>
         </div>
       </div>
     );
@@ -422,25 +422,25 @@ function App(): React.JSX.Element {
 
   return (
     <TranslationLoader>
-      <div className="App">
-        <header className="app-header">
-          <div className="header-content">
-            <div className="title-section">
+      <div className='App'>
+        <header className='app-header'>
+          <div className='header-content'>
+            <div className='title-section'>
               <h1>{t('app.title')}</h1>
-              <p className="subtitle">{t('app.subtitle')}</p>
+              <p className='subtitle'>{t('app.subtitle')}</p>
             </div>
             <LanguageSelector />
           </div>
         </header>
 
-        <main className="main-content">
+        <main className='main-content'>
           {/* Message display area */}
-          <div className="messages-container">
-            <ErrorMessage error={error} type="error" onDismiss={() => setError('')} />
-            <ErrorMessage error={warning} type="warning" onDismiss={() => setWarning('')} />
+          <div className='messages-container'>
+            <ErrorMessage error={error} type='error' onDismiss={() => setError('')} />
+            <ErrorMessage error={warning} type='warning' onDismiss={() => setWarning('')} />
             <ErrorMessage
               error={successMessage}
-              type="info"
+              type='info'
               onDismiss={() => setSuccessMessage('')}
             />
           </div>
@@ -452,50 +452,50 @@ function App(): React.JSX.Element {
               onExitQuiz={exitQuizMode}
             />
           ) : (
-            <div className="container">
-              <div className="settings-section">
+            <div className='container'>
+              <div className='settings-section'>
                 <SettingsPresets onApplyPreset={handleApplyPreset} />
 
                 <div>
-                  <label htmlFor="operations">{t('operations.title')}:</label>
+                  <label htmlFor='operations'>{t('operations.title')}:</label>
                   <select
-                    id="operations"
+                    id='operations'
                     multiple
                     value={settings.operations}
-                    onChange={(e) =>
+                    onChange={e =>
                       handleChange(
                         'operations',
-                        Array.from(e.target.selectedOptions, (option) => option.value as Operation),
+                        Array.from(e.target.selectedOptions, option => option.value as Operation)
                       )
                     }
                     aria-label={t('accessibility.selectOperations')}
                     title={t('operations.help')}
                   >
-                    <option value="+">{t('operations.addition')}</option>
-                    <option value="-">{t('operations.subtraction')}</option>
-                    <option value="*">{t('operations.multiplication')}</option>
-                    <option value="/">{t('operations.division')}</option>
+                    <option value='+'>{t('operations.addition')}</option>
+                    <option value='-'>{t('operations.subtraction')}</option>
+                    <option value='*'>{t('operations.multiplication')}</option>
+                    <option value='/'>{t('operations.division')}</option>
                   </select>
-                  <small className="help-text">{t('operations.help')}</small>
+                  <small className='help-text'>{t('operations.help')}</small>
                 </div>
                 <div>
-                  <label htmlFor="numProblems">{t('settings.numProblems')}:</label>
+                  <label htmlFor='numProblems'>{t('settings.numProblems')}:</label>
                   <input
-                    type="number"
-                    id="numProblems"
+                    type='number'
+                    id='numProblems'
                     value={settings.numProblems}
-                    onChange={(e) => handleChange('numProblems', parseInt(e.target.value, 10))}
+                    onChange={e => handleChange('numProblems', parseInt(e.target.value, 10))}
                     aria-label={t('accessibility.numProblemsInput')}
                   />
                 </div>
                 <div>
-                  <label htmlFor="numRange">{t('settings.numberRange')}:</label>
-                  <div className="range-inputs">
+                  <label htmlFor='numRange'>{t('settings.numberRange')}:</label>
+                  <div className='range-inputs'>
                     <input
-                      type="number"
-                      id="numRangeFrom"
+                      type='number'
+                      id='numRangeFrom'
                       value={settings.numRange[0]}
-                      onChange={(e) =>
+                      onChange={e =>
                         handleChange('numRange', [
                           parseInt(e.target.value, 10),
                           settings.numRange[1],
@@ -506,10 +506,10 @@ function App(): React.JSX.Element {
                     />
                     <span>{t('settings.to')}</span>
                     <input
-                      type="number"
-                      id="numRangeTo"
+                      type='number'
+                      id='numRangeTo'
                       value={settings.numRange[1]}
-                      onChange={(e) =>
+                      onChange={e =>
                         handleChange('numRange', [
                           settings.numRange[0],
                           parseInt(e.target.value, 10),
@@ -521,13 +521,13 @@ function App(): React.JSX.Element {
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="resultRange">{t('settings.resultRange')}:</label>
-                  <div className="range-inputs">
+                  <label htmlFor='resultRange'>{t('settings.resultRange')}:</label>
+                  <div className='range-inputs'>
                     <input
-                      type="number"
-                      id="resultRangeFrom"
+                      type='number'
+                      id='resultRangeFrom'
                       value={settings.resultRange[0]}
-                      onChange={(e) =>
+                      onChange={e =>
                         handleChange('resultRange', [
                           parseInt(e.target.value, 10),
                           settings.resultRange[1],
@@ -538,10 +538,10 @@ function App(): React.JSX.Element {
                     />
                     <span>{t('settings.to')}</span>
                     <input
-                      type="number"
-                      id="resultRangeTo"
+                      type='number'
+                      id='resultRangeTo'
                       value={settings.resultRange[1]}
-                      onChange={(e) =>
+                      onChange={e =>
                         handleChange('resultRange', [
                           settings.resultRange[0],
                           parseInt(e.target.value, 10),
@@ -553,13 +553,13 @@ function App(): React.JSX.Element {
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="numOperandsRange">{t('settings.operandsRange')}:</label>
-                  <div className="range-inputs">
+                  <label htmlFor='numOperandsRange'>{t('settings.operandsRange')}:</label>
+                  <div className='range-inputs'>
                     <input
-                      type="number"
-                      id="numOperandsRangeFrom"
+                      type='number'
+                      id='numOperandsRangeFrom'
                       value={settings.numOperandsRange[0]}
-                      onChange={(e) =>
+                      onChange={e =>
                         handleChange('numOperandsRange', [
                           parseInt(e.target.value, 10),
                           settings.numOperandsRange[1],
@@ -570,10 +570,10 @@ function App(): React.JSX.Element {
                     />
                     <span>{t('settings.to')}</span>
                     <input
-                      type="number"
-                      id="numOperandsRangeTo"
+                      type='number'
+                      id='numOperandsRangeTo'
                       value={settings.numOperandsRange[1]}
-                      onChange={(e) =>
+                      onChange={e =>
                         handleChange('numOperandsRange', [
                           settings.numOperandsRange[0],
                           parseInt(e.target.value, 10),
@@ -585,60 +585,60 @@ function App(): React.JSX.Element {
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="allowNegative">{t('settings.allowNegative')}:</label>
+                  <label htmlFor='allowNegative'>{t('settings.allowNegative')}:</label>
                   <input
-                    type="checkbox"
-                    id="allowNegative"
+                    type='checkbox'
+                    id='allowNegative'
                     checked={settings.allowNegative}
-                    onChange={(e) => handleChange('allowNegative', e.target.checked)}
+                    onChange={e => handleChange('allowNegative', e.target.checked)}
                     aria-label={t('accessibility.allowNegativeLabel')}
                   />
-                  <small className="help-text">{t('settings.allowNegativeDesc')}</small>
+                  <small className='help-text'>{t('settings.allowNegativeDesc')}</small>
                 </div>
                 <div>
-                  <label htmlFor="showAnswers">{t('settings.showAnswers')}:</label>
+                  <label htmlFor='showAnswers'>{t('settings.showAnswers')}:</label>
                   <input
-                    type="checkbox"
-                    id="showAnswers"
+                    type='checkbox'
+                    id='showAnswers'
                     checked={settings.showAnswers}
-                    onChange={(e) => handleChange('showAnswers', e.target.checked)}
+                    onChange={e => handleChange('showAnswers', e.target.checked)}
                     aria-label={t('accessibility.showAnswersLabel')}
                   />
-                  <small className="help-text">{t('settings.showAnswersDesc')}</small>
+                  <small className='help-text'>{t('settings.showAnswersDesc')}</small>
                 </div>
-                <fieldset className="pdf-settings">
+                <fieldset className='pdf-settings'>
                   <legend>{t('pdf.title')}</legend>
                   <div>
-                    <label htmlFor="fontSize">{t('pdf.fontSize')}:</label>
+                    <label htmlFor='fontSize'>{t('pdf.fontSize')}:</label>
                     <input
-                      type="number"
-                      id="fontSize"
+                      type='number'
+                      id='fontSize'
                       value={settings.fontSize}
-                      onChange={(e) => handleChange('fontSize', parseInt(e.target.value, 10))}
+                      onChange={e => handleChange('fontSize', parseInt(e.target.value, 10))}
                       aria-label={t('accessibility.fontSizeInput')}
                     />
                   </div>
                   <div>
-                    <label htmlFor="lineSpacing">{t('pdf.lineSpacing')}:</label>
+                    <label htmlFor='lineSpacing'>{t('pdf.lineSpacing')}:</label>
                     <input
-                      type="number"
-                      id="lineSpacing"
+                      type='number'
+                      id='lineSpacing'
                       value={settings.lineSpacing}
-                      onChange={(e) => handleChange('lineSpacing', parseInt(e.target.value, 10))}
+                      onChange={e => handleChange('lineSpacing', parseInt(e.target.value, 10))}
                       aria-label={t('accessibility.lineSpacingInput')}
                     />
                   </div>
                   <div>
-                    <label htmlFor="paperSize">{t('pdf.paperSize')}:</label>
+                    <label htmlFor='paperSize'>{t('pdf.paperSize')}:</label>
                     <select
-                      id="paperSize"
+                      id='paperSize'
                       value={settings.paperSize}
-                      onChange={(e) =>
+                      onChange={e =>
                         handleChange('paperSize', e.target.value as Settings['paperSize'])
                       }
                       aria-label={t('accessibility.paperSizeSelect')}
                     >
-                      {Object.keys(paperSizeOptions).map((size) => (
+                      {Object.keys(paperSizeOptions).map(size => (
                         <option key={size} value={size}>
                           {size.toUpperCase()}
                         </option>
@@ -648,8 +648,8 @@ function App(): React.JSX.Element {
                 </fieldset>
               </div>
 
-              <div className="results-section">
-                <div className="button-group">
+              <div className='results-section'>
+                <div className='button-group'>
                   <button
                     onClick={generateProblems}
                     aria-label={`${t('buttons.generate')} - ${t('accessibility.generateButton')}`}
@@ -666,27 +666,27 @@ function App(): React.JSX.Element {
                   <button
                     onClick={startQuizMode}
                     disabled={problems.length === 0}
-                    className="quiz-mode-btn"
-                    aria-label="Start quiz mode"
+                    className='quiz-mode-btn'
+                    aria-label='Start quiz mode'
                   >
                     🎯 Start Quiz
                   </button>
                 </div>
 
-                <div className="problems-container">
-                  <div className="problems-header">
-                    <h2 className="problems-title">
+                <div className='problems-container'>
+                  <div className='problems-header'>
+                    <h2 className='problems-title'>
                       {problems.length > 0
                         ? t('results.title', { count: problems.length })
                         : t('results.noProblems')}
                     </h2>
                     {problems.length > 0 && (
-                      <div className="problems-stats">
-                        <div className="problems-stat">
+                      <div className='problems-stats'>
+                        <div className='problems-stat'>
                           <span>📊</span>
                           <span>{problems.length} problems</span>
                         </div>
-                        <div className="problems-stat">
+                        <div className='problems-stat'>
                           <span>⚙️</span>
                           <span>{settings.operations.join(', ')}</span>
                         </div>
@@ -694,24 +694,24 @@ function App(): React.JSX.Element {
                     )}
                   </div>
                   <div
-                    className="problems-content"
+                    className='problems-content'
                     tabIndex={0}
-                    role="region"
-                    aria-label="Math problems list"
+                    role='region'
+                    aria-label='Math problems list'
                   >
                     {problems.length > 0 ? (
-                      <div className="problems-grid">
-                        {problems.map((problem) => (
-                          <div key={problem.id} className="problem-item">
+                      <div className='problems-grid'>
+                        {problems.map(problem => (
+                          <div key={problem.id} className='problem-item'>
                             {problem.text}
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <div className="no-problems">
-                        <div className="no-problems-icon">🎯</div>
-                        <div className="no-problems-text">{t('results.noProblems')}</div>
-                        <div className="no-problems-hint">
+                      <div className='no-problems'>
+                        <div className='no-problems-icon'>🎯</div>
+                        <div className='no-problems-text'>{t('results.noProblems')}</div>
+                        <div className='no-problems-hint'>
                           Click &ldquo;{t('buttons.generate')}&rdquo; to start
                         </div>
                       </div>

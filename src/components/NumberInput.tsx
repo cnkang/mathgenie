@@ -30,7 +30,7 @@ const NumberInput: React.FC<ExtendedNumberInputProps> = ({
     value,
     (currentValue: number, newValue: number | string) => {
       return typeof newValue === 'string' ? parseInt(newValue, 10) || currentValue : newValue;
-    },
+    }
   );
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
@@ -62,19 +62,19 @@ const NumberInput: React.FC<ExtendedNumberInputProps> = ({
   };
 
   return (
-    <div className="number-input-container">
+    <div className='number-input-container'>
       {label && (
-        <label htmlFor={id} className="number-input-label">
+        <label htmlFor={id} className='number-input-label'>
           {label}
           {required && (
-            <span className="required-indicator" aria-label="required">
+            <span className='required-indicator' aria-label='required'>
               *
             </span>
           )}
         </label>
       )}
       <input
-        type="number"
+        type='number'
         id={id}
         value={optimisticValue}
         onChange={handleChange}
@@ -84,16 +84,16 @@ const NumberInput: React.FC<ExtendedNumberInputProps> = ({
         required={required}
         placeholder={placeholder}
         // Mobile-friendly attributes
-        inputMode="numeric"
-        pattern="[0-9]*"
+        inputMode='numeric'
+        pattern='[0-9]*'
         aria-label={`${label} (${min} to ${max})`}
         // React 19: Show pending state
         style={{ opacity: isPending ? 0.7 : 1 }}
         {...props}
       />
       {isPending && (
-        <div className="input-pending-indicator" aria-hidden="true">
-          <div className="loading-spinner"></div>
+        <div className='input-pending-indicator' aria-hidden='true'>
+          <div className='loading-spinner'></div>
         </div>
       )}
     </div>

@@ -27,8 +27,8 @@ interface ExtendedPerformance extends Performance {
 const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({ children }) => {
   useEffect(() => {
     // Monitor Core Web Vitals
-    const observer = new PerformanceObserver((list) => {
-      list.getEntries().forEach((entry) => {
+    const observer = new PerformanceObserver(list => {
+      list.getEntries().forEach(entry => {
         // Log performance metrics in development
         if (process.env.NODE_ENV === 'development') {
           const value = 'value' in entry ? (entry as any).value : entry.duration;

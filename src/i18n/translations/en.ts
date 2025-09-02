@@ -83,7 +83,7 @@ export default {
     info: {
       autoGeneration: 'Problems are automatically generated when you change settings.',
       pdfTip: 'Tip: Adjust font size and line spacing for better PDF layout.',
-      presetApplied: 'Preset \'{{name}}\' has been applied to your settings.',
+      presetApplied: "Preset '{{name}}' has been applied to your settings.",
     },
   },
   accessibility: {
@@ -169,7 +169,7 @@ export default {
     feedback: {
       excellent: 'Amazing! You have strong math skills!',
       good: 'Well done! Keep it up!',
-      average: 'Nice work! There\'s room for improvement!',
+      average: "Nice work! There's room for improvement!",
       passing: 'Good foundation! Practice more!',
       needsImprovement: 'Keep trying and practice more!',
     },

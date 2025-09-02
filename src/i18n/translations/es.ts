@@ -88,7 +88,7 @@ export default {
       autoGeneration: 'Los problemas se generan automáticamente cuando cambias la configuración.',
       pdfTip:
         'Consejo: Ajusta el tamaño de fuente y espaciado de línea para un mejor diseño del PDF.',
-      presetApplied: 'El preset \'{{name}}\' ha sido aplicado a tu configuración.',
+      presetApplied: "El preset '{{name}}' ha sido aplicado a tu configuración.",
     },
   },
   accessibility: {

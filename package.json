@@ -23,8 +23,8 @@
     "verify": "node scripts/verify-pnpm.js",
     "clean": "rm -rf node_modules pnpm-lock.yaml dist coverage",
     "reinstall": "pnpm clean && pnpm install",
-    "lint": "eslint src --ext .ts,.tsx --fix",
-    "format": "prettier --write \"src/**/*.{ts,tsx,css,json}\"",
+    "lint": "eslint src --ext .ts,.tsx --fix && prettier --write \"src/**/*.{ts,tsx}\" --config .prettierrc.json",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css,json}\" --config .prettierrc.json",
     "type-check": "tsc --noEmit",
     "build:types": "tsc --emitDeclarationOnly",
     "analyze": "pnpm build:fast && npx vite-bundle-analyzer dist/assets/*.js",
@@ -135,13 +135,13 @@
   "lint-staged": {
     "*.{ts,tsx}": [
       "eslint --fix --max-warnings=0",
-      "prettier --write"
+      "prettier --write --config .prettierrc.json"
     ],
     "*.{css,scss,less}": [
-      "prettier --write"
+      "prettier --write --config .prettierrc.json"
     ],
     "*.{json,md,yml,yaml}": [
-      "prettier --write"
+      "prettier --write --config .prettierrc.json"
     ]
   },
   "pnpm": {

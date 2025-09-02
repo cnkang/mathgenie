@@ -50,25 +50,25 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       }
 
       return (
-        <div className="error-boundary">
-          <div className="error-content">
+        <div className='error-boundary'>
+          <div className='error-content'>
             <h2>🚨 Something went wrong</h2>
             <p>We&apos;re sorry, but something unexpected happened.</p>
 
             {process.env.NODE_ENV === 'development' && this.state.error && (
-              <details className="error-details">
+              <details className='error-details'>
                 <summary>Error Details (Development)</summary>
                 <pre>{this.state.error.toString()}</pre>
                 {this.state.errorInfo && <pre>{this.state.errorInfo.componentStack}</pre>}
               </details>
             )}
 
-            <div className="error-actions">
-              <button onClick={this.handleRetry} className="retry-button">
+            <div className='error-actions'>
+              <button onClick={this.handleRetry} className='retry-button'>
                 🔄 Try Again
               </button>
 
-              <button onClick={() => window.location.reload()} className="reload-button">
+              <button onClick={() => window.location.reload()} className='reload-button'>
                 🔃 Reload Page
               </button>
             </div>

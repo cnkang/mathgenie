@@ -90,7 +90,7 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />,
+      />
     );
 
     expect(screen.getByText('Practice Statistics')).toBeDefined();
@@ -108,7 +108,7 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />,
+      />
     );
 
     // Use more specific selector to find the current problems count
@@ -124,7 +124,7 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />,
+      />
     );
 
     expect(screen.getByText('🎯 Learning Progress')).toBeDefined();
@@ -139,7 +139,7 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />,
+      />
     );
 
     expect(screen.getByText('Regenerate Problems')).toBeDefined();
@@ -156,7 +156,7 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />,
+      />
     );
 
     const regenerateButton = screen.getByText('Regenerate Problems');
@@ -173,7 +173,7 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />,
+      />
     );
 
     const downloadButton = screen.getByText('Download PDF');
@@ -190,7 +190,7 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />,
+      />
     );
 
     const startQuizButton = screen.getByText('Start Quiz');
@@ -207,7 +207,7 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />,
+      />
     );
 
     const downloadButton = screen.getByText('Download PDF');
@@ -226,7 +226,7 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />,
+      />
     );
 
     expect(screen.getByText('🏆 Recent Quiz Results')).toBeDefined();
@@ -243,7 +243,7 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />,
+      />
     );
 
     expect(screen.getByText('⚙️ Current Configuration')).toBeDefined();
@@ -268,7 +268,7 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />,
+      />
     );
 
     expect(screen.getByText('Beginner')).toBeDefined();
@@ -289,7 +289,7 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />,
+      />
     );
 
     expect(screen.getByText('Intermediate')).toBeDefined();
@@ -310,7 +310,7 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />,
+      />
     );
 
     expect(screen.getByText('Advanced')).toBeDefined();
@@ -331,7 +331,7 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />,
+      />
     );
 
     expect(screen.getByText('Expert')).toBeDefined();
@@ -345,7 +345,7 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />,
+      />
     );
 
     // Check for multiple "0" values in different stat cards
@@ -362,12 +362,12 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />,
+      />
     );
 
     expect(screen.getByText('💡 Usage Tips')).toBeDefined();
     expect(
-      screen.getByText('Use quick presets to rapidly configure common settings'),
+      screen.getByText('Use quick presets to rapidly configure common settings')
     ).toBeDefined();
   });
 
@@ -387,7 +387,7 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />,
+      />
     );
 
     const jumpButton = screen.getByText('Jump to Problems');
@@ -409,7 +409,7 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />,
+      />
     );
 
     const jumpButton = screen.getByText('Jump to Problems');
@@ -429,7 +429,7 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />,
+      />
     );
 
     // Initially should show 0 cumulative
@@ -444,7 +444,7 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />,
+      />
     );
 
     // Should update cumulative count
@@ -466,7 +466,7 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />,
+      />
     );
 
     // Should show 50% progress (50 out of 100 target)
@@ -487,7 +487,7 @@ describe('InfoPanel', () => {
         onGenerateProblems={mockOnGenerateProblems}
         onDownloadPdf={mockOnDownloadPdf}
         onStartQuiz={mockOnStartQuiz}
-      />,
+      />
     );
 
     // Should cap at 100% even with more than 100 problems

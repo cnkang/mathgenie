@@ -36,7 +36,7 @@ export const useOptimisticState = <T>(initialValue: T) => {
         throw error;
       }
     },
-    [updateOptimistic, rollback],
+    [updateOptimistic, rollback]
   );
 
   return {

@@ -17,7 +17,7 @@ root.render(
     <I18nProvider>
       <App />
     </I18nProvider>
-  </React.StrictMode>,
+  </React.StrictMode>
 );
 
 // Register service worker for offline functionality

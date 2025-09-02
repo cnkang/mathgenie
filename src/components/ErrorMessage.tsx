@@ -50,21 +50,21 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
   return (
     <div
       className={`message-container message-${type} ${type === 'error' ? 'error-message' : ''}`}
-      role="alert"
-      aria-live="polite"
-      aria-atomic="true"
+      role='alert'
+      aria-live='polite'
+      aria-atomic='true'
       aria-label={getAriaLabel()}
     >
-      <div className="message-content">
-        {showIcon && <span className="message-icon">{getIcon()}</span>}
-        <span className="message-text">{error}</span>
+      <div className='message-content'>
+        {showIcon && <span className='message-icon'>{getIcon()}</span>}
+        <span className='message-text'>{error}</span>
       </div>
       {onDismiss && (
         <button
-          className="message-dismiss"
+          className='message-dismiss'
           onClick={onDismiss}
           aria-label={t('accessibility.dismissMessage') || 'Dismiss message'}
-          type="button"
+          type='button'
         >
           ✕
         </button>

@@ -36,25 +36,25 @@ const ProblemPreview: React.FC<ProblemPreviewProps> = ({ settings, generateSampl
   }, [deferredSettings, generateSampleProblem]);
 
   return (
-    <div className="problem-preview">
+    <div className='problem-preview'>
       <h3>{t('preview.title') || 'Preview'}</h3>
       <Suspense
         fallback={
-          <div className="preview-loading">
-            <div className="loading-spinner" aria-hidden="true"></div>
+          <div className='preview-loading'>
+            <div className='loading-spinner' aria-hidden='true'></div>
             <span>Generating preview...</span>
           </div>
         }
       >
-        <div className="preview-container">
-          <div className="preview-problems">
-            {sampleProblems.map((problem) => (
-              <div key={problem.id} className="preview-problem">
+        <div className='preview-container'>
+          <div className='preview-problems'>
+            {sampleProblems.map(problem => (
+              <div key={problem.id} className='preview-problem'>
                 {problem.text}
               </div>
             ))}
           </div>
-          <div className="preview-info">
+          <div className='preview-info'>
             <small>{t('preview.info') || 'Sample problems based on current settings'}</small>
           </div>
         </div>

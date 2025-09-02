@@ -140,7 +140,7 @@ const loadTranslations = async (language: string): Promise<Translations> => {
 
       // Wait before retry (exponential backoff)
       if (attempt < maxRetries) {
-        await new Promise((resolve) => setTimeout(resolve, Math.pow(2, attempt) * 100));
+        await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 100));
       }
     }
   }
@@ -149,7 +149,7 @@ const loadTranslations = async (language: string): Promise<Translations> => {
   if (__DEV__) {
     console.error(
       `🌐 All attempts failed to load translations for "${language}", falling back to English. Last error:`,
-      lastError,
+      lastError
     );
   }
 
@@ -252,7 +252,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
       t,
       changeLanguage,
     }),
-    [currentLanguage, translations, isLoading, isPending],
+    [currentLanguage, translations, isLoading, isPending]
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
