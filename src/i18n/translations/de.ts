@@ -1,0 +1,182 @@
+// German translations
+export default {
+  app: {
+    title: 'MathGenie',
+    subtitle: 'Erstellen Sie angepasste Mathematikaufgaben zum Üben und Lernen',
+  },
+  operations: {
+    title: 'Operationen auswählen',
+    addition: 'Addition (+)',
+    subtraction: 'Subtraktion (-)',
+    multiplication: 'Multiplikation (×)',
+    division: 'Division (÷)',
+    help: 'Halten Sie Strg/Cmd gedrückt, um mehrere Operationen auszuwählen',
+  },
+  settings: {
+    numProblems: 'Anzahl der Aufgaben',
+    numberRange: 'Zahlenbereich',
+    resultRange: 'Ergebnisbereich',
+    operandsRange: 'Anzahl der Operanden',
+    options: 'Aufgabenoptionen',
+    allowNegative: 'Negative Ergebnisse erlauben',
+    allowNegativeDesc: 'Erlaube, dass Berechnungsergebnisse negative Zahlen sind',
+    showAnswers: 'Antworten anzeigen',
+    showAnswersDesc: 'Antworten direkt neben den Aufgaben anzeigen',
+    from: 'Von',
+    to: 'bis',
+    manager: {
+      title: 'Einstellungsmanager',
+      export: 'Einstellungen exportieren',
+      import: 'Einstellungen importieren',
+      exportLabel: 'Aktuelle Einstellungen exportieren',
+      importLabel: 'Einstellungen aus Datei importieren',
+    },
+    importError: 'Fehler beim Lesen der Einstellungsdatei',
+  },
+  pdf: {
+    title: 'PDF-Einstellungen',
+    fontSize: 'Schriftgröße (pt)',
+    lineSpacing: 'Zeilenabstand (pt)',
+    paperSize: 'Papiergröße',
+  },
+  buttons: {
+    generate: 'Aufgaben generieren',
+    generating: 'Aufgaben werden generiert...',
+    download: 'PDF herunterladen',
+    downloadEmpty: 'PDF herunterladen',
+  },
+  results: {
+    title: 'Generierte Aufgaben ({{count}})',
+    noProblems: 'Noch keine Aufgaben generiert',
+  },
+  errors: {
+    noOperations: 'Bitte wählen Sie mindestens eine mathematische Operation aus, um fortzufahren.',
+    invalidProblemCount: 'Die Anzahl der Aufgaben muss zwischen 1 und 100 liegen.',
+    invalidProblemsCount: 'Die Anzahl der Aufgaben muss zwischen 1 und 100 liegen.',
+    invalidNumberRange: 'Das Minimum des Zahlenbereichs kann nicht größer als das Maximum sein.',
+    invalidResultRange: 'Das Minimum des Ergebnisbereichs kann nicht größer als das Maximum sein.',
+    invalidOperandsRange:
+      'Ungültiger Operandenbereich: Das Minimum muss mindestens 2 sein und darf nicht größer als das Maximum sein.',
+    noProblemsGenerated:
+      'Mit den aktuellen Einstellungen konnten keine Aufgaben generiert werden. Versuchen Sie, die Bereiche anzupassen.',
+    generationFailed: 'Fehler beim Generieren der Aufgaben. Bitte versuchen Sie es erneut.',
+    noProblemsToPdf: 'Keine Aufgaben zum Herunterladen. Generieren Sie zuerst Aufgaben.',
+    pdfFailed: 'PDF-Generierung fehlgeschlagen. Bitte versuchen Sie es erneut.',
+    partialGeneration:
+      '{{generated}} von {{requested}} angeforderten Aufgaben generiert. Erwägen Sie, Ihre Einstellungen für bessere Ergebnisse anzupassen.',
+    downloadFailed:
+      'Keine Aufgaben zum Herunterladen verfügbar. Bitte generieren Sie zuerst Aufgaben.',
+    pdfError:
+      'PDF-Generierung fehlgeschlagen. Bitte versuchen Sie es erneut oder überprüfen Sie Ihre Browser-Einstellungen.',
+    generalError:
+      'Ein Fehler ist beim Generieren der Aufgaben aufgetreten. Bitte versuchen Sie es erneut.',
+  },
+  warnings: {
+    settingsChanged:
+      'Einstellungen wurden aktualisiert. Aufgaben werden automatisch neu generiert.',
+    largeNumberOfProblems:
+      'Das Generieren von {{count}} Aufgaben kann einen Moment dauern. Bitte warten...',
+    restrictiveSettings:
+      'Die aktuellen Einstellungen sind ziemlich restriktiv. Sie könnten weniger Aufgaben erhalten als angefordert.',
+  },
+  messages: {
+    success: {
+      problemsGenerated: '{{count}} Aufgaben erfolgreich generiert!',
+      settingsImported: 'Einstellungen erfolgreich importiert!',
+      settingsExported: 'Einstellungen erfolgreich exportiert!',
+    },
+    info: {
+      autoGeneration: 'Aufgaben werden automatisch generiert, wenn Sie Einstellungen ändern.',
+      pdfTip: 'Tipp: Passen Sie Schriftgröße und Zeilenabstand für ein besseres PDF-Layout an.',
+      presetApplied: 'Vorlage \'{{name}}\' wurde auf Ihre Einstellungen angewendet.',
+    },
+  },
+  accessibility: {
+    selectOperations: 'Mathematische Operationen zum Einschließen auswählen',
+    numProblemsInput: 'Anzahl der zu generierenden Aufgaben',
+    minNumber: 'Mindestzahl für Operanden',
+    maxNumber: 'Höchstzahl für Operanden',
+    minResult: 'Minimaler Ergebniswert',
+    maxResult: 'Maximaler Ergebniswert',
+    minOperands: 'Mindestanzahl von Operanden pro Aufgabe',
+    maxOperands: 'Höchstanzahl von Operanden pro Aufgabe',
+    allowNegativeLabel: 'Negative Ergebnisse in Aufgaben erlauben',
+    showAnswersLabel: 'Antworten neben Aufgaben anzeigen',
+    fontSizeInput: 'Schriftgröße für PDF-Ausgabe',
+    lineSpacingInput: 'Zeilenabstand für PDF-Ausgabe',
+    paperSizeSelect: 'Papiergröße für PDF-Ausgabe',
+    generateButton: 'Mathematikaufgaben mit aktuellen Einstellungen generieren',
+    downloadButton: 'Generierte Aufgaben als PDF-Datei herunterladen',
+    languageSelect: 'Oberflächensprache auswählen',
+    errorMessage: 'Fehlermeldung',
+    warningMessage: 'Warnmeldung',
+    infoMessage: 'Informationsmeldung',
+    dismissMessage: 'Meldung schließen',
+  },
+  language: {
+    select: 'Sprache',
+    current: 'Aktuelle Sprache: {{language}}',
+  },
+  loading: {
+    insights: 'Erkenntnisse werden geladen...',
+    translations: 'Übersetzungen werden geladen...',
+  },
+  presets: {
+    title: 'Schnellvorlagen',
+    apply: 'Anwenden',
+    beginner: {
+      name: 'Anfänger (1-10)',
+      description: 'Einfache Addition und Subtraktion',
+    },
+    intermediate: {
+      name: 'Fortgeschritten (1-50)',
+      description: 'Alle Operationen mit mittleren Zahlen',
+    },
+    advanced: {
+      name: 'Experte (1-100)',
+      description: 'Alle Operationen einschließlich Division',
+    },
+    multiplication: {
+      name: 'Multiplikationstabellen',
+      description: 'Fokus auf Multiplikationsübung',
+    },
+  },
+  preview: {
+    title: 'Vorschau',
+    info: 'Beispielaufgaben basierend auf aktuellen Einstellungen',
+  },
+  quiz: {
+    loading: 'Quiz wird vorbereitet...',
+    exit: 'Beenden',
+    previousProblem: '← Vorherige',
+    nextProblem: 'Nächste →',
+    problemNumber: 'Aufgabe {{number}}',
+    progress: '{{current}} / {{total}}',
+    completed: '🎉 Quiz Abgeschlossen!',
+    score: 'Punkte',
+    retry: 'Quiz Wiederholen',
+    backToPractice: 'Zurück zur Übung',
+    detailedResults: 'Detaillierte Ergebnisse',
+    correctAnswer: 'Richtige Antwort: {{answer}}',
+    stats: {
+      totalProblems: 'Aufgaben Gesamt',
+      correct: 'Richtig',
+      incorrect: 'Falsch',
+      timeUsed: 'Verwendete Zeit',
+    },
+    grades: {
+      excellent: 'Ausgezeichnet',
+      good: 'Gut',
+      average: 'Durchschnittlich',
+      passing: 'Bestanden',
+      needsImprovement: 'Verbesserungsbedarf',
+    },
+    feedback: {
+      excellent: 'Fantastisch! Sie haben starke mathematische Fähigkeiten!',
+      good: 'Gut gemacht! Machen Sie weiter so!',
+      average: 'Schöne Arbeit! Es gibt Raum für Verbesserungen!',
+      passing: 'Gute Grundlage! Üben Sie mehr!',
+      needsImprovement: 'Versuchen Sie es weiter und üben Sie mehr!',
+    },
+  },
+} as const;
