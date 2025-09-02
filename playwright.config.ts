@@ -101,6 +101,203 @@ export default defineConfig({
             name: "Mobile Safari",
             use: { ...devices["iPhone 12"] },
           },
+          // Latest iPhone devices
+          {
+            name: "iPhone 16 Pro Max",
+            use: { ...devices["iPhone 15 Pro Max"] }, // Using closest available device
+          },
+          {
+            name: "iPhone 16 Pro",
+            use: { ...devices["iPhone 15 Pro"] }, // Using closest available device
+          },
+          {
+            name: "iPhone 16",
+            use: { ...devices["iPhone 15"] }, // Using closest available device
+          },
+          {
+            name: "iPhone 15 Pro Max",
+            use: { ...devices["iPhone 15 Pro Max"] },
+          },
+          {
+            name: "iPhone 15 Pro",
+            use: { ...devices["iPhone 15 Pro"] },
+          },
+          {
+            name: "iPhone 15",
+            use: { ...devices["iPhone 15"] },
+          },
+          {
+            name: "iPhone 14 Pro Max",
+            use: { ...devices["iPhone 14 Pro Max"] },
+          },
+          {
+            name: "iPhone 14 Pro",
+            use: { ...devices["iPhone 14 Pro"] },
+          },
+          {
+            name: "iPhone 13 Pro",
+            use: { ...devices["iPhone 13 Pro"] },
+          },
+          // iPad devices - Portrait orientation
+          {
+            name: "iPad Pro 12.9 Portrait",
+            use: {
+              ...devices["iPad Pro"],
+              viewport: { width: 1024, height: 1366 }, // Portrait
+            },
+          },
+          {
+            name: "iPad Pro 11 Portrait",
+            use: {
+              ...devices["iPad Pro"],
+              viewport: { width: 834, height: 1194 }, // Portrait
+            },
+          },
+          {
+            name: "iPad Air Portrait",
+            use: {
+              ...devices["iPad Pro"],
+              viewport: { width: 820, height: 1180 }, // Portrait
+            },
+          },
+          {
+            name: "iPad Portrait",
+            use: {
+              ...devices["iPad Pro"],
+              viewport: { width: 810, height: 1080 }, // Portrait
+            },
+          },
+          // iPad devices - Landscape orientation
+          {
+            name: "iPad Pro 12.9 Landscape",
+            use: {
+              ...devices["iPad Pro"],
+              viewport: { width: 1366, height: 1024 }, // Landscape
+            },
+          },
+          {
+            name: "iPad Pro 11 Landscape",
+            use: {
+              ...devices["iPad Pro"],
+              viewport: { width: 1194, height: 834 }, // Landscape
+            },
+          },
+          {
+            name: "iPad Air Landscape",
+            use: {
+              ...devices["iPad Pro"],
+              viewport: { width: 1180, height: 820 }, // Landscape
+            },
+          },
+          {
+            name: "iPad Landscape",
+            use: {
+              ...devices["iPad Pro"],
+              viewport: { width: 1080, height: 810 }, // Landscape
+            },
+          },
+          // Android devices - Latest phones
+          {
+            name: "Galaxy S24 Ultra",
+            use: {
+              ...devices["Galaxy S9+"],
+              viewport: { width: 412, height: 915 }, // S24 Ultra dimensions
+              userAgent:
+                "Mozilla/5.0 (Linux; Android 14; SM-S928B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+            },
+          },
+          {
+            name: "Galaxy S24",
+            use: {
+              ...devices["Galaxy S9+"],
+              viewport: { width: 384, height: 854 }, // S24 dimensions
+              userAgent:
+                "Mozilla/5.0 (Linux; Android 14; SM-S921B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+            },
+          },
+          {
+            name: "Pixel 8 Pro",
+            use: {
+              ...devices["Pixel 5"],
+              viewport: { width: 412, height: 892 }, // Pixel 8 Pro dimensions
+              userAgent:
+                "Mozilla/5.0 (Linux; Android 14; Pixel 8 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+            },
+          },
+          {
+            name: "Pixel 8",
+            use: {
+              ...devices["Pixel 5"],
+              viewport: { width: 412, height: 915 }, // Pixel 8 dimensions
+              userAgent:
+                "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+            },
+          },
+          {
+            name: "OnePlus 12",
+            use: {
+              ...devices["Galaxy S9+"],
+              viewport: { width: 450, height: 1000 }, // OnePlus 12 dimensions
+              userAgent:
+                "Mozilla/5.0 (Linux; Android 14; CPH2573) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+            },
+          },
+          // Android tablets - Portrait orientation
+          {
+            name: "Galaxy Tab S9 Ultra Portrait",
+            use: {
+              ...devices["iPad Pro"],
+              viewport: { width: 1848, height: 2960 }, // Tab S9 Ultra Portrait
+              userAgent:
+                "Mozilla/5.0 (Linux; Android 13; SM-X916B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            },
+          },
+          {
+            name: "Galaxy Tab S9 Portrait",
+            use: {
+              ...devices["iPad Pro"],
+              viewport: { width: 1600, height: 2560 }, // Tab S9 Portrait
+              userAgent:
+                "Mozilla/5.0 (Linux; Android 13; SM-X810) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            },
+          },
+          {
+            name: "Pixel Tablet Portrait",
+            use: {
+              ...devices["iPad Pro"],
+              viewport: { width: 1600, height: 2560 }, // Pixel Tablet Portrait
+              userAgent:
+                "Mozilla/5.0 (Linux; Android 13; Pixel Tablet) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            },
+          },
+          // Android tablets - Landscape orientation
+          {
+            name: "Galaxy Tab S9 Ultra Landscape",
+            use: {
+              ...devices["iPad Pro"],
+              viewport: { width: 2960, height: 1848 }, // Tab S9 Ultra Landscape
+              userAgent:
+                "Mozilla/5.0 (Linux; Android 13; SM-X916B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            },
+          },
+          {
+            name: "Galaxy Tab S9 Landscape",
+            use: {
+              ...devices["iPad Pro"],
+              viewport: { width: 2560, height: 1600 }, // Tab S9 Landscape
+              userAgent:
+                "Mozilla/5.0 (Linux; Android 13; SM-X810) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            },
+          },
+          {
+            name: "Pixel Tablet Landscape",
+            use: {
+              ...devices["iPad Pro"],
+              viewport: { width: 2560, height: 1600 }, // Pixel Tablet Landscape
+              userAgent:
+                "Mozilla/5.0 (Linux; Android 13; Pixel Tablet) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            },
+          },
         ]
       : []),
   ],
