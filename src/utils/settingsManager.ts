@@ -1,4 +1,4 @@
-import type { Settings } from "../types";
+import type { Settings } from '../types';
 
 export interface SettingsData {
   version: string;
@@ -7,7 +7,7 @@ export interface SettingsData {
 }
 
 export const createSettingsData = (settings: Settings): SettingsData => ({
-  version: "1.0",
+  version: '1.0',
   timestamp: new Date().toISOString(),
   settings,
 });
@@ -21,7 +21,7 @@ export const serializeSettings = (settingsData: SettingsData): string =>
 export const parseSettingsFile = (content: string): SettingsData => JSON.parse(content);
 
 export const validateSettingsData = (data: any): data is SettingsData =>
-  !!(data && data.settings && typeof data.settings === "object");
+  !!(data && data.settings && typeof data.settings === 'object');
 
 export const createDownloadBlob = (data: string): Blob =>
-  new Blob([data], { type: "application/json" });
+  new Blob([data], { type: 'application/json' });

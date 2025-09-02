@@ -1,5 +1,5 @@
 // Setup for testing environment with happy-dom only
-import { vi } from "vitest";
+import { vi } from 'vitest';
 
 // Extend expect with custom matchers
 declare global {
@@ -13,7 +13,7 @@ declare global {
 }
 
 // Also extend the global expect interface
-declare module "vitest" {
+declare module 'vitest' {
   interface Assertion<T = any> {
     toBeInTheDocument(): T;
     toHaveTextContent(text: string): T;
@@ -43,21 +43,21 @@ expect.extend({
   toBeInTheDocument(received) {
     const pass = received && document.body.contains(received);
     return {
-      message: () => `expected element ${pass ? "not " : ""}to be in the document`,
+      message: () => `expected element ${pass ? 'not ' : ''}to be in the document`,
       pass,
     };
   },
   toHaveTextContent(received, expected) {
     const pass = received && received.textContent && received.textContent.includes(expected);
     return {
-      message: () => `expected element ${pass ? "not " : ""}to have text content "${expected}"`,
+      message: () => `expected element ${pass ? 'not ' : ''}to have text content "${expected}"`,
       pass,
     };
   },
   toHaveValue(received, expected) {
     const pass = received && received.value === expected;
     return {
-      message: () => `expected element ${pass ? "not " : ""}to have value "${expected}"`,
+      message: () => `expected element ${pass ? 'not ' : ''}to have value "${expected}"`,
       pass,
     };
   },
@@ -91,18 +91,18 @@ const mockCanvas = {
     rect: vi.fn(),
     clip: vi.fn(),
   })),
-  toDataURL: vi.fn(() => ""),
+  toDataURL: vi.fn(() => ''),
   addEventListener: vi.fn(),
   removeEventListener: vi.fn(),
 };
 
-Object.defineProperty(window, "HTMLCanvasElement", {
+Object.defineProperty(window, 'HTMLCanvasElement', {
   writable: true,
   value: vi.fn().mockImplementation(() => mockCanvas),
 });
 
 // Mock crypto
-Object.defineProperty(window, "crypto", {
+Object.defineProperty(window, 'crypto', {
   writable: true,
   value: {
     getRandomValues: vi.fn((arr: Uint32Array) => {
@@ -132,7 +132,7 @@ const localStorageMock = (() => {
   };
 })();
 
-Object.defineProperty(window, "localStorage", {
+Object.defineProperty(window, 'localStorage', {
   writable: true,
   value: localStorageMock,
 });
