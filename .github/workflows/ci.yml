@@ -100,7 +100,7 @@ jobs:
 
       - name: 🎨 Check code formatting
         run: |
-          if ! pnpm exec prettier --check "src/**/*.{ts,tsx,css,json}"; then
+          if ! pnpm format --check; then
             echo "❌ Code formatting issues found. Run 'pnpm format' to fix."
             exit 1
           fi
@@ -232,23 +232,11 @@ jobs:
           path: dist/
           retention-days: 7
 
-  # Job 5: Accessibility Testing (runs in parallel)
+  # Job 5: Accessibility Testing (integrated with Playwright)
   accessibility:
     name: ♿ Accessibility
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    strategy:
-      fail-fast: false
-      matrix:
-        theme: [light, dark]
-        include:
-          - theme: light
-            theme_name: "浅色模式"
-            media_query: "light"
-          - theme: dark
-            theme_name: "夜间模式"
-            media_query: "dark"
+    timeout-minutes: 10
 
     steps:
       - name: 📥 Checkout code
@@ -268,103 +256,29 @@ jobs:
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: 🎭 Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
       - name: 🏗️ Build application
         run: pnpm build
 
-      - name: 🎨 Prepare theme-specific build (${{ matrix.theme_name }})
+      - name: ♿ Run accessibility tests
         run: |
-          # Create temporary CSS files for different themes
-          if [ "${{ matrix.theme }}" = "dark" ]; then
-            echo "Preparing dark mode build..."
-            # Force apply dark mode in built CSS files
-            sed -i 's/@media (prefers-color-scheme: dark) {/:root {/g' dist/assets/*.css
-            # Create a temporary CSS replacement file
-            cat > /tmp/dark-theme.css << 'EOF'
-          :root {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-tertiary: #334155;
-            --bg-accent: #1e293b;
-            --text-primary: #f8fafc;
-            --text-secondary: #e2e8f0;
-            --text-muted: #94a3b8;
-            --border-color: #334155;
-            --border-hover: #475569;
-          }
-          EOF
-            # Replace media query sections with dark theme variables
-            for css_file in dist/assets/*.css; do
-              if [ -f "$css_file" ]; then
-                sed -i '/^@media (prefers-color-scheme: dark)/,/^}$/d' "$css_file"
-                cat /tmp/dark-theme.css >> "$css_file"
-              fi
-            done
-          fi
+          echo "Running comprehensive accessibility tests..."
+          pnpm test:e2e:accessibility --reporter=html,json:accessibility-report.json
 
-      - name: 🌐 Start preview server
-        run: pnpm preview &
-        env:
-          PORT: 4173
-
-      - name: ⏳ Wait for server
-        run: npx wait-on http://localhost:4173
-
-      - name: ♿ Run accessibility tests (${{ matrix.theme_name }})
-        run: |
-          echo "Testing accessibility in ${{ matrix.theme_name }}..."
-
-          # Run axe-core tests
-          npx @axe-core/cli http://localhost:4173 \
-            --save accessibility-report-${{ matrix.theme }}.json \
-            --tags wcag2a,wcag2aa \
-            --timeout 30000 || echo "Accessibility issues found in ${{ matrix.theme_name }}"
-
-          # Generate detailed report
-          echo "## ♿ Accessibility Test Results - ${{ matrix.theme_name }}" >> $GITHUB_STEP_SUMMARY
-
-          if [ -f "accessibility-report-${{ matrix.theme }}.json" ]; then
-            # Parse JSON report and display results
-            # Safely parse JSON with error handling
-            violations=$(jq -r 'try (.violations | length) // 0' accessibility-report-${{ matrix.theme }}.json 2>/dev/null || echo "0")
-            passes=$(jq -r 'try (.passes | length) // 0' accessibility-report-${{ matrix.theme }}.json 2>/dev/null || echo "0")
-
-            echo "### 📊 Test Statistics" >> $GITHUB_STEP_SUMMARY
-            echo "- ✅ Passed rules: $passes" >> $GITHUB_STEP_SUMMARY
-            echo "- ❌ Violations: $violations" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-
-            if [ "$violations" -eq "0" ]; then
-              echo "🎉 **${{ matrix.theme_name }}下所有无障碍测试通过！**" >> $GITHUB_STEP_SUMMARY
-            else
-              echo "⚠️ **${{ matrix.theme_name }}下发现 $violations 个无障碍问题**" >> $GITHUB_STEP_SUMMARY
-              echo "" >> $GITHUB_STEP_SUMMARY
-              echo "### 🔍 Issue Details:" >> $GITHUB_STEP_SUMMARY
-              
-              # Safely parse violation information
-              if command -v jq >/dev/null 2>&1 && [ "$violations" -gt "0" ]; then
-                echo "### 🔍 Violation Details:" >> $GITHUB_STEP_SUMMARY
-                jq -r 'try (.violations[]? | "#### " + .id + " (" + (.impact // "unknown") + " impact)\n" + (.description // "No description") + "\n- Affected elements: " + (.nodes | length | tostring) + "\n- Help link: " + (.helpUrl // "N/A") + "\n") // "Could not parse violation details"' accessibility-report-${{ matrix.theme }}.json >> $GITHUB_STEP_SUMMARY 2>/dev/null || echo "Could not parse violation details" >> $GITHUB_STEP_SUMMARY
-              fi
-            fi
-          else
-            echo "⚠️ ${{ matrix.theme_name }}测试报告生成失败" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          # If there are violations, set non-zero exit code (but don't block subsequent steps)
-          if [ -f "accessibility-report-${{ matrix.theme }}.json" ]; then
-            violations=$(jq -r 'try (.violations | length) // 0' accessibility-report-${{ matrix.theme }}.json 2>/dev/null || echo "0")
-            if [ "$violations" -gt "0" ]; then
-              echo "Found $violations accessibility violations in ${{ matrix.theme_name }}"
-              # Don't exit, let tests continue running and upload reports
-            fi
-          fi
+          echo "## ♿ Accessibility Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "Comprehensive accessibility tests completed using Playwright with axe-core integration." >> $GITHUB_STEP_SUMMARY
+          echo "Tests include WCAG 2.1 AA compliance checks for light theme, dark theme, form interactions, and error states." >> $GITHUB_STEP_SUMMARY
 
       - name: 📊 Upload accessibility report
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: accessibility-report-${{ matrix.theme }}
-          path: accessibility-report-${{ matrix.theme }}.json
+          name: accessibility-report
+          path: |
+            accessibility-report.json
+            playwright-report/
 
   # Job 6: Cross-browser Testing (runs in parallel)
   cross-browser:
@@ -416,12 +330,11 @@ jobs:
 
       - name: 🎭 Run Playwright tests
         run: |
-          npx playwright test --config=playwright.config.ts \
+          pnpm test:e2e:ci \
             --project=${{ matrix.project }} \
             --shard=${{ matrix.shard }}/2 \
             --reporter=html,json:test-results-${{ matrix.browser }}-${{ matrix.shard }}.json
         env:
-          CI: true
           PLAYWRIGHT_OUTPUT_DIR: test-results-${{ matrix.browser }}-${{ matrix.shard }}
 
       # Server cleanup handled by Playwright
@@ -466,22 +379,17 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: "pnpm"
 
+      - name: 📋 Install dependencies
+        run: pnpm install --frozen-lockfile
+
       - name: 📋 Download build artifacts
         uses: actions/download-artifact@v4
         with:
           name: build-production
           path: dist/
 
-      - name: 🌐 Start preview server
-        run: npx serve -s dist -l 4173 &
-
-      - name: ⏳ Wait for server
-        run: npx wait-on http://localhost:4173
-
       - name: 🚀 Run Lighthouse CI
-        run: |
-          npm install -g @lhci/cli
-          lhci autorun
+        run: pnpm lighthouse:ci
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
 
@@ -531,9 +439,7 @@ jobs:
           fi
 
       - name: 📊 Analyze bundle composition
-        run: |
-          pnpm add -D webpack-bundle-analyzer
-          npx webpack-bundle-analyzer dist/assets/*.js --report --mode static --report-filename bundle-report.html
+        run: pnpm analyze
 
       - name: 📊 Upload dependency analysis
         uses: actions/upload-artifact@v4

@@ -16,6 +16,10 @@ jobs:
     runs-on: ubuntu-latest
     if: github.actor == 'dependabot[bot]'
     timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
 
     outputs:
       auto-merge: ${{ steps.analysis.outputs.auto-merge }}
@@ -81,6 +85,8 @@ jobs:
     needs: dependabot-analysis
     if: github.actor == 'dependabot[bot]'
     timeout-minutes: 20
+    permissions:
+      contents: read
 
     steps:
       - name: 📥 Checkout code
@@ -89,7 +95,7 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: "8.15.1"
+          version: "10.15.1"
 
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
@@ -185,6 +191,10 @@ jobs:
       needs.dependabot-analysis.outputs.auto-merge == 'false' &&
       needs.dependabot-ci.result == 'success'
     timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
     steps:
       - name: 📢 Request manual review
         uses: actions/github-script@v7
@@ -233,6 +243,10 @@ jobs:
       github.actor == 'dependabot[bot]' && 
       needs.dependabot-ci.result == 'failure'
     timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
     steps:
       - name: ❌ Handle CI failure
         uses: actions/github-script@v7
