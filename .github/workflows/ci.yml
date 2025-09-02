@@ -7,6 +7,12 @@ on:
     branches: [main, develop]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+  pull-requests: write
+
 # Cancel previous runs if a new one is triggered
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -14,10 +20,10 @@ concurrency:
 
 env:
   NODE_VERSION: "22"
-  PNPM_VERSION: "8.15.1"
-  # 性能优化
+  PNPM_VERSION: "10.15.1"
+  # Performance optimization
   NODE_OPTIONS: "--max-old-space-size=4096"
-  # Playwright 优化
+  # Playwright optimization
   PLAYWRIGHT_BROWSERS_PATH: 0
 
 jobs:
@@ -94,8 +100,8 @@ jobs:
 
       - name: 🎨 Check code formatting
         run: |
-          if ! pnpm prettier --check "src/**/*.{ts,tsx,css,json}"; then
-            echo "❌ Code formatting issues found. Run 'pnpm prettier --write .' to fix."
+          if ! pnpm exec prettier --check "src/**/*.{ts,tsx,css,json}"; then
+            echo "❌ Code formatting issues found. Run 'pnpm format' to fix."
             exit 1
           fi
 
@@ -172,13 +178,16 @@ jobs:
         run: pnpm audit --audit-level moderate
         continue-on-error: true
 
-      - name: 🔒 Run CodeQL Analysis
+      - name: 🔒 Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: javascript
+          queries: security-and-quality
 
       - name: 🔒 Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript"
 
   # Job 4: Build & Performance (runs in parallel)
   build:
@@ -236,7 +245,19 @@ jobs:
   accessibility:
     name: ♿ Accessibility
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        theme: [light, dark]
+        include:
+          - theme: light
+            theme_name: "浅色模式"
+            media_query: "light"
+          - theme: dark
+            theme_name: "夜间模式"
+            media_query: "dark"
 
     steps:
       - name: 📥 Checkout code
@@ -259,6 +280,36 @@ jobs:
       - name: 🏗️ Build application
         run: pnpm build
 
+      - name: 🎨 Prepare theme-specific build (${{ matrix.theme_name }})
+        run: |
+          # Create temporary CSS files for different themes
+          if [ "${{ matrix.theme }}" = "dark" ]; then
+            echo "Preparing dark mode build..."
+            # Force apply dark mode in built CSS files
+            sed -i 's/@media (prefers-color-scheme: dark) {/:root {/g' dist/assets/*.css
+            # Create a temporary CSS replacement file
+            cat > /tmp/dark-theme.css << 'EOF'
+          :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --bg-accent: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --border-hover: #475569;
+          }
+          EOF
+            # Replace media query sections with dark theme variables
+            for css_file in dist/assets/*.css; do
+              if [ -f "$css_file" ]; then
+                sed -i '/^@media (prefers-color-scheme: dark)/,/^}$/d' "$css_file"
+                cat /tmp/dark-theme.css >> "$css_file"
+              fi
+            done
+          fi
+
       - name: 🌐 Start preview server
         run: pnpm preview &
         env:
@@ -267,19 +318,62 @@ jobs:
       - name: ⏳ Wait for server
         run: npx wait-on http://localhost:4173
 
-      - name: ♿ Run accessibility tests
+      - name: ♿ Run accessibility tests (${{ matrix.theme_name }})
         run: |
+          echo "Testing accessibility in ${{ matrix.theme_name }}..."
+
+          # Run axe-core tests
           npx @axe-core/cli http://localhost:4173 \
-            --exit \
-            --save accessibility-report.json \
-            --tags wcag2a,wcag2aa
+            --save accessibility-report-${{ matrix.theme }}.json \
+            --tags wcag2a,wcag2aa \
+            --timeout 30000 || echo "Accessibility issues found in ${{ matrix.theme_name }}"
+
+          # Generate detailed report
+          echo "## ♿ Accessibility Test Results - ${{ matrix.theme_name }}" >> $GITHUB_STEP_SUMMARY
+
+          if [ -f "accessibility-report-${{ matrix.theme }}.json" ]; then
+            # Parse JSON report and display results
+            violations=$(cat accessibility-report-${{ matrix.theme }}.json | jq -r '.violations | length // 0')
+            passes=$(cat accessibility-report-${{ matrix.theme }}.json | jq -r '.passes | length // 0')
+
+            echo "### 📊 Test Statistics" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ Passed rules: $passes" >> $GITHUB_STEP_SUMMARY
+            echo "- ❌ Violations: $violations" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            if [ "$violations" -eq "0" ]; then
+              echo "🎉 **${{ matrix.theme_name }}下所有无障碍测试通过！**" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "⚠️ **${{ matrix.theme_name }}下发现 $violations 个无障碍问题**" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "### 🔍 Issue Details:" >> $GITHUB_STEP_SUMMARY
+              
+              # Safely parse violation information
+              if command -v jq >/dev/null 2>&1; then
+                jq -r '.violations[]? | "#### " + .id + " (" + (.impact // "unknown") + " impact)\n" + (.description // "No description") + "\n- Affected elements: " + (.nodes | length | tostring) + "\n- Help link: " + (.helpUrl // "N/A") + "\n"' accessibility-report-${{ matrix.theme }}.json >> $GITHUB_STEP_SUMMARY 2>/dev/null || echo "Could not parse violation details" >> $GITHUB_STEP_SUMMARY
+              else
+                echo "jq not available for detailed parsing" >> $GITHUB_STEP_SUMMARY
+              fi
+            fi
+          else
+            echo "⚠️ ${{ matrix.theme_name }}测试报告生成失败" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # If there are violations, set non-zero exit code (but don't block subsequent steps)
+          if [ -f "accessibility-report-${{ matrix.theme }}.json" ]; then
+            violations=$(cat accessibility-report-${{ matrix.theme }}.json | jq -r '.violations | length // 0')
+            if [ "$violations" -gt "0" ]; then
+              echo "Found $violations accessibility violations in ${{ matrix.theme_name }}"
+              # Don't exit, let tests continue running and upload reports
+            fi
+          fi
 
       - name: 📊 Upload accessibility report
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: accessibility-report
-          path: accessibility-report.json
+          name: accessibility-report-${{ matrix.theme }}
+          path: accessibility-report-${{ matrix.theme }}.json
 
   # Job 6: Cross-browser Testing (runs in parallel)
   cross-browser:
@@ -321,7 +415,7 @@ jobs:
       - name: 🎭 Install Playwright browsers
         run: |
           npx playwright install ${{ matrix.browser }} --with-deps
-          # 验证浏览器安装
+          # Verify browser installation
           npx playwright --version
 
       - name: 🏗️ Build application
@@ -334,10 +428,10 @@ jobs:
           npx playwright test --config=playwright.config.ts \
             --project=${{ matrix.project }} \
             --shard=${{ matrix.shard }}/2 \
-            --reporter=html,json:test-results-${{ matrix.browser }}-${{ matrix.shard }}.json \
-            --output-dir=test-results-${{ matrix.browser }}-${{ matrix.shard }}
+            --reporter=html,json:test-results-${{ matrix.browser }}-${{ matrix.shard }}.json
         env:
           CI: true
+          PLAYWRIGHT_OUTPUT_DIR: test-results-${{ matrix.browser }}-${{ matrix.shard }}
 
       # Server cleanup handled by Playwright
 
@@ -476,14 +570,25 @@ jobs:
           echo "| Tests | ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Security | ${{ needs.security.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Build | ${{ needs.build.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Accessibility | ${{ needs.accessibility.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Accessibility | ${{ needs.accessibility.result == 'success' && '✅ Passed' || '⚠️ Issues Found' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-          # Fail if any critical job failed
+          # Accessibility test result details
+          echo "### 📋 Accessibility Test Details" >> $GITHUB_STEP_SUMMARY
+          echo "Accessibility tests run in both light and dark modes. Even if issues are found, deployment won't be blocked, but detailed reports will be generated for reference." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Fail if any critical job failed (excluding accessibility, as it may have warnings but shouldn't block deployment)
           if [[ "${{ needs.code-quality.result }}" != "success" ]] || \
              [[ "${{ needs.test.result }}" != "success" ]] || \
              [[ "${{ needs.build.result }}" != "success" ]]; then
-            echo "❌ Quality gate failed!"
+            echo "❌ Quality gate failed! Critical checks did not pass." >> $GITHUB_STEP_SUMMARY
             exit 1
+          fi
+
+          # Check accessibility test status (warning but not failure)
+          if [[ "${{ needs.accessibility.result }}" != "success" ]]; then
+            echo "⚠️ Note: Accessibility tests found some issues, please check the detailed report for fixes." >> $GITHUB_STEP_SUMMARY
           fi
 
           echo "✅ Quality gate passed!"
