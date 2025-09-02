@@ -25,6 +25,11 @@ env:
   NODE_OPTIONS: "--max-old-space-size=4096"
   # Playwright optimization
   PLAYWRIGHT_BROWSERS_PATH: 0
+  # Cache optimization
+  FORCE_COLOR: 1
+  CI: true
+  # pnpm optimization
+  PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
 
 jobs:
   # Job 0: Quick Check (fast feedback for PRs)
@@ -51,6 +56,16 @@ jobs:
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: 🗂️ Cache TypeScript
+        uses: actions/cache@v4
+        with:
+          path: |
+            .tsbuildinfo
+            node_modules/.cache/typescript
+          key: ${{ runner.os }}-typescript-${{ hashFiles('**/tsconfig*.json', 'src/**/*.ts', 'src/**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-typescript-
 
       - name: 🔍 Quick lint check
         run: pnpm lint --max-warnings 0
@@ -86,6 +101,14 @@ jobs:
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: 🗂️ Cache ESLint
+        uses: actions/cache@v4
+        with:
+          path: .eslintcache
+          key: ${{ runner.os }}-eslint-${{ hashFiles('**/.eslintrc*', '**/eslint.config.*') }}
+          restore-keys: |
+            ${{ runner.os }}-eslint-
 
       - name: 🔍 Run ESLint
         run: pnpm lint --format=json --output-file=eslint-report.json
@@ -128,6 +151,16 @@ jobs:
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: 🗂️ Cache Vitest
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules/.vitest
+            coverage
+          key: ${{ runner.os }}-vitest-${{ hashFiles('**/vitest.config.*', 'src/**/*.test.*', 'src/**/*.spec.*') }}
+          restore-keys: |
+            ${{ runner.os }}-vitest-
 
       - name: 🧪 Run unit tests with coverage
         run: pnpm test:unit
@@ -204,6 +237,16 @@ jobs:
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: 🗂️ Cache build output
+        uses: actions/cache@v4
+        with:
+          path: |
+            dist
+            .vite
+          key: ${{ runner.os }}-build-${{ hashFiles('src/**/*', 'public/**/*', 'vite.config.ts', 'tsconfig.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+
       - name: 🏗️ Build application
         run: pnpm build
         env:
@@ -256,7 +299,28 @@ jobs:
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: 🗂️ Cache build output
+        uses: actions/cache@v4
+        with:
+          path: |
+            dist
+            .vite
+          key: ${{ runner.os }}-build-${{ hashFiles('src/**/*', 'public/**/*', 'vite.config.ts', 'tsconfig.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+
+      - name: 🎭 Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
       - name: 🎭 Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install chromium --with-deps
 
       - name: 🏗️ Build application
@@ -265,7 +329,7 @@ jobs:
       - name: ♿ Run accessibility tests
         run: |
           echo "Running comprehensive accessibility tests..."
-          pnpm test:e2e:accessibility --reporter=html,json:accessibility-report.json
+          JSON_REPORT_FILE=accessibility-report.json pnpm test:e2e:accessibility
 
           echo "## ♿ Accessibility Test Results" >> $GITHUB_STEP_SUMMARY
           echo "Comprehensive accessibility tests completed using Playwright with axe-core integration." >> $GITHUB_STEP_SUMMARY
@@ -317,7 +381,29 @@ jobs:
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: 🗂️ Cache build output
+        uses: actions/cache@v4
+        with:
+          path: |
+            dist
+            .vite
+          key: ${{ runner.os }}-build-${{ hashFiles('src/**/*', 'public/**/*', 'vite.config.ts', 'tsconfig.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+
+      - name: 🎭 Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ matrix.browser }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-${{ matrix.browser }}-
+            ${{ runner.os }}-playwright-
+
       - name: 🎭 Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: |
           npx playwright install ${{ matrix.browser }} --with-deps
           # Verify browser installation
@@ -330,10 +416,10 @@ jobs:
 
       - name: 🎭 Run Playwright tests
         run: |
+          JSON_REPORT_FILE=test-results-${{ matrix.browser }}-${{ matrix.shard }}.json \
           pnpm test:e2e:ci \
             --project=${{ matrix.project }} \
-            --shard=${{ matrix.shard }}/2 \
-            --reporter=html,json:test-results-${{ matrix.browser }}-${{ matrix.shard }}.json
+            --shard=${{ matrix.shard }}/2
         env:
           PLAYWRIGHT_OUTPUT_DIR: test-results-${{ matrix.browser }}-${{ matrix.shard }}
 
