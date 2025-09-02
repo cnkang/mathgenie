@@ -12,9 +12,10 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsx scripts/optimize-build.ts",
+    "build:fast": "vite build",
     "preview": "vite preview",
-    "test": "npm-run-all test:unit test:e2e",
+    "test": "npm-run-all test:unit",
     "test:unit": "vitest --run --coverage",
     "prepare": "husky",
     "coverage": "vitest --coverage",
@@ -25,7 +26,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,css,json}\"",
     "type-check": "tsc --noEmit",
     "build:types": "tsc --emitDeclarationOnly",
-    "analyze": "pnpm build && npx webpack-bundle-analyzer dist/assets/*.js",
+    "analyze": "pnpm build:fast && npx vite-bundle-analyzer dist/assets/*.js",
     "test:watch": "vitest",
     "test:e2e": "playwright test --config=playwright.config.ts",
     "test:e2e:ci": "CI=true playwright test --config=playwright.config.ts --project=chromium",
@@ -40,6 +41,9 @@
     "test:e2e:presets": "playwright test tests/e2e/presets-functionality.spec.ts",
     "test:e2e:integration": "playwright test tests/e2e/integration.spec.ts",
     "test:e2e:accessibility": "playwright test tests/e2e/accessibility.spec.ts",
+    "test:accessibility": "node scripts/accessibility-test.js light",
+    "test:accessibility:dark": "node scripts/accessibility-test.js dark",
+    "test:accessibility:all": "npm run test:accessibility && npm run test:accessibility:dark",
     "test:e2e:quick": "./scripts/test-e2e.sh quick",
     "test:e2e:full": "./scripts/test-e2e.sh full",
     "playwright:install": "playwright install --with-deps",
@@ -47,7 +51,7 @@
     "pre-commit": "lint-staged",
     "pre-push": "pnpm type-check && pnpm test:unit && pnpm build",
     "commit": "git-cz",
-    "validate": "pnpm lint && pnpm type-check && pnpm test && pnpm build"
+    "validate": "pnpm lint && pnpm type-check && pnpm test && pnpm build && pnpm test:e2e"
   },
   "eslintConfig": {
     "extends": [
@@ -67,12 +71,6 @@
     ]
   },
   "devDependencies": {
-    "@babel/cli": "^7.28.3",
-    "@babel/core": "^7.28.3",
-    "@babel/plugin-transform-runtime": "^7.28.3",
-    "@babel/preset-env": "^7.28.3",
-    "@babel/preset-react": "^7.27.1",
-    "@babel/register": "^7.28.3",
     "@eslint/js": "^9.34.0",
     "@fullhuman/postcss-purgecss": "^7.0.2",
     "@playwright/test": "^1.55.0",
@@ -107,7 +105,10 @@
     "typescript": "^5.9.2",
     "vite": "^7.1.4",
     "vite-plugin-compression": "^0.5.1",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "prettier": "^3.3.3",
+    "@axe-core/webdriverjs": "^4.10.2",
+    "selenium-webdriver": "^4.22.0"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -120,6 +121,11 @@
     "*.{json,md,yml,yaml}": [
       "prettier --write"
     ]
+  },
+  "pnpm": {
+    "overrides": {
+      "glob": "^11.0.3"
+    }
   },
   "packageManager": "pnpm@8.15.1"
 }

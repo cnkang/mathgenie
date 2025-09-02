@@ -1,5 +1,5 @@
 {
-  // 编辑器设置
+  // Editor settings
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
   "editor.codeActionsOnSave": {
@@ -8,12 +8,12 @@
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
 
-  // TypeScript设置
+  // TypeScript settings
   "typescript.preferences.importModuleSpecifier": "relative",
   "typescript.suggest.autoImports": true,
   "typescript.updateImportsOnFileMove.enabled": "always",
 
-  // ESLint设置
+  // ESLint settings
   "eslint.validate": [
     "javascript",
     "javascriptreact",
@@ -22,14 +22,14 @@
   ],
   "eslint.format.enable": true,
 
-  // 文件关联
+  // File associations
   "files.associations": {
     "*.css": "css",
     "*.scss": "scss",
     "*.less": "less"
   },
 
-  // 排除文件
+  // Exclude files
   "files.exclude": {
     "**/node_modules": true,
     "**/dist": true,
@@ -38,7 +38,7 @@
     "**/.vercel": true
   },
 
-  // 搜索排除
+  // Search exclude
   "search.exclude": {
     "**/node_modules": true,
     "**/dist": true,
@@ -48,14 +48,14 @@
     "**/pnpm-lock.yaml": true
   },
 
-  // Git设置
+  // Git settings
   "git.autofetch": true,
   "git.confirmSync": false,
 
-  // 终端设置
+  // Terminal settings
   "terminal.integrated.defaultProfile.osx": "zsh",
 
-  // 工作区推荐扩展
+  // Workspace recommended extensions
   "extensions.recommendations": [
     "esbenp.prettier-vscode",
     "dbaeumer.vscode-eslint",
