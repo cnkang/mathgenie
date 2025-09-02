@@ -11,6 +11,11 @@ export default defineConfig({
   expect: {
     timeout: 10000,
   },
+  // Set output directory dynamically for CI matrix builds
+  outputDir:
+    process.env.CI && process.env.PLAYWRIGHT_OUTPUT_DIR
+      ? process.env.PLAYWRIGHT_OUTPUT_DIR
+      : "test-results",
   reporter: [
     ["html", { open: "never" }],
     ["json", { outputFile: "test-results.json" }],
@@ -22,7 +27,7 @@ export default defineConfig({
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     video: "retain-on-failure",
-    // CI环境优化
+    // CI environment optimization
     ...(process.env.CI && {
       headless: true,
       launchOptions: {
@@ -43,7 +48,7 @@ export default defineConfig({
       name: "chromium",
       use: {
         ...devices["Desktop Chrome"],
-        // CI环境下的Chrome优化
+        // Chrome optimization for CI environment
         ...(process.env.CI && {
           launchOptions: {
             args: [
@@ -85,7 +90,7 @@ export default defineConfig({
         }),
       },
     },
-    // 移动端测试仅在非CI环境运行，或特定条件下运行
+    // Mobile tests only run in non-CI environment or under specific conditions
     ...(process.env.MOBILE_TESTS === "true"
       ? [
           {
@@ -107,7 +112,7 @@ export default defineConfig({
         port: 4173,
         reuseExistingServer: !process.env.CI,
         timeout: 120000,
-        // 让Playwright等待服务器在任何端口上启动
-        // 如果4173被占用，vite会自动选择下一个可用端口
+        // Let Playwright wait for server to start on any port
+        // If 4173 is occupied, vite will automatically choose the next available port
       },
 });

@@ -55,11 +55,15 @@ test.describe("Accessibility and ARIA", () => {
 
   test("should have proper ARIA labels on buttons", async ({ page }: { page: Page }) => {
     // Check generate button
-    const generateButton = page.locator('button:has-text("Generate Problems")');
+    const generateButton = page.getByRole("button", {
+      name: /Generate math problems with current settings/i,
+    });
     await expect(generateButton).toHaveAttribute("aria-label");
 
-    // Check download button
-    const downloadButton = page.locator('button:has-text("Download PDF")');
+    // Check main download button (in the button-group, not the quick action one)
+    const downloadButton = page.locator(
+      '.button-group button[aria-label*="Download generated problems"]',
+    );
     await expect(downloadButton).toHaveAttribute("aria-label");
   });
 

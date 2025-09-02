@@ -262,7 +262,7 @@ describe('useLocalStorage', () => {
     expect(result.current[0]).toBe('initial');
     expect(consoleSpy).toHaveBeenCalledWith(
       'Error parsing localStorage change for key "test-key":',
-      expect.any(Error)
+      expect.any(Error),
     );
 
     consoleSpy.mockRestore();

@@ -4,15 +4,15 @@ import { describe, it, expect, vi } from 'vitest';
 const mockCrypto = {
   getRandomValues: vi.fn((arr: Uint32Array) => {
     for (let i = 0; i < arr.length; i++) {
-      arr[i] = Math.floor(Math.random() * 0xFFFFFFFF);
+      arr[i] = Math.floor(Math.random() * 0xffffffff);
     }
     return arr;
-  })
+  }),
 };
 
 Object.defineProperty(global, 'crypto', {
   value: mockCrypto,
-  writable: true
+  writable: true,
 });
 
 // Math generation utilities
@@ -47,7 +47,7 @@ export const calculateExpression = (operands: number[], operators: string[]): nu
 export const generateRandomNumber = (min: number, max: number): number => {
   const array = new Uint32Array(1);
   crypto.getRandomValues(array);
-  const val = array[0] / (0xFFFFFFFF + 1);
+  const val = array[0] / (0xffffffff + 1);
   return min + Math.floor((max - min + 1) * val);
 };
 
