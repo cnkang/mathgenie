@@ -4,175 +4,176 @@ inclusion: always
 
 # MathGenie Development Guidelines
 
-## Code Style & Architecture
+## Architecture & Code Style
 
 ### React 19 Patterns
 
-- Use React 19 concurrent features: `useTransition`, `useDeferredValue`, `useOptimistic`
-- Prefer function components with hooks over class components
-- Co-locate component files: `Component.tsx`, `Component.css`, `Component.test.tsx`
-- Use TypeScript strict mode with comprehensive type coverage
+- Use concurrent features: `useTransition`, `useDeferredValue`, `useOptimistic`
+- Function components with hooks only
+- Co-locate files: `Component.tsx`, `Component.css`, `Component.test.tsx`
+- TypeScript strict mode with comprehensive coverage
 
 ### File Organization
 
-- Use `@/` path aliases for imports (configured in tsconfig.json)
-- Follow atomic design: components by complexity and reusability
-- Place component-specific styles alongside components
-- Group related functionality in dedicated directories
+- Import paths: Use `@/` aliases (e.g., `@/components/Component`)
+- Component structure: Atomic design by complexity/reusability
+- Co-location: Styles and tests alongside components
+- Directory grouping: Related functionality together
 
 ### State Management
 
-- Local state: `useState` for component-specific state
-- Persistent state: `useLocalStorage` hook for browser storage
-- Global state: React Context for app-wide state (i18n, settings)
-- Optimistic updates: `useOptimistic` for immediate UI feedback
+- Local: `useState` for component state
+- Persistent: `useLocalStorage` hook for browser storage
+- Global: React Context for i18n and settings
+- Optimistic: `useOptimistic` for immediate UI feedback
 
-## Testing Requirements
+## Testing Standards
 
-### Unit Tests (Vitest)
+### Requirements
 
-- Every component and utility must have corresponding tests
-- Use `happy-dom` environment for DOM simulation
-- Maintain 90% coverage threshold
-- Test behavior, not implementation details
+- Every component/utility needs tests
+- Vitest with `happy-dom` environment
+- 90% coverage threshold mandatory
+- Test behavior, not implementation
 
-### E2E Tests (Playwright)
+### E2E Testing
 
-- Cross-browser testing (Chrome, Firefox, Safari)
-- Accessibility testing with WCAG 2.1 AA compliance
-- Use page object model pattern from existing tests
-
-### Test Naming
-
-- Descriptive test names: `should generate addition problems when operation is selected`
-- Group related tests with `describe` blocks
+- Playwright cross-browser (Chrome, Firefox, Safari)
+- WCAG 2.1 AA accessibility compliance
 - Use existing test utilities in `tests/e2e/test-utils.ts`
 
 ## Development Workflow
 
-### Commands (Use pnpm only)
+### Commands (pnpm only)
 
-- Development: `pnpm dev`
-- Testing: `pnpm test` (unit), `pnpm test:e2e` (end-to-end)
-- Validation: `pnpm validate` (lint + type-check + test + build + e2e)
-- Building: `pnpm build` (production), `pnpm build:fast` (development)
+- `pnpm dev` - Development server
+- `pnpm test` - Unit tests
+- `pnpm test:e2e` - End-to-end tests
+- `pnpm validate` - Full validation pipeline
+- `pnpm build` - Production build
 
 ### Code Quality
 
-- ESLint with auto-fix: single quotes, semicolons required
-- Prettier formatting with consistent style
-- TypeScript strict mode compilation
-- Git hooks enforce pre-commit linting and pre-push validation
+- ESLint: Single quotes, semicolons required
+- Prettier: Consistent formatting
+- Git hooks: Pre-commit linting, pre-push validation
 
-### Git History Management
-
-- Use `git filter-repo` for history rewriting (preferred over `git filter-branch`)
-- Remove unwanted files/directories from entire history:
-  ```bash
-  git filter-repo --force --invert-paths --path unwanted-dir --path-glob 'unwanted-dir/**'
-  ```
-- After history rewriting, re-add remote and force push:
-  ```bash
-  git remote add origin <repository-url>
-  git push --force origin main
-  ```
-- Performance: `git filter-repo` is 50x+ faster than `git filter-branch`
-- Safety: Automatically removes origin remote to prevent accidental pushes
-
-## MathGenie-Specific Patterns
+## MathGenie Patterns
 
 ### Problem Generation
 
-- Use existing math utilities in `src/utils/`
-- Follow range validation patterns from `NumberInput` component
-- Implement accessibility features for math content
+- Use utilities in `src/utils/mathGenerator.ts`
+- Follow `NumberInput` validation patterns
+- Implement math accessibility features
 
 ### PDF Generation
 
-- Use jsPDF library following existing patterns
-- Implement proper error handling for PDF operations
-- Consider performance for large problem sets
+- Use jsPDF following existing patterns
+- Handle errors gracefully
+- Optimize for large problem sets
 
 ### Internationalization
 
-- Use custom i18n system with React 19 optimizations
-- Add translations to all 6 supported languages
+- Custom i18n system with React 19 optimizations
+- Support all 6 languages: en, zh, es, fr, de, ja
 - Follow existing translation key patterns
 
-### Settings Management
+### Settings
 
-- Use `settingsManager` utility for configuration
-- Implement preset functionality following existing patterns
-- Ensure settings persistence with `useLocalStorage`
+- Use `settingsManager` utility
+- Implement presets following existing patterns
+- Persist with `useLocalStorage`
 
-## Performance Guidelines
+## Performance
 
 ### React 19 Optimizations
 
-- Use `useTransition` for non-urgent updates
-- Implement `useDeferredValue` for expensive computations
-- Leverage automatic batching for state updates
+- `useTransition` for non-urgent updates
+- `useDeferredValue` for expensive computations
+- Leverage automatic batching
 
 ### Bundle Optimization
 
-- Manual code splitting for React, jsPDF, and analytics
-- Tree shaking for dead code elimination
-- Vendor chunk separation in Vite config
+- Manual chunks: React, jsPDF, analytics
+- Tree shaking enabled
+- Vendor separation in Vite config
 
-## Accessibility Standards
+## Accessibility (WCAG 2.1 AA)
 
-### WCAG 2.1 AA Compliance
+### Requirements
 
-- Semantic HTML with proper ARIA labels
+- Semantic HTML with ARIA labels
 - Keyboard navigation support
 - Screen reader compatibility
-- Color contrast requirements
-- Focus management
+- Proper focus management
 
 ### Implementation
 
-- Use existing accessibility patterns from components
-- Test with screen readers and keyboard-only navigation
-- Follow ARIA best practices for interactive elements
+- Use existing accessibility patterns
+- Test with keyboard-only navigation
+- Follow ARIA best practices
 
 ## Error Handling
 
-### User-Facing Errors
+### User Errors
 
-- Use `ErrorBoundary` component for React error boundaries
-- Implement `ErrorMessage` component for user feedback
-- Provide clear, actionable error messages
+- Use `ErrorBoundary` for React errors
+- Use `ErrorMessage` component for feedback
+- Provide clear, actionable messages
 
-### Development Errors
+### Development
 
 - Fail fast with descriptive messages
-- Include context for debugging
-- Use TypeScript for compile-time error prevention
+- Include debugging context
+- TypeScript for compile-time prevention
 
-## Decision Framework
+## Security (Critical)
 
-When implementing features, prioritize:
+### Code Security
 
-1. **Accessibility** - Does this work for all users?
-2. **Performance** - Is this optimized for the target use case?
-3. **Testability** - Can this be easily tested?
-4. **Consistency** - Does this match existing patterns?
-5. **Maintainability** - Will this be easy to modify later?
+- **NEVER** use `eval()`, `Function()`, or dynamic execution
+- **NEVER** use `Math.random()` for security (use `crypto.getRandomValues()`)
+- **ALWAYS** validate and sanitize user inputs
+- **ALWAYS** use secure parsers for math expressions
+
+### Dependencies
+
+- Run `pnpm audit` before releases
+- Pin exact versions for critical dependencies
+- Minimize dependency count
+
+### Data Protection
+
+- **NEVER** commit sensitive data (API keys, passwords)
+- Use environment variables for config
+- Be cautious with localStorage data
 
 ## Critical Rules
 
-**NEVER**:
+### NEVER
 
-- Use npm or yarn (pnpm only)
+- Use npm/yarn (pnpm only)
 - Bypass commit hooks with `--no-verify`
-- Disable tests instead of fixing them
+- Disable tests instead of fixing
 - Break accessibility standards
-- Introduce new dependencies without justification
+- Use dynamic code execution
+- Create ReDoS-vulnerable regex patterns
+- Commit sensitive information
 
-**ALWAYS**:
+### ALWAYS
 
 - Run `pnpm validate` before committing
-- Follow existing component and utility patterns
-- Include comprehensive tests for new functionality
-- Maintain TypeScript strict mode compliance
-- Consider performance impact of changes
+- Follow existing component patterns
+- Include comprehensive tests
+- Maintain TypeScript strict compliance
+- Consider performance impact
+- Validate user inputs
+- Review for security implications
+
+## Decision Priority
+
+1. **Accessibility** - Works for all users?
+2. **Security** - Safe and secure?
+3. **Performance** - Optimized for use case?
+4. **Testability** - Easily testable?
+5. **Consistency** - Matches existing patterns?
