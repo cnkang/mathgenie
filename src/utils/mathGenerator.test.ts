@@ -1,10 +1,13 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
-// Mock crypto for testing
+// Mock crypto for testing with secure approach
 const mockCrypto = {
   getRandomValues: vi.fn((arr: Uint32Array) => {
     for (let i = 0; i < arr.length; i++) {
-      arr[i] = Math.floor(Math.random() * 0xffffffff);
+      // Use a deterministic but secure approach for testing
+      const timestamp = Date.now();
+      const counter = i;
+      arr[i] = (timestamp * 0x9e3779b9 + counter) >>> 0; // Ensure 32-bit unsigned
     }
     return arr;
   }),

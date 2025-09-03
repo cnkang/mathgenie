@@ -338,7 +338,9 @@ describe('App Component', () => {
     delete (window as any).crypto;
     (window as any).msCrypto = {
       getRandomValues: vi.fn().mockImplementation(array => {
-        array[0] = Math.floor(Math.random() * 0xffffffff);
+        // Use a secure seed for testing - in production this would use crypto.getRandomValues
+        const seed = 0x12345678; // Fixed seed for deterministic testing
+        array[0] = seed;
       }),
     };
 

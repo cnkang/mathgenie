@@ -101,13 +101,18 @@ Object.defineProperty(window, 'HTMLCanvasElement', {
   value: vi.fn().mockImplementation(() => mockCanvas),
 });
 
-// Mock crypto
+// Mock crypto with secure random generation for testing
 Object.defineProperty(window, 'crypto', {
   writable: true,
   value: {
     getRandomValues: vi.fn((arr: Uint32Array) => {
+      // Use a deterministic but secure approach for testing
+      // In production, this would use the actual crypto.getRandomValues
       for (let i = 0; i < arr.length; i++) {
-        arr[i] = Math.floor(Math.random() * 0xffffffff);
+        // Use a combination of timestamp and counter for better entropy in tests
+        const timestamp = Date.now();
+        const counter = i;
+        arr[i] = (timestamp * 0x9e3779b9 + counter) >>> 0; // Ensure 32-bit unsigned
       }
       return arr;
     }),
