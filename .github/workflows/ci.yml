@@ -19,10 +19,10 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: "22"
-  PNPM_VERSION: "10.15.1"
+  NODE_VERSION: '22'
+  PNPM_VERSION: '10.15.1'
   # Performance optimization
-  NODE_OPTIONS: "--max-old-space-size=4096"
+  NODE_OPTIONS: '--max-old-space-size=4096'
   # Playwright optimization
   PLAYWRIGHT_BROWSERS_PATH: 0
   # Cache optimization
@@ -30,6 +30,8 @@ env:
   CI: true
   # pnpm optimization
   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+  # Playwright environment
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 0
 
 jobs:
   # Job 0: Quick Check (fast feedback for PRs)
@@ -52,7 +54,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -97,7 +99,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -147,7 +149,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -202,7 +204,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -232,7 +234,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -294,10 +296,26 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: 🔧 Install system dependencies for browsers
+        run: |
+          # Install system dependencies that browsers might need
+          sudo apt-get update
+          sudo apt-get install -y \
+            libnss3-dev \
+            libatk-bridge2.0-dev \
+            libdrm2 \
+            libxkbcommon-dev \
+            libxcomposite-dev \
+            libxdamage-dev \
+            libxrandr2 \
+            libgbm-dev \
+            libxss1 \
+            libasound2-dev
 
       - name: 🗂️ Cache build output
         uses: actions/cache@v4
@@ -315,13 +333,33 @@ jobs:
         with:
           path: |
             ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
+          key: ${{ runner.os }}-playwright-chromium-${{ hashFiles('**/pnpm-lock.yaml', '**/package.json') }}
           restore-keys: |
+            ${{ runner.os }}-playwright-chromium-
             ${{ runner.os }}-playwright-
 
       - name: 🎭 Install Playwright browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install chromium --with-deps
+        run: |
+          # Force install chromium browser with dependencies
+          echo "Installing chromium browser..."
+
+          # Clear any potential corrupted browser installations
+          if [ "${{ steps.playwright-cache.outputs.cache-hit }}" != "true" ]; then
+            echo "Cache miss - performing fresh installation"
+          else
+            echo "Cache hit - verifying existing installation"
+          fi
+
+          # Always run install to ensure browser is available
+          pnpm exec playwright install --with-deps chromium
+
+          # Verify installation by checking browser executable
+          echo "Verifying chromium installation..."
+          if pnpm exec playwright install --dry-run 2>&1 | grep -q "is already installed"; then
+            echo "✅ Chromium browser is already installed"
+          else
+            echo "⚠️ Browser installation status unclear, but proceeding..."
+          fi
 
       - name: 🏗️ Build application
         run: pnpm build
@@ -329,7 +367,29 @@ jobs:
       - name: ♿ Run accessibility tests
         run: |
           echo "Running comprehensive accessibility tests..."
+          # Start server in background and run tests
+          pnpm preview &
+          SERVER_PID=$!
+
+          # Wait for server to be ready
+          for i in {1..30}; do
+            if curl -f http://localhost:4173 >/dev/null 2>&1; then
+              echo "✅ Server is ready!"
+              break
+            fi
+            if [ $i -eq 30 ]; then
+              echo "❌ Server failed to start"
+              kill $SERVER_PID 2>/dev/null || true
+              exit 1
+            fi
+            sleep 1
+          done
+
+          # Run tests
           JSON_REPORT_FILE=accessibility-report.json pnpm test:e2e:accessibility
+
+          # Cleanup
+          kill $SERVER_PID 2>/dev/null || true
 
           echo "## ♿ Accessibility Test Results" >> $GITHUB_STEP_SUMMARY
           echo "Comprehensive accessibility tests completed using Playwright with axe-core integration." >> $GITHUB_STEP_SUMMARY
@@ -376,10 +436,26 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: 🔧 Install system dependencies for browsers
+        run: |
+          # Install system dependencies that browsers might need
+          sudo apt-get update
+          sudo apt-get install -y \
+            libnss3-dev \
+            libatk-bridge2.0-dev \
+            libdrm2 \
+            libxkbcommon-dev \
+            libxcomposite-dev \
+            libxdamage-dev \
+            libxrandr2 \
+            libgbm-dev \
+            libxss1 \
+            libasound2-dev
 
       - name: 🗂️ Cache build output
         uses: actions/cache@v4
@@ -397,33 +473,70 @@ jobs:
         with:
           path: |
             ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ matrix.browser }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          key: ${{ runner.os }}-playwright-${{ matrix.browser }}-${{ hashFiles('**/pnpm-lock.yaml', '**/package.json') }}
           restore-keys: |
             ${{ runner.os }}-playwright-${{ matrix.browser }}-
             ${{ runner.os }}-playwright-
 
       - name: 🎭 Install Playwright browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: |
-          npx playwright install ${{ matrix.browser }} --with-deps
-          # Verify browser installation
-          npx playwright --version
+          # Force install specific browser with dependencies (ignore cache issues)
+          echo "Installing ${{ matrix.browser }} browser..."
+
+          # Clear any potential corrupted browser installations
+          if [ "${{ steps.playwright-cache.outputs.cache-hit }}" != "true" ]; then
+            echo "Cache miss - performing fresh installation"
+          else
+            echo "Cache hit - verifying existing installation"
+          fi
+
+          # Always run install to ensure browser is available
+          pnpm exec playwright install --with-deps ${{ matrix.browser }}
+
+          # Verify installation by checking browser executable
+          echo "Verifying ${{ matrix.browser }} installation..."
+          if pnpm exec playwright install --dry-run 2>&1 | grep -q "is already installed"; then
+            echo "✅ ${{ matrix.browser }} browser is already installed"
+          else
+            echo "⚠️ Browser installation status unclear, but proceeding..."
+          fi
 
       - name: 🏗️ Build application
         run: pnpm build
 
-      # Playwright will handle server startup automatically
-
       - name: 🎭 Run Playwright tests
         run: |
+          # Start server in background and run tests
+          pnpm preview &
+          SERVER_PID=$!
+
+          # Wait for server to be ready
+          for i in {1..30}; do
+            if curl -f http://localhost:4173 >/dev/null 2>&1; then
+              echo "✅ Server is ready!"
+              break
+            fi
+            if [ $i -eq 30 ]; then
+              echo "❌ Server failed to start"
+              kill $SERVER_PID 2>/dev/null || true
+              exit 1
+            fi
+            sleep 1
+          done
+
+          # Run tests
           JSON_REPORT_FILE=test-results-${{ matrix.browser }}-${{ matrix.shard }}.json \
-          pnpm test:e2e:ci \
+          pnpm exec playwright test \
+            --config=playwright.config.ts \
             --project=${{ matrix.project }} \
-            --shard=${{ matrix.shard }}/2
+            --shard=${{ matrix.shard }}/2 \
+            --reporter=html \
+            --reporter=json
+
+          # Cleanup
+          kill $SERVER_PID 2>/dev/null || true
         env:
           PLAYWRIGHT_OUTPUT_DIR: test-results-${{ matrix.browser }}-${{ matrix.shard }}
-
-      # Server cleanup handled by Playwright
 
       - name: 📊 Upload test results
         uses: actions/upload-artifact@v4
@@ -463,7 +576,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -505,7 +618,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile

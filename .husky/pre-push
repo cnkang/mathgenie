@@ -1,6 +1,4 @@
 #!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
 echo "🚀 Running pre-push checks..."
 
 # 获取当前分支
