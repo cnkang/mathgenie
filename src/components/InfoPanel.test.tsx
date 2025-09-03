@@ -128,7 +128,7 @@ describe('InfoPanel', () => {
     );
 
     expect(screen.getByText('🎯 Learning Progress')).toBeDefined();
-    expect(screen.getByText(/Completed.*%.*Target: 100 problems/)).toBeDefined();
+    expect(screen.getByText(/Completed \d+% \(Target: 100 problems\)/)).toBeDefined();
   });
 
   test('renders quick action buttons', () => {
@@ -470,7 +470,7 @@ describe('InfoPanel', () => {
     );
 
     // Should show 50% progress (50 out of 100 target)
-    expect(screen.getByText(/Completed 50%.*Target: 100 problems/)).toBeDefined();
+    expect(screen.getByText(/Completed 50% \(Target: 100 problems\)/)).toBeDefined();
   });
 
   test('caps learning progress at 100%', () => {
@@ -491,6 +491,6 @@ describe('InfoPanel', () => {
     );
 
     // Should cap at 100% even with more than 100 problems
-    expect(screen.getByText(/Completed 100%.*Target: 100 problems/)).toBeDefined();
+    expect(screen.getByText(/Completed 100% \(Target: 100 problems\)/)).toBeDefined();
   });
 });
