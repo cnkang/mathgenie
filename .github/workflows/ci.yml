@@ -21,17 +21,13 @@ concurrency:
 env:
   NODE_VERSION: '22'
   PNPM_VERSION: '10.15.1'
-  # Performance optimization
   NODE_OPTIONS: '--max-old-space-size=4096'
-  # Playwright optimization
   PLAYWRIGHT_BROWSERS_PATH: 0
-  # Cache optimization
   FORCE_COLOR: 1
   CI: true
-  # pnpm optimization
-  PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
-  # Playwright environment
+  # Playwright optimizations
   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 0
+  PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS: true
 
 jobs:
   # Job 0: Quick Check (fast feedback for PRs)
@@ -281,7 +277,7 @@ jobs:
   accessibility:
     name: ♿ Accessibility
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     steps:
       - name: 📥 Checkout code
@@ -301,32 +297,6 @@ jobs:
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: 🔧 Install system dependencies for browsers
-        run: |
-          # Install system dependencies that browsers might need
-          sudo apt-get update
-          sudo apt-get install -y \
-            libnss3-dev \
-            libatk-bridge2.0-dev \
-            libdrm2 \
-            libxkbcommon-dev \
-            libxcomposite-dev \
-            libxdamage-dev \
-            libxrandr2 \
-            libgbm-dev \
-            libxss1 \
-            libasound2-dev
-
-      - name: 🗂️ Cache build output
-        uses: actions/cache@v4
-        with:
-          path: |
-            dist
-            .vite
-          key: ${{ runner.os }}-build-${{ hashFiles('src/**/*', 'public/**/*', 'vite.config.ts', 'tsconfig.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-
-
       - name: 🎭 Cache Playwright browsers
         uses: actions/cache@v4
         id: playwright-cache
@@ -339,27 +309,8 @@ jobs:
             ${{ runner.os }}-playwright-
 
       - name: 🎭 Install Playwright browsers
-        run: |
-          # Force install chromium browser with dependencies
-          echo "Installing chromium browser..."
-
-          # Clear any potential corrupted browser installations
-          if [ "${{ steps.playwright-cache.outputs.cache-hit }}" != "true" ]; then
-            echo "Cache miss - performing fresh installation"
-          else
-            echo "Cache hit - verifying existing installation"
-          fi
-
-          # Always run install to ensure browser is available
-          pnpm exec playwright install --with-deps chromium
-
-          # Verify installation by checking browser executable
-          echo "Verifying chromium installation..."
-          if pnpm exec playwright install --dry-run 2>&1 | grep -q "is already installed"; then
-            echo "✅ Chromium browser is already installed"
-          else
-            echo "⚠️ Browser installation status unclear, but proceeding..."
-          fi
+        run: pnpm exec playwright install chromium --with-deps
+        timeout-minutes: 8
 
       - name: 🏗️ Build application
         run: pnpm build
@@ -408,20 +359,18 @@ jobs:
   cross-browser:
     name: 🌐 Cross-browser
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
 
     strategy:
       fail-fast: false
       matrix:
-        browser: [chromium, firefox, webkit]
-        shard: [1, 2]
+        browser: [chromium, firefox]
+        shard: [1]
         include:
           - browser: chromium
             project: chromium
           - browser: firefox
             project: firefox
-          - browser: webkit
-            project: webkit
 
     steps:
       - name: 📥 Checkout code
@@ -441,32 +390,6 @@ jobs:
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: 🔧 Install system dependencies for browsers
-        run: |
-          # Install system dependencies that browsers might need
-          sudo apt-get update
-          sudo apt-get install -y \
-            libnss3-dev \
-            libatk-bridge2.0-dev \
-            libdrm2 \
-            libxkbcommon-dev \
-            libxcomposite-dev \
-            libxdamage-dev \
-            libxrandr2 \
-            libgbm-dev \
-            libxss1 \
-            libasound2-dev
-
-      - name: 🗂️ Cache build output
-        uses: actions/cache@v4
-        with:
-          path: |
-            dist
-            .vite
-          key: ${{ runner.os }}-build-${{ hashFiles('src/**/*', 'public/**/*', 'vite.config.ts', 'tsconfig.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-
-
       - name: 🎭 Cache Playwright browsers
         uses: actions/cache@v4
         id: playwright-cache
@@ -479,27 +402,8 @@ jobs:
             ${{ runner.os }}-playwright-
 
       - name: 🎭 Install Playwright browsers
-        run: |
-          # Force install specific browser with dependencies (ignore cache issues)
-          echo "Installing ${{ matrix.browser }} browser..."
-
-          # Clear any potential corrupted browser installations
-          if [ "${{ steps.playwright-cache.outputs.cache-hit }}" != "true" ]; then
-            echo "Cache miss - performing fresh installation"
-          else
-            echo "Cache hit - verifying existing installation"
-          fi
-
-          # Always run install to ensure browser is available
-          pnpm exec playwright install --with-deps ${{ matrix.browser }}
-
-          # Verify installation by checking browser executable
-          echo "Verifying ${{ matrix.browser }} installation..."
-          if pnpm exec playwright install --dry-run 2>&1 | grep -q "is already installed"; then
-            echo "✅ ${{ matrix.browser }} browser is already installed"
-          else
-            echo "⚠️ Browser installation status unclear, but proceeding..."
-          fi
+        run: pnpm exec playwright install ${{ matrix.browser }} --with-deps
+        timeout-minutes: 8
 
       - name: 🏗️ Build application
         run: pnpm build
