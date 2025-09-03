@@ -30,12 +30,11 @@ env:
   PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS: true
 
 jobs:
-  # Job 0: Quick Check (fast feedback for PRs)
+  # Job 0: Quick Check (fast feedback)
   quick-check:
     name: ⚡ Quick Check
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    if: github.event_name == 'pull_request'
 
     steps:
       - name: 📥 Checkout code
@@ -72,7 +71,7 @@ jobs:
         run: pnpm type-check
 
       - name: 🧪 Quick test
-        run: pnpm test:unit --run --reporter=basic
+        run: pnpm test:unit --reporter=basic
 
   # Job 1: Code Quality & Linting (runs in parallel)
   code-quality:
@@ -322,6 +321,17 @@ jobs:
           pnpm preview &
           SERVER_PID=$!
 
+          # Ensure cleanup happens regardless of test outcome
+          cleanup() {
+            echo "Cleaning up server process..."
+            kill $SERVER_PID 2>/dev/null || true
+            # Wait a moment for graceful shutdown
+            sleep 2
+            # Force kill if still running
+            kill -9 $SERVER_PID 2>/dev/null || true
+          }
+          trap cleanup EXIT
+
           # Wait for server to be ready
           for i in {1..30}; do
             if curl -f http://localhost:4173 >/dev/null 2>&1; then
@@ -330,21 +340,23 @@ jobs:
             fi
             if [ $i -eq 30 ]; then
               echo "❌ Server failed to start"
-              kill $SERVER_PID 2>/dev/null || true
               exit 1
             fi
             sleep 1
           done
 
-          # Run tests
-          JSON_REPORT_FILE=accessibility-report.json pnpm test:e2e:accessibility
-
-          # Cleanup
-          kill $SERVER_PID 2>/dev/null || true
+          # Run tests and capture exit code
+          set +e
+          JSON_REPORT_FILE=accessibility-report.json pnpm exec playwright test tests/e2e/accessibility.spec.ts --config=playwright.config.ts --project=chromium
+          TEST_EXIT_CODE=$?
+          set -e
 
           echo "## ♿ Accessibility Test Results" >> $GITHUB_STEP_SUMMARY
           echo "Comprehensive accessibility tests completed using Playwright with axe-core integration." >> $GITHUB_STEP_SUMMARY
           echo "Tests include WCAG 2.1 AA compliance checks for light theme, dark theme, form interactions, and error states." >> $GITHUB_STEP_SUMMARY
+
+          # Exit with the test result
+          exit $TEST_EXIT_CODE
 
       - name: 📊 Upload accessibility report
         uses: actions/upload-artifact@v4
@@ -414,6 +426,17 @@ jobs:
           pnpm preview &
           SERVER_PID=$!
 
+          # Ensure cleanup happens regardless of test outcome
+          cleanup() {
+            echo "Cleaning up server process..."
+            kill $SERVER_PID 2>/dev/null || true
+            # Wait a moment for graceful shutdown
+            sleep 2
+            # Force kill if still running
+            kill -9 $SERVER_PID 2>/dev/null || true
+          }
+          trap cleanup EXIT
+
           # Wait for server to be ready
           for i in {1..30}; do
             if curl -f http://localhost:4173 >/dev/null 2>&1; then
@@ -422,13 +445,13 @@ jobs:
             fi
             if [ $i -eq 30 ]; then
               echo "❌ Server failed to start"
-              kill $SERVER_PID 2>/dev/null || true
               exit 1
             fi
             sleep 1
           done
 
-          # Run tests
+          # Run tests and capture exit code
+          set +e
           JSON_REPORT_FILE=test-results-${{ matrix.browser }}-${{ matrix.shard }}.json \
           pnpm exec playwright test \
             --config=playwright.config.ts \
@@ -436,9 +459,11 @@ jobs:
             --shard=${{ matrix.shard }}/2 \
             --reporter=html \
             --reporter=json
+          TEST_EXIT_CODE=$?
+          set -e
 
-          # Cleanup
-          kill $SERVER_PID 2>/dev/null || true
+          # Exit with the test result
+          exit $TEST_EXIT_CODE
         env:
           PLAYWRIGHT_OUTPUT_DIR: test-results-${{ matrix.browser }}-${{ matrix.shard }}
 
