@@ -3,6 +3,82 @@ import { useTranslation } from '../i18n';
 import type { Problem, QuizResult } from '../types';
 import InteractiveProblem from './InteractiveProblem';
 
+// Safe expression evaluator that only handles basic arithmetic
+const safeEvaluateExpression = (expression: string): number => {
+  // Remove all whitespace and validate the expression
+  const cleanExpression = expression.replace(/\s/g, '');
+
+  // Only allow numbers, basic operators, and parentheses
+  if (!/^[\d+\-*/().]+$/.test(cleanExpression)) {
+    throw new Error('Invalid characters in expression');
+  }
+
+  // Parse and evaluate the expression safely
+  try {
+    // Split into tokens
+    const tokens = cleanExpression.match(/(\d+\.?\d*|[+\-*/()])/g);
+    if (!tokens) throw new Error('Invalid expression format');
+
+    // Simple recursive descent parser for basic arithmetic
+    let index = 0;
+
+    const parseNumber = (): number => {
+      const token = tokens[index++];
+      if (!token || !/^\d+\.?\d*$/.test(token)) {
+        throw new Error('Expected number');
+      }
+      return parseFloat(token);
+    };
+
+    const parseExpression = (): number => {
+      let result = parseTerm();
+
+      while (index < tokens.length && (tokens[index] === '+' || tokens[index] === '-')) {
+        const operator = tokens[index++];
+        const term = parseTerm();
+        result = operator === '+' ? result + term : result - term;
+      }
+
+      return result;
+    };
+
+    const parseTerm = (): number => {
+      let result = parseFactor();
+
+      while (index < tokens.length && (tokens[index] === '*' || tokens[index] === '/')) {
+        const operator = tokens[index++];
+        const factor = parseFactor();
+        result = operator === '*' ? result * factor : result / factor;
+      }
+
+      return result;
+    };
+
+    const parseFactor = (): number => {
+      if (tokens[index] === '(') {
+        index++; // consume '('
+        const result = parseExpression();
+        if (tokens[index] !== ')') {
+          throw new Error('Missing closing parenthesis');
+        }
+        index++; // consume ')'
+        return result;
+      }
+      return parseNumber();
+    };
+
+    const result = parseExpression();
+
+    if (index !== tokens.length) {
+      throw new Error('Unexpected tokens after expression');
+    }
+
+    return result;
+  } catch (error) {
+    throw new Error(`Expression evaluation failed: ${error}`);
+  }
+};
+
 interface QuizModeProps {
   problems: Problem[];
   onQuizComplete: (result: QuizResult) => void;
@@ -25,8 +101,8 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
       let correctAnswer: number;
 
       try {
-        // Safely calculate the expression
-        correctAnswer = Function(`"use strict"; return (${expression})`)();
+        // Safely calculate the expression using a secure parser
+        correctAnswer = safeEvaluateExpression(expression);
       } catch {
         console.error('Error calculating answer for:', expression);
         correctAnswer = 0;
