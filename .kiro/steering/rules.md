@@ -64,6 +64,21 @@ inclusion: always
 - TypeScript strict mode compilation
 - Git hooks enforce pre-commit linting and pre-push validation
 
+### Git History Management
+
+- Use `git filter-repo` for history rewriting (preferred over `git filter-branch`)
+- Remove unwanted files/directories from entire history:
+  ```bash
+  git filter-repo --force --invert-paths --path unwanted-dir --path-glob 'unwanted-dir/**'
+  ```
+- After history rewriting, re-add remote and force push:
+  ```bash
+  git remote add origin <repository-url>
+  git push --force origin main
+  ```
+- Performance: `git filter-repo` is 50x+ faster than `git filter-branch`
+- Safety: Automatically removes origin remote to prevent accidental pushes
+
 ## MathGenie-Specific Patterns
 
 ### Problem Generation
