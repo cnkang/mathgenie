@@ -1,8 +1,8 @@
 // Playwright configuration for cross-browser testing
-import { defineConfig, devices } from "@playwright/test";
+import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  testDir: "./tests/e2e",
+  testDir: './tests/e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
@@ -15,293 +15,284 @@ export default defineConfig({
   outputDir:
     process.env.CI && process.env.PLAYWRIGHT_OUTPUT_DIR
       ? process.env.PLAYWRIGHT_OUTPUT_DIR
-      : "test-results",
+      : 'test-results',
   reporter: process.env.CI
     ? [
-        ["html", { open: "never" }],
-        ["json", { outputFile: process.env.JSON_REPORT_FILE || "test-results.json" }],
-        ["junit", { outputFile: "test-results.xml" }],
-        ["github"],
+        ['html', { open: 'never' }],
+        ['json', { outputFile: process.env.JSON_REPORT_FILE || 'test-results.json' }],
+        ['junit', { outputFile: 'test-results.xml' }],
+        ['github'],
       ]
     : [
-        ["html", { open: "never" }],
-        ["json", { outputFile: "test-results.json" }],
-        ["junit", { outputFile: "test-results.xml" }],
+        ['html', { open: 'never' }],
+        ['json', { outputFile: 'test-results.json' }],
+        ['junit', { outputFile: 'test-results.xml' }],
       ],
   use: {
-    baseURL: process.env.BASE_URL || "http://localhost:4173",
-    trace: "on-first-retry",
-    screenshot: "only-on-failure",
-    video: "retain-on-failure",
-    // CI environment optimization
+    baseURL: process.env.BASE_URL || 'http://localhost:4173',
+    trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+    // CI environment optimization (headless only, browser-specific args moved to individual projects)
     ...(process.env.CI && {
       headless: true,
-      launchOptions: {
-        args: [
-          "--no-sandbox",
-          "--disable-dev-shm-usage",
-          "--disable-gpu",
-          "--disable-web-security",
-          "--disable-features=TranslateUI",
-          "--disable-ipc-flooding-protection",
-        ],
-      },
     }),
   },
 
   projects: [
     {
-      name: "chromium",
+      name: 'chromium',
       use: {
-        ...devices["Desktop Chrome"],
+        ...devices['Desktop Chrome'],
         // Chrome optimization for CI environment
         ...(process.env.CI && {
           launchOptions: {
             args: [
-              "--no-sandbox",
-              "--disable-dev-shm-usage",
-              "--disable-gpu",
-              "--disable-web-security",
-              "--disable-features=TranslateUI",
-              "--disable-ipc-flooding-protection",
-              "--memory-pressure-off",
-              "--max_old_space_size=4096",
+              '--no-sandbox',
+              '--disable-dev-shm-usage',
+              '--disable-gpu',
+              '--disable-web-security',
+              '--disable-features=TranslateUI',
+              '--disable-ipc-flooding-protection',
+              '--memory-pressure-off',
+              '--max_old_space_size=4096',
             ],
           },
         }),
       },
     },
     {
-      name: "firefox",
+      name: 'firefox',
       use: {
-        ...devices["Desktop Firefox"],
+        ...devices['Desktop Firefox'],
         ...(process.env.CI && {
           launchOptions: {
             firefoxUserPrefs: {
-              "media.navigator.streams.fake": true,
-              "media.navigator.permission.disabled": true,
+              'media.navigator.streams.fake': true,
+              'media.navigator.permission.disabled': true,
             },
           },
         }),
       },
     },
     {
-      name: "webkit",
+      name: 'webkit',
       use: {
-        ...devices["Desktop Safari"],
+        ...devices['Desktop Safari'],
+        // WebKit doesn't support --no-sandbox, explicitly set empty launchOptions
         ...(process.env.CI && {
           launchOptions: {
-            args: ["--no-sandbox"],
+            args: [], // Explicitly empty args to override any defaults
           },
         }),
       },
     },
     // Mobile tests only run in non-CI environment or under specific conditions
-    ...(process.env.MOBILE_TESTS === "true"
+    ...(process.env.MOBILE_TESTS === 'true'
       ? [
           {
-            name: "Mobile Chrome",
-            use: { ...devices["Pixel 5"] },
+            name: 'Mobile Chrome',
+            use: { ...devices['Pixel 5'] },
           },
           {
-            name: "Mobile Safari",
-            use: { ...devices["iPhone 12"] },
+            name: 'Mobile Safari',
+            use: { ...devices['iPhone 12'] },
           },
           // Latest iPhone devices
           {
-            name: "iPhone 16 Pro Max",
-            use: { ...devices["iPhone 15 Pro Max"] }, // Using closest available device
+            name: 'iPhone 16 Pro Max',
+            use: { ...devices['iPhone 15 Pro Max'] }, // Using closest available device
           },
           {
-            name: "iPhone 16 Pro",
-            use: { ...devices["iPhone 15 Pro"] }, // Using closest available device
+            name: 'iPhone 16 Pro',
+            use: { ...devices['iPhone 15 Pro'] }, // Using closest available device
           },
           {
-            name: "iPhone 16",
-            use: { ...devices["iPhone 15"] }, // Using closest available device
+            name: 'iPhone 16',
+            use: { ...devices['iPhone 15'] }, // Using closest available device
           },
           {
-            name: "iPhone 15 Pro Max",
-            use: { ...devices["iPhone 15 Pro Max"] },
+            name: 'iPhone 15 Pro Max',
+            use: { ...devices['iPhone 15 Pro Max'] },
           },
           {
-            name: "iPhone 15 Pro",
-            use: { ...devices["iPhone 15 Pro"] },
+            name: 'iPhone 15 Pro',
+            use: { ...devices['iPhone 15 Pro'] },
           },
           {
-            name: "iPhone 15",
-            use: { ...devices["iPhone 15"] },
+            name: 'iPhone 15',
+            use: { ...devices['iPhone 15'] },
           },
           {
-            name: "iPhone 14 Pro Max",
-            use: { ...devices["iPhone 14 Pro Max"] },
+            name: 'iPhone 14 Pro Max',
+            use: { ...devices['iPhone 14 Pro Max'] },
           },
           {
-            name: "iPhone 14 Pro",
-            use: { ...devices["iPhone 14 Pro"] },
+            name: 'iPhone 14 Pro',
+            use: { ...devices['iPhone 14 Pro'] },
           },
           {
-            name: "iPhone 13 Pro",
-            use: { ...devices["iPhone 13 Pro"] },
+            name: 'iPhone 13 Pro',
+            use: { ...devices['iPhone 13 Pro'] },
           },
           // iPad devices - Portrait orientation
           {
-            name: "iPad Pro 12.9 Portrait",
+            name: 'iPad Pro 12.9 Portrait',
             use: {
-              ...devices["iPad Pro"],
+              ...devices['iPad Pro'],
               viewport: { width: 1024, height: 1366 }, // Portrait
             },
           },
           {
-            name: "iPad Pro 11 Portrait",
+            name: 'iPad Pro 11 Portrait',
             use: {
-              ...devices["iPad Pro"],
+              ...devices['iPad Pro'],
               viewport: { width: 834, height: 1194 }, // Portrait
             },
           },
           {
-            name: "iPad Air Portrait",
+            name: 'iPad Air Portrait',
             use: {
-              ...devices["iPad Pro"],
+              ...devices['iPad Pro'],
               viewport: { width: 820, height: 1180 }, // Portrait
             },
           },
           {
-            name: "iPad Portrait",
+            name: 'iPad Portrait',
             use: {
-              ...devices["iPad Pro"],
+              ...devices['iPad Pro'],
               viewport: { width: 810, height: 1080 }, // Portrait
             },
           },
           // iPad devices - Landscape orientation
           {
-            name: "iPad Pro 12.9 Landscape",
+            name: 'iPad Pro 12.9 Landscape',
             use: {
-              ...devices["iPad Pro"],
+              ...devices['iPad Pro'],
               viewport: { width: 1366, height: 1024 }, // Landscape
             },
           },
           {
-            name: "iPad Pro 11 Landscape",
+            name: 'iPad Pro 11 Landscape',
             use: {
-              ...devices["iPad Pro"],
+              ...devices['iPad Pro'],
               viewport: { width: 1194, height: 834 }, // Landscape
             },
           },
           {
-            name: "iPad Air Landscape",
+            name: 'iPad Air Landscape',
             use: {
-              ...devices["iPad Pro"],
+              ...devices['iPad Pro'],
               viewport: { width: 1180, height: 820 }, // Landscape
             },
           },
           {
-            name: "iPad Landscape",
+            name: 'iPad Landscape',
             use: {
-              ...devices["iPad Pro"],
+              ...devices['iPad Pro'],
               viewport: { width: 1080, height: 810 }, // Landscape
             },
           },
           // Android devices - Latest phones
           {
-            name: "Galaxy S24 Ultra",
+            name: 'Galaxy S24 Ultra',
             use: {
-              ...devices["Galaxy S9+"],
+              ...devices['Galaxy S9+'],
               viewport: { width: 412, height: 915 }, // S24 Ultra dimensions
               userAgent:
-                "Mozilla/5.0 (Linux; Android 14; SM-S928B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+                'Mozilla/5.0 (Linux; Android 14; SM-S928B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
             },
           },
           {
-            name: "Galaxy S24",
+            name: 'Galaxy S24',
             use: {
-              ...devices["Galaxy S9+"],
+              ...devices['Galaxy S9+'],
               viewport: { width: 384, height: 854 }, // S24 dimensions
               userAgent:
-                "Mozilla/5.0 (Linux; Android 14; SM-S921B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+                'Mozilla/5.0 (Linux; Android 14; SM-S921B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
             },
           },
           {
-            name: "Pixel 8 Pro",
+            name: 'Pixel 8 Pro',
             use: {
-              ...devices["Pixel 5"],
+              ...devices['Pixel 5'],
               viewport: { width: 412, height: 892 }, // Pixel 8 Pro dimensions
               userAgent:
-                "Mozilla/5.0 (Linux; Android 14; Pixel 8 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+                'Mozilla/5.0 (Linux; Android 14; Pixel 8 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
             },
           },
           {
-            name: "Pixel 8",
+            name: 'Pixel 8',
             use: {
-              ...devices["Pixel 5"],
+              ...devices['Pixel 5'],
               viewport: { width: 412, height: 915 }, // Pixel 8 dimensions
               userAgent:
-                "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+                'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
             },
           },
           {
-            name: "OnePlus 12",
+            name: 'OnePlus 12',
             use: {
-              ...devices["Galaxy S9+"],
+              ...devices['Galaxy S9+'],
               viewport: { width: 450, height: 1000 }, // OnePlus 12 dimensions
               userAgent:
-                "Mozilla/5.0 (Linux; Android 14; CPH2573) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+                'Mozilla/5.0 (Linux; Android 14; CPH2573) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
             },
           },
           // Android tablets - Portrait orientation
           {
-            name: "Galaxy Tab S9 Ultra Portrait",
+            name: 'Galaxy Tab S9 Ultra Portrait',
             use: {
-              ...devices["iPad Pro"],
+              ...devices['iPad Pro'],
               viewport: { width: 1848, height: 2960 }, // Tab S9 Ultra Portrait
               userAgent:
-                "Mozilla/5.0 (Linux; Android 13; SM-X916B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                'Mozilla/5.0 (Linux; Android 13; SM-X916B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
             },
           },
           {
-            name: "Galaxy Tab S9 Portrait",
+            name: 'Galaxy Tab S9 Portrait',
             use: {
-              ...devices["iPad Pro"],
+              ...devices['iPad Pro'],
               viewport: { width: 1600, height: 2560 }, // Tab S9 Portrait
               userAgent:
-                "Mozilla/5.0 (Linux; Android 13; SM-X810) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                'Mozilla/5.0 (Linux; Android 13; SM-X810) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
             },
           },
           {
-            name: "Pixel Tablet Portrait",
+            name: 'Pixel Tablet Portrait',
             use: {
-              ...devices["iPad Pro"],
+              ...devices['iPad Pro'],
               viewport: { width: 1600, height: 2560 }, // Pixel Tablet Portrait
               userAgent:
-                "Mozilla/5.0 (Linux; Android 13; Pixel Tablet) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                'Mozilla/5.0 (Linux; Android 13; Pixel Tablet) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
             },
           },
           // Android tablets - Landscape orientation
           {
-            name: "Galaxy Tab S9 Ultra Landscape",
+            name: 'Galaxy Tab S9 Ultra Landscape',
             use: {
-              ...devices["iPad Pro"],
+              ...devices['iPad Pro'],
               viewport: { width: 2960, height: 1848 }, // Tab S9 Ultra Landscape
               userAgent:
-                "Mozilla/5.0 (Linux; Android 13; SM-X916B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                'Mozilla/5.0 (Linux; Android 13; SM-X916B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
             },
           },
           {
-            name: "Galaxy Tab S9 Landscape",
+            name: 'Galaxy Tab S9 Landscape',
             use: {
-              ...devices["iPad Pro"],
+              ...devices['iPad Pro'],
               viewport: { width: 2560, height: 1600 }, // Tab S9 Landscape
               userAgent:
-                "Mozilla/5.0 (Linux; Android 13; SM-X810) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                'Mozilla/5.0 (Linux; Android 13; SM-X810) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
             },
           },
           {
-            name: "Pixel Tablet Landscape",
+            name: 'Pixel Tablet Landscape',
             use: {
-              ...devices["iPad Pro"],
+              ...devices['iPad Pro'],
               viewport: { width: 2560, height: 1600 }, // Pixel Tablet Landscape
               userAgent:
-                "Mozilla/5.0 (Linux; Android 13; Pixel Tablet) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                'Mozilla/5.0 (Linux; Android 13; Pixel Tablet) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
             },
           },
         ]
@@ -311,7 +302,7 @@ export default defineConfig({
   webServer: process.env.CI
     ? undefined
     : {
-        command: "pnpm preview",
+        command: 'pnpm preview',
         port: 4173,
         reuseExistingServer: !process.env.CI,
         timeout: 120000,
