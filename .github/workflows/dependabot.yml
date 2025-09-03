@@ -95,13 +95,13 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: "10.15.1"
+          version: '10.15.1'
 
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
-          cache: "pnpm"
+          node-version: '22'
+          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -198,9 +198,12 @@ jobs:
     steps:
       - name: 📢 Request manual review
         uses: actions/github-script@v7
+        env:
+          UPDATE_TYPE: ${{ needs.dependabot-analysis.outputs.update-type }}
         with:
           script: |
             const pr = context.payload.pull_request;
+            const updateType = process.env.UPDATE_TYPE;
 
             // Request review from maintainers (update with actual GitHub usernames)
             const maintainers = []; // Add actual maintainer usernames here
@@ -225,7 +228,7 @@ jobs:
               ## 👀 Manual Review Required
               
               This Dependabot PR requires manual review due to:
-              - **Update Type**: ${needs.dependabot-analysis.outputs.update-type}
+              - **Update Type**: ${updateType}
               - **Potential Breaking Changes**: This update may introduce breaking changes
               
               Please review the changes carefully before merging.
