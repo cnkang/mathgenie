@@ -307,14 +307,14 @@ jobs:
         with:
           path: |
             ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-chromium-${{ hashFiles('**/pnpm-lock.yaml', '**/package.json') }}
+          key: ${{ runner.os }}-playwright-accessibility-${{ hashFiles('**/pnpm-lock.yaml', '**/package.json') }}
           restore-keys: |
-            ${{ runner.os }}-playwright-chromium-
+            ${{ runner.os }}-playwright-accessibility-
             ${{ runner.os }}-playwright-
 
       - name: 🎭 Install Playwright browsers
-        run: pnpm exec playwright install chromium --with-deps
-        timeout-minutes: 8
+        run: pnpm exec playwright install chromium webkit --with-deps
+        timeout-minutes: 10
 
       - name: 🏗️ Build application
         run: pnpm build
@@ -326,23 +326,42 @@ jobs:
           # Create output directories
           mkdir -p playwright-report
 
-          # Run tests with Playwright's built-in webServer
+          # Run tests on both Chromium (for Android/Desktop) and WebKit (for iOS)
           set +e
-          JSON_REPORT_FILE=accessibility-report.json pnpm exec playwright test tests/e2e/accessibility.spec.ts --config=playwright.config.ts --project=chromium
-          TEST_EXIT_CODE=$?
+
+          echo "🔍 Running accessibility tests on Chromium (Desktop/Android simulation)..."
+          JSON_REPORT_FILE=accessibility-report-chromium.json pnpm exec playwright test tests/e2e/accessibility-unified.spec.ts --config=playwright.config.ts --project=chromium
+          CHROMIUM_EXIT_CODE=$?
+
+          echo "🍎 Running accessibility tests on WebKit (iOS/Safari simulation)..."
+          JSON_REPORT_FILE=accessibility-report-webkit.json pnpm exec playwright test tests/e2e/accessibility-unified.spec.ts --config=playwright.config.ts --project=webkit
+          WEBKIT_EXIT_CODE=$?
+
           set -e
 
-          # Ensure JSON report exists
-          if [ ! -f "accessibility-report.json" ]; then
-            echo '{"stats":{"total":0,"passed":0,"failed":0},"suites":[]}' > accessibility-report.json
+          # Ensure JSON reports exist
+          if [ ! -f "accessibility-report-chromium.json" ]; then
+            echo '{"stats":{"total":0,"passed":0,"failed":0},"suites":[]}' > accessibility-report-chromium.json
+          fi
+          if [ ! -f "accessibility-report-webkit.json" ]; then
+            echo '{"stats":{"total":0,"passed":0,"failed":0},"suites":[]}' > accessibility-report-webkit.json
           fi
 
+          # Combine reports for summary
           echo "## ♿ Accessibility Test Results" >> $GITHUB_STEP_SUMMARY
           echo "Comprehensive accessibility tests completed using Playwright with axe-core integration." >> $GITHUB_STEP_SUMMARY
           echo "Tests include WCAG 2.2 AAA compliance checks for light theme, dark theme, form interactions, and error states." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Browser Engine | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Chromium (Desktop/Android) | $( [ $CHROMIUM_EXIT_CODE -eq 0 ] && echo '✅ Passed' || echo '❌ Failed' ) |" >> $GITHUB_STEP_SUMMARY
+          echo "| WebKit (iOS/Safari) | $( [ $WEBKIT_EXIT_CODE -eq 0 ] && echo '✅ Passed' || echo '❌ Failed' ) |" >> $GITHUB_STEP_SUMMARY
 
-          # Exit with the test result
-          exit $TEST_EXIT_CODE
+          # Exit with failure if either test failed
+          if [ $CHROMIUM_EXIT_CODE -ne 0 ] || [ $WEBKIT_EXIT_CODE -ne 0 ]; then
+            echo "⚠️ Some accessibility tests failed. Check detailed reports for specific issues." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
 
       - name: 📊 Upload accessibility report
         uses: actions/upload-artifact@v4
@@ -350,7 +369,8 @@ jobs:
         with:
           name: accessibility-report
           path: |
-            accessibility-report.json
+            accessibility-report-chromium.json
+            accessibility-report-webkit.json
           retention-days: 30
 
       - name: 📊 Upload accessibility HTML report
@@ -377,7 +397,7 @@ jobs:
           - browser: firefox
             project: firefox
             name: 'Desktop Firefox'
-          - browser: chromium
+          - browser: webkit
             project: mobile-iphone
             name: 'iPhone 16 Pro'
             mobile: true
@@ -385,7 +405,7 @@ jobs:
             project: mobile-android
             name: 'Galaxy S24'
             mobile: true
-          - browser: chromium
+          - browser: webkit
             project: mobile-ipad
             name: 'iPad Pro 12.9 Landscape'
             mobile: true

@@ -91,10 +91,16 @@ export default defineConfig({
     {
       name: 'mobile-iphone',
       use: {
-        ...devices['iPhone 15 Pro'], // Using iPhone 15 Pro as closest to iPhone 16 Pro
+        ...devices['iPhone 15 Pro'], // Using iPhone 15 Pro as closest to iPhone 16 Pro (WebKit engine)
         viewport: { width: 393, height: 852 }, // iPhone 16 Pro dimensions
         userAgent:
           'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
+        // Explicitly ensure WebKit engine is used for iOS devices
+        ...(process.env.CI && {
+          launchOptions: {
+            args: [], // WebKit doesn't support Chrome-specific args
+          },
+        }),
       },
     },
     {
@@ -109,10 +115,16 @@ export default defineConfig({
     {
       name: 'mobile-ipad',
       use: {
-        ...devices['iPad Pro'],
+        ...devices['iPad Pro'], // iPad Pro uses WebKit engine (Safari)
         viewport: { width: 1366, height: 1024 }, // iPad Pro 12.9" Landscape
         userAgent:
           'Mozilla/5.0 (iPad; CPU OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
+        // Explicitly ensure WebKit engine is used for iOS devices
+        ...(process.env.CI && {
+          launchOptions: {
+            args: [], // WebKit doesn't support Chrome-specific args
+          },
+        }),
       },
     },
     {
@@ -139,39 +151,111 @@ export default defineConfig({
           // Latest iPhone devices
           {
             name: 'iPhone 16 Pro Max',
-            use: { ...devices['iPhone 15 Pro Max'] }, // Using closest available device
+            use: {
+              ...devices['iPhone 15 Pro Max'], // Using closest available device
+              // Explicitly ensure WebKit engine is used for iOS devices
+              ...(process.env.CI && {
+                launchOptions: {
+                  args: [], // WebKit doesn't support Chrome-specific args
+                },
+              }),
+            },
           },
           {
             name: 'iPhone 16 Pro',
-            use: { ...devices['iPhone 15 Pro'] }, // Using closest available device
+            use: {
+              ...devices['iPhone 15 Pro'], // Using closest available device
+              // Explicitly ensure WebKit engine is used for iOS devices
+              ...(process.env.CI && {
+                launchOptions: {
+                  args: [], // WebKit doesn't support Chrome-specific args
+                },
+              }),
+            },
           },
           {
             name: 'iPhone 16',
-            use: { ...devices['iPhone 15'] }, // Using closest available device
+            use: {
+              ...devices['iPhone 15'], // Using closest available device
+              // Explicitly ensure WebKit engine is used for iOS devices
+              ...(process.env.CI && {
+                launchOptions: {
+                  args: [], // WebKit doesn't support Chrome-specific args
+                },
+              }),
+            },
           },
           {
             name: 'iPhone 15 Pro Max',
-            use: { ...devices['iPhone 15 Pro Max'] },
+            use: {
+              ...devices['iPhone 15 Pro Max'],
+              // Explicitly ensure WebKit engine is used for iOS devices
+              ...(process.env.CI && {
+                launchOptions: {
+                  args: [], // WebKit doesn't support Chrome-specific args
+                },
+              }),
+            },
           },
           {
             name: 'iPhone 15 Pro',
-            use: { ...devices['iPhone 15 Pro'] },
+            use: {
+              ...devices['iPhone 15 Pro'],
+              // Explicitly ensure WebKit engine is used for iOS devices
+              ...(process.env.CI && {
+                launchOptions: {
+                  args: [], // WebKit doesn't support Chrome-specific args
+                },
+              }),
+            },
           },
           {
             name: 'iPhone 15',
-            use: { ...devices['iPhone 15'] },
+            use: {
+              ...devices['iPhone 15'],
+              // Explicitly ensure WebKit engine is used for iOS devices
+              ...(process.env.CI && {
+                launchOptions: {
+                  args: [], // WebKit doesn't support Chrome-specific args
+                },
+              }),
+            },
           },
           {
             name: 'iPhone 14 Pro Max',
-            use: { ...devices['iPhone 14 Pro Max'] },
+            use: {
+              ...devices['iPhone 14 Pro Max'],
+              // Explicitly ensure WebKit engine is used for iOS devices
+              ...(process.env.CI && {
+                launchOptions: {
+                  args: [], // WebKit doesn't support Chrome-specific args
+                },
+              }),
+            },
           },
           {
             name: 'iPhone 14 Pro',
-            use: { ...devices['iPhone 14 Pro'] },
+            use: {
+              ...devices['iPhone 14 Pro'],
+              // Explicitly ensure WebKit engine is used for iOS devices
+              ...(process.env.CI && {
+                launchOptions: {
+                  args: [], // WebKit doesn't support Chrome-specific args
+                },
+              }),
+            },
           },
           {
             name: 'iPhone 13 Pro',
-            use: { ...devices['iPhone 13 Pro'] },
+            use: {
+              ...devices['iPhone 13 Pro'],
+              // Explicitly ensure WebKit engine is used for iOS devices
+              ...(process.env.CI && {
+                launchOptions: {
+                  args: [], // WebKit doesn't support Chrome-specific args
+                },
+              }),
+            },
           },
           // iPad devices - Portrait orientation
           {
@@ -179,6 +263,12 @@ export default defineConfig({
             use: {
               ...devices['iPad Pro'],
               viewport: { width: 1024, height: 1366 }, // Portrait
+              // Explicitly ensure WebKit engine is used for iOS devices
+              ...(process.env.CI && {
+                launchOptions: {
+                  args: [], // WebKit doesn't support Chrome-specific args
+                },
+              }),
             },
           },
           {
@@ -186,6 +276,12 @@ export default defineConfig({
             use: {
               ...devices['iPad Pro'],
               viewport: { width: 834, height: 1194 }, // Portrait
+              // Explicitly ensure WebKit engine is used for iOS devices
+              ...(process.env.CI && {
+                launchOptions: {
+                  args: [], // WebKit doesn't support Chrome-specific args
+                },
+              }),
             },
           },
           {
@@ -193,6 +289,12 @@ export default defineConfig({
             use: {
               ...devices['iPad Pro'],
               viewport: { width: 820, height: 1180 }, // Portrait
+              // Explicitly ensure WebKit engine is used for iOS devices
+              ...(process.env.CI && {
+                launchOptions: {
+                  args: [], // WebKit doesn't support Chrome-specific args
+                },
+              }),
             },
           },
           {
@@ -200,6 +302,12 @@ export default defineConfig({
             use: {
               ...devices['iPad Pro'],
               viewport: { width: 810, height: 1080 }, // Portrait
+              // Explicitly ensure WebKit engine is used for iOS devices
+              ...(process.env.CI && {
+                launchOptions: {
+                  args: [], // WebKit doesn't support Chrome-specific args
+                },
+              }),
             },
           },
           // iPad devices - Landscape orientation
@@ -208,6 +316,12 @@ export default defineConfig({
             use: {
               ...devices['iPad Pro'],
               viewport: { width: 1366, height: 1024 }, // Landscape
+              // Explicitly ensure WebKit engine is used for iOS devices
+              ...(process.env.CI && {
+                launchOptions: {
+                  args: [], // WebKit doesn't support Chrome-specific args
+                },
+              }),
             },
           },
           {
@@ -215,6 +329,12 @@ export default defineConfig({
             use: {
               ...devices['iPad Pro'],
               viewport: { width: 1194, height: 834 }, // Landscape
+              // Explicitly ensure WebKit engine is used for iOS devices
+              ...(process.env.CI && {
+                launchOptions: {
+                  args: [], // WebKit doesn't support Chrome-specific args
+                },
+              }),
             },
           },
           {
@@ -222,6 +342,12 @@ export default defineConfig({
             use: {
               ...devices['iPad Pro'],
               viewport: { width: 1180, height: 820 }, // Landscape
+              // Explicitly ensure WebKit engine is used for iOS devices
+              ...(process.env.CI && {
+                launchOptions: {
+                  args: [], // WebKit doesn't support Chrome-specific args
+                },
+              }),
             },
           },
           {
@@ -229,6 +355,12 @@ export default defineConfig({
             use: {
               ...devices['iPad Pro'],
               viewport: { width: 1080, height: 810 }, // Landscape
+              // Explicitly ensure WebKit engine is used for iOS devices
+              ...(process.env.CI && {
+                launchOptions: {
+                  args: [], // WebKit doesn't support Chrome-specific args
+                },
+              }),
             },
           },
           // Android devices - Latest phones

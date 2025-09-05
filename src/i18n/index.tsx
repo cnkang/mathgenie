@@ -53,6 +53,10 @@ export const useTranslation = (): I18nContextType => {
 };
 
 const getBrowserLanguage = (): string => {
+  if (typeof navigator === 'undefined') {
+    return 'en';
+  }
+
   const browserLang = navigator.language || navigator.languages?.[0] || 'en';
   const langCode = browserLang.split('-')[0];
   return languages[langCode] ? langCode : 'en';
@@ -180,31 +184,54 @@ interface I18nProviderProps {
 export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   const [currentLanguage, setCurrentLanguage] = useState<string>(() => {
     // 优先使用用户保存的语言设置，只有在没有保存设置时才使用浏览器语言
-    const savedLanguage = localStorage.getItem('mathgenie-language');
-    return savedLanguage || getBrowserLanguage();
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const savedLanguage = localStorage.getItem('mathgenie-language');
+      return savedLanguage || getBrowserLanguage();
+    }
+    return getBrowserLanguage();
   });
   const [translations, setTranslations] = useState<Translations>({});
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
+    let isMounted = true;
+
     const loadLanguage = async (): Promise<void> => {
+      if (!isMounted) return;
+
       setIsLoading(true);
       try {
         const newTranslations = await loadTranslations(currentLanguage);
+        if (!isMounted) return;
+
         setTranslations(newTranslations);
-        localStorage.setItem('mathgenie-language', currentLanguage);
-        document.documentElement.lang = currentLanguage;
+
+        // Safe localStorage access
+        if (typeof window !== 'undefined' && window.localStorage) {
+          localStorage.setItem('mathgenie-language', currentLanguage);
+        }
+
+        // Safe document access
+        if (typeof document !== 'undefined' && document.documentElement) {
+          document.documentElement.lang = currentLanguage;
+        }
       } catch (error) {
         if (__DEV__) {
           console.error('🌐 Failed to load translations:', error);
         }
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     loadLanguage();
+
+    return () => {
+      isMounted = false;
+    };
   }, [currentLanguage]);
 
   const t = (key: string, params: Record<string, string | number> = {}): string => {

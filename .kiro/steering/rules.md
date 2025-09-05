@@ -47,6 +47,38 @@ inclusion: always
 - Reduced motion preference testing
 - Use existing test utilities in `tests/e2e/test-utils.ts`
 
+#### Mobile Device Testing Configuration
+
+- **iOS Device Testing**: WebKit engine for iPhone/iPad tests
+- **Android Device Testing**: Chromium engine for Android device tests (Chrome-like behavior)
+- **Touch Target Validation**: Verify 44px minimum on actual mobile viewports
+- **Gesture Testing**: Test swipe, pinch, and touch interactions on mobile devices
+
+#### Browser Engine Requirements
+
+- **iOS Device Testing**: Use WebKit engine for iPhone/iPad tests (more realistic iOS experience)
+- **Android Device Testing**: Use Chromium engine for Android device tests
+- **Desktop Testing**: Use native browser engines (Chromium, Firefox, WebKit)
+- **Accessibility Testing**: Run on Chromium (Desktop/Android simulation), Firefox (Gecko engine), and WebKit (iOS/Safari simulation)
+- **Firefox Testing**: Include Firefox (Gecko engine) for comprehensive cross-browser compatibility
+- **CI Configuration**: Install Chromium, Firefox, and WebKit browsers for comprehensive testing
+- **Test Reports**: Generate separate accessibility reports for each browser engine
+
+#### CI/CD Browser Configuration
+
+- **CI Environment**: Install Chromium, Firefox, and WebKit browsers using `pnpm playwright:install:ci`
+- **Accessibility CI**: Run accessibility tests on Chromium, Firefox, and WebKit engines in parallel
+  - Chromium: Desktop and Android simulation accessibility testing
+  - Firefox: Gecko engine accessibility testing for comprehensive browser coverage
+  - WebKit: iOS and Safari simulation accessibility testing
+- **Mobile Device Testing**: Configure proper browser engines for realistic mobile testing
+  - iPhone/iPad tests: WebKit engine (Safari-like behavior)
+  - Android tests: Chromium engine (Chrome-like behavior)
+- **Cross-Engine Validation**: Ensure accessibility compliance across different rendering engines
+- **Performance Testing**: Run Core Web Vitals tests on both engines for comprehensive performance validation
+- **Parallel Execution**: Run accessibility tests simultaneously on both engines to reduce CI time
+- **Firefox Testing**: Include Firefox for complete cross-browser compatibility validation (Gecko engine)
+
 ## Documentation Maintenance (Critical)
 
 ### Documentation Update Requirements
@@ -144,10 +176,13 @@ Before creating a new file, ask:
 ### Commands (pnpm only)
 
 - `pnpm dev` - Development server
-- `pnpm test` - Unit tests
-- `pnpm test:e2e` - End-to-end tests
+- `pnpm test` - Unit tests with coverage
+- `pnpm test:e2e` - End-to-end tests (all browsers)
+- `pnpm test:e2e:accessibility` - Accessibility tests (Chromium + Firefox + WebKit for comprehensive coverage)
 - `pnpm validate` - Full validation pipeline
 - `pnpm build` - Production build
+- `pnpm playwright:install` - Install all Playwright browsers (Chromium, Firefox, WebKit)
+- `pnpm playwright:install:ci` - Install browsers for CI (Chromium, Firefox, WebKit)
 
 ### Code Quality
 
@@ -333,10 +368,11 @@ select,
 
 #### Automated Testing
 
-- **axe-core**: Run axe-core with WCAG 2.2 AAA rules enabled
-- **Color Contrast**: Automated contrast ratio testing
-- **Keyboard Navigation**: Automated keyboard accessibility testing
-- **Screen Reader**: Test with screen reader simulation
+- **axe-core**: Run axe-core with WCAG 2.2 AAA rules enabled on Chromium, Firefox, and WebKit
+- **Color Contrast**: Automated contrast ratio testing across all three rendering engines
+- **Keyboard Navigation**: Automated keyboard accessibility testing on all engines
+- **Screen Reader**: Test with screen reader simulation on Chromium (NVDA/JAWS simulation), Firefox (Gecko accessibility), and WebKit (VoiceOver simulation)
+- **Cross-Engine Validation**: Ensure accessibility features work consistently across Chromium, Firefox, and WebKit engines
 
 #### Manual Testing
 
@@ -345,6 +381,8 @@ select,
 - **High Contrast**: Test in high contrast mode
 - **Zoom**: Test at 200% zoom level
 - **Reduced Motion**: Test with reduced motion preferences
+- **Theme Testing**: Manual verification of accessibility in both light and dark modes
+- **Color Independence**: Verify information is not conveyed by color alone in both themes
 
 #### Mobile Accessibility
 
@@ -352,6 +390,15 @@ select,
 - **Orientation**: Test both portrait and landscape
 - **Voice Control**: Test with voice control features
 - **Screen Reader**: Test with mobile screen readers
+
+#### Theme and Color Mode Testing
+
+- **Light Mode**: Test all accessibility features in light color scheme
+- **Dark Mode**: Test all accessibility features in dark color scheme
+- **Color Contrast**: Verify AAA contrast ratios (7:1 for normal text, 4.5:1 for large text) in both themes
+- **Theme Switching**: Ensure accessibility compliance is maintained when switching between themes
+- **High Contrast Mode**: Test compatibility with system high contrast preferences
+- **Reduced Motion**: Respect user preferences for reduced motion in both themes
 
 ### Code Review Checklist
 
@@ -368,11 +415,14 @@ select,
 
 #### Testing Validation
 
-- [ ] axe-core tests pass with WCAG 2.2 AAA rules
+- [ ] axe-core tests pass with WCAG 2.2 AAA rules on Chromium, Firefox, and WebKit
 - [ ] Manual keyboard navigation test completed
 - [ ] Screen reader testing completed
 - [ ] Mobile accessibility testing completed
 - [ ] Reduced motion preferences respected
+- [ ] Light mode accessibility testing completed
+- [ ] Dark mode accessibility testing completed
+- [ ] Cross-browser accessibility validation (Chromium + Firefox + WebKit)
 
 ### Error Prevention
 

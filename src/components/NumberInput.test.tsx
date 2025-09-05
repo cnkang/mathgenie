@@ -22,20 +22,26 @@ describe('NumberInput', () => {
     expect(screen.getByText('Test Input')).toBeDefined();
   });
 
-  test('calls onChange when value changes', () => {
+  test('calls onChange when value changes', async () => {
     render(<NumberInput {...defaultProps} />);
 
     const input = screen.getByDisplayValue('10');
-    fireEvent.change(input, { target: { value: '25' } });
+
+    await act(async () => {
+      fireEvent.change(input, { target: { value: '25' } });
+    });
 
     expect(defaultProps.onChange).toHaveBeenCalledWith(25);
   });
 
-  test('handles empty input', () => {
+  test('handles empty input', async () => {
     render(<NumberInput {...defaultProps} />);
 
     const input = screen.getByDisplayValue('10');
-    fireEvent.change(input, { target: { value: '' } });
+
+    await act(async () => {
+      fireEvent.change(input, { target: { value: '' } });
+    });
 
     expect(defaultProps.onChange).toHaveBeenCalledWith(1);
   });
@@ -63,11 +69,14 @@ describe('NumberInput', () => {
     expect(input).toBeDefined();
   });
 
-  test('handles invalid number input', () => {
+  test('handles invalid number input', async () => {
     render(<NumberInput {...defaultProps} />);
 
     const input = screen.getByDisplayValue('10');
-    fireEvent.change(input, { target: { value: 'abc' } });
+
+    await act(async () => {
+      fireEvent.change(input, { target: { value: 'abc' } });
+    });
 
     // Should handle gracefully
     expect(input).toBeDefined();
@@ -142,12 +151,15 @@ describe('NumberInput', () => {
     expect(defaultProps.onChange).toHaveBeenCalledWith(1); // Should reset to min
   });
 
-  test('handles blur with valid value in range', () => {
+  test('handles blur with valid value in range', async () => {
     render(<NumberInput {...defaultProps} />);
 
     const input = screen.getByDisplayValue('10');
-    fireEvent.change(input, { target: { value: '50' } });
-    fireEvent.blur(input);
+
+    await act(async () => {
+      fireEvent.change(input, { target: { value: '50' } });
+      fireEvent.blur(input);
+    });
 
     // Should not call onChange again if value is already valid
     expect(input).toBeDefined();
@@ -178,25 +190,31 @@ describe('NumberInput', () => {
     expect(input.getAttribute('pattern')).toBe('[0-9]*');
   });
 
-  test('handles value at minimum boundary', () => {
+  test('handles value at minimum boundary', async () => {
     render(<NumberInput {...defaultProps} />);
 
     const input = screen.getByDisplayValue('10');
-    fireEvent.change(input, { target: { value: '1' } });
+
+    await act(async () => {
+      fireEvent.change(input, { target: { value: '1' } });
+    });
 
     expect(defaultProps.onChange).toHaveBeenCalledWith(1);
   });
 
-  test('handles value at maximum boundary', () => {
+  test('handles value at maximum boundary', async () => {
     render(<NumberInput {...defaultProps} />);
 
     const input = screen.getByDisplayValue('10');
-    fireEvent.change(input, { target: { value: '100' } });
+
+    await act(async () => {
+      fireEvent.change(input, { target: { value: '100' } });
+    });
 
     expect(defaultProps.onChange).toHaveBeenCalledWith(100);
   });
 
-  test('does not call onChange for out of range values during change', () => {
+  test('does not call onChange for out of range values during change', async () => {
     render(<NumberInput {...defaultProps} />);
 
     const input = screen.getByDisplayValue('10');
@@ -204,7 +222,9 @@ describe('NumberInput', () => {
     // Clear previous calls
     defaultProps.onChange.mockClear();
 
-    fireEvent.change(input, { target: { value: '150' } });
+    await act(async () => {
+      fireEvent.change(input, { target: { value: '150' } });
+    });
 
     // Should not call onChange for out of range value during change
     expect(defaultProps.onChange).not.toHaveBeenCalled();

@@ -184,19 +184,19 @@ run_test_suite() {
             npx playwright test tests/e2e/integration.spec.ts --project=$browser
             ;;
         "accessibility")
-            npx playwright test tests/e2e/accessibility.spec.ts --project=$browser
+            npx playwright test tests/e2e/accessibility-unified.spec.ts --project=$browser
             ;;
         "accessibility-comprehensive")
-            npx playwright test tests/e2e/accessibility-comprehensive.spec.ts --project=$browser
+            npx playwright test tests/e2e/accessibility-unified.spec.ts --project=$browser
             ;;
         "accessibility-mobile")
-            npx playwright test tests/e2e/accessibility-mobile.spec.ts --project=$browser
+            npx playwright test tests/e2e/accessibility-unified.spec.ts --project=$browser
             ;;
         "accessibility-themes")
-            npx playwright test tests/e2e/accessibility-themes.spec.ts --project=$browser
+            npx playwright test tests/e2e/accessibility-unified.spec.ts --project=$browser
             ;;
         "accessibility-all")
-            npx playwright test tests/e2e/accessibility*.spec.ts --project=$browser
+            npx playwright test tests/e2e/accessibility-unified.spec.ts --project=$browser
             ;;
         "basic")
             npx playwright test tests/e2e/basic.spec.ts --project=$browser
@@ -284,11 +284,11 @@ show_usage() {
     echo "  localstorage           - localStorage persistence tests"
     echo "  presets                - Presets functionality tests"
     echo "  integration            - Integration tests"
-    echo "  accessibility          - Basic accessibility and ARIA tests
-  accessibility-comprehensive - Comprehensive WCAG 2.2 AAA tests
-  accessibility-mobile       - Mobile accessibility tests (WCAG 2.2 AAA)
-  accessibility-themes       - Theme and color contrast tests (WCAG 2.2 AAA)
-  accessibility-all          - All accessibility tests (WCAG 2.2 AAA)"
+    echo "  accessibility          - Unified WCAG 2.2 AAA accessibility tests
+  accessibility-comprehensive - Same as accessibility (unified test)
+  accessibility-mobile       - Same as accessibility (unified test)
+  accessibility-themes       - Same as accessibility (unified test)
+  accessibility-all          - Same as accessibility (unified test)"
     echo "  basic                  - Basic functionality tests"
     echo "  all                    - All test suites"
     echo ""
@@ -318,8 +318,8 @@ show_usage() {
     echo "  $0 full                            # Run all tests"
     echo "  $0 suite error-handling            # Run error handling tests"
     echo "  $0 suite presets firefox           # Run presets tests on Firefox"
-    echo "  $0 suite accessibility-all         # Run all accessibility tests"
-    echo "  $0 suite accessibility-mobile      # Run mobile accessibility tests"
+    echo "  $0 suite accessibility             # Run unified WCAG 2.2 AAA accessibility tests"
+    echo "  $0 suite accessibility-all         # Run unified accessibility tests (same as above)"
     echo "  $0 mobile iphone16                 # Run iPhone 16 tests"
     echo "  $0 mobile ipad                     # Run iPad tests"
     echo "  $0 mobile android                  # Run Android tests"

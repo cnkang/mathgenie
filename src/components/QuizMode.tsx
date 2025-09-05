@@ -97,7 +97,10 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
   useEffect(() => {
     // Calculate the correct answer for each problem
     const problemsWithAnswers = problems.map(problem => {
-      const expression = problem.text.replace(' = ', '').replace('✖', '*').replace('➗', '/');
+      const expression = problem.text
+        .replace(' = ', '')
+        .replace(/[✖×]/g, '*')
+        .replace(/[➗÷]/g, '/');
       let correctAnswer: number;
 
       try {
