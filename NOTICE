@@ -1,0 +1,20 @@
+MathGenie
+Copyright (c) 2025 Kang Liu
+
+This software contains third-party libraries with the following licenses:
+
+React (MIT License)
+Copyright (c) Meta Platforms, Inc. and affiliates.
+
+jsPDF (MIT License)
+Copyright (c) 2010-2021 James Hall, https://github.com/MrRio/jsPDF
+
+@vercel/speed-insights (MIT License)
+Copyright (c) 2023 Vercel, Inc.
+
+web-vitals (Apache License 2.0)
+Copyright 2020 Google LLC
+
+For the full text of these licenses, please refer to the respective packages in node_modules or their official repositories.
+
+This project is licensed under the MIT License. See LICENSE file for details.

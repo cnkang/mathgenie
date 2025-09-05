@@ -4,8 +4,8 @@
 [![Node.js 22.19.1](https://img.shields.io/badge/Node.js-22.19.1-green.svg)](https://nodejs.org/)
 [![React 19.1.1](https://img.shields.io/badge/React-19.1.1-blue.svg)](https://reactjs.org/)
 [![TypeScript 5.9](https://img.shields.io/badge/TypeScript-5.9-blue.svg)](https://www.typescriptlang.org/)
-[![Version 1.0.0](https://img.shields.io/badge/Version-1.0.0-brightgreen.svg)](https://github.com/cnkang/mathgenie)
-[![CI/CD](https://github.com/cnkang/mathgenie/workflows/CI%2FCD%20Pipeline/badge.svg)](https://github.com/cnkang/mathgenie/actions)
+[![pnpm 10.15.1](https://img.shields.io/badge/pnpm-10.15.1-orange.svg)](https://pnpm.io/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 MathGenie is a modern web application built with **React 19.1.1**, **TypeScript 5.9**, and **Node.js 22.19.1**, designed to help tutors generate math problems focusing on basic arithmetic operations. Enhanced with the latest React concurrent features and full TypeScript support for optimal performance, type safety, and developer experience.
 
@@ -40,7 +40,7 @@ MathGenie is a modern web application built with **React 19.1.1**, **TypeScript 
 
 - **Frontend**: React 19.1.1 with concurrent features and TypeScript 5.9
 - **Runtime**: Node.js 22.19.1 with enhanced performance
-- **Build Tool**: Vite 7.1.3 for lightning-fast development with TypeScript support
+- **Build Tool**: Vite 7.1.4 for lightning-fast development with TypeScript support
 - **Package Manager**: pnpm 10.15.1 for optimal performance and disk efficiency
 - **Testing**: Vitest + Playwright for comprehensive testing with TypeScript
 - **Styling**: Modern CSS with mobile-first responsive design
@@ -54,8 +54,9 @@ MathGenie is a modern web application built with **React 19.1.1**, **TypeScript 
 - **Re-renders**: ~30% reduction with React 19 automatic batching
 - **Bundle Size**: Optimized with tree shaking and code splitting
 - **Core Web Vitals**: Excellent scores across all metrics
-- **Accessibility**: WCAG 2.1 AA compliant
+- **Accessibility**: WCAG 2.2 AAA compliant
 - **Type Safety**: 100% TypeScript coverage with strict mode
+- **Test Execution**: Optimized E2E suite (595 tests, 2.6min runtime)
 
 ## 🚀 Installation
 
@@ -188,6 +189,16 @@ After configuring the settings:
 
 ## 🧪 Testing
 
+### Test Suite Overview
+
+MathGenie features a comprehensive, optimized test suite:
+
+- **595 E2E tests** (optimized from 623, ~7% faster execution)
+- **90% code coverage** with unit and integration tests
+- **WCAG 2.2 AAA compliance** testing across all devices and themes
+- **Cross-browser compatibility** (Chrome, Firefox, Safari)
+- **Mobile device testing** (iPhone, iPad, Android)
+
 ### Unit & Integration Tests
 
 ```bash
@@ -201,14 +212,27 @@ pnpm test:watch
 ### E2E Tests
 
 ```bash
-# Desktop E2E tests
+# All E2E tests (optimized suite - 595 tests)
 pnpm test:e2e
 
-# Smoke tests
+# Smoke tests (essential functionality)
 pnpm test:smoke
 
-# E2E with UI
+# E2E with UI (interactive debugging)
 pnpm test:e2e:ui
+
+# Specific test suites
+pnpm test:e2e:accessibility    # WCAG 2.2 AAA compliance tests
+pnpm test:e2e:integration      # Complex integration scenarios
+pnpm test:e2e:presets          # Settings presets functionality
+pnpm test:e2e:localstorage     # Data persistence tests
+pnpm test:e2e:error-handling   # Error handling and validation
+
+# Essential mobile devices (included in CI)
+pnpm exec playwright test --project=mobile-iphone      # iPhone 16 Pro
+pnpm exec playwright test --project=mobile-android     # Galaxy S24
+pnpm exec playwright test --project=mobile-ipad        # iPad Pro 12.9" Landscape
+pnpm exec playwright test --project=mobile-android-tablet # Galaxy Tab S9 Landscape
 ```
 
 ### Mobile Device Testing
@@ -290,14 +314,18 @@ The build process includes:
 
 ### CI/CD Pipeline
 
-GitHub Actions handles quality assurance:
+GitHub Actions handles quality assurance with an optimized test suite:
 
 - ✅ Code quality checks (ESLint, Prettier)
 - ✅ TypeScript type checking
-- ✅ Unit and integration tests
-- ✅ Cross-browser testing (Playwright)
+- ✅ Unit and integration tests (90% coverage)
+- ✅ Optimized E2E testing (595 tests, ~2.6min execution)
+- ✅ Cross-browser testing (Chrome, Firefox)
+- ✅ Essential mobile device testing (iPhone, Android phone/tablet, iPad)
+- ✅ Comprehensive accessibility compliance (WCAG 2.2 AAA)
 - ✅ Security scanning
-- ✅ Performance monitoring
+- ✅ Performance monitoring (Lighthouse)
+- ✅ i18n translation validation
 
 ## 📈 Performance Monitoring
 
@@ -334,25 +362,40 @@ The project uses strict TypeScript configuration with React 19 optimizations ena
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for comprehensive information on:
 
-### Development Setup
+- 🚀 Development setup and workflow
+- 📏 Code standards and best practices
+- 🧪 Testing requirements and guidelines
+- 🌍 Internationalization requirements
+- ♿ Accessibility compliance (WCAG 2.2 AAA)
+- 📝 Commit and PR guidelines
+- 🐛 Issue reporting templates
+- 📚 Documentation maintenance requirements
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes with React 19 and TypeScript best practices
-4. Add tests for new features (with TypeScript)
-5. Run type checking: `pnpm type-check`
-6. Submit a pull request
+### Quick Start for Contributors
 
-### Code Standards
+```bash
+# Fork and clone the repository
+git clone https://github.com/YOUR_USERNAME/mathgenie.git
+cd mathgenie
 
-- **React 19.1.1** patterns and hooks with TypeScript
-- **TypeScript 5.9** with strict configuration
-- **ESLint** and **Prettier** for code formatting
-- **Accessibility** compliance (WCAG 2.1 AA)
-- **Performance** optimization with React 19 features
-- **Type Safety** with comprehensive type definitions
+# Install dependencies and start development
+pnpm install
+pnpm dev
+
+# Run validation before submitting
+pnpm validate
+```
+
+### Key Requirements
+
+- **React 19 + TypeScript**: Use concurrent features and strict typing
+- **Testing**: 90% coverage with optimized E2E suite (see [TESTING.md](TESTING.md))
+- **Accessibility**: WCAG 2.2 AAA compliance required
+- **i18n**: All user-facing text must use translation keys
+- **Mobile**: Test on iPhone, iPad, and Android devices
+- **Documentation**: Update docs immediately with code changes
 
 ## 🐛 Troubleshooting
 
@@ -406,6 +449,10 @@ pnpm build:types
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+**Copyright (c) 2025 Kang Liu**
+
+Third-party dependencies and their licenses are documented in the [NOTICE](NOTICE) file.
 
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fcnkang%2Fmathgenie.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fcnkang%2Fmathgenie?ref=badge_large)
 

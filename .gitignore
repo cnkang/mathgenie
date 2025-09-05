@@ -37,6 +37,10 @@ npm-error.log*
 *.swo
 *~
 
+# Kiro IDE files
+.kiro/specs/
+.kiro/hooks/
+
 # OS generated files
 .DS_Store
 .DS_Store?
@@ -149,6 +153,8 @@ package-lock.json
 # Build artifacts
 *.tgz
 *.tar.gz
+build-info.json
+public/build-info.json
 
 # Editor backup files
 *~
@@ -187,6 +193,23 @@ playwright.*.config.ts
 !playwright.config.ts
 !playwright.e2e.config.ts
 TESTING_SUMMARY.md
+
+# Temporary test files and debugging
+test-*.spec.ts
+*-check.spec.ts
+*-debug.spec.ts
+*startup*.spec.ts
+*refresh*.spec.ts
+*translation*check*.spec.ts
+*detailed*check*.spec.ts
+
+# Temporary screenshots and debugging images
+*-check.png
+*-debug.png
+*startup*.png
+*refresh*.png
+initial-load-screenshot.png
+detailed-startup-check.png
 
 # Code quality and analysis
 .sonarjs/
