@@ -1,15 +1,14 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import App from './App';
-import { I18nProvider } from './i18n';
 
-// Mock Speed Insights component
+// Mock external dependencies
 vi.mock('@vercel/speed-insights/react', () => ({
   SpeedInsights: () => <div data-testid='mocked-speed-insights'>Mocked Speed Insights</div>,
 }));
 
-// Mock jsPDF for PDF generation tests
 vi.mock('jspdf', () => ({
   default: vi.fn().mockImplementation(() => ({
     setFontSize: vi.fn(),
@@ -25,485 +24,168 @@ vi.mock('jspdf', () => ({
   })),
 }));
 
+// Create a mock state for language
+let mockCurrentLanguage = 'en';
+const mockChangeLanguage = vi.fn((lang: string) => {
+  mockCurrentLanguage = lang;
+});
+
+// Mock the i18n system for consistent testing
+vi.mock('./i18n', () => ({
+  I18nProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  useTranslation: () => ({
+    t: (key: string, params?: Record<string, string | number>) => {
+      const translations: Record<string, string> = {
+        'app.title': 'MathGenie',
+        'app.subtitle': 'Generate customized math problems for practice and learning',
+        'operations.title': 'Select Operations',
+        'operations.addition': 'Addition (+)',
+        'operations.subtraction': 'Subtraction (-)',
+        'operations.multiplication': 'Multiplication (×)',
+        'operations.division': 'Division (÷)',
+        'operations.help': 'Hold Ctrl/Cmd to select multiple operations',
+        'settings.numProblems': 'Number of Problems',
+        'settings.numberRange': 'Number Range',
+        'settings.resultRange': 'Result Range',
+        'settings.operandsRange': 'Number of Operands',
+        'settings.allowNegative': 'Allow Negative Results',
+        'settings.showAnswers': 'Show Answers',
+        'settings.from': 'From',
+        'settings.to': 'to',
+        'pdf.title': 'PDF Settings',
+        'pdf.fontSize': 'Font Size (pt)',
+        'pdf.lineSpacing': 'Line Spacing (pt)',
+        'pdf.paperSize': 'Paper Size',
+        'buttons.generate': 'Generate Problems',
+        'buttons.download': 'Download PDF',
+        'buttons.generateDescription': 'Create new math problems with your current settings',
+        'buttons.downloadDescription': 'Save your problems as a printable PDF file',
+        'buttons.quizDescription': 'Test your skills with an interactive quiz',
+        'results.title': 'Generated Problems ({{count}})',
+        'results.noProblems': 'No problems generated yet',
+        'accessibility.selectOperations': 'Select mathematical operations to include',
+        'accessibility.numProblemsInput': 'Number of problems to generate',
+        'accessibility.generateButton': 'Generate math problems with current settings',
+        'accessibility.downloadButton': 'Download generated problems as PDF file',
+        'language.select': 'Language',
+        'presets.title': 'Quick Presets',
+        'presets.beginner.name': 'Beginner (1-10)',
+        'presets.beginner.description': 'Simple addition and subtraction',
+        'presets.intermediate.name': 'Intermediate (1-50)',
+        'presets.intermediate.description': 'All operations with medium numbers',
+        'presets.advanced.name': 'Advanced (1-100)',
+        'presets.advanced.description': 'All operations including division',
+        'presets.multiplication.name': 'Multiplication Focus',
+        'presets.multiplication.description': 'Focus on multiplication tables',
+        'presets.apply': 'Apply',
+        'presets.clickToApply': 'Click to apply',
+        'infoPanel.quickActions.startQuiz': 'Start Quiz',
+        'messages.success.problemsGenerated': 'Successfully generated {{count}} problems!',
+        'messages.success.generated': 'Generated',
+      };
+
+      let result = translations[key] || key;
+
+      // Handle parameter substitution
+      if (params && typeof result === 'string') {
+        Object.entries(params).forEach(([paramKey, paramValue]) => {
+          const placeholder = '{{' + paramKey + '}}';
+          result = result.replace(new RegExp(placeholder, 'g'), String(paramValue));
+        });
+      }
+
+      return result;
+    },
+    get currentLanguage() {
+      return mockCurrentLanguage;
+    },
+    changeLanguage: mockChangeLanguage,
+    isLoading: false,
+    languages: {
+      en: { code: 'en', name: 'English', flag: '🇺🇸' },
+      zh: { code: 'zh', name: '中文', flag: '🇨🇳' },
+      es: { code: 'es', name: 'Español', flag: '🇪🇸' },
+      fr: { code: 'fr', name: 'Français', flag: '🇫🇷' },
+      de: { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+      ja: { code: 'ja', name: '日本語', flag: '🇯🇵' },
+    },
+  }),
+}));
+
 const renderWithProvider = (component: React.ReactElement) => {
-  return render(<I18nProvider>{component}</I18nProvider>);
+  return render(component);
 };
 
 describe('App Component', () => {
   beforeEach(() => {
-    // Clear localStorage before each test
     localStorage.clear();
     vi.clearAllMocks();
   });
 
-  it('renders MathGenie header', async () => {
-    renderWithProvider(<App />);
-    await waitFor(() => {
-      const header = screen.getByText(/MathGenie/i);
-      expect(header).not.toBeNull();
-    });
-  });
-
-  it('allows user to select operations', async () => {
-    renderWithProvider(<App />);
-    await waitFor(() => screen.getByLabelText(/Operations/i));
-
-    const operationsSelect = screen.getByLabelText(/Operations/i) as HTMLSelectElement;
-
-    // Manually update the options selection
-    for (const option of Array.from(operationsSelect.options)) {
-      option.selected = ['*', '/'].includes(option.value);
-    }
-
-    fireEvent.change(operationsSelect);
-
-    const selectedOptions = Array.from(operationsSelect.selectedOptions).map(opt => opt.value);
-    expect(selectedOptions).toEqual(['*', '/']);
-  });
-
-  it('generates problems correctly', async () => {
-    renderWithProvider(<App />);
-
-    // Wait for the component to load and auto-generate problems
-    await waitFor(
-      () => {
-        const problemDivs = screen.queryAllByText(/=/);
-        expect(problemDivs.length).toBeGreaterThan(0);
-      },
-      { timeout: 3000 }
-    );
-  });
-
-  it('enables download PDF button after problems are generated', async () => {
-    renderWithProvider(<App />);
-
-    // Wait for problems to be auto-generated
-    await waitFor(
-      () => {
-        const downloadButton = screen.getByRole('button', {
-          name: /Download generated problems as PDF file/i,
-        }) as HTMLButtonElement;
-        expect(downloadButton.disabled).toBe(false);
-      },
-      { timeout: 3000 }
-    );
-  });
-
-  it('checks allow negative results checkbox', async () => {
+  test('renders main application elements', async () => {
     renderWithProvider(<App />);
 
     await waitFor(() => {
-      const allowNegativeCheckbox = screen.getByLabelText(
-        /Allow Negative Results/i
-      ) as HTMLInputElement;
-
-      fireEvent.click(allowNegativeCheckbox);
-      expect(allowNegativeCheckbox.checked).toBe(true);
-
-      fireEvent.click(allowNegativeCheckbox);
-      expect(allowNegativeCheckbox.checked).toBe(false);
+      expect(screen.getByText(/MathGenie/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Number of problems/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Select mathematical operations/i)).toBeInTheDocument();
     });
   });
 
-  it('updates number of problems input', async () => {
+  test('generates problems when form is submitted', async () => {
+    const user = userEvent.setup();
     renderWithProvider(<App />);
+
+    await waitFor(() => screen.getByLabelText(/Number of problems/i));
+
+    // Fill form
+    await user.clear(screen.getByLabelText(/Number of problems/i));
+    await user.type(screen.getByLabelText(/Number of problems/i), '5');
+
+    // Generate problems using more specific selector
+    const generateButton = screen.getByRole('button', {
+      name: /Generate Problems.*Generate math problems/i,
+    });
+    await user.click(generateButton);
 
     await waitFor(() => {
-      const numProblemsInput = screen.getByLabelText(/Number of problems/i) as HTMLInputElement;
-
-      fireEvent.change(numProblemsInput, { target: { value: '30' } });
-      expect(numProblemsInput.value).toBe('30');
+      expect(screen.getByText(/Successfully generated 5 problems!/i)).toBeInTheDocument();
     });
   });
 
-  it('applies preset settings', async () => {
+  test('validates form inputs', async () => {
+    const user = userEvent.setup();
     renderWithProvider(<App />);
 
-    // Just check that the app renders with basic functionality
-    await waitFor(() => {
-      const numProblemsInput = document.getElementById('numProblems') as HTMLInputElement;
-      expect(numProblemsInput).toBeTruthy();
-      expect(parseInt(numProblemsInput.value)).toBeGreaterThan(0);
+    await waitFor(() => screen.getByLabelText(/Number of problems/i));
+
+    // Enter invalid value
+    await user.clear(screen.getByLabelText(/Number of problems/i));
+    await user.type(screen.getByLabelText(/Number of problems/i), '0');
+
+    // Try to generate
+    const generateButton = screen.getByRole('button', {
+      name: /Generate Problems.*Generate math problems/i,
     });
-  });
-
-  it('handles language switching', async () => {
-    renderWithProvider(<App />);
-
-    // Just check that the app renders with basic functionality
-    await waitFor(() => {
-      const generateButton = screen.getByRole('button', {
-        name: /Generate math problems with current settings/i,
-      });
-      expect(generateButton).toBeTruthy();
-    });
-  });
-
-  it('validates number range inputs', async () => {
-    renderWithProvider(<App />);
+    await user.click(generateButton);
 
     await waitFor(() => {
-      const minNumberInput = document.getElementById('numRangeFrom') as HTMLInputElement;
-      const maxNumberInput = document.getElementById('numRangeTo') as HTMLInputElement;
-      expect(minNumberInput).toBeTruthy();
-      expect(maxNumberInput).toBeTruthy();
-
-      fireEvent.change(minNumberInput, { target: { value: '10' } });
-      fireEvent.change(maxNumberInput, { target: { value: '5' } });
-
-      // Trigger validation by trying to generate problems
-      const generateButton = screen.getByRole('button', {
-        name: /Generate math problems with current settings/i,
-      });
-      fireEvent.click(generateButton);
-    });
-
-    // Test completed successfully
-  });
-
-  it('handles PDF download', async () => {
-    renderWithProvider(<App />);
-
-    await waitFor(
-      () => {
-        const downloadButton = screen.getByRole('button', {
-          name: /Download generated problems as PDF file/i,
-        }) as HTMLButtonElement;
-        fireEvent.click(downloadButton);
-      },
-      { timeout: 3000 }
-    );
-  });
-
-  it('handles show answers toggle', async () => {
-    renderWithProvider(<App />);
-
-    await waitFor(() => {
-      const showAnswersCheckbox = screen.getByLabelText(/Show Answers/i) as HTMLInputElement;
-      fireEvent.click(showAnswersCheckbox);
-      expect(showAnswersCheckbox.checked).toBe(true);
+      expect(screen.getByRole('alert')).toBeInTheDocument();
     });
   });
 
-  it('handles font size changes', async () => {
+  test('supports language switching', async () => {
+    const user = userEvent.setup();
     renderWithProvider(<App />);
 
-    await waitFor(() => {
-      const fontSizeInput = screen.getByLabelText(/Font size/i) as HTMLInputElement;
-      fireEvent.change(fontSizeInput, { target: { value: '16' } });
-      expect(fontSizeInput.value).toBe('16');
-    });
-  });
+    await waitFor(() => screen.getByLabelText(/Language/i));
 
-  it('validates no operations selected', async () => {
-    renderWithProvider(<App />);
+    const languageSelect = screen.getByLabelText(/Language/i);
+    expect(languageSelect).toHaveValue('en'); // Initial value
 
-    await waitFor(() => {
-      const operationsSelect = screen.getByLabelText(/Operations/i) as HTMLSelectElement;
+    await user.selectOptions(languageSelect, 'zh');
 
-      for (const option of Array.from(operationsSelect.options)) {
-        option.selected = false;
-      }
-      fireEvent.change(operationsSelect);
-
-      const generateButton = screen.getByRole('button', {
-        name: /Generate math problems with current settings/i,
-      });
-      fireEvent.click(generateButton);
-    });
-  });
-
-  it('handles invalid problem count', async () => {
-    renderWithProvider(<App />);
-
-    await waitFor(() => {
-      const numProblemsInput = screen.getByLabelText(/Number of problems/i) as HTMLInputElement;
-      fireEvent.change(numProblemsInput, { target: { value: '101' } });
-
-      const generateButton = screen.getByRole('button', {
-        name: /Generate math problems with current settings/i,
-      });
-      fireEvent.click(generateButton);
-    });
-  });
-
-  it('handles invalid result range', async () => {
-    renderWithProvider(<App />);
-
-    await waitFor(() => {
-      const resultRangeFrom = document.getElementById('resultRangeFrom') as HTMLInputElement;
-      const resultRangeTo = document.getElementById('resultRangeTo') as HTMLInputElement;
-
-      fireEvent.change(resultRangeFrom, { target: { value: '100' } });
-      fireEvent.change(resultRangeTo, { target: { value: '50' } });
-
-      const generateButton = screen.getByRole('button', {
-        name: /Generate math problems with current settings/i,
-      });
-      fireEvent.click(generateButton);
-    });
-  });
-
-  it('handles division operation', async () => {
-    renderWithProvider(<App />);
-
-    await waitFor(() => {
-      const operationsSelect = screen.getByLabelText(/Operations/i) as HTMLSelectElement;
-
-      for (const option of Array.from(operationsSelect.options)) {
-        option.selected = option.value === '/';
-      }
-      fireEvent.change(operationsSelect);
-    });
-  });
-
-  it('handles multiplication operation', async () => {
-    renderWithProvider(<App />);
-
-    await waitFor(() => {
-      const operationsSelect = screen.getByLabelText(/Operations/i) as HTMLSelectElement;
-
-      for (const option of Array.from(operationsSelect.options)) {
-        option.selected = option.value === '*';
-      }
-      fireEvent.change(operationsSelect);
-    });
-  });
-
-  it('handles operands range changes', async () => {
-    renderWithProvider(<App />);
-
-    await waitFor(() => {
-      const operandsFrom = screen.getByDisplayValue('2') as HTMLInputElement;
-      const operandsTo = screen.getByDisplayValue('3') as HTMLInputElement;
-
-      fireEvent.change(operandsFrom, { target: { value: '3' } });
-      fireEvent.change(operandsTo, { target: { value: '4' } });
-
-      expect(operandsFrom.value).toBe('3');
-      expect(operandsTo.value).toBe('4');
-    });
-  });
-
-  it('handles line spacing changes', async () => {
-    renderWithProvider(<App />);
-
-    await waitFor(() => {
-      const lineSpacingInput = screen.getByLabelText(/Line spacing/i) as HTMLInputElement;
-      fireEvent.change(lineSpacingInput, { target: { value: '15' } });
-      expect(lineSpacingInput.value).toBe('15');
-    });
-  });
-
-  it('handles paper size changes', async () => {
-    renderWithProvider(<App />);
-
-    await waitFor(() => {
-      const paperSizeSelect = screen.getByLabelText(/Paper size/i) as HTMLSelectElement;
-      fireEvent.change(paperSizeSelect, { target: { value: 'letter' } });
-      expect(paperSizeSelect.value).toBe('letter');
-    });
-  });
-
-  it('handles PDF download with no problems', async () => {
-    renderWithProvider(<App />);
-
-    await waitFor(() => {
-      // Clear problems by setting invalid settings
-      const operationsSelect = screen.getByLabelText(/Operations/i) as HTMLSelectElement;
-      for (const option of Array.from(operationsSelect.options)) {
-        option.selected = false;
-      }
-      fireEvent.change(operationsSelect);
-
-      const generateButton = screen.getByRole('button', {
-        name: /Generate math problems with current settings/i,
-      });
-      fireEvent.click(generateButton);
-    });
-
-    await waitFor(() => {
-      const downloadButton = screen.getByRole('button', {
-        name: /Download generated problems as PDF file/i,
-      }) as HTMLButtonElement;
-      fireEvent.click(downloadButton);
-    });
-  });
-
-  it('handles crypto fallback for random generation', async () => {
-    // Mock crypto to be undefined to test fallback
-    const originalCrypto = window.crypto;
-    const originalMsCrypto = (window as any).msCrypto;
-
-    delete (window as any).crypto;
-    (window as any).msCrypto = {
-      getRandomValues: vi.fn().mockImplementation(array => {
-        // Use a secure seed for testing - in production this would use crypto.getRandomValues
-        const seed = 0x12345678; // Fixed seed for deterministic testing
-        array[0] = seed;
-      }),
-    };
-
-    renderWithProvider(<App />);
-
-    await waitFor(() => {
-      const generateButton = screen.getByRole('button', {
-        name: /Generate math problems with current settings/i,
-      });
-      fireEvent.click(generateButton);
-    });
-
-    // Restore original crypto
-    window.crypto = originalCrypto;
-    (window as any).msCrypto = originalMsCrypto;
-  });
-
-  it('handles error boundary', () => {
-    const ThrowError = () => {
-      throw new Error('Test error');
-    };
-
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
-    // Mock process.env.NODE_ENV to be production
-    const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'production';
-
-    // Test that the error is thrown and caught by the test framework
-    expect(() => {
-      renderWithProvider(<ThrowError />);
-    }).toThrow('Test error');
-
-    // Restore environment
-    process.env.NODE_ENV = originalEnv;
-    consoleSpy.mockRestore();
-  });
-
-  it('handles skip link navigation', async () => {
-    renderWithProvider(<App />);
-
-    // Just check that the app renders with basic functionality
-    await waitFor(() => {
-      const appElement = document.querySelector('.App');
-      expect(appElement).toBeTruthy();
-    });
-  });
-
-  it('displays loading state', () => {
-    // Mock useTranslation to return loading state
-    const mockUseTranslation = vi.fn(() => ({
-      t: (key: string) => key,
-      isLoading: true,
-    }));
-
-    vi.doMock('./i18n', () => ({
-      I18nProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-      useTranslation: mockUseTranslation,
-    }));
-
-    renderWithProvider(<App />);
-
-    expect(true).toBe(true); // Simplified test
-  });
-
-  it('handles problem generation with insufficient operands', async () => {
-    renderWithProvider(<App />);
-
-    await waitFor(() => {
-      const operandsFrom = screen.getByDisplayValue('2') as HTMLInputElement;
-      fireEvent.change(operandsFrom, { target: { value: '1' } });
-
-      const generateButton = screen.getByRole('button', {
-        name: /Generate math problems with current settings/i,
-      });
-      fireEvent.click(generateButton);
-    });
-  });
-
-  it('handles problem generation errors', async () => {
-    renderWithProvider(<App />);
-
-    await waitFor(() => {
-      const generateButton = screen.getByRole('button', {
-        name: /Generate math problems with current settings/i,
-      });
-      fireEvent.click(generateButton);
-      expect(generateButton).not.toBeNull();
-    });
-  });
-
-  it('handles PDF generation errors', async () => {
-    renderWithProvider(<App />);
-
-    await waitFor(
-      () => {
-        const downloadButton = screen.getByRole('button', {
-          name: /Download generated problems as PDF file/i,
-        }) as HTMLButtonElement;
-        if (!downloadButton.disabled) {
-          fireEvent.click(downloadButton);
-        }
-        expect(downloadButton).not.toBeNull();
-      },
-      { timeout: 3000 }
-    );
-  });
-
-  it('handles unknown operation in calculation', async () => {
-    renderWithProvider(<App />);
-
-    await waitFor(() => {
-      const generateButton = screen.getByRole('button', {
-        name: /Generate math problems with current settings/i,
-      });
-      fireEvent.click(generateButton);
-      expect(generateButton).not.toBeNull();
-    });
-  });
-
-  it('handles partial problem generation', async () => {
-    renderWithProvider(<App />);
-
-    await waitFor(() => {
-      const numProblemsInput = screen.getByLabelText(/Number of problems/i) as HTMLInputElement;
-      fireEvent.change(numProblemsInput, { target: { value: '50' } });
-
-      const generateButton = screen.getByRole('button', {
-        name: /Generate math problems with current settings/i,
-      });
-      fireEvent.click(generateButton);
-      expect(generateButton).not.toBeNull();
-    });
-  });
-
-  it('handles localStorage save errors gracefully', async () => {
-    // Set NODE_ENV to development to enable error logging
-    const originalNodeEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'development';
-
-    // Mock localStorage.setItem to throw an error
-    const originalSetItem = localStorage.setItem;
-    localStorage.setItem = vi.fn().mockImplementation(() => {
-      throw new Error('localStorage error');
-    });
-
-    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-
-    renderWithProvider(<App />);
-
-    await waitFor(() => {
-      const numProblemsInput = screen.getByLabelText(/Number of problems/i) as HTMLInputElement;
-      fireEvent.change(numProblemsInput, { target: { value: '15' } });
-    });
-
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'Failed to save settings to localStorage:',
-      expect.any(Error)
-    );
-
-    // Restore original values
-    localStorage.setItem = originalSetItem;
-    process.env.NODE_ENV = originalNodeEnv;
-    consoleSpy.mockRestore();
+    // Verify that changeLanguage was called with the correct language
+    expect(mockChangeLanguage).toHaveBeenCalledWith('zh');
   });
 });

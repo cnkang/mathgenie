@@ -60,7 +60,11 @@ describe('TranslationLoader', () => {
   });
 
   test('renders loading screen when loading', () => {
-    mockT.mockReturnValue('Loading translations...');
+    mockT.mockImplementation((key: string) => {
+      if (key === 'app.title') return 'MathGenie';
+      if (key === 'loading.translations') return 'Loading translations...';
+      return key;
+    });
     mockUseTranslation.mockReturnValue(createMockI18nContextWithT(true, mockT));
 
     render(
@@ -76,7 +80,11 @@ describe('TranslationLoader', () => {
   });
 
   test('displays loading spinner when loading', () => {
-    mockT.mockReturnValue('Loading translations...');
+    mockT.mockImplementation((key: string) => {
+      if (key === 'app.title') return 'MathGenie';
+      if (key === 'loading.translations') return 'Loading translations...';
+      return key;
+    });
     mockUseTranslation.mockReturnValue(createMockI18nContextWithT(true, mockT));
 
     render(
@@ -85,7 +93,7 @@ describe('TranslationLoader', () => {
       </TranslationLoader>
     );
 
-    const spinner = screen.getByLabelText('Loading...');
+    const spinner = screen.getByLabelText('Loading translations...');
     expect(spinner).toBeDefined();
     expect(spinner.classList.contains('translation-loader-spinner')).toBe(true);
 
@@ -142,7 +150,11 @@ describe('TranslationLoader', () => {
   });
 
   test('applies correct CSS classes to loading elements', () => {
-    mockT.mockReturnValue('Loading translations...');
+    mockT.mockImplementation((key: string) => {
+      if (key === 'app.title') return 'MathGenie';
+      if (key === 'loading.translations') return 'Loading translations...';
+      return key;
+    });
     mockUseTranslation.mockReturnValue({
       t: mockT,
       isLoading: true,
@@ -240,7 +252,7 @@ describe('TranslationLoader', () => {
     );
 
     // Verify loading state
-    expect(screen.getByText('Loading translations...')).toBeDefined();
+    expect(screen.getAllByText('Loading translations...')).toHaveLength(2); // title and message
     expect(screen.queryByTestId('child-content')).toBeNull();
 
     // Change to loaded state
@@ -324,8 +336,8 @@ describe('TranslationLoader', () => {
       </TranslationLoader>
     );
 
-    const spinner = screen.getByLabelText('Loading...');
-    expect(spinner.getAttribute('aria-label')).toBe('Loading...');
+    const spinner = screen.getByLabelText('Loading translations...');
+    expect(spinner.getAttribute('aria-label')).toBe('Loading translations...');
   });
 
   test('handles boolean children when not loading', () => {

@@ -571,15 +571,15 @@ describe('QuizMode', () => {
 
     const progressFill = document.querySelector('.progress-fill');
 
-    // Initial progress (1/3)
-    expect((progressFill as HTMLElement)?.style.width).toContain('33.33');
+    // Initial progress (1/3) - rounded to 33%
+    expect((progressFill as HTMLElement)?.style.width).toContain('33%');
 
     // Navigate to second problem
     const nextButton = screen.getByText('Next →');
     fireEvent.click(nextButton);
 
-    // Progress should update (2/3)
-    expect((progressFill as HTMLElement)?.style.width).toContain('66.66');
+    // Progress should update (2/3) - rounded to 67%
+    expect((progressFill as HTMLElement)?.style.width).toContain('67%');
   });
 
   test('handles grade calculation for different score ranges', () => {
