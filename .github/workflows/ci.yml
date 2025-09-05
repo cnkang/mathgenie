@@ -308,20 +308,18 @@ jobs:
           path: |
             ~/.cache/ms-playwright
             node_modules/playwright-core/.local-browsers
-          key: ${{ runner.os }}-playwright-accessibility-${{ hashFiles('**/pnpm-lock.yaml', '**/package.json') }}
+            ~/.local/share/ms-playwright
+          key: ${{ runner.os }}-playwright-accessibility-${{ hashFiles('**/pnpm-lock.yaml', '**/package.json', '**/playwright*.config.ts') }}-v2
           restore-keys: |
+            ${{ runner.os }}-playwright-accessibility-${{ hashFiles('**/pnpm-lock.yaml', '**/package.json', '**/playwright*.config.ts') }}-
             ${{ runner.os }}-playwright-accessibility-
             ${{ runner.os }}-playwright-
 
       - name: 🎭 Install Playwright browsers
         run: |
-          echo "🎭 Installing browsers for accessibility testing..."
-          echo "🌐 Installing Chromium for desktop/Android accessibility tests..."
-          pnpm exec playwright install chromium --with-deps
-          echo "📱 Installing WebKit for iOS/Safari accessibility tests..."
-          pnpm exec playwright install webkit --with-deps
-          echo "🦊 Installing Firefox for comprehensive cross-browser accessibility tests..."
-          pnpm exec playwright install firefox --with-deps
+          # Use the cache helper script for smart browser installation
+          CACHE_HIT="${{ steps.playwright-cache.outputs.cache-hit }}" \
+          ./scripts/playwright-cache-helper.sh smart-install all
         timeout-minutes: 15
 
       - name: 🏗️ Build application
@@ -456,8 +454,10 @@ jobs:
           path: |
             ~/.cache/ms-playwright
             node_modules/playwright-core/.local-browsers
-          key: ${{ runner.os }}-playwright-${{ matrix.browser }}-${{ hashFiles('**/pnpm-lock.yaml', '**/package.json') }}
+            ~/.local/share/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ matrix.browser }}-${{ hashFiles('**/pnpm-lock.yaml', '**/package.json', '**/playwright*.config.ts') }}-v2
           restore-keys: |
+            ${{ runner.os }}-playwright-${{ matrix.browser }}-${{ hashFiles('**/pnpm-lock.yaml', '**/package.json', '**/playwright*.config.ts') }}-
             ${{ runner.os }}-playwright-${{ matrix.browser }}-
             ${{ runner.os }}-playwright-
 
@@ -470,40 +470,9 @@ jobs:
           echo "🔍 Playwright version:"
           pnpm exec playwright --version
 
-          # Install the specific browser needed for this matrix job
-          if [[ "${{ matrix.browser }}" == "webkit" ]]; then
-            echo "📱 Installing WebKit for iOS/Safari testing..."
-            pnpm exec playwright install webkit --with-deps
-            echo "✅ WebKit installation completed"
-          elif [[ "${{ matrix.browser }}" == "firefox" ]]; then
-            echo "🦊 Installing Firefox for cross-browser testing..."
-            pnpm exec playwright install firefox --with-deps
-            echo "✅ Firefox installation completed"
-          else
-            echo "🌐 Installing Chromium for desktop/Android testing..."
-            pnpm exec playwright install chromium --with-deps
-            echo "✅ Chromium installation completed"
-          fi
-
-          # Verify browser installation
-          echo "🔍 Verifying browser installation..."
-          ls -la ~/.cache/ms-playwright/ || echo "Cache directory not found"
-          ls -la node_modules/playwright-core/.local-browsers/ || echo "Local browsers directory not found"
-
-          # Specific verification for WebKit on iPad tests
-          if [[ "${{ matrix.browser }}" == "webkit" ]]; then
-            echo "🍎 Verifying WebKit installation for iPad Pro..."
-            if [ -d "~/.cache/ms-playwright/webkit-*" ] || [ -d "node_modules/playwright-core/.local-browsers/webkit-*" ]; then
-              echo "✅ WebKit browser found"
-            else
-              echo "❌ WebKit browser not found, attempting reinstall..."
-              pnpm exec playwright install webkit --with-deps --force
-            fi
-            
-            # Test WebKit availability
-            echo "🧪 Testing WebKit browser availability..."
-            pnpm exec playwright install-deps webkit || echo "WebKit deps installation completed"
-          fi
+          # Use the cache helper script for smart browser installation
+          CACHE_HIT="${{ steps.playwright-cache.outputs.cache-hit }}" \
+          ./scripts/playwright-cache-helper.sh smart-install ${{ matrix.browser }}
         timeout-minutes: 10
 
       - name: 🏗️ Build application
