@@ -124,7 +124,7 @@ function App(): React.JSX.Element {
     return '';
   };
 
-  const calculateExpression = (operands: number[], operators: string[]): number => {
+  const calculateExpression = (operands: number[], operators: string[]): number | null => {
     let result = operands[0];
 
     for (let i = 0; i < operators.length; i++) {
@@ -142,10 +142,13 @@ function App(): React.JSX.Element {
           result *= operand;
           break;
         case '/':
+          if (operand === 0 || result % operand !== 0) {
+            return null;
+          }
           result = result / operand;
           break;
         default:
-          return NaN;
+          return null;
       }
     }
 
@@ -159,6 +162,20 @@ function App(): React.JSX.Element {
       crypto.getRandomValues(array);
       const val = array[0] / (0xffffffff + 1);
       return min + Math.floor((max - min + 1) * val);
+    };
+
+    const randomNonZero = (min: number, max: number): number | null => {
+      if (min === 0 && max === 0) {
+        return null;
+      }
+      if (min > 0 || max < 0) {
+        return random(min, max);
+      }
+      const rangeSize = max - min + 1;
+      const zeroIndex = -min;
+      const rand = random(0, rangeSize - 2);
+      const actualIndex = rand >= zeroIndex ? rand + 1 : rand;
+      return min + actualIndex;
     };
 
     const numOperands = random(settings.numOperandsRange[0], settings.numOperandsRange[1]);
@@ -177,16 +194,25 @@ function App(): React.JSX.Element {
         () => settings.operations[random(0, settings.operations.length - 1)]
       );
 
-      // Ensure division operations don't use zero as divisor
+      let validOperands = true;
       operationSymbols.forEach((operator, index) => {
         if (operator === '/') {
-          while (operands[index + 1] === 0) {
-            operands[index + 1] = random(settings.numRange[0], settings.numRange[1]);
+          const divisor = randomNonZero(settings.numRange[0], settings.numRange[1]);
+          if (divisor === null) {
+            validOperands = false;
+          } else {
+            operands[index + 1] = divisor;
           }
         }
       });
+      if (!validOperands) {
+        continue;
+      }
 
       const result = calculateExpression(operands, operationSymbols);
+      if (result === null) {
+        continue;
+      }
 
       if (settings.resultRange[0] <= result && result <= settings.resultRange[1]) {
         if (settings.allowNegative || result >= 0) {
