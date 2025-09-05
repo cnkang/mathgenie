@@ -1,18 +1,18 @@
-import react from "@vitejs/plugin-react";
-import { resolve } from "path";
-import { defineConfig } from "vite";
-import viteCompression from "vite-plugin-compression";
+import react from '@vitejs/plugin-react';
+import { resolve } from 'path';
+import { defineConfig } from 'vite';
+import viteCompression from 'vite-plugin-compression';
 
 export default defineConfig(({ mode }) => ({
   plugins: [
     react({
       // Optimize JSX runtime
-      jsxRuntime: "automatic",
+      jsxRuntime: 'automatic',
     }),
     // Brotli compression (better compression ratio)
     viteCompression({
-      algorithm: "brotliCompress",
-      ext: ".br",
+      algorithm: 'brotliCompress',
+      ext: '.br',
       threshold: 1024, // Only compress files larger than 1KB
       compressionOptions: {
         level: 11, // Highest compression level
@@ -22,8 +22,8 @@ export default defineConfig(({ mode }) => ({
     }),
     // Gzip compression (better compatibility)
     viteCompression({
-      algorithm: "gzip",
-      ext: ".gz",
+      algorithm: 'gzip',
+      ext: '.gz',
       threshold: 1024,
       compressionOptions: {
         level: 9, // Highest compression level
@@ -34,11 +34,11 @@ export default defineConfig(({ mode }) => ({
   ],
   build: {
     // Output directory
-    outDir: "dist",
+    outDir: 'dist',
     // Enable source maps (development environment only)
-    sourcemap: process.env.NODE_ENV !== "production",
+    sourcemap: process.env.NODE_ENV !== 'production',
     // Build target - use ES2020 for better compatibility
-    target: ["es2020", "edge88", "firefox78", "chrome87", "safari14"],
+    target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'],
     // Enable CSS code splitting
     cssCodeSplit: true,
     // Set chunk size warning limit
@@ -51,33 +51,33 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         // Asset file naming
-        assetFileNames: "assets/[name]-[hash].[ext]",
-        chunkFileNames: "assets/[name]-[hash].js",
-        entryFileNames: "assets/[name]-[hash].js",
+        assetFileNames: 'assets/[name]-[hash].[ext]',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
         // Manual chunk splitting strategy
         manualChunks(id: string) {
           // Keep translation files as separate chunks for dynamic loading
-          if (id.includes("src/i18n/translations/")) {
+          if (id.includes('src/i18n/translations/')) {
             const match = id.match(/translations\/([a-z]{2})\.ts$/);
             if (match) {
               return match[1]; // Return language code as chunk name
             }
           }
           // Bundle React-related libraries separately
-          if (id.includes("react") || id.includes("react-dom")) {
-            return "react-vendor";
+          if (id.includes('react') || id.includes('react-dom')) {
+            return 'react-vendor';
           }
           // Bundle PDF generation library separately (large)
-          if (id.includes("jspdf")) {
-            return "jspdf";
+          if (id.includes('jspdf')) {
+            return 'jspdf';
           }
           // Bundle analytics tools separately
-          if (id.includes("speed-insights") || id.includes("web-vitals")) {
-            return "analytics";
+          if (id.includes('speed-insights') || id.includes('web-vitals')) {
+            return 'analytics';
           }
           // Other third-party libraries
-          if (id.includes("node_modules")) {
-            return "vendor";
+          if (id.includes('node_modules')) {
+            return 'vendor';
           }
         },
       },
@@ -85,11 +85,11 @@ export default defineConfig(({ mode }) => ({
       external: [],
     },
     // Use terser for better compatibility
-    minify: "terser",
+    minify: 'terser',
     // Terser minification options
     terserOptions: {
       compress: {
-        drop_console: process.env.NODE_ENV === "production",
+        drop_console: process.env.NODE_ENV === 'production',
         drop_debugger: true,
         dead_code: true,
         passes: 2,
@@ -109,81 +109,88 @@ export default defineConfig(({ mode }) => ({
   },
   preview: {
     port: 4173,
-    strictPort: true,
+    strictPort: false, // Allow fallback to other ports if 4173 is occupied
+    host: process.env.CI ? '0.0.0.0' : 'localhost',
+    cors: true,
+    headers: {
+      'Cache-Control': 'no-cache',
+    },
   },
   resolve: {
-    extensions: [".js", ".jsx", ".ts", ".tsx"],
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
     alias: {
-      "@": resolve(__dirname, "./src"),
-      "@/components": resolve(__dirname, "./src/components"),
-      "@/hooks": resolve(__dirname, "./src/hooks"),
-      "@/utils": resolve(__dirname, "./src/utils"),
-      "@/i18n": resolve(__dirname, "./src/i18n"),
-      "@/types": resolve(__dirname, "./src/types"),
+      '@': resolve(__dirname, './src'),
+      '@/components': resolve(__dirname, './src/components'),
+      '@/hooks': resolve(__dirname, './src/hooks'),
+      '@/utils': resolve(__dirname, './src/utils'),
+      '@/i18n': resolve(__dirname, './src/i18n'),
+      '@/types': resolve(__dirname, './src/types'),
     },
   },
   // Optimize dependency pre-bundling
   optimizeDeps: {
-    include: ["react", "react-dom", "jspdf"],
-    exclude: ["@vercel/speed-insights"],
+    include: ['react', 'react-dom', 'jspdf'],
+    exclude: ['@vercel/speed-insights'],
     esbuildOptions: {
-      target: "es2022",
+      target: 'es2022',
     },
   },
   // Environment variables
   define: {
-    __DEV__: mode !== "production",
-    __PROD__: mode === "production",
-    global: "globalThis",
+    __DEV__: mode !== 'production',
+    __PROD__: mode === 'production',
+    __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+    __BUILD_HASH__: JSON.stringify(Date.now().toString(36)),
+    global: 'globalThis',
   },
   // CSS optimization
   css: {
-    devSourcemap: mode !== "production",
+    devSourcemap: mode !== 'production',
   },
   test: {
-    environment: "happy-dom",
+    environment: 'happy-dom',
     globals: true,
-    setupFiles: "./src/setupTests.ts",
+    setupFiles: './src/setupTests.ts',
     css: true,
     exclude: [
-      "**/node_modules/**",
-      "**/dist/**",
-      "**/tests/e2e/**",
-      "**/tests/smoke/**",
-      "**/*.e2e.spec.ts",
-      "**/*.smoke.spec.ts",
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/tests/e2e/**',
+      '**/tests/smoke/**',
+      '**/*.e2e.spec.ts',
+      '**/*.smoke.spec.ts',
     ],
     coverage: {
-      provider: "v8",
-      reporter: ["text", "json", "html", "lcov", "clover"],
-      reportsDirectory: "coverage",
+      provider: 'v8',
+      reporter: ['text', 'json', 'html', 'lcov', 'clover'],
+      reportsDirectory: 'coverage',
       exclude: [
-        "**/*.config.{js,ts,cjs}",
-        "**/*.test.{js,ts,jsx,tsx}",
-        "**/*.spec.{js,ts,jsx,tsx}",
-        "**/tests/**",
-        "**/coverage/**",
-        "**/dist/**",
-        "**/node_modules/**",
-        "**/scripts/**",
-        "**/src/index.tsx",
-        "**/src/setupTests.ts",
-        "**/src/reportWebVitals.ts",
-        "**/public/**",
-        "**/*.svg",
-        "**/*.css",
-        "**/src/i18n/translations/**",
-        "**/src/types/**",
-        "**/src/utils/serviceWorker.ts",
-        "**/lighthouserc.{js,ts,cjs}",
-        "**/playwright-report/**",
-        "**/test-results/**",
-        "**/postcss.config.cjs",
-        "**/eslint.config.{js,ts}",
-        "**/vite.config.ts",
-        "**/vite/**",
-        "vite/**",
-        "**/dynamic-import-helper.js",
+        '**/*.config.{js,ts,cjs}',
+        '**/*.test.{js,ts,jsx,tsx}',
+        '**/*.spec.{js,ts,jsx,tsx}',
+        '**/tests/**',
+        '**/coverage/**',
+        '**/dist/**',
+        '**/node_modules/**',
+        '**/scripts/**',
+        '**/src/index.tsx',
+        '**/src/setupTests.ts',
+        '**/src/reportWebVitals.ts',
+        '**/public/**',
+        '**/*.svg',
+        '**/*.css',
+        '**/src/i18n/translations/**',
+        '**/src/types/**',
+        '**/src/utils/serviceWorker.ts',
+        '**/lighthouserc.{js,ts,cjs}',
+        '**/playwright-report/**',
+        '**/test-results/**',
+        '**/postcss.config.cjs',
+        '**/eslint.config.{js,ts}',
+        '**/vite.config.ts',
+        '**/vite/**',
+        'vite/**',
+        '**/dynamic-import-helper.js',
       ],
       thresholds: {
         global: {
