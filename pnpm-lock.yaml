@@ -35,8 +35,8 @@ importers:
         specifier: ^4.10.2
         version: 4.10.2(playwright-core@1.55.0)
       '@eslint/js':
-        specifier: ^9.34.0
-        version: 9.34.0
+        specifier: ^9.35.0
+        version: 9.35.0
       '@fullhuman/postcss-purgecss':
         specifier: ^7.0.2
         version: 7.0.2(postcss@8.5.6)
