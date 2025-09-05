@@ -1,9 +1,10 @@
 import React from 'react';
 import { useTranslation } from '../i18n';
+import type { MessageValue } from '../types';
 import './ErrorMessage.css';
 
 export interface ErrorMessageProps {
-  error: string;
+  error: MessageValue;
   type?: 'error' | 'warning' | 'info';
   onDismiss?: () => void;
   showIcon?: boolean;
@@ -20,6 +21,21 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
   if (!error) {
     return null;
   }
+
+  // Helper function to check if error is MessageState
+  const isMessageState = (
+    value: MessageValue
+  ): value is { key: string; params?: Record<string, string | number> } => {
+    return typeof value === 'object' && value !== null && 'key' in value;
+  };
+
+  // Get the display text - either translate MessageState or use string directly
+  const getDisplayText = (): string => {
+    if (isMessageState(error)) {
+      return t(error.key, error.params);
+    }
+    return error;
+  };
 
   const getIcon = () => {
     switch (type) {
@@ -57,7 +73,7 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
     >
       <div className='message-content'>
         {showIcon && <span className='message-icon'>{getIcon()}</span>}
-        <span className='message-text'>{error}</span>
+        <span className='message-text'>{getDisplayText()}</span>
       </div>
       {onDismiss && (
         <button

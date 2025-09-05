@@ -318,6 +318,9 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
   const currentProblem = quizProblems[currentProblemIndex];
   const progress = ((currentProblemIndex + 1) / quizProblems.length) * 100;
 
+  // Calculate progress percentage for inline style
+  const progressPercentage = Math.round(progress);
+
   // If current problem doesn't exist, return loading state
   if (!currentProblem) {
     return <div className='quiz-loading'>{t('quiz.loading')}</div>;
@@ -327,8 +330,14 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
     <div className='quiz-mode'>
       <div className='quiz-header'>
         <div className='quiz-progress'>
-          <div className='progress-bar'>
-            <div className='progress-fill' style={{ width: `${progress}%` }}></div>
+          <div
+            className='progress-bar'
+            role='progressbar'
+            aria-valuenow={progressPercentage}
+            aria-valuemin={0}
+            aria-valuemax={100}
+          >
+            <div className='progress-fill' style={{ width: `${progressPercentage}%` }}></div>
           </div>
           <span className='progress-text'>
             {t('quiz.progress', {

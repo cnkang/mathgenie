@@ -1,5 +1,11 @@
 import { ReactNode } from 'react';
 
+// Global build-time constants
+declare global {
+  const __BUILD_TIME__: string;
+  const __BUILD_HASH__: string;
+}
+
 // Application types
 export type Operation = '+' | '-' | '*' | '/' | '×' | '÷';
 export type PaperSize = 'a4' | 'letter' | 'legal';
@@ -90,6 +96,14 @@ export interface I18nContextType {
   t: (key: string, params?: Record<string, string | number>) => string;
   changeLanguage: (lang: string) => void;
 }
+
+// Message system types for dynamic translation
+export interface MessageState {
+  key: string; // Translation key (e.g., 'messages.success.problemsGenerated')
+  params?: Record<string, string | number>; // Parameters for interpolation (e.g., { count: 20 })
+}
+
+export type MessageValue = string | MessageState; // Support both legacy strings and new MessageState objects
 
 // Utility types
 export type DeepPartial<T> = {

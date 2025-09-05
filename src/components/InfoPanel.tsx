@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useProgressBar } from '../hooks/useProgressBar';
 import { useTranslation } from '../i18n';
 import type { Problem, QuizResult, Settings } from '../types';
 
@@ -84,6 +85,15 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
   // Calculate learning progress (based on problem completion)
   const learningProgress = Math.min((sessionStats.totalGenerated / 100) * 100, 100);
 
+  const ProgressBar: React.FC<{ value: number }> = ({ value }) => {
+    const { progressBarProps, progressFillProps } = useProgressBar({ value });
+    return (
+      <div {...progressBarProps}>
+        <div {...progressFillProps}></div>
+      </div>
+    );
+  };
+
   return (
     <div className='info-panel'>
       <h3>
@@ -92,22 +102,42 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
       </h3>
 
       <div className='stats-grid'>
-        <div className='stat-card'>
+        <div
+          className='stat-card'
+          tabIndex={0}
+          role='button'
+          aria-label={`${t('infoPanel.stats.currentProblems')}: ${stats.totalProblems}`}
+        >
           <span className='stat-value'>{stats.totalProblems}</span>
           <div className='stat-label'>{t('infoPanel.stats.currentProblems')}</div>
         </div>
 
-        <div className='stat-card'>
+        <div
+          className='stat-card'
+          tabIndex={0}
+          role='button'
+          aria-label={`${t('infoPanel.stats.totalGenerated')}: ${sessionStats.totalGenerated}`}
+        >
           <span className='stat-value'>{sessionStats.totalGenerated}</span>
           <div className='stat-label'>{t('infoPanel.stats.totalGenerated')}</div>
         </div>
 
-        <div className='stat-card'>
+        <div
+          className='stat-card'
+          tabIndex={0}
+          role='button'
+          aria-label={`${t('infoPanel.stats.difficultyLevel')}: ${stats.difficultyLevel}`}
+        >
           <span className='stat-value'>{stats.difficultyLevel}</span>
           <div className='stat-label'>{t('infoPanel.stats.difficultyLevel')}</div>
         </div>
 
-        <div className='stat-card'>
+        <div
+          className='stat-card'
+          tabIndex={0}
+          role='button'
+          aria-label={`${t('infoPanel.stats.operationTypes')}: ${stats.operationTypes}`}
+        >
           <span className='stat-value'>{stats.operationTypes}</span>
           <div className='stat-label'>{t('infoPanel.stats.operationTypes')}</div>
         </div>
@@ -115,9 +145,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
 
       <div className='progress-section'>
         <h4>🎯 {t('infoPanel.progress.title')}</h4>
-        <div className='progress-bar'>
-          <div className='progress-fill' style={{ width: `${learningProgress}%` }}></div>
-        </div>
+        <ProgressBar value={learningProgress} />
         <div className='progress-text'>
           {t('infoPanel.progress.completed', { percent: Math.round(learningProgress) })}
         </div>
@@ -125,29 +153,43 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
 
       <div className='tips-section'>
         <h4>⚡ {t('infoPanel.quickActions.title')}</h4>
-        <div className='quick-actions'>
-          <button className='quick-action-btn' onClick={onGenerateProblems}>
-            <span>🔄</span>
-            {t('infoPanel.quickActions.regenerate')}
+        <div className='quick-actions-grid'>
+          <button className='quick-action-card' onClick={onGenerateProblems}>
+            <div className='quick-action-content'>
+              <div className='quick-action-icon'>🔄</div>
+              <div className='quick-action-text'>
+                <span className='quick-action-label'>{t('infoPanel.quickActions.regenerate')}</span>
+              </div>
+            </div>
           </button>
           <button
-            className='quick-action-btn'
+            className='quick-action-card'
             onClick={onDownloadPdf}
             disabled={problems.length === 0}
           >
-            <span>📄</span>
-            {t('infoPanel.quickActions.downloadPdf')}
+            <div className='quick-action-content'>
+              <div className='quick-action-icon'>📄</div>
+              <div className='quick-action-text'>
+                <span className='quick-action-label'>
+                  {t('infoPanel.quickActions.downloadPdf')}
+                </span>
+              </div>
+            </div>
           </button>
           <button
-            className='quick-action-btn'
+            className='quick-action-card'
             onClick={onStartQuiz}
             disabled={problems.length === 0}
           >
-            <span>🎯</span>
-            {t('infoPanel.quickActions.startQuiz')}
+            <div className='quick-action-content'>
+              <div className='quick-action-icon'>🎯</div>
+              <div className='quick-action-text'>
+                <span className='quick-action-label'>{t('infoPanel.quickActions.startQuiz')}</span>
+              </div>
+            </div>
           </button>
           <button
-            className='quick-action-btn'
+            className='quick-action-card'
             onClick={() => {
               const element = document.querySelector('.problems-grid');
               if (element) {
@@ -155,8 +197,14 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
               }
             }}
           >
-            <span>📝</span>
-            {t('infoPanel.quickActions.jumpToProblems')}
+            <div className='quick-action-content'>
+              <div className='quick-action-icon'>📝</div>
+              <div className='quick-action-text'>
+                <span className='quick-action-label'>
+                  {t('infoPanel.quickActions.jumpToProblems')}
+                </span>
+              </div>
+            </div>
           </button>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import React, { ChangeEvent, useOptimistic, useTransition } from 'react';
+import { useLoadingState } from '../hooks/useLoadingState';
 import type { NumberInputProps } from '../types';
 
 interface ExtendedNumberInputProps extends NumberInputProps {
@@ -24,6 +25,7 @@ const NumberInput: React.FC<ExtendedNumberInputProps> = ({
 }) => {
   // React 19: Use transitions for smooth updates
   const [isPending, startTransition] = useTransition();
+  const { loadingProps } = useLoadingState({ isPending });
 
   // React 19: Optimistic updates for better perceived performance
   const [optimisticValue, setOptimisticValue] = useOptimistic(
@@ -88,7 +90,7 @@ const NumberInput: React.FC<ExtendedNumberInputProps> = ({
         pattern='[0-9]*'
         aria-label={`${label} (${min} to ${max})`}
         // React 19: Show pending state
-        style={{ opacity: isPending ? 0.7 : 1 }}
+        {...loadingProps}
         {...props}
       />
       {isPending && (

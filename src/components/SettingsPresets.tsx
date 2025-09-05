@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from '../i18n';
 import type { Settings, SettingsPreset, SettingsPresetsProps } from '../types';
+import './SettingsPresets.css';
 
 /**
  * Settings Presets Component with TypeScript support
@@ -85,17 +86,23 @@ const SettingsPresets: React.FC<SettingsPresetsProps> = ({ onApplyPreset }) => {
       <h3>{t('presets.title') || 'Quick Presets'}</h3>
       <div className='presets-grid'>
         {presets.map((preset, index) => (
-          <div key={index} className='preset-card'>
-            <h4>{preset.name}</h4>
-            <p>{preset.description}</p>
-            <button
-              onClick={() => handleApplyPreset(preset.settings)}
-              className='preset-button'
-              aria-label={`${t('presets.apply') || 'Apply'} ${preset.name} preset`}
-            >
-              {t('presets.apply') || 'Apply'}
-            </button>
-          </div>
+          <button
+            key={index}
+            className='preset-card clickable-card'
+            onClick={() => handleApplyPreset(preset.settings)}
+            aria-label={`${t('presets.apply') || 'Apply'} ${preset.name} preset: ${preset.description}`}
+          >
+            <div className='preset-content'>
+              <h4>{preset.name}</h4>
+              <p>{preset.description}</p>
+              <div className='preset-indicator'>
+                <span className='preset-icon'>✨</span>
+                <span className='preset-action'>
+                  {t('presets.clickToApply') || 'Click to apply'}
+                </span>
+              </div>
+            </div>
+          </button>
         ))}
       </div>
     </div>

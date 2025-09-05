@@ -1,6 +1,5 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import './App.css';
-import './components/ButtonFix.css';
 import ErrorMessage from './components/ErrorMessage';
 import InfoPanel from './components/InfoPanel';
 import LanguageSelector from './components/LanguageSelector';
@@ -10,7 +9,16 @@ import './components/QuizMode.css';
 import SettingsPresets from './components/SettingsPresets';
 import TranslationLoader from './components/TranslationLoader';
 import { useTranslation } from './i18n';
-import type { Operation, PaperSizeOptions, Problem, QuizResult, Settings } from './types';
+import './styles/components.css';
+import type {
+  MessageValue,
+  Operation,
+  PaperSizeOptions,
+  Problem,
+  QuizResult,
+  Settings,
+} from './types';
+import { setupWCAGEnforcement } from './utils/wcagEnforcement';
 
 const SpeedInsights = React.lazy(() =>
   import('@vercel/speed-insights/react').then(module => ({ default: module.SpeedInsights }))
@@ -69,11 +77,12 @@ function App(): React.JSX.Element {
 
   const [settings, setSettings] = useState<Settings>(() => loadSettings());
   const [problems, setProblems] = useState<Problem[]>([]);
-  const [error, setError] = useState<string>('');
-  const [warning, setWarning] = useState<string>('');
-  const [successMessage, setSuccessMessage] = useState<string>('');
+  const [error, setError] = useState<MessageValue>('');
+  const [warning, setWarning] = useState<MessageValue>('');
+  const [successMessage, setSuccessMessage] = useState<MessageValue>('');
   const [isQuizMode, setIsQuizMode] = useState<boolean>(false);
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
+  const [hasInitialGenerated, setHasInitialGenerated] = useState<boolean>(false);
 
   const paperSizeOptions: PaperSizeOptions = {
     a4: 'a4',
@@ -93,33 +102,24 @@ function App(): React.JSX.Element {
   };
 
   // Validate settings
-  const validateSettings = (newSettings: Settings): string => {
+  const validateSettings = (newSettings: Settings): MessageValue => {
     if (newSettings.operations.length === 0) {
-      return t('errors.noOperations') || 'Please select at least one operation.';
+      return { key: 'errors.noOperations' };
     }
     if (newSettings.numProblems <= 0 || newSettings.numProblems > 100) {
-      return t('errors.invalidProblemCount') || 'Number of problems must be between 1 and 100.';
+      return { key: 'errors.invalidProblemCount' };
     }
     if (newSettings.numRange[0] > newSettings.numRange[1]) {
-      return (
-        t('errors.invalidNumberRange') ||
-        'Invalid number range: minimum cannot be greater than maximum.'
-      );
+      return { key: 'errors.invalidNumberRange' };
     }
     if (newSettings.resultRange[0] > newSettings.resultRange[1]) {
-      return (
-        t('errors.invalidResultRange') ||
-        'Invalid result range: minimum cannot be greater than maximum.'
-      );
+      return { key: 'errors.invalidResultRange' };
     }
     if (
       newSettings.numOperandsRange[0] > newSettings.numOperandsRange[1] ||
       newSettings.numOperandsRange[0] < 2
     ) {
-      return (
-        t('errors.invalidOperandsRange') ||
-        'Invalid operands range: minimum must be at least 2 and not greater than maximum.'
-      );
+      return { key: 'errors.invalidOperandsRange' };
     }
     return '';
   };
@@ -196,11 +196,16 @@ function App(): React.JSX.Element {
     return '';
   };
 
-  const generateProblems = (): void => {
+  const generateProblems = (showSuccessMessage: boolean = true): void => {
     // Clear previous messages
     setError('');
     setWarning('');
     setSuccessMessage('');
+
+    // Don't show any messages if i18n is still loading
+    if (isLoading) {
+      return;
+    }
 
     // Validate settings first
     const validationError = validateSettings(settings);
@@ -211,7 +216,10 @@ function App(): React.JSX.Element {
 
     // Show warning for large number of problems
     if (settings.numProblems > 50) {
-      setWarning(t('warnings.largeNumberOfProblems', { count: settings.numProblems }));
+      setWarning({
+        key: 'warnings.largeNumberOfProblems',
+        params: { count: settings.numProblems },
+      });
     }
 
     try {
@@ -222,28 +230,46 @@ function App(): React.JSX.Element {
         .map((problem, index) => ({ id: index, text: problem }));
 
       if (generatedProblems.length === 0) {
-        setError(t('errors.noProblemsGenerated'));
+        // Only show error if i18n is loaded and this is not initial generation
+        if (!isLoading && showSuccessMessage) {
+          setError({ key: 'errors.noProblemsGenerated' });
+        }
       } else if (generatedProblems.length < settings.numProblems) {
-        // Partial generation - show warning
-        setWarning(
-          t('errors.partialGeneration', {
-            generated: generatedProblems.length,
-            requested: settings.numProblems,
-          })
-        );
+        // Partial generation - show warning only if i18n is loaded
+        if (!isLoading && showSuccessMessage) {
+          setWarning({
+            key: 'errors.partialGeneration',
+            params: {
+              generated: generatedProblems.length,
+              requested: settings.numProblems,
+            },
+          });
+        }
         setProblems(generatedProblems);
       } else {
-        // Full success
-        setSuccessMessage(
-          t('messages.success.problemsGenerated', { count: generatedProblems.length })
-        );
+        // Full success - only show message if not initial load and i18n is loaded
+        if (showSuccessMessage && !isLoading) {
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Setting success message:', {
+              showSuccessMessage,
+              isLoading,
+              count: generatedProblems.length,
+            });
+          }
+          setSuccessMessage({
+            key: 'messages.success.problemsGenerated',
+            params: { count: generatedProblems.length },
+          });
+          // Clear success message after 5 seconds
+          setTimeout(() => setSuccessMessage(''), 5000);
+        }
         setProblems(generatedProblems);
-
-        // Clear success message after 3 seconds
-        setTimeout(() => setSuccessMessage(''), 3000);
       }
     } catch (err) {
-      setError(t('errors.generationFailed'));
+      // Only show error if i18n is loaded and this is not initial generation
+      if (!isLoading && showSuccessMessage) {
+        setError({ key: 'errors.generationFailed' });
+      }
       if (process.env.NODE_ENV === 'development') {
         console.error('Problem generation error:', err);
       }
@@ -252,7 +278,10 @@ function App(): React.JSX.Element {
 
   const downloadPdf = (): void => {
     if (problems.length === 0) {
-      setError(t('errors.noProblemsToPdf'));
+      // Only show error if i18n is loaded
+      if (!isLoading) {
+        setError({ key: 'errors.noProblemsToPdf' });
+      }
       return;
     }
 
@@ -301,12 +330,17 @@ function App(): React.JSX.Element {
 
         doc.save('problems.pdf');
 
-        // Show success message
-        setSuccessMessage(t('messages.success.settingsExported'));
-        setTimeout(() => setSuccessMessage(''), 3000);
+        // Show success message only if i18n is loaded
+        if (!isLoading) {
+          setSuccessMessage({ key: 'messages.success.pdfGenerated' });
+          setTimeout(() => setSuccessMessage(''), 5000);
+        }
       });
     } catch (err) {
-      setError(t('errors.pdfFailed'));
+      // Only show error if i18n is loaded
+      if (!isLoading) {
+        setError({ key: 'errors.pdfFailed' });
+      }
       if (process.env.NODE_ENV === 'development') {
         console.error('PDF generation error:', err);
       }
@@ -314,14 +348,27 @@ function App(): React.JSX.Element {
   };
 
   useEffect(() => {
-    // Only auto-generate if there's no current error and settings are valid
+    // Only generate problems after i18n is fully loaded
+    if (isLoading) {
+      return;
+    }
+
     const validationError = validateSettings(settings);
     if (!validationError) {
-      generateProblems();
+      generateProblems(hasInitialGenerated);
+      if (!hasInitialGenerated) {
+        setHasInitialGenerated(true);
+      }
     } else {
       setError(validationError);
     }
-  }, [settings]);
+  }, [settings, isLoading]);
+
+  // WCAG 2.2 AAA Enforcement
+  useEffect(() => {
+    const cleanup = setupWCAGEnforcement();
+    return cleanup;
+  }, []);
 
   const handleChange = <K extends keyof Settings>(field: K, value: Settings[K]): void => {
     const newSettings = {
@@ -344,15 +391,18 @@ function App(): React.JSX.Element {
     ) {
       const validationError = validateSettings(newSettings);
       if (validationError) {
-        setError(validationError);
+        // Only show error if i18n is loaded
+        if (!isLoading) {
+          setError(validationError);
+        }
       } else {
         // Check for restrictive settings
         const isRestrictive =
           newSettings.resultRange[1] - newSettings.resultRange[0] < 10 ||
           newSettings.numRange[1] - newSettings.numRange[0] < 5;
 
-        if (isRestrictive && newSettings.numProblems > 20) {
-          setWarning(t('warnings.restrictiveSettings'));
+        if (isRestrictive && newSettings.numProblems > 20 && !isLoading) {
+          setWarning({ key: 'warnings.restrictiveSettings' });
         }
       }
     }
@@ -365,16 +415,24 @@ function App(): React.JSX.Element {
     setSettings(presetSettings);
     saveSettings(presetSettings);
 
-    // Clear messages and show success
+    // Clear messages and show success only if i18n is loaded
     setError('');
     setWarning('');
-    setSuccessMessage(t('messages.info.presetApplied', { name: 'Preset' }));
-    setTimeout(() => setSuccessMessage(''), 3000);
+    if (!isLoading) {
+      setSuccessMessage({
+        key: 'messages.info.presetApplied',
+        params: { name: 'Preset' },
+      });
+      setTimeout(() => setSuccessMessage(''), 5000);
+    }
   };
 
   const startQuizMode = (): void => {
     if (problems.length === 0) {
-      setError('Please generate problems first before starting quiz mode');
+      // Only show error if i18n is loaded
+      if (!isLoading) {
+        setError({ key: 'errors.noProblemsForQuiz' });
+      }
       return;
     }
     setIsQuizMode(true);
@@ -456,7 +514,7 @@ function App(): React.JSX.Element {
               <div className='settings-section'>
                 <SettingsPresets onApplyPreset={handleApplyPreset} />
 
-                <div>
+                <div className='form-row'>
                   <label htmlFor='operations'>{t('operations.title')}:</label>
                   <select
                     id='operations'
@@ -470,6 +528,8 @@ function App(): React.JSX.Element {
                     }
                     aria-label={t('accessibility.selectOperations')}
                     title={t('operations.help')}
+                    tabIndex={0}
+                    className='operations-select'
                   >
                     <option value='+'>{t('operations.addition')}</option>
                     <option value='-'>{t('operations.subtraction')}</option>
@@ -478,7 +538,7 @@ function App(): React.JSX.Element {
                   </select>
                   <small className='help-text'>{t('operations.help')}</small>
                 </div>
-                <div>
+                <div className='form-row'>
                   <label htmlFor='numProblems'>{t('settings.numProblems')}:</label>
                   <input
                     type='number'
@@ -486,9 +546,11 @@ function App(): React.JSX.Element {
                     value={settings.numProblems}
                     onChange={e => handleChange('numProblems', parseInt(e.target.value, 10))}
                     aria-label={t('accessibility.numProblemsInput')}
+                    tabIndex={0}
+                    className='form-input'
                   />
                 </div>
-                <div>
+                <div className='form-row'>
                   <label htmlFor='numRange'>{t('settings.numberRange')}:</label>
                   <div className='range-inputs'>
                     <input
@@ -503,6 +565,8 @@ function App(): React.JSX.Element {
                       }
                       aria-label={t('accessibility.minNumber')}
                       placeholder={t('settings.from')}
+                      tabIndex={0}
+                      className='form-input'
                     />
                     <span>{t('settings.to')}</span>
                     <input
@@ -517,10 +581,12 @@ function App(): React.JSX.Element {
                       }
                       aria-label={t('accessibility.maxNumber')}
                       placeholder={t('settings.to')}
+                      tabIndex={0}
+                      className='form-input'
                     />
                   </div>
                 </div>
-                <div>
+                <div className='form-row'>
                   <label htmlFor='resultRange'>{t('settings.resultRange')}:</label>
                   <div className='range-inputs'>
                     <input
@@ -535,6 +601,8 @@ function App(): React.JSX.Element {
                       }
                       aria-label={t('accessibility.minResult')}
                       placeholder={t('settings.from')}
+                      tabIndex={0}
+                      className='form-input'
                     />
                     <span>{t('settings.to')}</span>
                     <input
@@ -549,10 +617,12 @@ function App(): React.JSX.Element {
                       }
                       aria-label={t('accessibility.maxResult')}
                       placeholder={t('settings.to')}
+                      tabIndex={0}
+                      className='form-input'
                     />
                   </div>
                 </div>
-                <div>
+                <div className='form-row'>
                   <label htmlFor='numOperandsRange'>{t('settings.operandsRange')}:</label>
                   <div className='range-inputs'>
                     <input
@@ -567,6 +637,8 @@ function App(): React.JSX.Element {
                       }
                       aria-label={t('accessibility.minOperands')}
                       placeholder={t('settings.from')}
+                      tabIndex={0}
+                      className='form-input'
                     />
                     <span>{t('settings.to')}</span>
                     <input
@@ -581,10 +653,12 @@ function App(): React.JSX.Element {
                       }
                       aria-label={t('accessibility.maxOperands')}
                       placeholder={t('settings.to')}
+                      tabIndex={0}
+                      className='form-input'
                     />
                   </div>
                 </div>
-                <div>
+                <div className='form-row'>
                   <label htmlFor='allowNegative'>{t('settings.allowNegative')}:</label>
                   <input
                     type='checkbox'
@@ -592,10 +666,12 @@ function App(): React.JSX.Element {
                     checked={settings.allowNegative}
                     onChange={e => handleChange('allowNegative', e.target.checked)}
                     aria-label={t('accessibility.allowNegativeLabel')}
+                    tabIndex={0}
+                    className='form-checkbox'
                   />
                   <small className='help-text'>{t('settings.allowNegativeDesc')}</small>
                 </div>
-                <div>
+                <div className='form-row'>
                   <label htmlFor='showAnswers'>{t('settings.showAnswers')}:</label>
                   <input
                     type='checkbox'
@@ -603,12 +679,14 @@ function App(): React.JSX.Element {
                     checked={settings.showAnswers}
                     onChange={e => handleChange('showAnswers', e.target.checked)}
                     aria-label={t('accessibility.showAnswersLabel')}
+                    tabIndex={0}
+                    className='form-checkbox'
                   />
                   <small className='help-text'>{t('settings.showAnswersDesc')}</small>
                 </div>
-                <fieldset className='pdf-settings'>
+                <fieldset className='pdf-settings' tabIndex={0}>
                   <legend>{t('pdf.title')}</legend>
-                  <div>
+                  <div className='form-row'>
                     <label htmlFor='fontSize'>{t('pdf.fontSize')}:</label>
                     <input
                       type='number'
@@ -616,9 +694,11 @@ function App(): React.JSX.Element {
                       value={settings.fontSize}
                       onChange={e => handleChange('fontSize', parseInt(e.target.value, 10))}
                       aria-label={t('accessibility.fontSizeInput')}
+                      tabIndex={0}
+                      className='form-input'
                     />
                   </div>
-                  <div>
+                  <div className='form-row'>
                     <label htmlFor='lineSpacing'>{t('pdf.lineSpacing')}:</label>
                     <input
                       type='number'
@@ -626,9 +706,11 @@ function App(): React.JSX.Element {
                       value={settings.lineSpacing}
                       onChange={e => handleChange('lineSpacing', parseInt(e.target.value, 10))}
                       aria-label={t('accessibility.lineSpacingInput')}
+                      tabIndex={0}
+                      className='form-input'
                     />
                   </div>
-                  <div>
+                  <div className='form-row'>
                     <label htmlFor='paperSize'>{t('pdf.paperSize')}:</label>
                     <select
                       id='paperSize'
@@ -637,6 +719,8 @@ function App(): React.JSX.Element {
                         handleChange('paperSize', e.target.value as Settings['paperSize'])
                       }
                       aria-label={t('accessibility.paperSizeSelect')}
+                      tabIndex={0}
+                      className='form-select'
                     >
                       {Object.keys(paperSizeOptions).map(size => (
                         <option key={size} value={size}>
@@ -649,27 +733,61 @@ function App(): React.JSX.Element {
               </div>
 
               <div className='results-section'>
-                <div className='button-group'>
+                <div className='action-cards-grid'>
                   <button
-                    onClick={generateProblems}
+                    onClick={() => generateProblems()}
+                    className='action-card generate-card'
                     aria-label={`${t('buttons.generate')} - ${t('accessibility.generateButton')}`}
+                    tabIndex={0}
                   >
-                    {t('buttons.generate')}
+                    <div className='action-card-content'>
+                      <div className='action-icon'>🎲</div>
+                      <div className='action-text'>
+                        <h3>{t('buttons.generate')}</h3>
+                        <p>{t('buttons.generateDescription')}</p>
+                      </div>
+                      <div className='action-indicator'>
+                        <span className='action-arrow'>→</span>
+                      </div>
+                    </div>
                   </button>
+
                   <button
                     onClick={downloadPdf}
+                    className='action-card download-card'
                     aria-label={`${t('buttons.download')} - ${t('accessibility.downloadButton')}`}
                     disabled={problems.length === 0}
+                    tabIndex={0}
                   >
-                    {t('buttons.download')}
+                    <div className='action-card-content'>
+                      <div className='action-icon'>📄</div>
+                      <div className='action-text'>
+                        <h3>{t('buttons.download')}</h3>
+                        <p>{t('buttons.downloadDescription')}</p>
+                      </div>
+                      <div className='action-indicator'>
+                        <span className='action-arrow'>→</span>
+                      </div>
+                    </div>
                   </button>
+
                   <button
                     onClick={startQuizMode}
                     disabled={problems.length === 0}
-                    className='quiz-mode-btn'
-                    aria-label='Start quiz mode'
+                    className='action-card quiz-card'
+                    aria-label={t('infoPanel.quickActions.startQuiz')}
+                    tabIndex={0}
                   >
-                    🎯 Start Quiz
+                    <div className='action-card-content'>
+                      <div className='action-icon'>🎯</div>
+                      <div className='action-text'>
+                        <h3>{t('infoPanel.quickActions.startQuiz')}</h3>
+                        <p>{t('buttons.quizDescription')}</p>
+                      </div>
+                      <div className='action-indicator'>
+                        <span className='action-arrow'>→</span>
+                      </div>
+                    </div>
                   </button>
                 </div>
 
@@ -682,13 +800,32 @@ function App(): React.JSX.Element {
                     </h2>
                     {problems.length > 0 && (
                       <div className='problems-stats'>
-                        <div className='problems-stat'>
+                        <div
+                          className='problems-stat'
+                          tabIndex={0}
+                          role='button'
+                          aria-label={`${problems.length} problems generated`}
+                        >
                           <span>📊</span>
                           <span>{problems.length} problems</span>
                         </div>
-                        <div className='problems-stat'>
+                        <div
+                          className='problems-stat'
+                          tabIndex={0}
+                          role='button'
+                          aria-label={`Operations: ${settings.operations.join(', ')}`}
+                        >
                           <span>⚙️</span>
                           <span>{settings.operations.join(', ')}</span>
+                        </div>
+                        <div
+                          className='problems-stat success-indicator'
+                          tabIndex={0}
+                          role='button'
+                          aria-label={t('messages.success.generated')}
+                        >
+                          <span>✅</span>
+                          <span>{t('messages.success.generated')}</span>
                         </div>
                       </div>
                     )}
@@ -697,7 +834,7 @@ function App(): React.JSX.Element {
                     className='problems-content'
                     tabIndex={0}
                     role='region'
-                    aria-label='Math problems list'
+                    aria-label={t('accessibility.problemsList')}
                   >
                     {problems.length > 0 ? (
                       <div className='problems-grid'>
@@ -712,7 +849,7 @@ function App(): React.JSX.Element {
                         <div className='no-problems-icon'>🎯</div>
                         <div className='no-problems-text'>{t('results.noProblems')}</div>
                         <div className='no-problems-hint'>
-                          Click &ldquo;{t('buttons.generate')}&rdquo; to start
+                          {t('results.clickToStart', { generateButton: t('buttons.generate') })}
                         </div>
                       </div>
                     )}

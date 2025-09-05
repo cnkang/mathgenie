@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from '../i18n';
 import type { Problem } from '../types';
 
 interface InteractiveProblemProps {
@@ -14,18 +15,25 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
   showResult = false,
   disabled = false,
 }) => {
+  const { t } = useTranslation();
   const [userInput, setUserInput] = useState<string>('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const currentProblemId = useRef<number | null>(null);
 
   useEffect(() => {
-    if (problem.userAnswer !== undefined) {
-      setUserInput(problem.userAnswer.toString());
-      setIsSubmitted(true);
-    } else {
-      setUserInput('');
-      setIsSubmitted(false);
+    // Only reset if this is a new problem
+    if (currentProblemId.current !== problem.id) {
+      currentProblemId.current = problem.id;
+
+      if (problem.userAnswer !== undefined) {
+        setUserInput(problem.userAnswer.toString());
+        setIsSubmitted(true);
+      } else {
+        setUserInput('');
+        setIsSubmitted(false);
+      }
     }
-  }, [problem.userAnswer]);
+  }, [problem.id, problem.userAnswer]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,6 +45,7 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
     if (!isNaN(answer)) {
       onAnswerSubmit(problem.id, answer);
       setIsSubmitted(true);
+      setUserInput(''); // Clear input after submission
     }
   };
 
@@ -71,7 +80,7 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
             value={userInput}
             onChange={e => setUserInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder='Enter answer'
+            placeholder={t('quiz.enterAnswer') || 'Enter answer'}
             disabled={isSubmitted || disabled}
             className='answer-input'
             step='any'
@@ -81,7 +90,7 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
             disabled={isSubmitted || disabled || userInput.trim() === ''}
             className='submit-answer-btn'
           >
-            {isSubmitted ? 'Submitted' : 'Submit'}
+            {isSubmitted ? t('quiz.submitted') || 'Submitted' : t('quiz.submit') || 'Submit'}
           </button>
         </div>
       </form>
@@ -91,10 +100,12 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
           <span className='result-icon'>{getResultIcon()}</span>
           <span className='result-text'>
             {problem.isCorrect ? (
-              'Correct!'
+              t('quiz.correct') || 'Correct!'
             ) : (
               <>
-                Incorrect. The correct answer is <strong>{problem.correctAnswer}</strong>
+                {t('quiz.incorrect') || 'Incorrect.'}{' '}
+                {t('quiz.correctAnswer', { answer: problem.correctAnswer ?? 0 }) ||
+                  `The correct answer is ${problem.correctAnswer ?? 0}`}
               </>
             )}
           </span>
