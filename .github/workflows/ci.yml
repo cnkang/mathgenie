@@ -489,6 +489,21 @@ jobs:
           echo "🔍 Verifying browser installation..."
           ls -la ~/.cache/ms-playwright/ || echo "Cache directory not found"
           ls -la node_modules/playwright-core/.local-browsers/ || echo "Local browsers directory not found"
+
+          # Specific verification for WebKit on iPad tests
+          if [[ "${{ matrix.browser }}" == "webkit" ]]; then
+            echo "🍎 Verifying WebKit installation for iPad Pro..."
+            if [ -d "~/.cache/ms-playwright/webkit-*" ] || [ -d "node_modules/playwright-core/.local-browsers/webkit-*" ]; then
+              echo "✅ WebKit browser found"
+            else
+              echo "❌ WebKit browser not found, attempting reinstall..."
+              pnpm exec playwright install webkit --with-deps --force
+            fi
+            
+            # Test WebKit availability
+            echo "🧪 Testing WebKit browser availability..."
+            pnpm exec playwright install-deps webkit || echo "WebKit deps installation completed"
+          fi
         timeout-minutes: 10
 
       - name: 🏗️ Build application
@@ -511,12 +526,24 @@ jobs:
           # Run tests with Playwright's built-in webServer
           # This will automatically start and stop the server
           set +e
+
+          # Add extra debugging for iPad Pro tests
+          if [[ "${{ matrix.project }}" == "mobile-ipad" ]]; then
+            echo "🍎 Running iPad Pro tests with WebKit engine..."
+            echo "📋 Available browsers:"
+            pnpm exec playwright install --dry-run || true
+            echo "🔍 WebKit browser check:"
+            find ~/.cache/ms-playwright -name "*webkit*" -type d || echo "No WebKit in cache"
+            find node_modules/playwright-core/.local-browsers -name "*webkit*" -type d || echo "No WebKit in local"
+          fi
+
           JSON_REPORT_FILE=test-results-${{ matrix.project }}.json \
           pnpm exec playwright test \
             --config=playwright.config.ts \
             --project=${{ matrix.project }} \
             --reporter=html \
-            --reporter=json
+            --reporter=json \
+            --verbose
           TEST_EXIT_CODE=$?
           set -e
 

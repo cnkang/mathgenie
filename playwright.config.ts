@@ -130,7 +130,7 @@ export default defineConfig({
     {
       name: 'mobile-android-tablet',
       use: {
-        ...devices['iPad Pro'],
+        ...devices['Galaxy Tab S4'], // Use Android tablet device (Chromium engine)
         viewport: { width: 2560, height: 1600 }, // Galaxy Tab S9 Landscape
         userAgent:
           'Mozilla/5.0 (Linux; Android 13; SM-X810) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -413,7 +413,7 @@ export default defineConfig({
           {
             name: 'Galaxy Tab S9 Ultra Portrait',
             use: {
-              ...devices['iPad Pro'],
+              ...devices['Galaxy Tab S4'], // Use Android tablet device (Chromium engine)
               viewport: { width: 1848, height: 2960 }, // Tab S9 Ultra Portrait
               userAgent:
                 'Mozilla/5.0 (Linux; Android 13; SM-X916B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -422,7 +422,7 @@ export default defineConfig({
           {
             name: 'Galaxy Tab S9 Portrait',
             use: {
-              ...devices['iPad Pro'],
+              ...devices['Galaxy Tab S4'], // Use Android tablet device (Chromium engine)
               viewport: { width: 1600, height: 2560 }, // Tab S9 Portrait
               userAgent:
                 'Mozilla/5.0 (Linux; Android 13; SM-X810) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -431,7 +431,7 @@ export default defineConfig({
           {
             name: 'Pixel Tablet Portrait',
             use: {
-              ...devices['iPad Pro'],
+              ...devices['Galaxy Tab S4'], // Use Android tablet device (Chromium engine)
               viewport: { width: 1600, height: 2560 }, // Pixel Tablet Portrait
               userAgent:
                 'Mozilla/5.0 (Linux; Android 13; Pixel Tablet) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -441,7 +441,7 @@ export default defineConfig({
           {
             name: 'Galaxy Tab S9 Ultra Landscape',
             use: {
-              ...devices['iPad Pro'],
+              ...devices['Galaxy Tab S4'], // Use Android tablet device (Chromium engine)
               viewport: { width: 2960, height: 1848 }, // Tab S9 Ultra Landscape
               userAgent:
                 'Mozilla/5.0 (Linux; Android 13; SM-X916B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -450,7 +450,7 @@ export default defineConfig({
           {
             name: 'Galaxy Tab S9 Landscape',
             use: {
-              ...devices['iPad Pro'],
+              ...devices['Galaxy Tab S4'], // Use Android tablet device (Chromium engine)
               viewport: { width: 2560, height: 1600 }, // Tab S9 Landscape
               userAgent:
                 'Mozilla/5.0 (Linux; Android 13; SM-X810) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -459,7 +459,7 @@ export default defineConfig({
           {
             name: 'Pixel Tablet Landscape',
             use: {
-              ...devices['iPad Pro'],
+              ...devices['Galaxy Tab S4'], // Use Android tablet device (Chromium engine)
               viewport: { width: 2560, height: 1600 }, // Pixel Tablet Landscape
               userAgent:
                 'Mozilla/5.0 (Linux; Android 13; Pixel Tablet) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
