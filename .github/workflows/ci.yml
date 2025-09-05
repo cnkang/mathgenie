@@ -542,8 +542,7 @@ jobs:
             --config=playwright.config.ts \
             --project=${{ matrix.project }} \
             --reporter=html \
-            --reporter=json \
-            --verbose
+            --reporter=json
           TEST_EXIT_CODE=$?
           set -e
 
