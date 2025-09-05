@@ -315,19 +315,19 @@ export default defineConfig({
       : []),
   ],
 
-  webServer: process.env.CI
-    ? undefined
-    : {
-        command: 'pnpm preview',
-        port: 4173,
-        reuseExistingServer: !process.env.CI,
-        timeout: 120000,
-        // Enhanced server startup detection
-        url: 'http://localhost:4173',
-        ignoreHTTPSErrors: true,
+  webServer: {
+    command: 'pnpm preview',
+    url: 'http://localhost:4173',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120000,
+    ignoreHTTPSErrors: true,
+    // Retry server startup in case of port conflicts
+    ...(process.env.CI && {
+      env: {
+        ...process.env,
+        PORT: '4173',
+        HOST: '0.0.0.0',
       },
-
-  // Global setup for e2e tests
-  globalSetup: require.resolve('./tests/e2e/global-setup.ts'),
-  globalTeardown: require.resolve('./tests/e2e/global-teardown.ts'),
+    }),
+  },
 });

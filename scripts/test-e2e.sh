@@ -63,20 +63,35 @@ build_project() {
 # Function to start the preview server
 start_server() {
     print_status "Starting preview server..."
+    
+    # Check if server is already running
+    if curl -s http://localhost:4173 > /dev/null 2>&1; then
+        print_warning "Server already running on port 4173"
+        return 0
+    fi
+    
+    # Start server in background
     pnpm preview &
     SERVER_PID=$!
     
-    # Wait for server to start
-    sleep 5
+    # Wait for server to start with retry logic
+    local max_attempts=30
+    local attempt=1
     
-    # Check if server is running
-    if ! curl -s http://localhost:4173 > /dev/null; then
-        print_error "Failed to start preview server"
-        kill $SERVER_PID 2>/dev/null || true
-        exit 1
-    fi
+    while [ $attempt -le $max_attempts ]; do
+        if curl -s http://localhost:4173 > /dev/null 2>&1; then
+            print_success "Preview server started on http://localhost:4173"
+            return 0
+        fi
+        
+        print_status "Waiting for server to start... (attempt $attempt/$max_attempts)"
+        sleep 2
+        attempt=$((attempt + 1))
+    done
     
-    print_success "Preview server started on http://localhost:4173"
+    print_error "Failed to start preview server after $max_attempts attempts"
+    kill $SERVER_PID 2>/dev/null || true
+    exit 1
 }
 
 # Function to stop the server
@@ -171,6 +186,18 @@ run_test_suite() {
         "accessibility")
             npx playwright test tests/e2e/accessibility.spec.ts --project=$browser
             ;;
+        "accessibility-comprehensive")
+            npx playwright test tests/e2e/accessibility-comprehensive.spec.ts --project=$browser
+            ;;
+        "accessibility-mobile")
+            npx playwright test tests/e2e/accessibility-mobile.spec.ts --project=$browser
+            ;;
+        "accessibility-themes")
+            npx playwright test tests/e2e/accessibility-themes.spec.ts --project=$browser
+            ;;
+        "accessibility-all")
+            npx playwright test tests/e2e/accessibility*.spec.ts --project=$browser
+            ;;
         "basic")
             npx playwright test tests/e2e/basic.spec.ts --project=$browser
             ;;
@@ -179,7 +206,7 @@ run_test_suite() {
             ;;
         *)
             print_error "Unknown test suite: $suite"
-            print_status "Available suites: error-handling, localstorage, presets, integration, accessibility, basic, all"
+            print_status "Available suites: error-handling, localstorage, presets, integration, accessibility, accessibility-comprehensive, accessibility-mobile, accessibility-themes, accessibility-all, basic, all"
             exit 1
             ;;
     esac
@@ -257,7 +284,11 @@ show_usage() {
     echo "  localstorage           - localStorage persistence tests"
     echo "  presets                - Presets functionality tests"
     echo "  integration            - Integration tests"
-    echo "  accessibility          - Accessibility and ARIA tests"
+    echo "  accessibility          - Basic accessibility and ARIA tests
+  accessibility-comprehensive - Comprehensive WCAG 2.2 AAA tests
+  accessibility-mobile       - Mobile accessibility tests (WCAG 2.2 AAA)
+  accessibility-themes       - Theme and color contrast tests (WCAG 2.2 AAA)
+  accessibility-all          - All accessibility tests (WCAG 2.2 AAA)"
     echo "  basic                  - Basic functionality tests"
     echo "  all                    - All test suites"
     echo ""
@@ -287,6 +318,8 @@ show_usage() {
     echo "  $0 full                            # Run all tests"
     echo "  $0 suite error-handling            # Run error handling tests"
     echo "  $0 suite presets firefox           # Run presets tests on Firefox"
+    echo "  $0 suite accessibility-all         # Run all accessibility tests"
+    echo "  $0 suite accessibility-mobile      # Run mobile accessibility tests"
     echo "  $0 mobile iphone16                 # Run iPhone 16 tests"
     echo "  $0 mobile ipad                     # Run iPad tests"
     echo "  $0 mobile android                  # Run Android tests"

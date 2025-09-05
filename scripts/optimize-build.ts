@@ -1,69 +1,83 @@
 #!/usr/bin/env tsx
 
-import { execSync } from "child_process";
-import { readFileSync, writeFileSync } from "fs";
-import { join } from "path";
+import { execSync } from 'child_process';
+import { readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
 
 interface BuildError extends Error {
   message: string;
 }
 
-console.log("🚀 Starting optimized build process...");
+console.log('🚀 Starting optimized build process...');
+
+// Step 0: Generate build info
+const buildInfo = {
+  buildTime: new Date().toISOString(),
+  buildTimestamp: Date.now(),
+  buildHash: Date.now().toString(36),
+  version: process.env.npm_package_version || '1.0.0',
+  nodeVersion: process.version,
+  environment: process.env.NODE_ENV || 'development',
+};
+
+const buildInfoPath = join(process.cwd(), 'public/build-info.json');
+writeFileSync(buildInfoPath, JSON.stringify(buildInfo, null, 2));
+console.log('📋 Build info generated:', buildInfo);
 
 // Step 1: Clean previous build
-console.log("🧹 Cleaning previous build...");
+console.log('🧹 Cleaning previous build...');
 try {
-  execSync("rm -rf dist", { stdio: "inherit" });
+  execSync('rm -rf dist', { stdio: 'inherit' });
 } catch (error) {
   // Ignore if dist doesn't exist
 }
 
 // Step 2: Build with optimizations
-console.log("🔨 Building with optimizations...");
-execSync("NODE_ENV=production vite build", { stdio: "inherit" });
+console.log('🔨 Building with optimizations...');
+execSync('NODE_ENV=production vite build', { stdio: 'inherit' });
 
 // Step 3: Optimize HTML
-console.log("📄 Optimizing HTML...");
-const htmlPath: string = join(process.cwd(), "dist", "index.html");
+console.log('📄 Optimizing HTML...');
+const htmlPath: string = join(process.cwd(), 'dist', 'index.html');
 try {
-  let html: string = readFileSync(htmlPath, "utf8");
+  let html: string = readFileSync(htmlPath, 'utf8');
 
   // Add performance hints
   html = html.replace(
-    "<head>",
+    '<head>',
     `<head>
   <link rel="dns-prefetch" href="//fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <meta name="robots" content="index,follow">
-  <meta name="googlebot" content="index,follow">`,
+  <meta name="googlebot" content="index,follow">`
   );
 
   // Add resource hints for critical resources
   html = html.replace(
-    "</head>",
+    '</head>',
     `  <link rel="prefetch" href="/manifest.json">
   <link rel="prefetch" href="/favicon.ico">
-</head>`,
+</head>`
   );
 
   writeFileSync(htmlPath, html);
-  console.log("✅ HTML optimized");
+  console.log('✅ HTML optimized');
 } catch (error) {
   const buildError = error as BuildError;
-  console.warn("⚠️  HTML optimization failed:", buildError.message);
+  console.warn('⚠️  HTML optimization failed:', buildError.message);
 }
 
 // Step 4: Generate service worker
-console.log("🔧 Generating service worker...");
+console.log('🔧 Generating service worker...');
 try {
   const cacheVersion: string = `mathgenie-v${Date.now()}`;
   const staticCacheUrls: string[] = [
-    "/",
-    "/index.html",
-    "/favicon.ico",
-    "/logo192.png",
-    "/logo512.png",
-    "/manifest.json",
+    '/',
+    '/index.html',
+    '/favicon.ico',
+    '/logo192.png',
+    '/logo512.png',
+    '/manifest.json',
   ];
 
   const swTemplate: string = `
@@ -123,12 +137,12 @@ self.addEventListener('fetch', (event) => {
 });
 `;
 
-  writeFileSync(join(process.cwd(), "dist", "sw.js"), swTemplate.trim());
-  console.log("✅ Service worker generated");
+  writeFileSync(join(process.cwd(), 'dist', 'sw.js'), swTemplate.trim());
+  console.log('✅ Service worker generated');
 } catch (error) {
   const buildError = error as BuildError;
-  console.warn("⚠️  Service worker generation failed:", buildError.message);
+  console.warn('⚠️  Service worker generation failed:', buildError.message);
 }
 
-console.log("🎉 Build optimization complete!");
+console.log('🎉 Build optimization complete!');
 console.log('📊 Run "npm run analyze" to analyze bundle size');

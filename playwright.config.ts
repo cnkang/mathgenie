@@ -87,7 +87,45 @@ export default defineConfig({
         }),
       },
     },
-    // Mobile tests only run in non-CI environment or under specific conditions
+    // Essential mobile devices for CI (always available)
+    {
+      name: 'mobile-iphone',
+      use: {
+        ...devices['iPhone 15 Pro'], // Using iPhone 15 Pro as closest to iPhone 16 Pro
+        viewport: { width: 393, height: 852 }, // iPhone 16 Pro dimensions
+        userAgent:
+          'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
+      },
+    },
+    {
+      name: 'mobile-android',
+      use: {
+        ...devices['Galaxy S9+'],
+        viewport: { width: 384, height: 854 }, // Galaxy S24 dimensions
+        userAgent:
+          'Mozilla/5.0 (Linux; Android 14; SM-S921B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+      },
+    },
+    {
+      name: 'mobile-ipad',
+      use: {
+        ...devices['iPad Pro'],
+        viewport: { width: 1366, height: 1024 }, // iPad Pro 12.9" Landscape
+        userAgent:
+          'Mozilla/5.0 (iPad; CPU OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
+      },
+    },
+    {
+      name: 'mobile-android-tablet',
+      use: {
+        ...devices['iPad Pro'],
+        viewport: { width: 2560, height: 1600 }, // Galaxy Tab S9 Landscape
+        userAgent:
+          'Mozilla/5.0 (Linux; Android 13; SM-X810) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      },
+    },
+
+    // Extended mobile tests only run when MOBILE_TESTS=true
     ...(process.env.MOBILE_TESTS === 'true'
       ? [
           {
@@ -299,14 +337,19 @@ export default defineConfig({
       : []),
   ],
 
-  webServer: process.env.CI
-    ? undefined
-    : {
-        command: 'pnpm preview',
-        port: 4173,
-        reuseExistingServer: !process.env.CI,
-        timeout: 120000,
-        // Let Playwright wait for server to start on any port
-        // If 4173 is occupied, vite will automatically choose the next available port
+  webServer: {
+    command: 'pnpm preview',
+    url: 'http://localhost:4173',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120000,
+    ignoreHTTPSErrors: true,
+    // Retry server startup in case of port conflicts
+    ...(process.env.CI && {
+      env: {
+        ...process.env,
+        PORT: '4173',
+        HOST: '0.0.0.0',
       },
+    }),
+  },
 });
