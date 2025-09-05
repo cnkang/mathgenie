@@ -177,6 +177,15 @@ function App(): React.JSX.Element {
         () => settings.operations[random(0, settings.operations.length - 1)]
       );
 
+      // Ensure division operations don't use zero as divisor
+      operationSymbols.forEach((operator, index) => {
+        if (operator === '/') {
+          while (operands[index + 1] === 0) {
+            operands[index + 1] = random(settings.numRange[0], settings.numRange[1]);
+          }
+        }
+      });
+
       const result = calculateExpression(operands, operationSymbols);
 
       if (settings.resultRange[0] <= result && result <= settings.resultRange[1]) {
