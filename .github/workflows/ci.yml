@@ -424,7 +424,7 @@ jobs:
             mobile: true
           - browser: webkit
             project: mobile-ipad
-            name: 'iPad Pro 12.9 Landscape'
+            name: 'Large iPad Landscape'
             mobile: true
           - browser: chromium
             project: mobile-android-tablet
@@ -527,9 +527,9 @@ jobs:
           # This will automatically start and stop the server
           set +e
 
-          # Add extra debugging for iPad Pro tests
+          # Add extra debugging for Large iPad tests
           if [[ "${{ matrix.project }}" == "mobile-ipad" ]]; then
-            echo "🍎 Running iPad Pro tests with WebKit engine..."
+            echo "🍎 Running Large iPad tests with WebKit engine..."
             echo "📋 Available browsers:"
             pnpm exec playwright install --dry-run || true
             echo "🔍 WebKit browser check:"
@@ -785,7 +785,7 @@ jobs:
           echo "**Cross-browser & Mobile Testing includes:**" >> $GITHUB_STEP_SUMMARY
           echo "- 🖥️ Desktop: Chrome, Firefox" >> $GITHUB_STEP_SUMMARY
           echo "- 📱 Mobile: iPhone 16 Pro (portrait), Galaxy S24 (portrait)" >> $GITHUB_STEP_SUMMARY
-          echo "- 📱 Tablet: iPad Pro 12.9\" (landscape), Galaxy Tab S9 (landscape)" >> $GITHUB_STEP_SUMMARY
+          echo "- 📱 Tablet: Large iPad (landscape), Galaxy Tab S9 (landscape)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Accessibility tests** run in both light and dark modes. Even if issues are found, deployment won't be blocked, but detailed reports will be generated for reference." >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY

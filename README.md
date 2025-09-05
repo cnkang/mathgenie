@@ -231,7 +231,7 @@ pnpm test:e2e:error-handling   # Error handling and validation
 # Essential mobile devices (included in CI)
 pnpm exec playwright test --project=mobile-iphone      # iPhone 16 Pro
 pnpm exec playwright test --project=mobile-android     # Galaxy S24
-pnpm exec playwright test --project=mobile-ipad        # iPad Pro 12.9" Landscape
+pnpm exec playwright test --project=mobile-ipad        # Large iPad Landscape
 pnpm exec playwright test --project=mobile-android-tablet # Galaxy Tab S9 Landscape
 ```
 
@@ -273,7 +273,7 @@ pnpm test:mobile:e2e:ipad
 
 **iPad Models:**
 
-- iPad Pro 12.9" (2024) - Portrait & Landscape
+- Large iPad (custom 1366x1024) - Portrait & Landscape
 - iPad Pro 11" (2024) - Portrait & Landscape
 - iPad Air (2024) - Portrait & Landscape
 - iPad (2024) - Portrait & Landscape

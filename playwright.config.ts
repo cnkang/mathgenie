@@ -115,8 +115,8 @@ export default defineConfig({
     {
       name: 'mobile-ipad',
       use: {
-        ...devices['iPad Pro'], // iPad Pro uses WebKit engine (Safari)
-        viewport: { width: 1366, height: 1024 }, // iPad Pro 12.9" Landscape
+        ...devices['iPad Pro 11 landscape'], // iPad Pro 11 landscape uses WebKit engine (Safari)
+        viewport: { width: 1366, height: 1024 }, // Large iPad Landscape (custom viewport)
         userAgent:
           'Mozilla/5.0 (iPad; CPU OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
         // Explicitly ensure WebKit engine is used for iOS devices
@@ -259,9 +259,9 @@ export default defineConfig({
           },
           // iPad devices - Portrait orientation
           {
-            name: 'iPad Pro 12.9 Portrait',
+            name: 'Large iPad Portrait',
             use: {
-              ...devices['iPad Pro'],
+              ...devices['iPad Pro 11'],
               viewport: { width: 1024, height: 1366 }, // Portrait
               // Explicitly ensure WebKit engine is used for iOS devices
               ...(process.env.CI && {
@@ -274,7 +274,7 @@ export default defineConfig({
           {
             name: 'iPad Pro 11 Portrait',
             use: {
-              ...devices['iPad Pro'],
+              ...devices['iPad Pro 11'],
               viewport: { width: 834, height: 1194 }, // Portrait
               // Explicitly ensure WebKit engine is used for iOS devices
               ...(process.env.CI && {
@@ -287,7 +287,7 @@ export default defineConfig({
           {
             name: 'iPad Air Portrait',
             use: {
-              ...devices['iPad Pro'],
+              ...devices['iPad Pro 11'],
               viewport: { width: 820, height: 1180 }, // Portrait
               // Explicitly ensure WebKit engine is used for iOS devices
               ...(process.env.CI && {
@@ -300,7 +300,7 @@ export default defineConfig({
           {
             name: 'iPad Portrait',
             use: {
-              ...devices['iPad Pro'],
+              ...devices['iPad Pro 11'],
               viewport: { width: 810, height: 1080 }, // Portrait
               // Explicitly ensure WebKit engine is used for iOS devices
               ...(process.env.CI && {
@@ -312,9 +312,9 @@ export default defineConfig({
           },
           // iPad devices - Landscape orientation
           {
-            name: 'iPad Pro 12.9 Landscape',
+            name: 'Large iPad Landscape',
             use: {
-              ...devices['iPad Pro'],
+              ...devices['iPad Pro 11'],
               viewport: { width: 1366, height: 1024 }, // Landscape
               // Explicitly ensure WebKit engine is used for iOS devices
               ...(process.env.CI && {
@@ -327,7 +327,7 @@ export default defineConfig({
           {
             name: 'iPad Pro 11 Landscape',
             use: {
-              ...devices['iPad Pro'],
+              ...devices['iPad Pro 11'],
               viewport: { width: 1194, height: 834 }, // Landscape
               // Explicitly ensure WebKit engine is used for iOS devices
               ...(process.env.CI && {
@@ -340,7 +340,7 @@ export default defineConfig({
           {
             name: 'iPad Air Landscape',
             use: {
-              ...devices['iPad Pro'],
+              ...devices['iPad Pro 11'],
               viewport: { width: 1180, height: 820 }, // Landscape
               // Explicitly ensure WebKit engine is used for iOS devices
               ...(process.env.CI && {
@@ -353,7 +353,7 @@ export default defineConfig({
           {
             name: 'iPad Landscape',
             use: {
-              ...devices['iPad Pro'],
+              ...devices['iPad Pro 11'],
               viewport: { width: 1080, height: 810 }, // Landscape
               // Explicitly ensure WebKit engine is used for iOS devices
               ...(process.env.CI && {
