@@ -194,38 +194,35 @@ function App(): React.JSX.Element {
         () => settings.operations[random(0, settings.operations.length - 1)]
       );
 
-      let validOperands = true;
-      operationSymbols.forEach((operator, index) => {
-        if (operator === '/') {
+      for (let i = 0; i < operationSymbols.length; i++) {
+        if (operationSymbols[i] === '/') {
           const divisor = randomNonZero(settings.numRange[0], settings.numRange[1]);
           if (divisor === null) {
-            validOperands = false;
-          } else {
-            operands[index + 1] = divisor;
+            return '';
           }
+          operands[i + 1] = divisor;
         }
-      });
-      if (!validOperands) {
-        return '';
       }
 
       const result = calculateExpression(operands, operationSymbols);
-      if (result === null) {
+      const invalid =
+        result === null ||
+        result < settings.resultRange[0] ||
+        result > settings.resultRange[1] ||
+        (!settings.allowNegative && result < 0);
+
+      if (invalid) {
         continue;
       }
 
-      if (settings.resultRange[0] <= result && result <= settings.resultRange[1]) {
-        if (settings.allowNegative || result >= 0) {
-          let problem = operands[0].toString();
-          operationSymbols.forEach((operator, index) => {
-            problem += ` ${operator} ${operands[index + 1]}`;
-          });
+      let problem = operands[0].toString();
+      operationSymbols.forEach((operator, index) => {
+        problem += ` ${operator} ${operands[index + 1]}`;
+      });
 
-          problem = problem.replace(/\*/g, '✖').replace(/\//g, '➗');
+      problem = problem.replace(/\*/g, '✖').replace(/\//g, '➗');
 
-          return settings.showAnswers ? `${problem} = ${result}` : `${problem} = `;
-        }
-      }
+      return settings.showAnswers ? `${problem} = ${result}` : `${problem} = `;
     }
 
     return '';
