@@ -59,7 +59,7 @@
 }
 
 .exit-quiz-btn-small {
-  padding: var(--space-sm) var(--space-md);
+  padding: var(--space-md) var(--space-lg);
   font-size: var(--font-size-sm);
   background: var(--error-color);
   color: white;
@@ -67,7 +67,9 @@
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: all var(--transition-fast);
-  min-height: auto;
+  /* WCAG 2.2 AAA: Minimum 44px touch target */
+  min-height: 44px;
+  min-width: 44px;
 }
 
 .exit-quiz-btn-small:hover {
@@ -101,7 +103,9 @@
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: all var(--transition-fast);
-  min-height: auto;
+  /* WCAG 2.2 AAA: Minimum 44px touch target */
+  min-height: 44px;
+  min-width: 44px;
   flex: 1;
   max-width: 150px;
 }
@@ -192,7 +196,9 @@
   cursor: pointer;
   transition: all var(--transition-fast);
   font-weight: 600;
-  min-height: auto;
+  /* WCAG 2.2 AAA: Minimum 44px touch target */
+  min-height: 44px;
+  min-width: 44px;
 }
 
 .submit-answer-btn:hover:not(:disabled) {
@@ -360,7 +366,8 @@
   cursor: pointer;
   transition: all var(--transition-fast);
   font-weight: 600;
-  min-height: auto;
+  /* WCAG 2.2 AAA: Minimum 44px touch target */
+  min-height: 44px;
   min-width: 140px;
 }
 
@@ -455,6 +462,26 @@
   padding: var(--space-xl);
   font-size: var(--font-size-lg);
   color: var(--text-secondary);
+}
+
+/* Dark mode support - WCAG 2.2 AAA compliant */
+@media (prefers-color-scheme: dark) {
+  /* All buttons in dark theme - WCAG AA compliant */
+  .submit-answer-btn,
+  .retry-quiz-btn,
+  .exit-quiz-btn-small {
+    background: #5b21b6 !important;
+    color: #ffffff !important;
+  }
+
+  .submit-answer-btn:hover:not(:disabled),
+  .retry-quiz-btn:hover {
+    background: #4c1d95 !important;
+  }
+
+  .exit-quiz-btn-small:hover {
+    background: #b91c1c !important;
+  }
 }
 
 /* Responsive Design */

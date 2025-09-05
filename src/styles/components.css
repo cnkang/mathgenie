@@ -1,0 +1,44 @@
+/* ===== SHARED COMPONENT STYLES ===== */
+
+/* Progress Bar Component */
+.progress-container {
+  margin: var(--space-sm) 0;
+}
+
+.progress-container .progress-text {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  text-align: center;
+  margin-top: var(--space-xs);
+}
+
+/* Number Input Component */
+.number-input-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.number-input-label {
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.required-indicator {
+  color: var(--error-color);
+  margin-left: 2px;
+}
+
+.input-pending-indicator {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+}
+
+/* Note: Settings Manager styles moved to src/components/SettingsManager.css */
+/* Note: Other component-specific styles moved to their respective component CSS files */

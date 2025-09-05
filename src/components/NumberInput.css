@@ -1,0 +1,72 @@
+/* Number Input Component Styles */
+.number-input-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.number-input-label {
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.required-indicator {
+  color: var(--error-color);
+  margin-left: 2px;
+}
+
+.input-pending-indicator {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+}
+
+.number-input {
+  width: 100%;
+  padding: var(--space-md);
+  font-size: var(--font-size-base);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: all var(--transition-fast);
+  min-height: 48px;
+}
+
+.number-input:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgb(79 70 229 / 0.1);
+  transform: translateY(-1px);
+}
+
+.number-input:hover {
+  border-color: var(--border-hover);
+}
+
+.number-input.error {
+  border-color: var(--error-color);
+}
+
+.number-input.error:focus {
+  border-color: var(--error-color);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.number-input.pending {
+  opacity: var(--pending-opacity);
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .number-input {
+    font-size: 16px; /* Prevent zoom on iOS */
+    padding: var(--space-sm);
+    min-height: 44px;
+  }
+}

@@ -1,0 +1,250 @@
+/* ===== SETTINGS PRESETS COMPONENT - WCAG 2.2 AAA OPTIMIZED ===== */
+
+.settings-presets {
+  margin-bottom: var(--space-xl);
+  padding: var(--space-lg);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.settings-presets::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+}
+
+.settings-presets h3 {
+  margin: 0 0 var(--space-lg) 0;
+  color: var(--text-primary);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.settings-presets h3::before {
+  content: '🎯';
+  font-size: var(--font-size-lg);
+}
+
+.presets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-md);
+}
+
+/* WCAG 2.2 AAA: Large clickable card design */
+.preset-card.clickable-card {
+  padding: 0;
+  background: var(--bg-primary);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--border-color);
+  transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  /* WCAG 2.2 AAA: Large touch target - entire card is clickable */
+  min-height: 120px;
+  min-width: 240px;
+  display: flex;
+  align-items: stretch;
+  text-align: left;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* Clickable card content container */
+.preset-content {
+  padding: var(--space-lg);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+}
+
+/* Hover and focus effects for the entire card */
+.preset-card.clickable-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(79, 70, 229, 0.08), transparent);
+  transition: left 0.6s ease;
+  z-index: 1;
+}
+
+.preset-card.clickable-card:hover::before {
+  left: 100%;
+}
+
+.preset-card.clickable-card:hover {
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-3px);
+  background: linear-gradient(135deg, var(--bg-primary), rgba(79, 70, 229, 0.02));
+}
+
+.preset-card.clickable-card:active {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* WCAG 2.2 AAA: Enhanced focus indicator */
+.preset-card.clickable-card:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow:
+    0 0 0 3px rgba(79, 70, 229, 0.3),
+    var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.preset-card.clickable-card h4 {
+  margin: 0 0 var(--space-sm) 0;
+  color: var(--text-primary);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  position: relative;
+  z-index: 2;
+}
+
+.preset-card.clickable-card p {
+  margin: 0 0 var(--space-md) 0;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+  flex-grow: 1;
+  position: relative;
+  z-index: 2;
+}
+
+/* Visual indicator for clickable action */
+.preset-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-top: auto;
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--border-color);
+  position: relative;
+  z-index: 2;
+}
+
+.preset-icon {
+  font-size: var(--font-size-sm);
+  opacity: 0.7;
+  transition: all var(--transition-fast);
+}
+
+.preset-action {
+  font-size: var(--font-size-xs);
+  color: var(--primary-color);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all var(--transition-fast);
+}
+
+.preset-card.clickable-card:hover .preset-icon {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.preset-card.clickable-card:hover .preset-action {
+  color: var(--primary-hover);
+}
+
+/* Remove old preset-button styles - now using clickable cards */
+
+/* WCAG 2.2 AAA: Responsive design with enhanced touch targets */
+@media (min-width: 1200px) {
+  .presets-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-lg);
+  }
+
+  .preset-card.clickable-card {
+    min-height: 140px;
+    min-width: 280px;
+  }
+
+  .preset-content {
+    padding: var(--space-xl);
+  }
+
+  .preset-card.clickable-card h4 {
+    font-size: var(--font-size-lg);
+  }
+
+  .preset-card.clickable-card p {
+    font-size: var(--font-size-base);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .presets-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .preset-card.clickable-card {
+    min-height: 130px;
+    min-width: 260px;
+  }
+}
+
+@media (max-width: 767px) {
+  .settings-presets {
+    padding: var(--space-md);
+  }
+
+  .presets-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-sm);
+  }
+
+  .preset-card.clickable-card {
+    /* WCAG 2.2 AAA: Enhanced mobile touch targets */
+    min-height: 120px;
+    min-width: 100%;
+  }
+
+  .preset-content {
+    padding: var(--space-md);
+  }
+
+  .preset-card.clickable-card h4 {
+    font-size: var(--font-size-base);
+  }
+
+  .preset-card.clickable-card p {
+    font-size: var(--font-size-sm);
+  }
+
+  .preset-action {
+    font-size: var(--font-size-xs);
+  }
+}
+
+@media (max-width: 480px) {
+  .preset-card.clickable-card {
+    /* WCAG 2.2 AAA: Extra large touch targets for small screens */
+    min-height: 140px;
+    min-width: 100%;
+  }
+
+  .preset-content {
+    padding: var(--space-lg);
+  }
+}

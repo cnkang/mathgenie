@@ -1,11 +1,11 @@
-body {
-  margin: 0;
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
-    'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+/* Import modular CSS architecture */
+@import './styles/globals.css';
+@import './styles/layout.css';
+@import './styles/base-components.css';
+@import './styles/utilities.css';
+@import './styles/action-cards.css';
+/* CRITICAL: Load unified accessibility fixes last to ensure they take precedence */
+@import './styles/accessibility-unified.css';
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;

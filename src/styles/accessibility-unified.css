@@ -1,0 +1,435 @@
+/* ===== UNIFIED WCAG 2.2 AAA ACCESSIBILITY COMPLIANCE ===== */
+/* This file consolidates all accessibility fixes for maximum compliance */
+/* WCAG 2.2 AAA requires minimum 44x44px touch targets for Level AAA compliance */
+
+/* CRITICAL: Universal touch target enforcement - covers ALL interactive elements */
+*[onclick],
+*[onmousedown],
+*[onmouseup],
+*[ontouchstart],
+*[ontouchend],
+*[role='button'],
+*[role='tab'],
+*[role='menuitem'],
+*[role='option'],
+*[tabindex='0'],
+*[tabindex]:not([tabindex='-1']),
+button,
+input,
+select,
+textarea,
+a,
+label,
+.generate-btn,
+.download-btn,
+.quiz-mode-btn,
+.quick-action-btn,
+.preset-button,
+.export-button,
+.import-button,
+.exit-quiz-btn,
+.retry-quiz-btn,
+.submit-answer-btn,
+.nav-btn,
+.exit-quiz-btn-small,
+.language-select,
+.problems-stat,
+.stat-card,
+.action-card,
+.quick-action-card,
+.message-dismiss,
+.preset-card,
+.problem-item,
+.button-group > *,
+.form-row button,
+.form-row input,
+.form-row select,
+.form-input,
+.form-select,
+.form-checkbox,
+.operations-select {
+  /* WCAG 2.2 AAA: Minimum 44x44px touch targets */
+  min-height: 44px !important;
+  min-width: 44px !important;
+  box-sizing: border-box !important;
+  /* Ensure adequate spacing between touch targets */
+  margin: 2px !important;
+  /* Ensure touch targets are properly padded */
+  padding: 12px 16px !important;
+}
+
+/* Special handling for checkboxes and radio buttons */
+input[type='checkbox'],
+input[type='radio'],
+.form-checkbox {
+  /* Use padding to create the touch target while keeping visual size appropriate */
+  padding: 12px !important;
+  min-height: 44px !important;
+  min-width: 44px !important;
+  position: relative;
+}
+
+input[type='checkbox']::before,
+input[type='radio']::before,
+.form-checkbox::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: -12px;
+  right: -12px;
+  bottom: -12px;
+  min-height: 44px;
+  min-width: 44px;
+  z-index: -1;
+}
+
+/* Form elements specific adjustments */
+input,
+select,
+textarea,
+.form-input,
+.form-select {
+  padding: 12px !important;
+  font-size: 16px !important; /* Prevent iOS zoom */
+  line-height: 1.2 !important;
+}
+
+/* Special handling for quick-action-btn */
+.quick-action-btn {
+  min-height: 60px !important;
+  min-width: 120px !important;
+  padding: 12px 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  line-height: 1.2 !important;
+}
+
+/* Special handling for problem items */
+.problem-item {
+  min-height: 44px !important;
+  min-width: 44px !important;
+  padding: 12px 16px !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+/* Button group specific overrides */
+.button-group {
+  gap: 8px !important; /* Ensure adequate spacing between buttons */
+}
+
+.button-group > * {
+  min-width: 120px !important; /* Ensure buttons are wide enough for text */
+}
+
+/* WCAG 2.2 AAA Mobile-specific overrides */
+@media (max-width: 768px) {
+  /* Enhanced mobile touch targets */
+  *[onclick],
+  *[onmousedown],
+  *[onmouseup],
+  *[ontouchstart],
+  *[ontouchend],
+  *[role='button'],
+  *[role='tab'],
+  *[role='menuitem'],
+  *[role='option'],
+  *[tabindex='0'],
+  *[tabindex]:not([tabindex='-1']),
+  button,
+  input,
+  select,
+  textarea,
+  a,
+  label,
+  .generate-btn,
+  .download-btn,
+  .quiz-mode-btn,
+  .quick-action-btn,
+  .preset-button,
+  .export-button,
+  .import-button,
+  .exit-quiz-btn,
+  .retry-quiz-btn,
+  .submit-answer-btn,
+  .nav-btn,
+  .exit-quiz-btn-small,
+  .language-select,
+  .problems-stat,
+  .stat-card,
+  .action-card,
+  .quick-action-card,
+  .message-dismiss,
+  .preset-card,
+  .problem-item,
+  .button-group > *,
+  .form-row button,
+  .form-row input,
+  .form-row select,
+  .form-input,
+  .form-select,
+  .form-checkbox,
+  .operations-select {
+    /* WCAG 2.2 AAA: Enhanced mobile touch targets (48px recommended) */
+    min-height: 48px !important;
+    min-width: 48px !important;
+    padding: 14px 18px !important;
+    margin: 4px !important;
+  }
+
+  /* Form elements mobile adjustments */
+  input,
+  select,
+  textarea,
+  .form-input,
+  .form-select {
+    padding: 14px !important;
+    font-size: 16px !important; /* Prevent iOS zoom */
+  }
+
+  input[type='checkbox'],
+  input[type='radio'],
+  .form-checkbox {
+    padding: 14px !important;
+    min-height: 48px !important;
+    min-width: 48px !important;
+  }
+
+  .quick-action-btn {
+    min-height: 64px !important;
+    min-width: 140px !important;
+    padding: 14px 18px !important;
+  }
+
+  .operations-select,
+  select[multiple] {
+    min-height: 140px !important;
+    padding: 14px !important;
+  }
+
+  .button-group > * {
+    min-width: 140px !important;
+  }
+}
+
+/* Extra small screens - maximum accessibility */
+@media (max-width: 480px) {
+  /* Ultra-aggressive touch target enforcement */
+  *[onclick],
+  *[onmousedown],
+  *[onmouseup],
+  *[ontouchstart],
+  *[ontouchend],
+  *[role='button'],
+  *[role='tab'],
+  *[role='menuitem'],
+  *[role='option'],
+  *[tabindex='0'],
+  *[tabindex]:not([tabindex='-1']),
+  button,
+  input,
+  select,
+  textarea,
+  a,
+  label,
+  .generate-btn,
+  .download-btn,
+  .quiz-mode-btn,
+  .quick-action-btn,
+  .preset-button,
+  .export-button,
+  .import-button,
+  .exit-quiz-btn,
+  .retry-quiz-btn,
+  .submit-answer-btn,
+  .nav-btn,
+  .exit-quiz-btn-small,
+  .language-select,
+  .problems-stat,
+  .stat-card,
+  .action-card,
+  .quick-action-card,
+  .message-dismiss,
+  .preset-card,
+  .problem-item,
+  .button-group > *,
+  .form-row button,
+  .form-row input,
+  .form-row select,
+  .form-input,
+  .form-select,
+  .form-checkbox,
+  .operations-select {
+    /* WCAG 2.2 AAA: Extra large touch targets for very small screens */
+    min-height: 50px !important;
+    min-width: 50px !important;
+    padding: 16px 20px !important;
+    margin: 6px !important;
+  }
+
+  /* Form elements ultra-mobile adjustments */
+  input,
+  select,
+  textarea,
+  .form-input,
+  .form-select {
+    padding: 16px !important;
+    font-size: 16px !important;
+    line-height: 1.2 !important;
+  }
+
+  input[type='checkbox'],
+  input[type='radio'],
+  .form-checkbox {
+    padding: 16px !important;
+    min-height: 50px !important;
+    min-width: 50px !important;
+  }
+
+  .quick-action-btn {
+    min-height: 68px !important;
+    min-width: 160px !important;
+    padding: 16px 20px !important;
+  }
+
+  .operations-select,
+  select[multiple] {
+    min-height: 160px !important;
+    padding: 16px !important;
+  }
+
+  .button-group > * {
+    min-width: 160px !important;
+  }
+}
+
+/* WCAG 2.2 AAA: Specific button class overrides */
+button.generate-btn,
+button.download-btn,
+button.quiz-mode-btn,
+.button-group button.generate-btn,
+.button-group button.download-btn,
+.button-group button.quiz-mode-btn {
+  min-height: 44px !important;
+  min-width: 160px !important;
+  padding: 12px 16px !important;
+  box-sizing: border-box !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+
+/* Mobile specific button overrides */
+@media (max-width: 768px) {
+  button.generate-btn,
+  button.download-btn,
+  button.quiz-mode-btn,
+  .button-group button.generate-btn,
+  .button-group button.download-btn,
+  .button-group button.quiz-mode-btn {
+    min-height: 48px !important;
+    min-width: 140px !important;
+    padding: 14px 18px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  button.generate-btn,
+  button.download-btn,
+  button.quiz-mode-btn,
+  .button-group button.generate-btn,
+  .button-group button.download-btn,
+  .button-group button.quiz-mode-btn {
+    min-height: 50px !important;
+    min-width: 160px !important;
+    padding: 16px 20px !important;
+  }
+}
+
+/* WCAG 2.2 AAA: Enhanced focus indicators */
+*:focus,
+*:focus-visible {
+  outline: 3px solid #4f46e5 !important;
+  outline-offset: 2px !important;
+  /* High contrast focus ring for all backgrounds */
+  box-shadow:
+    0 0 0 2px #ffffff,
+    0 0 0 5px #4f46e5,
+    0 0 8px rgba(79, 70, 229, 0.3) !important;
+  /* Ensure focus is visible on mobile */
+  border-radius: 4px !important;
+}
+
+/* WCAG 2.2 AAA: Ensure all interactive elements are keyboard accessible */
+button:not([tabindex='-1']),
+input:not([tabindex='-1']),
+select:not([tabindex='-1']),
+textarea:not([tabindex='-1']),
+[role='button']:not([tabindex='-1']),
+[onclick]:not([tabindex='-1']),
+a[href]:not([tabindex='-1']) {
+  /* Ensure all interactive elements are focusable */
+  -webkit-tap-highlight-color: rgba(79, 70, 229, 0.2);
+  tap-highlight-color: rgba(79, 70, 229, 0.2);
+}
+
+/* WCAG 2.2 AAA: Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* WCAG 2.2 AAA: High contrast mode support */
+@media (prefers-contrast: high) {
+  button,
+  input,
+  select,
+  textarea,
+  [role='button'] {
+    border: 2px solid currentColor !important;
+    background-color: ButtonFace !important;
+    color: ButtonText !important;
+  }
+
+  *:focus,
+  *:focus-visible {
+    outline: 3px solid Highlight !important;
+    outline-offset: 2px !important;
+    box-shadow: none !important;
+  }
+}
+
+/* WCAG 2.2 AAA: Color scheme support */
+@media (prefers-color-scheme: dark) {
+  *:focus,
+  *:focus-visible {
+    box-shadow:
+      0 0 0 2px #000000,
+      0 0 0 5px #6366f1,
+      0 0 8px rgba(99, 102, 241, 0.3) !important;
+  }
+}
+
+/* Ensure buttons are visible and clickable */
+.generate-btn,
+.download-btn,
+.quiz-mode-btn {
+  visibility: visible !important;
+  display: inline-flex !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}

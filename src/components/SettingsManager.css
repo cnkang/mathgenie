@@ -1,0 +1,124 @@
+/* Settings Manager Component Styles */
+.settings-manager {
+  margin: var(--space-lg) 0;
+  padding: var(--space-lg);
+  background: var(--bg-accent);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+}
+
+.settings-actions {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.export-button,
+.import-button {
+  padding: var(--space-md) var(--space-lg);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-weight: 600;
+  /* WCAG 2.2 AAA: Minimum 44px touch target */
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.export-button {
+  background: var(--success-color);
+  color: white;
+}
+
+.export-button:hover {
+  background: #047857;
+  transform: translateY(-1px);
+}
+
+.import-button {
+  background: #0891b2;
+  color: white;
+}
+
+.import-button:hover {
+  background: #0e7490;
+  transform: translateY(-1px);
+}
+
+.preset-button {
+  padding: var(--space-md) var(--space-lg);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-weight: 500;
+  font-size: var(--font-size-sm);
+  /* WCAG 2.2 AAA: Minimum 44px touch target */
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.preset-button:hover {
+  background: var(--primary-light);
+  border-color: var(--primary-color);
+  transform: translateY(-1px);
+}
+
+.preset-button.active {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+/* PDF Settings Grid */
+.pdf-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+}
+
+.pdf-settings-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* Responsive adjustments */
+@media (min-width: 1200px) {
+  .pdf-settings-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-lg);
+  }
+
+  .pdf-settings-grid > div {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+}
+
+@media (max-width: 768px) {
+  .pdf-settings-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+
+  .settings-actions {
+    flex-direction: column;
+  }
+
+  .export-button,
+  .import-button,
+  .preset-button {
+    width: 100%;
+    justify-content: center;
+  }
+}

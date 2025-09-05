@@ -53,22 +53,37 @@
   color: inherit;
   cursor: pointer;
   font-size: 16px;
-  padding: 0;
+  padding: var(--space-sm);
   margin-left: 12px;
   opacity: 0.7;
-  transition: opacity 0.2s ease;
+  transition: all var(--transition-fast);
   flex-shrink: 0;
   line-height: 1;
+  /* WCAG 2.2 AAA: Large touch targets */
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
 }
 
 .message-dismiss:hover {
   opacity: 1;
+  background: rgba(0, 0, 0, 0.1);
+  transform: scale(1.1);
 }
 
 .message-dismiss:focus {
-  outline: 2px solid currentColor;
-  outline-offset: 2px;
-  border-radius: 2px;
+  outline: none;
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
+}
+
+.message-dismiss:active {
+  transform: scale(0.95);
 }
 
 @keyframes slideIn {
@@ -82,7 +97,7 @@
   }
 }
 
-/* Dark mode support */
+/* Dark mode support - WCAG 2.2 AAA compliant colors */
 @media (prefers-color-scheme: dark) {
   .message-error {
     background-color: #450a0a;
@@ -95,8 +110,8 @@
   }
 
   .message-info {
-    background-color: #1e3a8a;
-    color: #93c5fd;
+    background-color: #1e293b;
+    color: #f1f5f9;
   }
 }
 
@@ -114,5 +129,19 @@
 
   .message-dismiss {
     margin-left: 8px;
+    /* WCAG 2.2 AAA: Enhanced mobile touch targets */
+    min-height: 48px;
+    min-width: 48px;
+    padding: var(--space-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .message-dismiss {
+    /* WCAG 2.2 AAA: Extra large touch targets for very small screens */
+    min-height: 52px;
+    min-width: 52px;
+    padding: var(--space-lg);
+    font-size: 18px;
   }
 }
