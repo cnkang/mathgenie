@@ -20,6 +20,8 @@ echo "🎨 Running format..."
 pnpm format
 
 echo "🧹 Running lint-staged..."
+# Ensure consistent color output in CI environments
+export NO_COLOR=1
 npx lint-staged
 
 # 检查是否有未解决的merge conflicts

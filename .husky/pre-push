@@ -1,4 +1,7 @@
 #!/bin/sh
+# Ensure consistent color output in CI environments
+export NO_COLOR=1
+
 echo "🚀 Running pre-push checks..."
 
 # 获取当前分支

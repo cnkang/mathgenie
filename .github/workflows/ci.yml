@@ -23,7 +23,7 @@ env:
   PNPM_VERSION: '10.15.1'
   NODE_OPTIONS: '--max-old-space-size=4096'
   PLAYWRIGHT_BROWSERS_PATH: 0
-  FORCE_COLOR: 0
+  # Disable color output for CI consistency (NO_COLOR takes precedence)
   NO_COLOR: 1
   CI: true
   # Playwright optimizations
