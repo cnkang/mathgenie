@@ -307,14 +307,22 @@ jobs:
         with:
           path: |
             ~/.cache/ms-playwright
+            node_modules/playwright-core/.local-browsers
           key: ${{ runner.os }}-playwright-accessibility-${{ hashFiles('**/pnpm-lock.yaml', '**/package.json') }}
           restore-keys: |
             ${{ runner.os }}-playwright-accessibility-
             ${{ runner.os }}-playwright-
 
       - name: 🎭 Install Playwright browsers
-        run: pnpm exec playwright install chromium webkit --with-deps
-        timeout-minutes: 10
+        run: |
+          echo "🎭 Installing browsers for accessibility testing..."
+          echo "🌐 Installing Chromium for desktop/Android accessibility tests..."
+          pnpm exec playwright install chromium --with-deps
+          echo "📱 Installing WebKit for iOS/Safari accessibility tests..."
+          pnpm exec playwright install webkit --with-deps
+          echo "🦊 Installing Firefox for comprehensive cross-browser accessibility tests..."
+          pnpm exec playwright install firefox --with-deps
+        timeout-minutes: 15
 
       - name: 🏗️ Build application
         run: pnpm build
@@ -326,12 +334,16 @@ jobs:
           # Create output directories
           mkdir -p playwright-report
 
-          # Run tests on both Chromium (for Android/Desktop) and WebKit (for iOS)
+          # Run tests on all three browser engines for comprehensive coverage
           set +e
 
           echo "🔍 Running accessibility tests on Chromium (Desktop/Android simulation)..."
           JSON_REPORT_FILE=accessibility-report-chromium.json pnpm exec playwright test tests/e2e/accessibility-unified.spec.ts --config=playwright.config.ts --project=chromium
           CHROMIUM_EXIT_CODE=$?
+
+          echo "🦊 Running accessibility tests on Firefox (Gecko engine)..."
+          JSON_REPORT_FILE=accessibility-report-firefox.json pnpm exec playwright test tests/e2e/accessibility-unified.spec.ts --config=playwright.config.ts --project=firefox
+          FIREFOX_EXIT_CODE=$?
 
           echo "🍎 Running accessibility tests on WebKit (iOS/Safari simulation)..."
           JSON_REPORT_FILE=accessibility-report-webkit.json pnpm exec playwright test tests/e2e/accessibility-unified.spec.ts --config=playwright.config.ts --project=webkit
@@ -342,6 +354,9 @@ jobs:
           # Ensure JSON reports exist
           if [ ! -f "accessibility-report-chromium.json" ]; then
             echo '{"stats":{"total":0,"passed":0,"failed":0},"suites":[]}' > accessibility-report-chromium.json
+          fi
+          if [ ! -f "accessibility-report-firefox.json" ]; then
+            echo '{"stats":{"total":0,"passed":0,"failed":0},"suites":[]}' > accessibility-report-firefox.json
           fi
           if [ ! -f "accessibility-report-webkit.json" ]; then
             echo '{"stats":{"total":0,"passed":0,"failed":0},"suites":[]}' > accessibility-report-webkit.json
@@ -355,10 +370,11 @@ jobs:
           echo "| Browser Engine | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|----------------|--------|" >> $GITHUB_STEP_SUMMARY
           echo "| Chromium (Desktop/Android) | $( [ $CHROMIUM_EXIT_CODE -eq 0 ] && echo '✅ Passed' || echo '❌ Failed' ) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Firefox (Gecko) | $( [ $FIREFOX_EXIT_CODE -eq 0 ] && echo '✅ Passed' || echo '❌ Failed' ) |" >> $GITHUB_STEP_SUMMARY
           echo "| WebKit (iOS/Safari) | $( [ $WEBKIT_EXIT_CODE -eq 0 ] && echo '✅ Passed' || echo '❌ Failed' ) |" >> $GITHUB_STEP_SUMMARY
 
-          # Exit with failure if either test failed
-          if [ $CHROMIUM_EXIT_CODE -ne 0 ] || [ $WEBKIT_EXIT_CODE -ne 0 ]; then
+          # Exit with failure if any test failed
+          if [ $CHROMIUM_EXIT_CODE -ne 0 ] || [ $FIREFOX_EXIT_CODE -ne 0 ] || [ $WEBKIT_EXIT_CODE -ne 0 ]; then
             echo "⚠️ Some accessibility tests failed. Check detailed reports for specific issues." >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
@@ -370,6 +386,7 @@ jobs:
           name: accessibility-report
           path: |
             accessibility-report-chromium.json
+            accessibility-report-firefox.json
             accessibility-report-webkit.json
           retention-days: 30
 
@@ -438,14 +455,41 @@ jobs:
         with:
           path: |
             ~/.cache/ms-playwright
+            node_modules/playwright-core/.local-browsers
           key: ${{ runner.os }}-playwright-${{ matrix.browser }}-${{ hashFiles('**/pnpm-lock.yaml', '**/package.json') }}
           restore-keys: |
             ${{ runner.os }}-playwright-${{ matrix.browser }}-
             ${{ runner.os }}-playwright-
 
       - name: 🎭 Install Playwright browsers
-        run: pnpm exec playwright install ${{ matrix.browser }} --with-deps
-        timeout-minutes: 8
+        run: |
+          echo "🎭 Installing Playwright browsers for ${{ matrix.name }}..."
+          echo "📋 Project: ${{ matrix.project }}, Browser: ${{ matrix.browser }}"
+
+          # Verify Playwright installation
+          echo "🔍 Playwright version:"
+          pnpm exec playwright --version
+
+          # Install the specific browser needed for this matrix job
+          if [[ "${{ matrix.browser }}" == "webkit" ]]; then
+            echo "📱 Installing WebKit for iOS/Safari testing..."
+            pnpm exec playwright install webkit --with-deps
+            echo "✅ WebKit installation completed"
+          elif [[ "${{ matrix.browser }}" == "firefox" ]]; then
+            echo "🦊 Installing Firefox for cross-browser testing..."
+            pnpm exec playwright install firefox --with-deps
+            echo "✅ Firefox installation completed"
+          else
+            echo "🌐 Installing Chromium for desktop/Android testing..."
+            pnpm exec playwright install chromium --with-deps
+            echo "✅ Chromium installation completed"
+          fi
+
+          # Verify browser installation
+          echo "🔍 Verifying browser installation..."
+          ls -la ~/.cache/ms-playwright/ || echo "Cache directory not found"
+          ls -la node_modules/playwright-core/.local-browsers/ || echo "Local browsers directory not found"
+        timeout-minutes: 10
 
       - name: 🏗️ Build application
         run: pnpm build
