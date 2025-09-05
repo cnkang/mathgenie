@@ -132,6 +132,44 @@ describe('I18n System', () => {
     expect(getFallbackValue(undefined, 'fallback')).toBe('fallback');
   });
 
+  it('provides fallback text for success messages when translations are missing', () => {
+    // Test that success messages don't show raw keys when translations are missing
+    const TestFallbackComponent: React.FC = () => {
+      const { t } = useTranslation();
+      return (
+        <div>
+          <div data-testid='success-problems'>
+            {t('messages.success.problemsGenerated', { count: 5 })}
+          </div>
+          <div data-testid='success-imported'>{t('messages.success.settingsImported')}</div>
+          <div data-testid='success-exported'>{t('messages.success.settingsExported')}</div>
+        </div>
+      );
+    };
+
+    render(
+      <I18nProvider>
+        <TestFallbackComponent />
+      </I18nProvider>
+    );
+
+    // The key improvement: these should NOT show raw translation keys
+    // They should show either proper translations or fallback text
+    const problemsText = screen.getByTestId('success-problems').textContent;
+    const importedText = screen.getByTestId('success-imported').textContent;
+    const exportedText = screen.getByTestId('success-exported').textContent;
+
+    // Verify we don't get raw keys (the original problem)
+    expect(problemsText).not.toBe('messages.success.problemsGenerated');
+    expect(importedText).not.toBe('messages.success.settingsImported');
+    expect(exportedText).not.toBe('messages.success.settingsExported');
+
+    // Verify we get meaningful text (either translation or fallback)
+    expect(problemsText).toMatch(/generated|problems/i);
+    expect(importedText).toMatch(/imported|successfully/i);
+    expect(exportedText).toMatch(/exported|successfully/i);
+  });
+
   it('provides I18n context and translations', async () => {
     await act(async () => {
       render(

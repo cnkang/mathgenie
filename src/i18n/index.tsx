@@ -66,7 +66,10 @@ const getFallbackText = (key: string): string | null => {
     'loading.translations': 'Loading translations...',
     'loading.insights': 'Loading insights...',
     'buttons.generate': 'Generate Problems',
+    'buttons.generateDescription': 'Create new math problems with your current settings',
     'buttons.download': 'Download PDF',
+    'buttons.downloadDescription': 'Save your problems as a printable PDF file',
+    'buttons.quizDescription': 'Test your skills with an interactive quiz',
     'buttons.downloadEmpty': 'Download PDF',
     'results.title': 'Generated Problems',
     'results.noProblems': 'No problems generated yet',
@@ -83,6 +86,7 @@ const getFallbackText = (key: string): string | null => {
     'pdf.paperSize': 'Paper Size',
     'presets.title': 'Quick Presets',
     'presets.apply': 'Apply',
+    'presets.clickToApply': 'Click to apply',
     'presets.beginner.name': 'Beginner (1-10)',
     'presets.beginner.description': 'Simple addition and subtraction',
     'presets.intermediate.name': 'Intermediate (1-50)',
@@ -109,6 +113,10 @@ const getFallbackText = (key: string): string | null => {
     'errors.generationFailed': 'Failed to generate problems. Please try again.',
     'errors.noProblemsToPdf': 'No problems to download. Generate problems first.',
     'errors.pdfFailed': 'Failed to generate PDF. Please try again.',
+    'messages.success.problemsGenerated': 'Successfully generated {{count}} problems!',
+    'messages.success.settingsImported': 'Settings imported successfully!',
+    'messages.success.settingsExported': 'Settings exported successfully!',
+    'messages.success.pdfGenerated': 'PDF downloaded successfully!',
   };
 
   return fallbacks[key] || null;
@@ -218,9 +226,10 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
 
       // Return a more user-friendly fallback
       const fallbackText = getFallbackText(key);
-      return fallbackText || key;
+      value = fallbackText || key;
     }
 
+    // Apply parameter substitution to both translations and fallback text
     if (typeof value === 'string' && Object.keys(params).length > 0) {
       let result = value;
       Object.entries(params).forEach(([paramKey, paramValue]) => {

@@ -43,12 +43,16 @@ export default {
   buttons: {
     generate: 'Générer les problèmes',
     generating: 'Génération des problèmes...',
+    generateDescription: 'Créer de nouveaux problèmes mathématiques avec vos paramètres actuels',
     download: 'Télécharger PDF',
+    downloadDescription: 'Sauvegarder vos problèmes comme fichier PDF imprimable',
+    quizDescription: 'Testez vos compétences avec un quiz interactif',
     downloadEmpty: 'Télécharger PDF',
   },
   results: {
     title: 'Problèmes générés ({{count}})',
     noProblems: 'Aucun problème généré pour le moment',
+    clickToStart: 'Cliquez sur "{{generateButton}}" pour commencer',
   },
   errors: {
     noOperations: 'Veuillez sélectionner au moins une opération mathématique pour continuer.',
@@ -72,6 +76,10 @@ export default {
       'Échec de la génération du PDF. Veuillez réessayer ou vérifier les paramètres de votre navigateur.',
     generalError:
       "Une erreur s'est produite lors de la génération des problèmes. Veuillez réessayer.",
+    noProblemsForQuiz: "Veuillez d'abord générer des problèmes avant de commencer le mode quiz.",
+    unexpectedError: "Nous sommes désolés, mais quelque chose d'inattendu s'est produit.",
+    tryAgain: 'Réessayer',
+    reloadPage: 'Recharger la Page',
   },
   warnings: {
     settingsChanged:
@@ -86,6 +94,8 @@ export default {
       problemsGenerated: '{{count}} problèmes générés avec succès !',
       settingsImported: 'Paramètres importés avec succès !',
       settingsExported: 'Paramètres exportés avec succès !',
+      pdfGenerated: 'PDF téléchargé avec succès !',
+      generated: 'Généré',
     },
     info: {
       autoGeneration:
@@ -116,6 +126,7 @@ export default {
     warningMessage: "Message d'avertissement",
     infoMessage: "Message d'information",
     dismissMessage: 'Ignorer le message',
+    problemsList: 'Liste des problèmes mathématiques générés',
   },
   language: {
     select: 'Langue',
@@ -128,6 +139,7 @@ export default {
   presets: {
     title: 'Préréglages rapides',
     apply: 'Appliquer',
+    clickToApply: 'Cliquez pour appliquer',
     beginner: {
       name: 'Débutant (1-10)',
       description: 'Addition et soustraction simples',
@@ -162,6 +174,11 @@ export default {
     backToPractice: 'Retour à la Pratique',
     detailedResults: 'Résultats Détaillés',
     correctAnswer: 'Réponse correcte : {{answer}}',
+    enterAnswer: 'Entrez la réponse',
+    submit: 'Soumettre',
+    submitted: 'Soumis',
+    correct: 'Correct !',
+    incorrect: 'Incorrect.',
     stats: {
       totalProblems: 'Problèmes Totaux',
       correct: 'Correctes',

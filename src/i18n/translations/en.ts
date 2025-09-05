@@ -42,12 +42,16 @@ export default {
   buttons: {
     generate: 'Generate Problems',
     generating: 'Generating Problems...',
+    generateDescription: 'Create new math problems with your current settings',
     download: 'Download PDF',
+    downloadDescription: 'Save your problems as a printable PDF file',
+    quizDescription: 'Test your skills with an interactive quiz',
     downloadEmpty: 'Download PDF',
   },
   results: {
     title: 'Generated Problems ({{count}})',
     noProblems: 'No problems generated yet',
+    clickToStart: 'Click "{{generateButton}}" to start',
   },
   errors: {
     noOperations: 'Please select at least one mathematical operation to continue.',
@@ -67,6 +71,10 @@ export default {
     downloadFailed: 'No problems available to download. Please generate problems first.',
     pdfError: 'Failed to generate PDF. Please try again or check your browser settings.',
     generalError: 'An error occurred while generating problems. Please try again.',
+    noProblemsForQuiz: 'Please generate problems first before starting quiz mode.',
+    unexpectedError: "We're sorry, but something unexpected happened.",
+    tryAgain: 'Try Again',
+    reloadPage: 'Reload Page',
   },
   warnings: {
     settingsChanged: 'Settings have been updated. Problems will be regenerated automatically.',
@@ -79,6 +87,8 @@ export default {
       problemsGenerated: 'Successfully generated {{count}} problems!',
       settingsImported: 'Settings imported successfully!',
       settingsExported: 'Settings exported successfully!',
+      pdfGenerated: 'PDF downloaded successfully!',
+      generated: 'Generated',
     },
     info: {
       autoGeneration: 'Problems are automatically generated when you change settings.',
@@ -107,6 +117,7 @@ export default {
     warningMessage: 'Warning message',
     infoMessage: 'Information message',
     dismissMessage: 'Dismiss message',
+    problemsList: 'List of generated math problems',
   },
   language: {
     select: 'Language',
@@ -119,6 +130,7 @@ export default {
   presets: {
     title: 'Quick Presets',
     apply: 'Apply',
+    clickToApply: 'Click to apply',
     beginner: {
       name: 'Beginner (1-10)',
       description: 'Simple addition and subtraction',
@@ -153,6 +165,11 @@ export default {
     backToPractice: 'Back to Practice',
     detailedResults: 'Detailed Results',
     correctAnswer: 'Correct answer: {{answer}}',
+    enterAnswer: 'Enter answer',
+    submit: 'Submit',
+    submitted: 'Submitted',
+    correct: 'Correct!',
+    incorrect: 'Incorrect.',
     stats: {
       totalProblems: 'Total Problems',
       correct: 'Correct',

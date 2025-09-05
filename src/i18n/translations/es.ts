@@ -42,12 +42,16 @@ export default {
   buttons: {
     generate: 'Generar Problemas',
     generating: 'Generando Problemas...',
+    generateDescription: 'Crear nuevos problemas matemáticos con tu configuración actual',
     download: 'Descargar PDF',
+    downloadDescription: 'Guardar tus problemas como un archivo PDF imprimible',
+    quizDescription: 'Pon a prueba tus habilidades con un quiz interactivo',
     downloadEmpty: 'Descargar PDF',
   },
   results: {
     title: 'Problemas Generados ({{count}})',
     noProblems: 'Aún no se han generado problemas',
+    clickToStart: 'Haz clic en "{{generateButton}}" para comenzar',
   },
   errors: {
     noOperations: 'Por favor selecciona al menos una operación matemática para continuar.',
@@ -69,6 +73,10 @@ export default {
     pdfError:
       'Error al generar PDF. Por favor intenta de nuevo o verifica la configuración de tu navegador.',
     generalError: 'Ocurrió un error al generar problemas. Por favor intenta de nuevo.',
+    noProblemsForQuiz: 'Por favor genera problemas primero antes de iniciar el modo de prueba.',
+    unexpectedError: 'Lo sentimos, pero algo inesperado ocurrió.',
+    tryAgain: 'Intentar de Nuevo',
+    reloadPage: 'Recargar Página',
   },
   warnings: {
     settingsChanged:
@@ -83,6 +91,8 @@ export default {
       problemsGenerated: '¡Se generaron {{count}} problemas exitosamente!',
       settingsImported: '¡Configuración importada exitosamente!',
       settingsExported: '¡Configuración exportada exitosamente!',
+      pdfGenerated: '¡PDF descargado exitosamente!',
+      generated: 'Generado',
     },
     info: {
       autoGeneration: 'Los problemas se generan automáticamente cuando cambias la configuración.',
@@ -112,6 +122,7 @@ export default {
     warningMessage: 'Mensaje de advertencia',
     infoMessage: 'Mensaje de información',
     dismissMessage: 'Descartar mensaje',
+    problemsList: 'Lista de problemas matemáticos generados',
   },
   language: {
     select: 'Idioma',
@@ -124,6 +135,7 @@ export default {
   presets: {
     title: 'Presets Rápidos',
     apply: 'Aplicar',
+    clickToApply: 'Haz clic para aplicar',
     beginner: {
       name: 'Principiante (1-10)',
       description: 'Suma y resta simples',
@@ -158,6 +170,11 @@ export default {
     backToPractice: 'Volver a Práctica',
     detailedResults: 'Resultados Detallados',
     correctAnswer: 'Respuesta correcta: {{answer}}',
+    enterAnswer: 'Ingresa respuesta',
+    submit: 'Enviar',
+    submitted: 'Enviado',
+    correct: '¡Correcto!',
+    incorrect: 'Incorrecto.',
     stats: {
       totalProblems: 'Problemas Totales',
       correct: 'Correctas',

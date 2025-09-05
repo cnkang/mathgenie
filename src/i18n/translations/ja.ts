@@ -17,8 +17,11 @@ export default {
     numberRange: '数値の範囲',
     resultRange: '結果の範囲',
     operandsRange: 'オペランドの数',
+    options: '問題オプション',
     allowNegative: '負の結果を許可',
+    allowNegativeDesc: '計算結果が負の数になることを許可',
     showAnswers: '答えを表示',
+    showAnswersDesc: '問題の横に答えを直接表示',
     from: 'から',
     to: 'まで',
     manager: {
@@ -39,25 +42,58 @@ export default {
   buttons: {
     generate: '問題を生成',
     generating: '問題を生成中...',
+    generateDescription: '現在の設定で新しい数学問題を作成',
     download: 'PDFをダウンロード',
+    downloadDescription: '問題を印刷可能なPDFファイルとして保存',
+    quizDescription: 'インタラクティブなクイズでスキルをテスト',
     downloadEmpty: 'PDFをダウンロード',
   },
   results: {
     title: '生成された問題 ({{count}}問)',
     noProblems: 'まだ問題が生成されていません',
+    clickToStart: '「{{generateButton}}」をクリックして開始',
   },
   errors: {
     noOperations: '続行するには少なくとも1つの数学演算を選択してください。',
+    invalidProblemCount: '問題数は1から100の間である必要があります。',
     invalidProblemsCount: '問題数は1から100の間である必要があります。',
     invalidNumberRange: '数値範囲の最小値は最大値より大きくできません。',
     invalidResultRange: '結果範囲の最小値は最大値より大きくできません。',
-    generationFailed:
-      '現在の設定では問題を生成できません。数値範囲を調整するか、負の結果を許可してみてください。',
+    invalidOperandsRange:
+      '無効なオペランド範囲：最小値は少なくとも2で、最大値より大きくできません。',
+    noProblemsGenerated: '現在の設定では問題を生成できませんでした。範囲を調整してみてください。',
+    generationFailed: '問題の生成に失敗しました。再試行してください。',
+    noProblemsToPdf: 'ダウンロードする問題がありません。まず問題を生成してください。',
+    pdfFailed: 'PDF生成に失敗しました。再試行してください。',
     partialGeneration:
       '要求された{{requested}}問のうち{{generated}}問を生成しました。より良い結果のために設定の調整を検討してください。',
     downloadFailed: 'ダウンロード可能な問題がありません。まず問題を生成してください。',
     pdfError: 'PDF生成に失敗しました。再試行するか、ブラウザ設定を確認してください。',
     generalError: '問題生成中にエラーが発生しました。再試行してください。',
+    noProblemsForQuiz: 'クイズモードを開始する前に、まず問題を生成してください。',
+    unexpectedError: '申し訳ございませんが、予期しないエラーが発生しました。',
+    tryAgain: '再試行',
+    reloadPage: 'ページを再読み込み',
+  },
+  warnings: {
+    settingsChanged: '設定が更新されました。問題は自動的に再生成されます。',
+    largeNumberOfProblems: '{{count}}問を生成中です。しばらくお待ちください...',
+    restrictiveSettings:
+      '現在の設定は非常に制限的です。要求された数より少ない問題が生成される可能性があります。',
+  },
+  messages: {
+    success: {
+      problemsGenerated: '{{count}}問の問題を正常に生成しました！',
+      settingsImported: '設定が正常にインポートされました！',
+      settingsExported: '設定が正常にエクスポートされました！',
+      pdfGenerated: 'PDFが正常にダウンロードされました！',
+      generated: '生成済み',
+    },
+    info: {
+      autoGeneration: '設定を変更すると問題が自動的に再生成されます。',
+      pdfTip: 'ヒント：フォントサイズと行間を調整してPDFレイアウトを改善できます。',
+      presetApplied: 'プリセット「{{name}}」が設定に適用されました。',
+    },
   },
   accessibility: {
     selectOperations: '含める数学演算を選択',
@@ -76,6 +112,11 @@ export default {
     generateButton: '現在の設定で数学問題を生成',
     downloadButton: '生成された問題をPDFファイルとしてダウンロード',
     languageSelect: 'インターフェース言語を選択',
+    errorMessage: 'エラーメッセージ',
+    warningMessage: '警告メッセージ',
+    infoMessage: '情報メッセージ',
+    dismissMessage: 'メッセージを閉じる',
+    problemsList: '生成された数学問題のリスト',
   },
   language: {
     select: '言語',
@@ -88,6 +129,7 @@ export default {
   presets: {
     title: 'クイックプリセット',
     apply: '適用',
+    clickToApply: 'クリックして適用',
     beginner: {
       name: '初級 (1-10)',
       description: '簡単な足し算と引き算',
@@ -122,6 +164,11 @@ export default {
     backToPractice: '練習に戻る',
     detailedResults: '詳細結果',
     correctAnswer: '正解: {{answer}}',
+    enterAnswer: '答えを入力',
+    submit: '送信',
+    submitted: '送信済み',
+    correct: '正解！',
+    incorrect: '不正解。',
     stats: {
       totalProblems: '総問題数',
       correct: '正解',

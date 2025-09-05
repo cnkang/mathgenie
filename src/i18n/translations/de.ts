@@ -42,12 +42,16 @@ export default {
   buttons: {
     generate: 'Aufgaben generieren',
     generating: 'Aufgaben werden generiert...',
+    generateDescription: 'Neue Mathematikaufgaben mit Ihren aktuellen Einstellungen erstellen',
     download: 'PDF herunterladen',
+    downloadDescription: 'Ihre Aufgaben als druckbare PDF-Datei speichern',
+    quizDescription: 'Testen Sie Ihre Fähigkeiten mit einem interaktiven Quiz',
     downloadEmpty: 'PDF herunterladen',
   },
   results: {
     title: 'Generierte Aufgaben ({{count}})',
     noProblems: 'Noch keine Aufgaben generiert',
+    clickToStart: 'Klicken Sie auf "{{generateButton}}", um zu beginnen',
   },
   errors: {
     noOperations: 'Bitte wählen Sie mindestens eine mathematische Operation aus, um fortzufahren.',
@@ -70,6 +74,10 @@ export default {
       'PDF-Generierung fehlgeschlagen. Bitte versuchen Sie es erneut oder überprüfen Sie Ihre Browser-Einstellungen.',
     generalError:
       'Ein Fehler ist beim Generieren der Aufgaben aufgetreten. Bitte versuchen Sie es erneut.',
+    noProblemsForQuiz: 'Bitte generieren Sie zuerst Aufgaben, bevor Sie den Quiz-Modus starten.',
+    unexpectedError: 'Es tut uns leid, aber etwas Unerwartetes ist passiert.',
+    tryAgain: 'Erneut Versuchen',
+    reloadPage: 'Seite Neu Laden',
   },
   warnings: {
     settingsChanged:
@@ -84,6 +92,8 @@ export default {
       problemsGenerated: '{{count}} Aufgaben erfolgreich generiert!',
       settingsImported: 'Einstellungen erfolgreich importiert!',
       settingsExported: 'Einstellungen erfolgreich exportiert!',
+      pdfGenerated: 'PDF erfolgreich heruntergeladen!',
+      generated: 'Generiert',
     },
     info: {
       autoGeneration: 'Aufgaben werden automatisch generiert, wenn Sie Einstellungen ändern.',
@@ -112,6 +122,7 @@ export default {
     warningMessage: 'Warnmeldung',
     infoMessage: 'Informationsmeldung',
     dismissMessage: 'Meldung schließen',
+    problemsList: 'Liste der generierten Mathematikaufgaben',
   },
   language: {
     select: 'Sprache',
@@ -124,6 +135,7 @@ export default {
   presets: {
     title: 'Schnellvorlagen',
     apply: 'Anwenden',
+    clickToApply: 'Klicken zum Anwenden',
     beginner: {
       name: 'Anfänger (1-10)',
       description: 'Einfache Addition und Subtraktion',
@@ -158,6 +170,11 @@ export default {
     backToPractice: 'Zurück zur Übung',
     detailedResults: 'Detaillierte Ergebnisse',
     correctAnswer: 'Richtige Antwort: {{answer}}',
+    enterAnswer: 'Antwort eingeben',
+    submit: 'Senden',
+    submitted: 'Gesendet',
+    correct: 'Richtig!',
+    incorrect: 'Falsch.',
     stats: {
       totalProblems: 'Aufgaben Gesamt',
       correct: 'Richtig',

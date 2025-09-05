@@ -42,12 +42,16 @@ export default {
   buttons: {
     generate: '生成题目',
     generating: '正在生成题目...',
+    generateDescription: '使用当前设置创建新的数学题目',
     download: '下载 PDF',
+    downloadDescription: '将题目保存为可打印的 PDF 文件',
+    quizDescription: '通过互动测验测试您的技能',
     downloadEmpty: '下载 PDF',
   },
   results: {
     title: '生成的题目 ({{count}} 道)',
     noProblems: '尚未生成题目',
+    clickToStart: '点击"{{generateButton}}"开始',
   },
   errors: {
     noOperations: '请至少选择一种数学运算才能继续。',
@@ -65,6 +69,10 @@ export default {
     downloadFailed: '没有可下载的题目。请先生成题目。',
     pdfError: '生成 PDF 失败。请重试或检查浏览器设置。',
     generalError: '生成题目时发生错误。请重试。',
+    noProblemsForQuiz: '请先生成题目再开始答题模式。',
+    unexpectedError: '抱歉，发生了意外错误。',
+    tryAgain: '重试',
+    reloadPage: '重新加载页面',
   },
   warnings: {
     settingsChanged: '设置已更新。题目将自动重新生成。',
@@ -76,6 +84,8 @@ export default {
       problemsGenerated: '成功生成了 {{count}} 道题目！',
       settingsImported: '设置导入成功！',
       settingsExported: '设置导出成功！',
+      pdfGenerated: 'PDF下载成功！',
+      generated: '已生成',
     },
     info: {
       autoGeneration: '当您更改设置时，题目会自动重新生成。',
@@ -104,6 +114,7 @@ export default {
     warningMessage: '警告消息',
     infoMessage: '信息消息',
     dismissMessage: '关闭消息',
+    problemsList: '生成的数学题目列表',
   },
   language: {
     select: '语言',
@@ -116,6 +127,7 @@ export default {
   presets: {
     title: '快速预设',
     apply: '应用',
+    clickToApply: '点击应用',
     beginner: {
       name: '初级 (1-10)',
       description: '简单的加法和减法',
@@ -150,6 +162,11 @@ export default {
     backToPractice: '返回练习',
     detailedResults: '详细结果',
     correctAnswer: '正确答案: {{answer}}',
+    enterAnswer: '输入答案',
+    submit: '提交',
+    submitted: '已提交',
+    correct: '正确！',
+    incorrect: '错误。',
     stats: {
       totalProblems: '总题数',
       correct: '正确',
