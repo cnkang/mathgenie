@@ -165,17 +165,17 @@ function App(): React.JSX.Element {
     };
 
     const randomNonZero = (min: number, max: number): number | null => {
-      if (min === 0 && max === 0) {
+      const values: number[] = [];
+      for (let i = min; i <= max; i++) {
+        if (i !== 0) {
+          values.push(i);
+        }
+      }
+      if (values.length === 0) {
         return null;
       }
-      if (min > 0 || max < 0) {
-        return random(min, max);
-      }
-      const rangeSize = max - min + 1;
-      const zeroIndex = -min;
-      const rand = random(0, rangeSize - 2);
-      const actualIndex = rand >= zeroIndex ? rand + 1 : rand;
-      return min + actualIndex;
+      const idx = random(0, values.length - 1);
+      return values[idx];
     };
 
     const numOperands = random(settings.numOperandsRange[0], settings.numOperandsRange[1]);
@@ -206,7 +206,7 @@ function App(): React.JSX.Element {
         }
       });
       if (!validOperands) {
-        continue;
+        return '';
       }
 
       const result = calculateExpression(operands, operationSymbols);
