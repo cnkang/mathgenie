@@ -20,14 +20,18 @@
 
 - **Unit Testing**: Vitest with happy-dom environment
 - **E2E Testing**: Playwright with cross-browser support (Chrome, Firefox, Safari)
+- **Mobile Testing**: Comprehensive mobile device emulation (iPhone, iPad, Android)
+- **Accessibility Testing**: WCAG 2.2 AAA compliance with @axe-core/playwright
+- **Performance Testing**: Lighthouse CI integration for Core Web Vitals
 - **Coverage**: V8 coverage provider with 90% threshold requirements
 - **Test Environment**: happy-dom for lightweight DOM simulation
 
 ## Key Libraries
 
-- **PDF Generation**: jsPDF for client-side PDF creation
+- **PDF Generation**: jsPDF 3.0.2 for client-side PDF creation
 - **Analytics**: Vercel Speed Insights and Web Vitals tracking
-- **Internationalization**: Custom i18n system with React 19 optimizations
+- **Internationalization**: Custom i18n system with React 19 optimizations and 6-language support
+- **Testing**: Playwright with mobile device emulation and accessibility testing
 
 ## Development Commands
 
@@ -47,11 +51,22 @@ pnpm test:e2e         # Run E2E tests across browsers
 pnpm test:e2e:ui      # E2E tests with Playwright UI
 pnpm test:smoke       # Quick smoke tests
 
+# Mobile Testing
+pnpm test:mobile      # Test on all mobile devices
+pnpm test:mobile:iphone    # iPhone device testing
+pnpm test:mobile:ipad      # iPad device testing
+pnpm test:mobile:android   # Android device testing
+
 # Code Quality
 pnpm lint             # ESLint with auto-fix
 pnpm format           # Prettier formatting
 pnpm type-check       # TypeScript compilation check
+pnpm i18n:check       # Validate i18n translations
 pnpm validate         # Full validation (lint + type-check + test + build + e2e)
+
+# Performance & Quality
+pnpm lighthouse      # Run Lighthouse performance tests
+pnpm lighthouse:ci    # CI-friendly Lighthouse tests
 
 # Utilities
 pnpm clean            # Clean node_modules and build artifacts
@@ -68,8 +83,10 @@ pnpm reinstall        # Clean reinstall of dependencies
 
 ## Performance Optimizations
 
-- **Code Splitting**: Manual chunks for React, jsPDF, and analytics
+- **Code Splitting**: Manual chunks for React, jsPDF, analytics, and i18n translations
 - **Compression**: Brotli and Gzip compression enabled
 - **Tree Shaking**: Aggressive dead code elimination
 - **Bundle Analysis**: Built-in bundle analyzer for optimization
 - **Concurrent Features**: React 19 useTransition and useDeferredValue
+- **Translation Loading**: Dynamic loading of language files as separate chunks
+- **Terser Minification**: Advanced minification with dead code elimination
