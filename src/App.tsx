@@ -124,7 +124,7 @@ function App(): React.JSX.Element {
     return '';
   };
 
-  const calculateExpression = (operands: number[], operators: string[]): number => {
+  const calculateExpression = (operands: number[], operators: string[]): number | null => {
     let result = operands[0];
 
     for (let i = 0; i < operators.length; i++) {
@@ -142,10 +142,13 @@ function App(): React.JSX.Element {
           result *= operand;
           break;
         case '/':
+          if (operand === 0 || result % operand !== 0) {
+            return null;
+          }
           result = result / operand;
           break;
         default:
-          return NaN;
+          return null;
       }
     }
 
@@ -161,6 +164,38 @@ function App(): React.JSX.Element {
       return min + Math.floor((max - min + 1) * val);
     };
 
+    const randomNonZero = (min: number, max: number): number | null => {
+      const values: number[] = [];
+      for (let i = min; i <= max; i++) {
+        if (i !== 0) {
+          values.push(i);
+        }
+      }
+      if (values.length === 0) {
+        return null;
+      }
+      const idx = random(0, values.length - 1);
+      return values[idx];
+    };
+
+    const buildExpression = (count: number): { operands: number[]; operators: string[] } | null => {
+      const operands = [random(settings.numRange[0], settings.numRange[1])];
+      const operators: string[] = [];
+      for (let i = 0; i < count - 1; i++) {
+        const operator = settings.operations[random(0, settings.operations.length - 1)];
+        operators.push(operator);
+        const next =
+          operator === '/'
+            ? randomNonZero(settings.numRange[0], settings.numRange[1])
+            : random(settings.numRange[0], settings.numRange[1]);
+        if (next === null) {
+          return null;
+        }
+        operands.push(next);
+      }
+      return { operands, operators };
+    };
+
     const numOperands = random(settings.numOperandsRange[0], settings.numOperandsRange[1]);
     if (numOperands < 2) {
       return '';
@@ -168,29 +203,31 @@ function App(): React.JSX.Element {
 
     const MAX_ATTEMPTS = 10000;
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-      const operands = Array.from({ length: numOperands }, () =>
-        random(settings.numRange[0], settings.numRange[1])
-      );
-
-      const operationSymbols = Array.from(
-        { length: numOperands - 1 },
-        () => settings.operations[random(0, settings.operations.length - 1)]
-      );
-
-      const result = calculateExpression(operands, operationSymbols);
-
-      if (settings.resultRange[0] <= result && result <= settings.resultRange[1]) {
-        if (settings.allowNegative || result >= 0) {
-          let problem = operands[0].toString();
-          operationSymbols.forEach((operator, index) => {
-            problem += ` ${operator} ${operands[index + 1]}`;
-          });
-
-          problem = problem.replace(/\*/g, '✖').replace(/\//g, '➗');
-
-          return settings.showAnswers ? `${problem} = ${result}` : `${problem} = `;
-        }
+      const expression = buildExpression(numOperands);
+      if (!expression) {
+        return '';
       }
+      const { operands, operators } = expression;
+
+      const result = calculateExpression(operands, operators);
+      const invalid =
+        result === null ||
+        result < settings.resultRange[0] ||
+        result > settings.resultRange[1] ||
+        (!settings.allowNegative && result < 0);
+
+      if (invalid) {
+        continue;
+      }
+
+      let problem = operands[0].toString();
+      operators.forEach((operator, index) => {
+        problem += ` ${operator} ${operands[index + 1]}`;
+      });
+
+      problem = problem.replace(/\*/g, '✖').replace(/\//g, '➗');
+
+      return settings.showAnswers ? `${problem} = ${result}` : `${problem} = `;
     }
 
     return '';
