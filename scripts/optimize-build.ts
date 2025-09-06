@@ -1,13 +1,16 @@
 #!/usr/bin/env tsx
 
-import { execSync } from 'child_process';
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, rmSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import { build as viteBuild } from 'vite';
 
 interface BuildError extends Error {
   message: string;
 }
 
+const SAFE_PATH = '/usr/bin:/bin';
+process.env.PATH = SAFE_PATH;
+process.env.NODE_ENV = 'production';
 console.log('🚀 Starting optimized build process...');
 
 // Step 0: Generate build info
@@ -26,15 +29,11 @@ console.log('📋 Build info generated:', buildInfo);
 
 // Step 1: Clean previous build
 console.log('🧹 Cleaning previous build...');
-try {
-  execSync('rm -rf dist', { stdio: 'inherit' });
-} catch (error) {
-  // Ignore if dist doesn't exist
-}
+rmSync('dist', { recursive: true, force: true });
 
 // Step 2: Build with optimizations
 console.log('🔨 Building with optimizations...');
-execSync('NODE_ENV=production vite build', { stdio: 'inherit' });
+await viteBuild();
 
 // Step 3: Optimize HTML
 console.log('📄 Optimizing HTML...');
