@@ -93,7 +93,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@2270f39ef63c3edf50be34da68c039eca5e15c15
         with:
           version: '10.15.1'
 
