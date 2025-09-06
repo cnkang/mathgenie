@@ -61,10 +61,16 @@ function loadTranslationFile(language: string): Record<string, string> {
       throw new Error(`Could not parse translation file for ${language}`);
     }
 
-    // Safely evaluate the object in an isolated VM context
-    const translations = runInNewContext(
-      `(${match[1]})`,
-      {},
+const translations = runInNewContext(
+  `(${match[1]})`,
+  {},
+  { timeout: 1000 }
+).catch(error => {
+  if (error.code === 'ERR_SCRIPT_EXECUTION_TIMEOUT') {
+    throw new Error(`Translation parsing timed out for ${language}`);
+  }
+  throw error;
+}) as TranslationObject;
       { timeout: 1000 }
     ) as TranslationObject;
     return flattenTranslations(translations);
