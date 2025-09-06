@@ -8,6 +8,7 @@
 
 import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
+import { runInNewContext } from 'vm';
 
 interface TranslationObject {
   [key: string]: string | TranslationObject;
@@ -26,6 +27,7 @@ interface ValidationResult {
 
 const TRANSLATIONS_DIR = join(process.cwd(), 'src/i18n/translations');
 const SUPPORTED_LANGUAGES = ['en', 'zh', 'es', 'fr', 'de', 'ja'];
+const PARAM_REGEX = /{{[\w.-]+}}/g;
 
 /**
  * Flatten nested translation object into dot-notation keys
@@ -60,9 +62,12 @@ function loadTranslationFile(language: string): Record<string, string> {
       throw new Error(`Could not parse translation file for ${language}`);
     }
 
-    // Use eval to parse the object (safe in this context as we control the input)
-    // eslint-disable-next-line no-eval
-    const translations = eval(`(${match[1]})`);
+    // Safely evaluate the object in an isolated VM context
+    const translations = runInNewContext(
+      `(${match[1]})`,
+      {},
+      { timeout: 1000 }
+    ) as TranslationObject;
     return flattenTranslations(translations);
   } catch (error) {
     throw new Error(`Failed to load translations for ${language}: ${error}`);
@@ -82,9 +87,7 @@ function checkParameterConsistency(
   if (!baseTranslation) return errors;
 
   // Extract parameters from English translation
-  const baseParams = (baseTranslation.match(/\{\{[^}]+\}\}/g) || []).map(param =>
-    param.slice(2, -2)
-  );
+  const baseParams = Array.from(baseTranslation.matchAll(PARAM_REGEX), m => m[0].slice(2, -2));
 
   // Check each language has the same parameters
   for (const [lang, langTranslations] of Object.entries(translations)) {
@@ -93,7 +96,7 @@ function checkParameterConsistency(
     const translation = langTranslations[key];
     if (!translation) continue;
 
-    const params = (translation.match(/\{\{[^}]+\}\}/g) || []).map(param => param.slice(2, -2));
+    const params = Array.from(translation.matchAll(PARAM_REGEX), m => m[0].slice(2, -2));
 
     // Check for missing parameters
     const missingParams = baseParams.filter(param => !params.includes(param));
