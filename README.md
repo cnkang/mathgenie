@@ -305,6 +305,8 @@ pnpm build
 pnpm preview
 ```
 
+> **Note**: The build script limits `PATH` to system directories for security. Set `SAFE_PATH` if your toolchain lives elsewhere.
+
 The build process includes:
 
 - TypeScript compilation with strict type checking
