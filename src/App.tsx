@@ -178,6 +178,24 @@ function App(): React.JSX.Element {
       return values[idx];
     };
 
+    const buildExpression = (count: number): { operands: number[]; operators: string[] } | null => {
+      const operands = [random(settings.numRange[0], settings.numRange[1])];
+      const operators: string[] = [];
+      for (let i = 0; i < count - 1; i++) {
+        const operator = settings.operations[random(0, settings.operations.length - 1)];
+        operators.push(operator);
+        const next =
+          operator === '/'
+            ? randomNonZero(settings.numRange[0], settings.numRange[1])
+            : random(settings.numRange[0], settings.numRange[1]);
+        if (next === null) {
+          return null;
+        }
+        operands.push(next);
+      }
+      return { operands, operators };
+    };
+
     const numOperands = random(settings.numOperandsRange[0], settings.numOperandsRange[1]);
     if (numOperands < 2) {
       return '';
@@ -185,26 +203,13 @@ function App(): React.JSX.Element {
 
     const MAX_ATTEMPTS = 10000;
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-      const operands = Array.from({ length: numOperands }, () =>
-        random(settings.numRange[0], settings.numRange[1])
-      );
-
-      const operationSymbols = Array.from(
-        { length: numOperands - 1 },
-        () => settings.operations[random(0, settings.operations.length - 1)]
-      );
-
-      for (let i = 0; i < operationSymbols.length; i++) {
-        if (operationSymbols[i] === '/') {
-          const divisor = randomNonZero(settings.numRange[0], settings.numRange[1]);
-          if (divisor === null) {
-            return '';
-          }
-          operands[i + 1] = divisor;
-        }
+      const expression = buildExpression(numOperands);
+      if (!expression) {
+        return '';
       }
+      const { operands, operators } = expression;
 
-      const result = calculateExpression(operands, operationSymbols);
+      const result = calculateExpression(operands, operators);
       const invalid =
         result === null ||
         result < settings.resultRange[0] ||
@@ -216,7 +221,7 @@ function App(): React.JSX.Element {
       }
 
       let problem = operands[0].toString();
-      operationSymbols.forEach((operator, index) => {
+      operators.forEach((operator, index) => {
         problem += ` ${operator} ${operands[index + 1]}`;
       });
 
