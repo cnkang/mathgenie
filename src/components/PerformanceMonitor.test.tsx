@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { resetViteEnv, setViteEnv } from '../../tests/helpers/viteEnv';
+import { setViteEnv, useViteEnv } from '../../tests/helpers/viteEnv';
 import PerformanceMonitor from './PerformanceMonitor';
 
 // Mock PerformanceObserver
@@ -20,6 +20,8 @@ describe('PerformanceMonitor', () => {
   let consoleLogSpy: ReturnType<typeof vi.spyOn>;
   let consoleWarnSpy: ReturnType<typeof vi.spyOn>;
 
+  useViteEnv();
+
   beforeEach(() => {
     originalPerformanceObserver = global.PerformanceObserver;
     global.PerformanceObserver = MockPerformanceObserver as any;
@@ -28,7 +30,6 @@ describe('PerformanceMonitor', () => {
     consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     vi.useFakeTimers();
-    setViteEnv('test');
   });
 
   afterEach(() => {
@@ -36,7 +37,6 @@ describe('PerformanceMonitor', () => {
     consoleLogSpy.mockRestore();
     consoleWarnSpy.mockRestore();
     vi.useRealTimers();
-    resetViteEnv();
   });
 
   it('renders children correctly', () => {

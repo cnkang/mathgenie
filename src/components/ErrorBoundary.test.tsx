@@ -1,7 +1,7 @@
 import { fireEvent, render, renderHook, screen } from '@testing-library/react';
 import React, { act } from 'react';
 import { afterAll, beforeAll, describe, expect, vi } from 'vitest';
-import { resetViteEnv, setViteEnv } from '../../tests/helpers/viteEnv';
+import { setViteEnv, useViteEnv } from '../../tests/helpers/viteEnv';
 import ErrorBoundary, { useErrorHandler } from './ErrorBoundary';
 
 // Create a component that throws errors
@@ -23,13 +23,7 @@ describe('ErrorBoundary', () => {
     console.error = originalError;
   });
 
-  beforeEach(() => {
-    setViteEnv('test');
-  });
-
-  afterEach(() => {
-    resetViteEnv();
-  });
+  useViteEnv();
 
   test('renders children when there is no error', () => {
     render(
@@ -216,13 +210,7 @@ describe('ErrorBoundary', () => {
 });
 
 describe('useErrorHandler', () => {
-  beforeEach(() => {
-    setViteEnv('test');
-  });
-
-  afterEach(() => {
-    resetViteEnv();
-  });
+  useViteEnv();
 
   test('initializes with no error', () => {
     const { result } = renderHook(() => useErrorHandler());

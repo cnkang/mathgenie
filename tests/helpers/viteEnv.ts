@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { afterEach, beforeEach, vi } from 'vitest';
 
 export type ViteMode = 'development' | 'production' | 'test';
 
@@ -13,4 +13,9 @@ export const setViteEnv = (mode: ViteMode): void => {
 
 export const resetViteEnv = (): void => {
   vi.unstubAllEnvs();
+};
+
+export const useViteEnv = (mode: ViteMode = 'test'): void => {
+  beforeEach(() => setViteEnv(mode));
+  afterEach(() => resetViteEnv());
 };
