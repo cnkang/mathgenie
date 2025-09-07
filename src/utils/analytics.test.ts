@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import { resetViteEnv, setViteEnv } from '../../tests/helpers/viteEnv';
+import { setViteEnv, useViteEnv } from '../../tests/helpers/viteEnv';
 import {
   trackEvent,
   trackLanguageChange,
@@ -24,15 +24,15 @@ Object.defineProperty(window, 'localStorage', {
 const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
 describe('Analytics Utils', () => {
+  useViteEnv();
+
   beforeEach(() => {
     vi.clearAllMocks();
-    setViteEnv('test');
   });
 
   afterEach(() => {
     consoleSpy.mockClear();
     delete (window as any).gtag;
-    resetViteEnv();
   });
 
   describe('trackEvent', () => {
