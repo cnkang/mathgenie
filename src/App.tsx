@@ -10,7 +10,7 @@ import SettingsPresets from './components/SettingsPresets';
 import TranslationLoader from './components/TranslationLoader';
 import { useTranslation } from './i18n';
 import './styles/components.css';
-import type { Operation, PaperSizeOptions, QuizResult, Settings } from './types';
+import type { MessageValue, Operation, PaperSizeOptions, QuizResult, Settings } from './types';
 import { setupWCAGEnforcement } from './utils/wcagEnforcement';
 import { useProblemGenerator } from './hooks/useProblemGenerator';
 import { useSettings } from './hooks/useSettings';
@@ -22,17 +22,11 @@ const SpeedInsights = React.lazy(() =>
 function App(): React.JSX.Element {
   const { t, isLoading } = useTranslation();
 
-  const { settings, setSettings, saveSettings, validateSettings } = useSettings();
-  const {
-    problems,
-    error,
-    warning,
-    successMessage,
-    generateProblems,
-    setError,
-    setWarning,
-    setSuccessMessage,
-  } = useProblemGenerator(settings, isLoading, validateSettings);
+  const { settings, setSettings, validateSettings } = useSettings();
+  const { problems, generateProblems } = useProblemGenerator(settings, isLoading, validateSettings);
+  const [error, setError] = useState<MessageValue>('');
+  const [warning, setWarning] = useState<MessageValue>('');
+  const [successMessage, setSuccessMessage] = useState<MessageValue>('');
 
   const [isQuizMode, setIsQuizMode] = useState<boolean>(false);
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
@@ -123,7 +117,15 @@ function App(): React.JSX.Element {
 
     const validationError = validateSettings(settings);
     if (!validationError) {
-      generateProblems(hasInitialGenerated);
+      const messages = generateProblems(hasInitialGenerated);
+      setError(messages.error);
+      setWarning(messages.warning);
+      if (messages.successMessage) {
+        setSuccessMessage(messages.successMessage);
+        setTimeout(() => setSuccessMessage(''), 5000);
+      } else {
+        setSuccessMessage('');
+      }
       if (!hasInitialGenerated) {
         setHasInitialGenerated(true);
       }
@@ -176,12 +178,10 @@ function App(): React.JSX.Element {
     }
 
     setSettings(newSettings);
-    saveSettings(newSettings);
   };
 
   const handleApplyPreset = (presetSettings: Settings): void => {
     setSettings(presetSettings);
-    saveSettings(presetSettings);
 
     // Clear messages and show success only if i18n is loaded
     setError('');
@@ -503,7 +503,15 @@ function App(): React.JSX.Element {
               <div className='results-section'>
                 <div className='action-cards-grid'>
                   <button
-                    onClick={() => generateProblems()}
+                    onClick={() => {
+                      const messages = generateProblems();
+                      setError(messages.error);
+                      setWarning(messages.warning);
+                      setSuccessMessage(messages.successMessage);
+                      if (messages.successMessage) {
+                        setTimeout(() => setSuccessMessage(''), 5000);
+                      }
+                    }}
                     className='action-card generate-card'
                     aria-label={`${t('buttons.generate')} - ${t('accessibility.generateButton')}`}
                     tabIndex={0}
@@ -627,7 +635,15 @@ function App(): React.JSX.Element {
                 <InfoPanel
                   problems={problems}
                   settings={settings}
-                  onGenerateProblems={generateProblems}
+                  onGenerateProblems={() => {
+                    const messages = generateProblems();
+                    setError(messages.error);
+                    setWarning(messages.warning);
+                    setSuccessMessage(messages.successMessage);
+                    if (messages.successMessage) {
+                      setTimeout(() => setSuccessMessage(''), 5000);
+                    }
+                  }}
                   onDownloadPdf={downloadPdf}
                   quizResult={quizResult}
                   onStartQuiz={startQuizMode}
