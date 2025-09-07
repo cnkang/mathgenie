@@ -1,4 +1,5 @@
 import { vi } from 'vitest';
+import { resetViteEnv, setViteEnv } from '../../tests/helpers/viteEnv';
 import {
   trackEvent,
   trackLanguageChange,
@@ -25,35 +26,40 @@ const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 describe('Analytics Utils', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // Reset environment to test
-    vi.stubEnv('MODE', 'test');
-    vi.stubEnv('DEV', false);
-    vi.stubEnv('PROD', false);
+    setViteEnv('test');
   });
 
   afterEach(() => {
     consoleSpy.mockClear();
-    vi.unstubAllEnvs();
+    delete (window as any).gtag;
+    resetViteEnv();
   });
 
   describe('trackEvent', () => {
-    test('should not track in non-production environment', () => {
+    test('logs event in development environment', () => {
+      setViteEnv('development');
       localStorageMock.getItem.mockReturnValue(null);
+
+      const mockGtag = vi.fn();
+      window.gtag = mockGtag;
 
       trackEvent('test-event', { prop: 'value' });
 
-      expect(consoleSpy).not.toHaveBeenCalled();
+      expect(consoleSpy).toHaveBeenCalled();
+      expect(mockGtag).not.toHaveBeenCalled();
     });
 
     test('should not track when user has opted out', () => {
-      vi.stubEnv('MODE', 'production');
-      vi.stubEnv('DEV', false);
-      vi.stubEnv('PROD', true);
+      setViteEnv('production');
       localStorageMock.getItem.mockReturnValue('true');
+
+      const mockGtag = vi.fn();
+      window.gtag = mockGtag;
 
       trackEvent('test-event', { prop: 'value' });
 
       expect(consoleSpy).not.toHaveBeenCalled();
+      expect(mockGtag).not.toHaveBeenCalled();
     });
 
     test('should handle empty properties', () => {
@@ -75,9 +81,7 @@ describe('Analytics Utils', () => {
     });
 
     test('should handle localStorage errors gracefully', () => {
-      vi.stubEnv('MODE', 'production');
-      vi.stubEnv('DEV', false);
-      vi.stubEnv('PROD', true);
+      setViteEnv('production');
       localStorageMock.getItem.mockImplementation(() => {
         throw new Error('localStorage error');
       });
@@ -88,9 +92,7 @@ describe('Analytics Utils', () => {
     });
 
     test('should track events in production when not opted out', () => {
-      vi.stubEnv('MODE', 'production');
-      vi.stubEnv('DEV', false);
-      vi.stubEnv('PROD', true);
+      setViteEnv('production');
       localStorageMock.getItem.mockReturnValue(null);
 
       // Mock gtag
@@ -103,9 +105,7 @@ describe('Analytics Utils', () => {
     });
 
     test('should include user agent and screen info in production', () => {
-      vi.stubEnv('MODE', 'production');
-      vi.stubEnv('DEV', false);
-      vi.stubEnv('PROD', true);
+      setViteEnv('production');
       localStorageMock.getItem.mockReturnValue(null);
 
       // Mock navigator and screen
@@ -133,9 +133,7 @@ describe('Analytics Utils', () => {
 
   describe('trackProblemGeneration', () => {
     test('should track problem generation with correct properties', () => {
-      vi.stubEnv('MODE', 'production');
-      vi.stubEnv('DEV', false);
-      vi.stubEnv('PROD', true);
+      setViteEnv('production');
       localStorageMock.getItem.mockReturnValue(null);
 
       const mockGtag = vi.fn();
@@ -162,9 +160,7 @@ describe('Analytics Utils', () => {
 
   describe('trackPdfDownload', () => {
     test('should track PDF download with settings', () => {
-      vi.stubEnv('MODE', 'production');
-      vi.stubEnv('DEV', false);
-      vi.stubEnv('PROD', true);
+      setViteEnv('production');
       localStorageMock.getItem.mockReturnValue(null);
 
       const mockGtag = vi.fn();
@@ -189,9 +185,7 @@ describe('Analytics Utils', () => {
     });
 
     test('should use default values when not provided', () => {
-      vi.stubEnv('MODE', 'production');
-      vi.stubEnv('DEV', false);
-      vi.stubEnv('PROD', true);
+      setViteEnv('production');
       localStorageMock.getItem.mockReturnValue(null);
 
       const mockGtag = vi.fn();
@@ -216,9 +210,7 @@ describe('Analytics Utils', () => {
 
   describe('trackLanguageChange', () => {
     test('should track language changes', () => {
-      vi.stubEnv('MODE', 'production');
-      vi.stubEnv('DEV', false);
-      vi.stubEnv('PROD', true);
+      setViteEnv('production');
       localStorageMock.getItem.mockReturnValue(null);
 
       const mockGtag = vi.fn();
@@ -235,9 +227,7 @@ describe('Analytics Utils', () => {
 
   describe('trackPresetUsed', () => {
     test('should track preset usage', () => {
-      vi.stubEnv('MODE', 'production');
-      vi.stubEnv('DEV', false);
-      vi.stubEnv('PROD', true);
+      setViteEnv('production');
       localStorageMock.getItem.mockReturnValue(null);
 
       const mockGtag = vi.fn();
