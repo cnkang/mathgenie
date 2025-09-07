@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { resetViteEnv, setViteEnv } from '../../tests/helpers/viteEnv';
 import PerformanceMonitor from './PerformanceMonitor';
 
 // Mock PerformanceObserver
@@ -27,6 +28,7 @@ describe('PerformanceMonitor', () => {
     consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     vi.useFakeTimers();
+    setViteEnv('test');
   });
 
   afterEach(() => {
@@ -34,7 +36,7 @@ describe('PerformanceMonitor', () => {
     consoleLogSpy.mockRestore();
     consoleWarnSpy.mockRestore();
     vi.useRealTimers();
-    vi.unstubAllEnvs();
+    resetViteEnv();
   });
 
   it('renders children correctly', () => {
@@ -101,9 +103,7 @@ describe('PerformanceMonitor', () => {
   });
 
   it('logs performance metrics in development', () => {
-    vi.stubEnv('MODE', 'development');
-    vi.stubEnv('DEV', true);
-    vi.stubEnv('PROD', false);
+    setViteEnv('development');
 
     const mockObserver = new MockPerformanceObserver(() => {});
     const mockEntry = {
@@ -121,9 +121,7 @@ describe('PerformanceMonitor', () => {
   });
 
   it('handles memory monitoring with interval', () => {
-    vi.stubEnv('MODE', 'development');
-    vi.stubEnv('DEV', true);
-    vi.stubEnv('PROD', false);
+    setViteEnv('development');
 
     const mockMemory = {
       usedJSHeapSize: 50 * 1048576,
@@ -155,9 +153,7 @@ describe('PerformanceMonitor', () => {
   });
 
   it('handles production environment with gtag', () => {
-    vi.stubEnv('MODE', 'production');
-    vi.stubEnv('DEV', false);
-    vi.stubEnv('PROD', true);
+    setViteEnv('production');
 
     const mockGtag = vi.fn();
     (global as any).window = { gtag: mockGtag };
@@ -172,9 +168,7 @@ describe('PerformanceMonitor', () => {
   });
 
   it('handles entries without value property', () => {
-    vi.stubEnv('MODE', 'development');
-    vi.stubEnv('DEV', true);
-    vi.stubEnv('PROD', false);
+    setViteEnv('development');
 
     // Mock window for this test
     Object.defineProperty(global, 'window', {
@@ -233,9 +227,7 @@ describe('PerformanceMonitor', () => {
   });
 
   it('triggers performance observer callback in development', () => {
-    vi.stubEnv('MODE', 'development');
-    vi.stubEnv('DEV', true);
-    vi.stubEnv('PROD', false);
+    setViteEnv('development');
 
     Object.defineProperty(global, 'window', {
       value: {},
@@ -278,9 +270,7 @@ describe('PerformanceMonitor', () => {
   });
 
   it('triggers performance observer callback in production with gtag', () => {
-    vi.stubEnv('MODE', 'production');
-    vi.stubEnv('DEV', false);
-    vi.stubEnv('PROD', true);
+    setViteEnv('production');
 
     const mockGtag = vi.fn();
     Object.defineProperty(global, 'window', {
@@ -325,9 +315,7 @@ describe('PerformanceMonitor', () => {
   });
 
   it('handles production environment without gtag', () => {
-    vi.stubEnv('MODE', 'production');
-    vi.stubEnv('DEV', false);
-    vi.stubEnv('PROD', true);
+    setViteEnv('production');
 
     Object.defineProperty(global, 'window', {
       value: {},
@@ -366,9 +354,7 @@ describe('PerformanceMonitor', () => {
   });
 
   it('handles entries with undefined/null values', () => {
-    vi.stubEnv('MODE', 'production');
-    vi.stubEnv('DEV', false);
-    vi.stubEnv('PROD', true);
+    setViteEnv('production');
 
     const mockGtag = vi.fn();
     Object.defineProperty(global, 'window', {
