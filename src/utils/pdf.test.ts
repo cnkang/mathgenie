@@ -40,14 +40,16 @@ describe('pdf utils', () => {
   });
 
   test('generatePdf uses jsPDF', async () => {
-    const jsPDF = await loadJsPDF();
+    const jsPDF = (await loadJsPDF()) as any;
     const manyProblems: Problem[] = [
       { id: 1, text: '1 + 1 =' },
       { id: 2, text: '2 + 2 =' },
       { id: 3, text: '3 + 3 =' },
     ];
     const customSettings = { ...settings, lineSpacing: 1000 };
-    await generatePdf(manyProblems, customSettings, paperSizes);
+    await generatePdf(manyProblems, customSettings, paperSizes, 'custom.pdf');
     expect(jsPDF).toHaveBeenCalledTimes(1);
+    const instance = jsPDF.mock.results[0]?.value as any;
+    expect(instance.save).toHaveBeenCalledWith('custom.pdf');
   });
 });
