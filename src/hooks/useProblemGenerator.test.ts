@@ -58,13 +58,18 @@ describe('useProblemGenerator hook', () => {
     paperSize: 'a4',
   };
 
-  it('generates problems and success message', () => {
+  it('generates problems and returns success message', () => {
     const { result } = renderHook(() => useProblemGenerator(baseSettings, false, () => ''));
+    let messages: ReturnType<typeof result.current.generateProblems> = {
+      error: '',
+      warning: '',
+      successMessage: '',
+    };
     act(() => {
-      result.current.generateProblems();
+      messages = result.current.generateProblems();
     });
     expect(result.current.problems).toHaveLength(2);
-    expect(result.current.successMessage).toEqual({
+    expect(messages.successMessage).toEqual({
       key: 'messages.success.problemsGenerated',
       params: { count: 2 },
     });
@@ -73,19 +78,29 @@ describe('useProblemGenerator hook', () => {
   it('handles validation errors', () => {
     const validate = () => ({ key: 'errors.noOperations' });
     const { result } = renderHook(() => useProblemGenerator(baseSettings, false, validate));
+    let messages: ReturnType<typeof result.current.generateProblems> = {
+      error: '',
+      warning: '',
+      successMessage: '',
+    };
     act(() => {
-      result.current.generateProblems();
+      messages = result.current.generateProblems();
     });
-    expect(result.current.error).toEqual({ key: 'errors.noOperations' });
+    expect(messages.error).toEqual({ key: 'errors.noOperations' });
   });
 
   it('sets warning for large number of problems', () => {
     const manySettings = { ...baseSettings, numProblems: 60 };
     const { result } = renderHook(() => useProblemGenerator(manySettings, false, () => ''));
+    let messages: ReturnType<typeof result.current.generateProblems> = {
+      error: '',
+      warning: '',
+      successMessage: '',
+    };
     act(() => {
-      result.current.generateProblems();
+      messages = result.current.generateProblems();
     });
-    expect(result.current.warning).toEqual({
+    expect(messages.warning).toEqual({
       key: 'warnings.largeNumberOfProblems',
       params: { count: 60 },
     });
@@ -94,9 +109,14 @@ describe('useProblemGenerator hook', () => {
   it('reports error when no problems can be generated', () => {
     const impossible: Settings = { ...baseSettings, resultRange: [100, 200] };
     const { result } = renderHook(() => useProblemGenerator(impossible, false, () => ''));
+    let messages: ReturnType<typeof result.current.generateProblems> = {
+      error: '',
+      warning: '',
+      successMessage: '',
+    };
     act(() => {
-      result.current.generateProblems();
+      messages = result.current.generateProblems();
     });
-    expect(result.current.error).toEqual({ key: 'errors.noProblemsGenerated' });
+    expect(messages.error).toEqual({ key: 'errors.noProblemsGenerated' });
   });
 });

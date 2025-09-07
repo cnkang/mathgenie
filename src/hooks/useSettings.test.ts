@@ -25,7 +25,7 @@ describe('useSettings', () => {
     expect(result.current.settings.operations).toEqual(['+', '-']);
   });
 
-  it('saves settings to localStorage', () => {
+  it('auto-saves settings to localStorage', () => {
     localStorageMock.getItem.mockReturnValue(null);
     const { result } = renderHook(() => useSettings());
     const newSettings: Settings = {
@@ -34,7 +34,6 @@ describe('useSettings', () => {
     };
     act(() => {
       result.current.setSettings(newSettings);
-      result.current.saveSettings(newSettings);
     });
     expect(localStorageMock.setItem).toHaveBeenCalledWith(
       'mathgenie-settings',
@@ -78,5 +77,12 @@ describe('useSettings', () => {
     localStorageMock.getItem.mockReturnValue(JSON.stringify(saved));
     const { result } = renderHook(() => useSettings());
     expect(result.current.settings).toMatchObject(saved);
+  });
+
+  it('clears corrupted settings from storage', () => {
+    localStorageMock.getItem.mockReturnValue('not-json');
+    const { result } = renderHook(() => useSettings());
+    expect(localStorageMock.removeItem).toHaveBeenCalledWith('mathgenie-settings');
+    expect(result.current.settings.operations).toEqual(['+', '-']);
   });
 });

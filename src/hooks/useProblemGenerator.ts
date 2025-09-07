@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { buildExpression, randomInt } from '@/utils/problemUtils';
 import type { MessageValue, Problem, Settings } from '@/types';
 
 export const calculateExpression = (operands: number[], operators: string[]): number | null => {
@@ -33,54 +34,14 @@ export const calculateExpression = (operands: number[], operators: string[]): nu
 };
 
 export const generateProblem = (settings: Settings): string => {
-  const cryptoObj = window.crypto || (window as any).msCrypto;
-  const random = (min: number, max: number): number => {
-    const array = new Uint32Array(1);
-    cryptoObj.getRandomValues(array);
-    const val = array[0] / (0xffffffff + 1);
-    return min + Math.floor((max - min + 1) * val);
-  };
-
-  const randomNonZero = (min: number, max: number): number | null => {
-    const values: number[] = [];
-    for (let i = min; i <= max; i++) {
-      if (i !== 0) {
-        values.push(i);
-      }
-    }
-    if (values.length === 0) {
-      return null;
-    }
-    const idx = random(0, values.length - 1);
-    return values[idx];
-  };
-
-  const buildExpression = (count: number): { operands: number[]; operators: string[] } | null => {
-    const operands = [random(settings.numRange[0], settings.numRange[1])];
-    const operators: string[] = [];
-    for (let i = 0; i < count - 1; i++) {
-      const operator = settings.operations[random(0, settings.operations.length - 1)];
-      operators.push(operator);
-      const next =
-        operator === '/'
-          ? randomNonZero(settings.numRange[0], settings.numRange[1])
-          : random(settings.numRange[0], settings.numRange[1]);
-      if (next === null) {
-        return null;
-      }
-      operands.push(next);
-    }
-    return { operands, operators };
-  };
-
-  const numOperands = random(settings.numOperandsRange[0], settings.numOperandsRange[1]);
+  const numOperands = randomInt(settings.numOperandsRange[0], settings.numOperandsRange[1]);
   if (numOperands < 2) {
     return '';
   }
 
   const MAX_ATTEMPTS = 10000;
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-    const expression = buildExpression(numOperands);
+    const expression = buildExpression(numOperands, settings);
     if (!expression) {
       return '';
     }
@@ -116,30 +77,32 @@ export const useProblemGenerator = (
   validateSettings: (settings: Settings) => MessageValue
 ) => {
   const [problems, setProblems] = useState<Problem[]>([]);
-  const [error, setError] = useState<MessageValue>('');
-  const [warning, setWarning] = useState<MessageValue>('');
-  const [successMessage, setSuccessMessage] = useState<MessageValue>('');
 
-  const generateProblems = (showSuccessMessage: boolean = true): void => {
-    setError('');
-    setWarning('');
-    setSuccessMessage('');
+  const generateProblems = (
+    showSuccessMessage: boolean = true
+  ): {
+    error: MessageValue;
+    warning: MessageValue;
+    successMessage: MessageValue;
+  } => {
+    let error: MessageValue = '';
+    let warning: MessageValue = '';
+    let successMessage: MessageValue = '';
 
     if (isLoading) {
-      return;
+      return { error, warning, successMessage };
     }
 
     const validationError = validateSettings(settings);
     if (validationError) {
-      setError(validationError);
-      return;
+      return { error: validationError, warning, successMessage };
     }
 
     if (settings.numProblems > 50) {
-      setWarning({
+      warning = {
         key: 'warnings.largeNumberOfProblems',
         params: { count: settings.numProblems },
-      });
+      };
     }
 
     try {
@@ -151,47 +114,42 @@ export const useProblemGenerator = (
 
       if (generatedProblems.length === 0) {
         if (!isLoading && showSuccessMessage) {
-          setError({ key: 'errors.noProblemsGenerated' });
+          error = { key: 'errors.noProblemsGenerated' };
         }
       } else if (generatedProblems.length < settings.numProblems) {
         if (!isLoading && showSuccessMessage) {
-          setWarning({
+          warning = {
             key: 'errors.partialGeneration',
             params: {
               generated: generatedProblems.length,
               requested: settings.numProblems,
             },
-          });
+          };
         }
         setProblems(generatedProblems);
       } else {
         if (showSuccessMessage && !isLoading) {
-          setSuccessMessage({
+          successMessage = {
             key: 'messages.success.problemsGenerated',
             params: { count: generatedProblems.length },
-          });
-          setTimeout(() => setSuccessMessage(''), 5000);
+          };
         }
         setProblems(generatedProblems);
       }
     } catch (err) {
       if (!isLoading && showSuccessMessage) {
-        setError({ key: 'errors.generationFailed' });
+        error = { key: 'errors.generationFailed' };
       }
       if (process.env.NODE_ENV === 'development') {
         console.error('Problem generation error:', err);
       }
     }
+
+    return { error, warning, successMessage };
   };
 
   return {
     problems,
-    error,
-    warning,
-    successMessage,
     generateProblems,
-    setError,
-    setWarning,
-    setSuccessMessage,
   };
 };

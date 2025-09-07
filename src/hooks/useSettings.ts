@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { MessageValue, Settings } from '@/types';
 
 const defaultSettings: Settings = {
@@ -40,6 +40,7 @@ const loadSettings = (): Settings => {
       };
     }
   } catch (error) {
+    localStorage.removeItem('mathgenie-settings');
     if (process.env.NODE_ENV === 'development') {
       console.warn('Failed to load settings from localStorage:', error);
     }
@@ -50,15 +51,15 @@ const loadSettings = (): Settings => {
 export const useSettings = () => {
   const [settings, setSettings] = useState<Settings>(() => loadSettings());
 
-  const saveSettings = (newSettings: Settings): void => {
+  useEffect(() => {
     try {
-      localStorage.setItem('mathgenie-settings', JSON.stringify(newSettings));
+      localStorage.setItem('mathgenie-settings', JSON.stringify(settings));
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
         console.warn('Failed to save settings to localStorage:', error);
       }
     }
-  };
+  }, [settings]);
 
   const validateSettings = (newSettings: Settings): MessageValue => {
     if (newSettings.operations.length === 0) {
@@ -82,5 +83,5 @@ export const useSettings = () => {
     return '';
   };
 
-  return { settings, setSettings, saveSettings, validateSettings };
+  return { settings, setSettings, validateSettings };
 };
