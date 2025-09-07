@@ -7,7 +7,7 @@ interface InfoPanelProps {
   problems: Problem[];
   settings: Settings;
   onGenerateProblems?: () => void;
-  onDownloadPdf?: () => void;
+  onDownloadPdf?: () => Promise<void>;
   quizResult?: QuizResult | null;
   onStartQuiz?: () => void;
 }
@@ -25,6 +25,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
     totalGenerated: 0,
     sessionsCount: 1,
   });
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     if (problems.length > 0) {
@@ -164,15 +165,31 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
           </button>
           <button
             className='quick-action-card'
-            onClick={onDownloadPdf}
-            disabled={problems.length === 0}
+            onClick={async () => {
+              if (!onDownloadPdf) return;
+              setIsDownloading(true);
+              try {
+                await onDownloadPdf();
+              } finally {
+                setIsDownloading(false);
+              }
+            }}
+            disabled={problems.length === 0 || isDownloading}
           >
             <div className='quick-action-content'>
               <div className='quick-action-icon'>📄</div>
               <div className='quick-action-text'>
-                <span className='quick-action-label'>
-                  {t('infoPanel.quickActions.downloadPdf')}
-                </span>
+                {isDownloading ? (
+                  <div
+                    className='loading-spinner'
+                    aria-live='polite'
+                    aria-label={t('messages.loading')}
+                  ></div>
+                ) : (
+                  <span className='quick-action-label'>
+                    {t('infoPanel.quickActions.downloadPdf')}
+                  </span>
+                )}
               </div>
             </div>
           </button>
