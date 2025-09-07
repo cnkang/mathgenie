@@ -165,7 +165,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
           <button
             className='quick-action-card'
             onClick={() => {
-              void onDownloadPdf?.();
+              onDownloadPdf?.();
             }}
             disabled={problems.length === 0}
           >
