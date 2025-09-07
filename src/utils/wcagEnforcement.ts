@@ -3,6 +3,8 @@
  * This utility ensures all interactive elements meet the minimum 44x44px requirement
  */
 
+import { debounce } from './debounce';
+
 export const enforceWCAGTouchTargets = (): void => {
   // WCAG 2.2 AAA Success Criterion 2.5.5: Target Size (Enhanced)
   const MIN_TOUCH_TARGET_SIZE = 44;
@@ -40,15 +42,20 @@ export const enforceWCAGTouchTargets = (): void => {
   elements.forEach(element => {
     const htmlElement = element as HTMLElement;
 
+    const computedStyle = window.getComputedStyle(htmlElement);
+
     // Skip hidden elements
-    if (htmlElement.offsetParent === null && htmlElement.style.display !== 'none') {
+    if (
+      htmlElement.hidden ||
+      computedStyle.display === 'none' ||
+      computedStyle.visibility === 'hidden' ||
+      computedStyle.opacity === '0'
+    ) {
       return;
     }
 
-    // Get computed styles
-    const computedStyle = window.getComputedStyle(htmlElement);
-    const currentHeight = parseFloat(computedStyle.height);
-    const currentWidth = parseFloat(computedStyle.width);
+    const currentHeight = parseFloat(computedStyle.height) || 0;
+    const currentWidth = parseFloat(computedStyle.width) || 0;
 
     // Force minimum dimensions if they're too small
     if (currentHeight < minSize || currentWidth < minSize) {
@@ -108,18 +115,15 @@ export const setupWCAGEnforcement = (): (() => void) => {
   }
 
   // Re-run enforcement when the window is resized
-  let resizeTimeout: number;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = window.setTimeout(enforceWCAGTouchTargets, 250);
-  });
+  const resizeHandler = debounce(enforceWCAGTouchTargets, 250);
+  window.addEventListener('resize', resizeHandler);
 
-  // Re-run enforcement when new content is added (using MutationObserver)
+  // Re-run enforcement when new content is added or revealed
+  const mutationHandler = debounce(enforceWCAGTouchTargets, 100);
   const observer = new MutationObserver(mutations => {
     let shouldRerun = false;
     mutations.forEach(mutation => {
       if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-        // Check if any added nodes are interactive elements
         mutation.addedNodes.forEach(node => {
           if (node.nodeType === Node.ELEMENT_NODE) {
             const element = node as Element;
@@ -133,23 +137,37 @@ export const setupWCAGEnforcement = (): (() => void) => {
           }
         });
       }
+      if (mutation.type === 'attributes' && mutation.target instanceof HTMLElement) {
+        const target = mutation.target as HTMLElement;
+        const style = window.getComputedStyle(target);
+        if (
+          style.display !== 'none' &&
+          style.visibility !== 'hidden' &&
+          style.opacity !== '0' &&
+          !target.hidden
+        ) {
+          shouldRerun = true;
+        }
+      }
     });
 
     if (shouldRerun) {
-      // Debounce the enforcement to avoid excessive calls
-      clearTimeout(resizeTimeout);
-      resizeTimeout = window.setTimeout(enforceWCAGTouchTargets, 100);
+      mutationHandler();
     }
   });
 
   observer.observe(document.body, {
     childList: true,
     subtree: true,
+    attributes: true,
+    attributeFilter: ['style', 'class', 'hidden'],
   });
 
   // Cleanup function
   return () => {
     observer.disconnect();
-    window.removeEventListener('resize', enforceWCAGTouchTargets);
+    window.removeEventListener('resize', resizeHandler);
+    resizeHandler.cancel();
+    mutationHandler.cancel();
   };
 };
