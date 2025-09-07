@@ -86,9 +86,10 @@
 ### Deviation Policy
 
 44. If a rule must be broken, add a **`@deviation`** note near the violation including: Rule, Reason, Risk, Refactor Plan (link), Owner, Target date. Keep deviations temporary and tracked.
-
----
-
+86. Tests green and deterministic; changed-line coverage ≥ 80%.
+87. Performance metrics within SLOs; Core Web Vitals pass.
+88. Accessibility: WCAG 2.2 AAA compliance verified.
+89. Errors structured; logging/metrics/traces added where appropriate.
 ## SYSTEM — Maintenance Playbook for Existing Non-Compliant Code
 
 ### Principles
