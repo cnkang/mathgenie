@@ -40,7 +40,7 @@ describe('pdf utils', () => {
   });
 
   test('generatePdf uses jsPDF', async () => {
-    const jsPDF = (await loadJsPDF()) as any;
+    const jsPDF = vi.mocked(await loadJsPDF());
     const manyProblems: Problem[] = [
       { id: 1, text: '1 + 1 =' },
       { id: 2, text: '2 + 2 =' },
@@ -49,7 +49,7 @@ describe('pdf utils', () => {
     const customSettings = { ...settings, lineSpacing: 1000 };
     await generatePdf(manyProblems, customSettings, paperSizes, 'custom.pdf');
     expect(jsPDF).toHaveBeenCalledTimes(1);
-    const instance = jsPDF.mock.results[0]?.value as any;
+    const instance = jsPDF.mock.results[0]?.value;
     expect(instance.save).toHaveBeenCalledWith('custom.pdf');
   });
 });
