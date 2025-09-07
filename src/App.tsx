@@ -103,7 +103,7 @@ function App(): React.JSX.Element {
       if (!isLoading) {
         setError({ key: 'errors.pdfFailed' });
       }
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.DEV) {
         console.error('PDF generation error:', err);
       }
     }
@@ -228,7 +228,7 @@ function App(): React.JSX.Element {
       }
       localStorage.setItem('mathgenie-quiz-results', JSON.stringify(results));
     } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.DEV) {
         console.warn('Failed to save quiz result:', error);
       }
     }
@@ -652,7 +652,7 @@ function App(): React.JSX.Element {
             </div>
           )}
 
-          {process.env.NODE_ENV === 'production' && (
+          {import.meta.env.PROD && (
             <Suspense fallback={<div>{t('loading.insights')}</div>}>
               <SpeedInsights />
             </Suspense>

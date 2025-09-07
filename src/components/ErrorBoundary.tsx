@@ -34,7 +34,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       this.props.onError(error, errorInfo);
     }
 
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.error('ErrorBoundary caught an error:', error, errorInfo);
     }
   }
@@ -55,7 +55,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
             <h2>🚨 Something went wrong</h2>
             <p>We&apos;re sorry, but something unexpected happened.</p>
 
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {import.meta.env.DEV && this.state.error && (
               <details className='error-details'>
                 <summary>Error Details (Development)</summary>
                 <pre>{this.state.error.toString()}</pre>
@@ -101,7 +101,7 @@ export const useErrorHandler = (): {
   const handleError = React.useCallback((error: Error): void => {
     setError(error);
 
-    if (process.env.NODE_ENV === 'production') {
+    if (import.meta.env.PROD) {
       console.error('Application error:', error);
     }
   }, []);
