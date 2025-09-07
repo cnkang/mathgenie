@@ -71,8 +71,9 @@
 34. **Run & Test Instructions** (exact commands).
 35. **Assumptions** (bulleted).
 36. **Self-check** (map Review Checklist items to what you did).
-37. **Deviation Notes** (`@deviation` items with owners & dates).
-
+72. **Codemods**: jscodeshift / ts-morph (JS/TS); OpenRewrite (JVM); Bowler/libCST (Python); `rustfix`; `gofix`.
+73. **Security**: Semgrep rulesets; osv-scanner; OWASP Dependency-Check; Trivy (container/SCA); Snyk (SCA/container); GitGuardian (secrets).
+74. **Coverage**: Jest/Vitest + c8; coverage.py; `go test -coverprofile`; tarpaulin (Rust).
 ### Review Checklist (Verify Before Returning Output)
 
 38. Lints/formatters clean.
