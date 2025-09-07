@@ -99,7 +99,7 @@ export const enforceWCAGTouchTargets = (): void => {
   });
 
   // Add debug information in development
-  if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
     console.log(
       `WCAG Enforcement: Applied ${minSize}px minimum touch targets to ${elements.length} elements`
     );
