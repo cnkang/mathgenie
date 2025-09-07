@@ -14,6 +14,7 @@ import type { MessageValue, Operation, PaperSizeOptions, QuizResult, Settings } 
 import { setupWCAGEnforcement } from './utils/wcagEnforcement';
 import { useProblemGenerator } from './hooks/useProblemGenerator';
 import { useSettings } from './hooks/useSettings';
+import LoadingButton from '@/components/LoadingButton';
 import { generatePdf } from '@/utils/pdf';
 
 const SpeedInsights = React.lazy(() =>
@@ -32,7 +33,6 @@ function App(): React.JSX.Element {
   const [isQuizMode, setIsQuizMode] = useState<boolean>(false);
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
   const [hasInitialGenerated, setHasInitialGenerated] = useState<boolean>(false);
-  const [pdfLoading, setPdfLoading] = useState(false);
 
   const paperSizeOptions: PaperSizeOptions = {
     a4: 'a4',
@@ -490,21 +490,13 @@ function App(): React.JSX.Element {
                     </div>
                   </button>
 
-                  <button
-                    onClick={async () => {
-                      setPdfLoading(true);
-                      try {
-                        await downloadPdf();
-                      } finally {
-                        setPdfLoading(false);
-                      }
-                    }}
+                  <LoadingButton
+                    onClick={downloadPdf}
                     className='action-card download-card'
                     aria-label={`${t('buttons.download')} - ${t('accessibility.downloadButton')}`}
-                    disabled={problems.length === 0 || pdfLoading}
+                    disabled={problems.length === 0}
                     tabIndex={0}
-                  >
-                    {pdfLoading ? (
+                    loadingContent={
                       <div className='action-card-content'>
                         <div className='action-icon'>📄</div>
                         <div className='action-text'>
@@ -515,19 +507,19 @@ function App(): React.JSX.Element {
                           ></div>
                         </div>
                       </div>
-                    ) : (
-                      <div className='action-card-content'>
-                        <div className='action-icon'>📄</div>
-                        <div className='action-text'>
-                          <h3>{t('buttons.download')}</h3>
-                          <p>{t('buttons.downloadDescription')}</p>
-                        </div>
-                        <div className='action-indicator'>
-                          <span className='action-arrow'>→</span>
-                        </div>
+                    }
+                  >
+                    <div className='action-card-content'>
+                      <div className='action-icon'>📄</div>
+                      <div className='action-text'>
+                        <h3>{t('buttons.download')}</h3>
+                        <p>{t('buttons.downloadDescription')}</p>
                       </div>
-                    )}
-                  </button>
+                      <div className='action-indicator'>
+                        <span className='action-arrow'>→</span>
+                      </div>
+                    </div>
+                  </LoadingButton>
 
                   <button
                     onClick={startQuizMode}

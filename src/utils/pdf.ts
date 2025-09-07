@@ -13,7 +13,8 @@ const loadJsPDF = async (): Promise<typeof import('jspdf').default> => {
 export const generatePdf = async (
   problems: Problem[],
   settings: Settings,
-  paperSizes: PaperSizeOptions
+  paperSizes: PaperSizeOptions,
+  filename = 'problems.pdf'
 ): Promise<void> => {
   const jsPDF = await loadJsPDF();
   const doc = new jsPDF({ format: paperSizes[settings.paperSize] });
@@ -50,7 +51,7 @@ export const generatePdf = async (
     }
   });
 
-  doc.save('problems.pdf');
+  doc.save(filename);
 };
 
 export { loadJsPDF };

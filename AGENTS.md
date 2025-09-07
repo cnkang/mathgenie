@@ -288,4 +288,3 @@ Owner / Timeline
 97. “Lines” refers to **source lines of code** (SLoC), excluding comments/blank lines.
 98. When encountering a **code smell**, the agent MUST surface it, propose remedies, and—if within scope—apply a targeted refactor or add a `@deviation` with a refactor plan.
 99. **Enforcement stance**: If constraints conflict with correctness, ship the correct solution with a brief `@deviation` and a refactor plan.
-100.  Do not use the `void` operator to suppress Promise results; handle asynchronous calls explicitly.

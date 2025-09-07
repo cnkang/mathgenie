@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useProgressBar } from '../hooks/useProgressBar';
 import { useTranslation } from '../i18n';
 import type { Problem, QuizResult, Settings } from '../types';
+import LoadingButton from './LoadingButton';
 
 interface InfoPanelProps {
   problems: Problem[];
@@ -25,7 +26,6 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
     totalGenerated: 0,
     sessionsCount: 1,
   });
-  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     if (problems.length > 0) {
@@ -163,36 +163,36 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
               </div>
             </div>
           </button>
-          <button
+          <LoadingButton
             className='quick-action-card'
             onClick={async () => {
-              if (!onDownloadPdf) return;
-              setIsDownloading(true);
-              try {
+              if (onDownloadPdf) {
                 await onDownloadPdf();
-              } finally {
-                setIsDownloading(false);
               }
             }}
-            disabled={problems.length === 0 || isDownloading}
-          >
-            <div className='quick-action-content'>
-              <div className='quick-action-icon'>📄</div>
-              <div className='quick-action-text'>
-                {isDownloading ? (
+            disabled={problems.length === 0}
+            loadingContent={
+              <div className='quick-action-content'>
+                <div className='quick-action-icon'>📄</div>
+                <div className='quick-action-text'>
                   <div
                     className='loading-spinner'
                     aria-live='polite'
                     aria-label={t('messages.loading')}
                   ></div>
-                ) : (
-                  <span className='quick-action-label'>
-                    {t('infoPanel.quickActions.downloadPdf')}
-                  </span>
-                )}
+                </div>
+              </div>
+            }
+          >
+            <div className='quick-action-content'>
+              <div className='quick-action-icon'>📄</div>
+              <div className='quick-action-text'>
+                <span className='quick-action-label'>
+                  {t('infoPanel.quickActions.downloadPdf')}
+                </span>
               </div>
             </div>
-          </button>
+          </LoadingButton>
           <button
             className='quick-action-card'
             onClick={onStartQuiz}
