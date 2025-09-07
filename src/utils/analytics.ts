@@ -29,7 +29,7 @@ declare global {
 export const trackEvent = (eventName: string, properties: EventProperties = {}): void => {
   try {
     // Only track in production and if user hasn't opted out
-    if (process.env.NODE_ENV !== 'production' || localStorage.getItem('analytics-opt-out')) {
+    if (!import.meta.env.PROD || localStorage.getItem('analytics-opt-out')) {
       return;
     }
   } catch (error) {
@@ -52,7 +52,7 @@ export const trackEvent = (eventName: string, properties: EventProperties = {}):
   };
 
   // Log to console in development
-  if (process.env.NODE_ENV !== 'production') {
+  if (!import.meta.env.PROD) {
     console.log('Analytics Event:', event);
   }
 

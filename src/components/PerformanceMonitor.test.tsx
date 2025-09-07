@@ -34,6 +34,7 @@ describe('PerformanceMonitor', () => {
     consoleLogSpy.mockRestore();
     consoleWarnSpy.mockRestore();
     vi.useRealTimers();
+    vi.unstubAllEnvs();
   });
 
   it('renders children correctly', () => {
@@ -100,8 +101,9 @@ describe('PerformanceMonitor', () => {
   });
 
   it('logs performance metrics in development', () => {
-    const originalNodeEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'development';
+    vi.stubEnv('MODE', 'development');
+    vi.stubEnv('DEV', true);
+    vi.stubEnv('PROD', false);
 
     const mockObserver = new MockPerformanceObserver(() => {});
     const mockEntry = {
@@ -116,13 +118,12 @@ describe('PerformanceMonitor', () => {
         <div>Test</div>
       </PerformanceMonitor>
     );
-
-    process.env.NODE_ENV = originalNodeEnv;
   });
 
   it('handles memory monitoring with interval', () => {
-    const originalNodeEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'development';
+    vi.stubEnv('MODE', 'development');
+    vi.stubEnv('DEV', true);
+    vi.stubEnv('PROD', false);
 
     const mockMemory = {
       usedJSHeapSize: 50 * 1048576,
@@ -151,12 +152,12 @@ describe('PerformanceMonitor', () => {
     });
 
     unmount();
-    process.env.NODE_ENV = originalNodeEnv;
   });
 
   it('handles production environment with gtag', () => {
-    const originalNodeEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'production';
+    vi.stubEnv('MODE', 'production');
+    vi.stubEnv('DEV', false);
+    vi.stubEnv('PROD', true);
 
     const mockGtag = vi.fn();
     (global as any).window = { gtag: mockGtag };
@@ -167,13 +168,13 @@ describe('PerformanceMonitor', () => {
       </PerformanceMonitor>
     );
 
-    process.env.NODE_ENV = originalNodeEnv;
     delete (global as any).window;
   });
 
   it('handles entries without value property', () => {
-    const originalNodeEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'development';
+    vi.stubEnv('MODE', 'development');
+    vi.stubEnv('DEV', true);
+    vi.stubEnv('PROD', false);
 
     // Mock window for this test
     Object.defineProperty(global, 'window', {
@@ -195,7 +196,6 @@ describe('PerformanceMonitor', () => {
       </PerformanceMonitor>
     );
 
-    process.env.NODE_ENV = originalNodeEnv;
     delete (global as any).window;
   });
 
@@ -233,8 +233,9 @@ describe('PerformanceMonitor', () => {
   });
 
   it('triggers performance observer callback in development', () => {
-    const originalNodeEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'development';
+    vi.stubEnv('MODE', 'development');
+    vi.stubEnv('DEV', true);
+    vi.stubEnv('PROD', false);
 
     Object.defineProperty(global, 'window', {
       value: {},
@@ -273,13 +274,13 @@ describe('PerformanceMonitor', () => {
     expect(consoleLogSpy).toHaveBeenCalledWith('test-metric: 100ms');
     expect(consoleLogSpy).toHaveBeenCalledWith('test-duration: 200ms');
 
-    process.env.NODE_ENV = originalNodeEnv;
     delete (global as any).window;
   });
 
   it('triggers performance observer callback in production with gtag', () => {
-    const originalNodeEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'production';
+    vi.stubEnv('MODE', 'production');
+    vi.stubEnv('DEV', false);
+    vi.stubEnv('PROD', true);
 
     const mockGtag = vi.fn();
     Object.defineProperty(global, 'window', {
@@ -320,13 +321,13 @@ describe('PerformanceMonitor', () => {
       non_interaction: true,
     });
 
-    process.env.NODE_ENV = originalNodeEnv;
     delete (global as any).window;
   });
 
   it('handles production environment without gtag', () => {
-    const originalNodeEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'production';
+    vi.stubEnv('MODE', 'production');
+    vi.stubEnv('DEV', false);
+    vi.stubEnv('PROD', true);
 
     Object.defineProperty(global, 'window', {
       value: {},
@@ -361,13 +362,13 @@ describe('PerformanceMonitor', () => {
       observerCallback!(mockList as any, {} as any);
     }).not.toThrow();
 
-    process.env.NODE_ENV = originalNodeEnv;
     delete (global as any).window;
   });
 
   it('handles entries with undefined/null values', () => {
-    const originalNodeEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'production';
+    vi.stubEnv('MODE', 'production');
+    vi.stubEnv('DEV', false);
+    vi.stubEnv('PROD', true);
 
     const mockGtag = vi.fn();
     Object.defineProperty(global, 'window', {
@@ -411,7 +412,6 @@ describe('PerformanceMonitor', () => {
       non_interaction: true,
     });
 
-    process.env.NODE_ENV = originalNodeEnv;
     delete (global as any).window;
   });
 });

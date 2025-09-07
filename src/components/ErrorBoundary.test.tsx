@@ -22,6 +22,10 @@ describe('ErrorBoundary', () => {
     console.error = originalError;
   });
 
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   test('renders children when there is no error', () => {
     render(
       <ErrorBoundary>
@@ -44,7 +48,7 @@ describe('ErrorBoundary', () => {
     expect(screen.getByText(/Reload Page/)).toBeDefined();
 
     // In development environment, error details should exist
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       expect(screen.getByText(/Error Details/)).toBeDefined();
     }
   });
@@ -117,8 +121,9 @@ describe('ErrorBoundary', () => {
   });
 
   test('shows error details in development mode', () => {
-    const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'development';
+    vi.stubEnv('MODE', 'development');
+    vi.stubEnv('DEV', true);
+    vi.stubEnv('PROD', false);
 
     render(
       <ErrorBoundary>
@@ -128,13 +133,12 @@ describe('ErrorBoundary', () => {
 
     expect(screen.getByText(/Error Details/)).toBeDefined();
     expect(screen.getByText(/Test error/)).toBeDefined();
-
-    process.env.NODE_ENV = originalEnv;
   });
 
   test('hides error details in production mode', () => {
-    const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'production';
+    vi.stubEnv('MODE', 'production');
+    vi.stubEnv('DEV', false);
+    vi.stubEnv('PROD', true);
 
     render(
       <ErrorBoundary>
@@ -143,8 +147,6 @@ describe('ErrorBoundary', () => {
     );
 
     expect(screen.queryByText(/Error Details/)).toBeNull();
-
-    process.env.NODE_ENV = originalEnv;
   });
 
   test('handles error with custom error info', () => {
@@ -213,6 +215,10 @@ describe('ErrorBoundary', () => {
 });
 
 describe('useErrorHandler', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   test('initializes with no error', () => {
     const { result } = renderHook(() => useErrorHandler());
 
@@ -222,9 +228,10 @@ describe('useErrorHandler', () => {
   });
 
   test('handles error in production', () => {
-    const originalEnv = process.env.NODE_ENV;
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    process.env.NODE_ENV = 'production';
+    vi.stubEnv('MODE', 'production');
+    vi.stubEnv('DEV', false);
+    vi.stubEnv('PROD', true);
 
     const TestComponent = () => {
       const { handleError, error } = useErrorHandler();
@@ -248,7 +255,6 @@ describe('useErrorHandler', () => {
 
     expect(consoleSpy).toHaveBeenCalledWith('Application error:', expect.any(Error));
 
-    process.env.NODE_ENV = originalEnv;
     consoleSpy.mockRestore();
   });
 
