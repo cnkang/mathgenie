@@ -41,7 +41,7 @@ export const enforceWCAGTouchTargets = (): void => {
     const htmlElement = element as HTMLElement;
 
     // Skip hidden elements
-    if (htmlElement.offsetParent === null && htmlElement.style.display !== 'none') {
+    if (htmlElement.offsetParent === null || htmlElement.style.display === 'none') {
       return;
     }
 
@@ -109,10 +109,11 @@ export const setupWCAGEnforcement = (): (() => void) => {
 
   // Re-run enforcement when the window is resized
   let resizeTimeout: number;
-  window.addEventListener('resize', () => {
+  const resizeHandler = (): void => {
     clearTimeout(resizeTimeout);
     resizeTimeout = window.setTimeout(enforceWCAGTouchTargets, 250);
-  });
+  };
+  window.addEventListener('resize', resizeHandler);
 
   // Re-run enforcement when new content is added (using MutationObserver)
   const observer = new MutationObserver(mutations => {
@@ -150,6 +151,6 @@ export const setupWCAGEnforcement = (): (() => void) => {
   // Cleanup function
   return () => {
     observer.disconnect();
-    window.removeEventListener('resize', enforceWCAGTouchTargets);
+    window.removeEventListener('resize', resizeHandler);
   };
 };
