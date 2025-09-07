@@ -71,6 +71,48 @@ export const generateProblem = (settings: Settings): string => {
   return '';
 };
 
+const evaluateGeneratedProblems = (
+  generated: Problem[],
+  requested: number,
+  showSuccessMessage: boolean
+): {
+  error: MessageValue;
+  warning: MessageValue;
+  successMessage: MessageValue;
+} => {
+  if (generated.length === 0) {
+    return {
+      error: showSuccessMessage ? { key: 'errors.noProblemsGenerated' } : '',
+      warning: '',
+      successMessage: '',
+    };
+  }
+
+  if (generated.length < requested) {
+    return {
+      error: '',
+      warning: showSuccessMessage
+        ? {
+            key: 'errors.partialGeneration',
+            params: { generated: generated.length, requested },
+          }
+        : '',
+      successMessage: '',
+    };
+  }
+
+  return {
+    error: '',
+    warning: '',
+    successMessage: showSuccessMessage
+      ? {
+          key: 'messages.success.problemsGenerated',
+          params: { count: generated.length },
+        }
+      : '',
+  };
+};
+
 export const useProblemGenerator = (
   settings: Settings,
   isLoading: boolean,
@@ -85,25 +127,19 @@ export const useProblemGenerator = (
     warning: MessageValue;
     successMessage: MessageValue;
   } => {
-    let error: MessageValue = '';
-    let warning: MessageValue = '';
-    let successMessage: MessageValue = '';
-
     if (isLoading) {
-      return { error, warning, successMessage };
+      return { error: '', warning: '', successMessage: '' };
     }
 
     const validationError = validateSettings(settings);
     if (validationError) {
-      return { error: validationError, warning, successMessage };
+      return { error: validationError, warning: '', successMessage: '' };
     }
 
-    if (settings.numProblems > 50) {
-      warning = {
-        key: 'warnings.largeNumberOfProblems',
-        params: { count: settings.numProblems },
-      };
-    }
+    const warning: MessageValue =
+      settings.numProblems > 50
+        ? { key: 'warnings.largeNumberOfProblems', params: { count: settings.numProblems } }
+        : '';
 
     try {
       const generatedProblems = Array.from({ length: settings.numProblems }, () =>
@@ -112,40 +148,27 @@ export const useProblemGenerator = (
         .filter(problem => problem !== '')
         .map((problem, index) => ({ id: index, text: problem }));
 
-      if (generatedProblems.length === 0) {
-        if (!isLoading && showSuccessMessage) {
-          error = { key: 'errors.noProblemsGenerated' };
-        }
-      } else if (generatedProblems.length < settings.numProblems) {
-        if (!isLoading && showSuccessMessage) {
-          warning = {
-            key: 'errors.partialGeneration',
-            params: {
-              generated: generatedProblems.length,
-              requested: settings.numProblems,
-            },
-          };
-        }
-        setProblems(generatedProblems);
-      } else {
-        if (showSuccessMessage && !isLoading) {
-          successMessage = {
-            key: 'messages.success.problemsGenerated',
-            params: { count: generatedProblems.length },
-          };
-        }
+      const messages = evaluateGeneratedProblems(
+        generatedProblems,
+        settings.numProblems,
+        showSuccessMessage
+      );
+
+      if (generatedProblems.length > 0) {
         setProblems(generatedProblems);
       }
+
+      return { ...messages, warning: messages.warning || warning };
     } catch (err) {
-      if (!isLoading && showSuccessMessage) {
-        error = { key: 'errors.generationFailed' };
-      }
       if (process.env.NODE_ENV === 'development') {
         console.error('Problem generation error:', err);
       }
+      return {
+        error: showSuccessMessage ? { key: 'errors.generationFailed' } : '',
+        warning,
+        successMessage: '',
+      };
     }
-
-    return { error, warning, successMessage };
   };
 
   return {

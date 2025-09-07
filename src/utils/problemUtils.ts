@@ -1,7 +1,8 @@
 import type { Settings } from '@/types';
 
 const getCrypto = (): Crypto => {
-  return (window.crypto || (window as unknown as { msCrypto: Crypto }).msCrypto) as Crypto;
+  const { crypto, msCrypto } = window as typeof window & { msCrypto?: Crypto };
+  return crypto || msCrypto!;
 };
 
 export const randomInt = (min: number, max: number, cryptoObj: Crypto = getCrypto()): number => {
