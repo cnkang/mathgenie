@@ -14,6 +14,8 @@ import type { MessageValue, Operation, PaperSizeOptions, QuizResult, Settings } 
 import { setupWCAGEnforcement } from './utils/wcagEnforcement';
 import { useProblemGenerator } from './hooks/useProblemGenerator';
 import { useSettings } from './hooks/useSettings';
+import LoadingButton from '@/components/LoadingButton';
+import { generatePdf } from '@/utils/pdf';
 
 const SpeedInsights = React.lazy(() =>
   import('@vercel/speed-insights/react').then(module => ({ default: module.SpeedInsights }))
@@ -38,7 +40,7 @@ function App(): React.JSX.Element {
     legal: 'legal',
   };
 
-  const downloadPdf = (): void => {
+  const downloadPdf = async (): Promise<void> => {
     if (problems.length === 0) {
       // Only show error if i18n is loaded
       if (!isLoading) {
@@ -53,51 +55,11 @@ function App(): React.JSX.Element {
     setSuccessMessage('');
 
     try {
-      import('jspdf').then(({ default: jsPDF }) => {
-        const doc = new jsPDF({
-          format: paperSizeOptions[settings.paperSize],
-        });
-
-        doc.setFontSize(settings.fontSize);
-        const pageHeight = doc.internal.pageSize.getHeight();
-        const pageWidth = doc.internal.pageSize.getWidth();
-
-        const marginLeft = 10;
-        const marginTop = 10;
-        const lineSpacing = settings.lineSpacing;
-        const colWidth = (pageWidth - 3 * marginLeft) / 2;
-
-        let currYLeft = marginTop;
-        let currYRight = marginTop;
-
-        problems.forEach((problem, index) => {
-          if (index % 2 === 0) {
-            if (currYLeft + lineSpacing > pageHeight) {
-              doc.addPage();
-              currYLeft = marginTop;
-              currYRight = marginTop;
-            }
-            doc.text(problem.text, marginLeft, currYLeft);
-            currYLeft += lineSpacing;
-          } else {
-            if (currYRight + lineSpacing > pageHeight) {
-              doc.addPage();
-              currYLeft = marginTop;
-              currYRight = marginTop;
-            }
-            doc.text(problem.text, marginLeft + colWidth + marginLeft, currYRight);
-            currYRight += lineSpacing;
-          }
-        });
-
-        doc.save('problems.pdf');
-
-        // Show success message only if i18n is loaded
-        if (!isLoading) {
-          setSuccessMessage({ key: 'messages.success.pdfGenerated' });
-          setTimeout(() => setSuccessMessage(''), 5000);
-        }
-      });
+      await generatePdf(problems, settings, paperSizeOptions);
+      if (!isLoading) {
+        setSuccessMessage({ key: 'messages.success.pdfGenerated' });
+        setTimeout(() => setSuccessMessage(''), 5000);
+      }
     } catch (err) {
       // Only show error if i18n is loaded
       if (!isLoading) {
@@ -528,12 +490,24 @@ function App(): React.JSX.Element {
                     </div>
                   </button>
 
-                  <button
+                  <LoadingButton
                     onClick={downloadPdf}
                     className='action-card download-card'
                     aria-label={`${t('buttons.download')} - ${t('accessibility.downloadButton')}`}
                     disabled={problems.length === 0}
                     tabIndex={0}
+                    loadingContent={
+                      <div className='action-card-content'>
+                        <div className='action-icon'>📄</div>
+                        <div className='action-text'>
+                          <div
+                            className='loading-spinner'
+                            aria-live='polite'
+                            aria-label={t('messages.loading')}
+                          ></div>
+                        </div>
+                      </div>
+                    }
                   >
                     <div className='action-card-content'>
                       <div className='action-icon'>📄</div>
@@ -545,7 +519,7 @@ function App(): React.JSX.Element {
                         <span className='action-arrow'>→</span>
                       </div>
                     </div>
-                  </button>
+                  </LoadingButton>
 
                   <button
                     onClick={startQuizMode}

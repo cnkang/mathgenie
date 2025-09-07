@@ -90,6 +90,7 @@ export default {
       'Les paramètres actuels sont assez restrictifs. Vous pourriez obtenir moins de problèmes que demandé.',
   },
   messages: {
+    loading: 'Chargement...',
     success: {
       problemsGenerated: '{{count}} problèmes générés avec succès !',
       settingsImported: 'Paramètres importés avec succès !',
