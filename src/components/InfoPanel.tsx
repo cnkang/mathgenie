@@ -7,7 +7,7 @@ interface InfoPanelProps {
   problems: Problem[];
   settings: Settings;
   onGenerateProblems?: () => void;
-  onDownloadPdf?: () => void;
+  onDownloadPdf?: () => Promise<void>;
   quizResult?: QuizResult | null;
   onStartQuiz?: () => void;
 }
@@ -164,7 +164,9 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
           </button>
           <button
             className='quick-action-card'
-            onClick={onDownloadPdf}
+            onClick={() => {
+              void onDownloadPdf?.();
+            }}
             disabled={problems.length === 0}
           >
             <div className='quick-action-content'>
