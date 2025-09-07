@@ -23,11 +23,13 @@
 ### Structure Limits (Targets + Caps)
 
 9. **File Size (SLoC)**
-   9.1 Dynamic languages (Python/JS/TS): target ≤ 200 SLoC; hard cap 400.
-   9.2 Static languages (Java/Go/Rust): target ≤ 250 SLoC; hard cap 400.
-   9.3 Exclusions: generated code, migrations, large schemas, snapshot test data (place in dedicated folders).
-   9.4 If exceeding a cap, include a `@deviation` note (Rule, Reason, Risk, Refactor Plan, Owner, Target date).
-10. **Function Complexity**: target ≤ 40 lines per function; cyclomatic complexity ≤ 10. Prefer early returns over deep nesting.
+### Dependencies & Boundaries
+
+26. Prefer standard library first. Wrap external calls behind adapters with timeouts, retries, and circuit breakers where applicable.
+27. Keep public APIs small and stable. Version or deprecate with migration guidance.
+28. Run automated vulnerability scans on dependencies in CI/CD pipeline.
+29. Schedule regular dependency updates (at least monthly) with automated PRs.
+30. Maintain a Software Bill of Materials (SBOM) and audit dependencies for license compliance.
 11. **Directory Hygiene**: aim ≤ 8 items per directory. Group by domain/layer (e.g., `users/`, `billing/`, `adapters/`, `usecases/`). Export a minimal public surface.
 
 ### Architecture Principles
