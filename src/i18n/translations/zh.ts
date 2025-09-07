@@ -80,6 +80,7 @@ export default {
     restrictiveSettings: '当前设置比较严格，可能生成的题目数量少于请求数量。',
   },
   messages: {
+    loading: '加载中...',
     success: {
       problemsGenerated: '成功生成了 {{count}} 道题目！',
       settingsImported: '设置导入成功！',
