@@ -23,6 +23,7 @@
 ### Structure Limits (Targets + Caps)
 
 9. **File Size (SLoC)**
+
 ### Dependencies & Boundaries
 
 26. Prefer standard library first. Wrap external calls behind adapters with timeouts, retries, and circuit breakers where applicable.
@@ -30,7 +31,7 @@
 28. Run automated vulnerability scans on dependencies in CI/CD pipeline.
 29. Schedule regular dependency updates (at least monthly) with automated PRs.
 30. Maintain a Software Bill of Materials (SBOM) and audit dependencies for license compliance.
-11. **Directory Hygiene**: aim ≤ 8 items per directory. Group by domain/layer (e.g., `users/`, `billing/`, `adapters/`, `usecases/`). Export a minimal public surface.
+31. **Directory Hygiene**: aim ≤ 8 items per directory. Group by domain/layer (e.g., `users/`, `billing/`, `adapters/`, `usecases/`). Export a minimal public surface.
 
 ### Architecture Principles
 
@@ -71,9 +72,10 @@
 34. **Run & Test Instructions** (exact commands).
 35. **Assumptions** (bulleted).
 36. **Self-check** (map Review Checklist items to what you did).
-72. **Codemods**: jscodeshift / ts-morph (JS/TS); OpenRewrite (JVM); Bowler/libCST (Python); `rustfix`; `gofix`.
-73. **Security**: Semgrep rulesets; osv-scanner; OWASP Dependency-Check; Trivy (container/SCA); Snyk (SCA/container); GitGuardian (secrets).
-74. **Coverage**: Jest/Vitest + c8; coverage.py; `go test -coverprofile`; tarpaulin (Rust).
+37. **Codemods**: jscodeshift / ts-morph (JS/TS); OpenRewrite (JVM); Bowler/libCST (Python); `rustfix`; `gofix`.
+38. **Security**: Semgrep rulesets; osv-scanner; OWASP Dependency-Check; Trivy (container/SCA); Snyk (SCA/container); GitGuardian (secrets).
+39. **Coverage**: Jest/Vitest + c8; coverage.py; `go test -coverprofile`; tarpaulin (Rust).
+
 ### Review Checklist (Verify Before Returning Output)
 
 38. Lints/formatters clean.
@@ -86,10 +88,11 @@
 ### Deviation Policy
 
 44. If a rule must be broken, add a **`@deviation`** note near the violation including: Rule, Reason, Risk, Refactor Plan (link), Owner, Target date. Keep deviations temporary and tracked.
-86. Tests green and deterministic; changed-line coverage ≥ 80%.
-87. Performance metrics within SLOs; Core Web Vitals pass.
-88. Accessibility: WCAG 2.2 AAA compliance verified.
-89. Errors structured; logging/metrics/traces added where appropriate.
+45. Tests green and deterministic; changed-line coverage ≥ 80%.
+46. Performance metrics within SLOs; Core Web Vitals pass.
+47. Accessibility: WCAG 2.2 AAA compliance verified.
+48. Errors structured; logging/metrics/traces added where appropriate.
+
 ## SYSTEM — Maintenance Playbook for Existing Non-Compliant Code
 
 ### Principles
@@ -201,6 +204,9 @@
 - **CI Commands**: `pnpm lint`, `pnpm type-check`, `pnpm test`, optional `pnpm test:e2e`, `pnpm format`.
 - **Dependency Policy**: Use pnpm; avoid npm/yarn; add deps sparingly with approved licenses.
 - **Observability & Security**: Use structured logging; monitor with Vercel Speed Insights and Web Vitals; never log secrets; run security scanners as configured.
+- **Environment Handling**:
+  - Client code must read flags from `import.meta.env` (`DEV`, `PROD`, `MODE`); avoid `process.env.NODE_ENV` outside build scripts and other Node-only files.
+  - Tests stubbing env vars must use `tests/helpers/viteEnv.ts` and restore values after each test.
 - **CI Gates & Thresholds**: Lint and type-check must pass; coverage ≥90%; E2E accessibility tests across Chromium, Firefox, WebKit.
 - **Repository Layout**:
   - Root directories: `src/`, `public/`, `tests/e2e/`, `scripts/`, `coverage/`, `dist/`, `.lighthouseci/`, `.husky/`, etc.
