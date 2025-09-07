@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, test, vi } from 'vitest';
 import type { Settings } from '../types';
 import InfoPanel from './InfoPanel';
@@ -119,5 +120,17 @@ describe('InfoPanel', () => {
 
     // Should render without errors
     expect(screen.getByText('Problem Statistics')).toBeInTheDocument();
+  });
+
+  test('calls onDownloadPdf when download button is clicked', async () => {
+    const mockDownload = vi.fn().mockResolvedValue(undefined);
+    const mockProblems = [{ id: 1, text: '2 + 2 = ' }];
+
+    render(
+      <InfoPanel problems={mockProblems} settings={mockSettings} onDownloadPdf={mockDownload} />
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: /Download PDF/ }));
+    expect(mockDownload).toHaveBeenCalledTimes(1);
   });
 });
