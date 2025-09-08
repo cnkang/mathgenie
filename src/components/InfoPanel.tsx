@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useProgressBar } from '../hooks/useProgressBar';
 import { useTranslation } from '../i18n';
 import type { Problem, QuizResult, Settings } from '../types';
+import LoadingButton from './LoadingButton';
 
 interface InfoPanelProps {
   problems: Problem[];
@@ -162,12 +163,26 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
               </div>
             </div>
           </button>
-          <button
+          <LoadingButton
             className='quick-action-card'
-            onClick={() => {
-              onDownloadPdf?.();
+            onClick={async () => {
+              if (onDownloadPdf) {
+                await onDownloadPdf();
+              }
             }}
             disabled={problems.length === 0}
+            loadingContent={
+              <div className='quick-action-content'>
+                <div className='quick-action-icon'>📄</div>
+                <div className='quick-action-text'>
+                  <div
+                    className='loading-spinner'
+                    aria-live='polite'
+                    aria-label={t('messages.loading')}
+                  ></div>
+                </div>
+              </div>
+            }
           >
             <div className='quick-action-content'>
               <div className='quick-action-icon'>📄</div>
@@ -177,7 +192,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
                 </span>
               </div>
             </div>
-          </button>
+          </LoadingButton>
           <button
             className='quick-action-card'
             onClick={onStartQuiz}

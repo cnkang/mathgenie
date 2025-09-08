@@ -204,6 +204,9 @@
 - **CI Commands**: `pnpm lint`, `pnpm type-check`, `pnpm test`, optional `pnpm test:e2e`, `pnpm format`.
 - **Dependency Policy**: Use pnpm; avoid npm/yarn; add deps sparingly with approved licenses.
 - **Observability & Security**: Use structured logging; monitor with Vercel Speed Insights and Web Vitals; never log secrets; run security scanners as configured.
+- **Environment Handling**:
+  - Client code must read flags from `import.meta.env` (`DEV`, `PROD`, `MODE`); avoid `process.env.NODE_ENV` outside build scripts and other Node-only files.
+  - Tests stubbing env vars must use `tests/helpers/viteEnv.ts` and restore values after each test.
 - **CI Gates & Thresholds**: Lint and type-check must pass; coverage ≥90%; E2E accessibility tests across Chromium, Firefox, WebKit.
 - **Repository Layout**:
   - Root directories: `src/`, `public/`, `tests/e2e/`, `scripts/`, `coverage/`, `dist/`, `.lighthouseci/`, `.husky/`, etc.
@@ -280,12 +283,12 @@ Owner / Timeline
 94. Label code fences with file paths (e.g., ```ts title=src/app.ts).
 95. Prefer explicit imports and named exports; avoid wildcard exports.
 96. Keep explanations concise; prioritize executable artifacts.
+97. Avoid the `void` operator; handle asynchronous calls explicitly.
 
 ---
 
 ### Notes
 
-97. “Lines” refers to **source lines of code** (SLoC), excluding comments/blank lines.
-98. When encountering a **code smell**, the agent MUST surface it, propose remedies, and—if within scope—apply a targeted refactor or add a `@deviation` with a refactor plan.
-99. **Enforcement stance**: If constraints conflict with correctness, ship the correct solution with a brief `@deviation` and a refactor plan.
-100.  Do not use the `void` operator to suppress Promise results; handle asynchronous calls explicitly.
+98. “Lines” refers to **source lines of code** (SLoC), excluding comments/blank lines.
+99. When encountering a **code smell**, the agent MUST surface it, propose remedies, and—if within scope—apply a targeted refactor or add a `@deviation` with a refactor plan.
+100.  **Enforcement stance**: If constraints conflict with correctness, ship the correct solution with a brief `@deviation` and a refactor plan.
