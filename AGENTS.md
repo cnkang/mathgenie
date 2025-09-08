@@ -23,6 +23,7 @@
 ### Structure Limits (Targets + Caps)
 
 9. **File Size (SLoC)**
+
 ### Dependencies & Boundaries
 
 26. Prefer standard library first. Wrap external calls behind adapters with timeouts, retries, and circuit breakers where applicable.
@@ -30,7 +31,7 @@
 28. Run automated vulnerability scans on dependencies in CI/CD pipeline.
 29. Schedule regular dependency updates (at least monthly) with automated PRs.
 30. Maintain a Software Bill of Materials (SBOM) and audit dependencies for license compliance.
-11. **Directory Hygiene**: aim ≤ 8 items per directory. Group by domain/layer (e.g., `users/`, `billing/`, `adapters/`, `usecases/`). Export a minimal public surface.
+31. **Directory Hygiene**: aim ≤ 8 items per directory. Group by domain/layer (e.g., `users/`, `billing/`, `adapters/`, `usecases/`). Export a minimal public surface.
 
 ### Architecture Principles
 
@@ -40,6 +41,12 @@
 15. Hexagonal layering: domain isolated from frameworks and I/O. Domain code testable without network/DB.
 16. Configuration via environment with schema validation and safe defaults.
 17. Error handling: do not swallow errors; propagate with context; return typed/structured errors; log once.
+
+### First Principles & Pragmatism
+
+17.1. Start from first principles to clarify constraints and intent.
+17.2. Avoid over-engineering: prefer mature libraries and frameworks for routine business logic.
+17.3. Avoid “Not Invented Here”: study existing solutions' principles before choosing to adopt, extend, or rewrite.
 
 ### Code Smells → Immediate Action (with Remedies)
 
@@ -71,9 +78,10 @@
 34. **Run & Test Instructions** (exact commands).
 35. **Assumptions** (bulleted).
 36. **Self-check** (map Review Checklist items to what you did).
-72. **Codemods**: jscodeshift / ts-morph (JS/TS); OpenRewrite (JVM); Bowler/libCST (Python); `rustfix`; `gofix`.
-73. **Security**: Semgrep rulesets; osv-scanner; OWASP Dependency-Check; Trivy (container/SCA); Snyk (SCA/container); GitGuardian (secrets).
-74. **Coverage**: Jest/Vitest + c8; coverage.py; `go test -coverprofile`; tarpaulin (Rust).
+37. **Codemods**: jscodeshift / ts-morph (JS/TS); OpenRewrite (JVM); Bowler/libCST (Python); `rustfix`; `gofix`.
+38. **Security**: Semgrep rulesets; osv-scanner; OWASP Dependency-Check; Trivy (container/SCA); Snyk (SCA/container); GitGuardian (secrets).
+39. **Coverage**: Jest/Vitest + c8; coverage.py; `go test -coverprofile`; tarpaulin (Rust).
+
 ### Review Checklist (Verify Before Returning Output)
 
 38. Lints/formatters clean.
@@ -86,10 +94,11 @@
 ### Deviation Policy
 
 44. If a rule must be broken, add a **`@deviation`** note near the violation including: Rule, Reason, Risk, Refactor Plan (link), Owner, Target date. Keep deviations temporary and tracked.
-86. Tests green and deterministic; changed-line coverage ≥ 80%.
-87. Performance metrics within SLOs; Core Web Vitals pass.
-88. Accessibility: WCAG 2.2 AAA compliance verified.
-89. Errors structured; logging/metrics/traces added where appropriate.
+45. Tests green and deterministic; changed-line coverage ≥ 80%.
+46. Performance metrics within SLOs; Core Web Vitals pass.
+47. Accessibility: WCAG 2.2 AAA compliance verified.
+48. Errors structured; logging/metrics/traces added where appropriate.
+
 ## SYSTEM — Maintenance Playbook for Existing Non-Compliant Code
 
 ### Principles
@@ -201,6 +210,9 @@
 - **CI Commands**: `pnpm lint`, `pnpm type-check`, `pnpm test`, optional `pnpm test:e2e`, `pnpm format`.
 - **Dependency Policy**: Use pnpm; avoid npm/yarn; add deps sparingly with approved licenses.
 - **Observability & Security**: Use structured logging; monitor with Vercel Speed Insights and Web Vitals; never log secrets; run security scanners as configured.
+- **Environment Handling**:
+  - Client code must read flags from `import.meta.env` (`DEV`, `PROD`, `MODE`); avoid `process.env.NODE_ENV` outside build scripts and other Node-only files.
+  - Tests stubbing env vars must use `tests/helpers/viteEnv.ts` and restore values after each test.
 - **CI Gates & Thresholds**: Lint and type-check must pass; coverage ≥90%; E2E accessibility tests across Chromium, Firefox, WebKit.
 - **Repository Layout**:
   - Root directories: `src/`, `public/`, `tests/e2e/`, `scripts/`, `coverage/`, `dist/`, `.lighthouseci/`, `.husky/`, etc.
@@ -277,11 +289,12 @@ Owner / Timeline
 94. Label code fences with file paths (e.g., ```ts title=src/app.ts).
 95. Prefer explicit imports and named exports; avoid wildcard exports.
 96. Keep explanations concise; prioritize executable artifacts.
+97. Avoid the `void` operator; handle asynchronous calls explicitly.
 
 ---
 
 ### Notes
 
-97. “Lines” refers to **source lines of code** (SLoC), excluding comments/blank lines.
-98. When encountering a **code smell**, the agent MUST surface it, propose remedies, and—if within scope—apply a targeted refactor or add a `@deviation` with a refactor plan.
-99. **Enforcement stance**: If constraints conflict with correctness, ship the correct solution with a brief `@deviation` and a refactor plan.
+98. “Lines” refers to **source lines of code** (SLoC), excluding comments/blank lines.
+99. When encountering a **code smell**, the agent MUST surface it, propose remedies, and—if within scope—apply a targeted refactor or add a `@deviation` with a refactor plan.
+100.  **Enforcement stance**: If constraints conflict with correctness, ship the correct solution with a brief `@deviation` and a refactor plan.
