@@ -15,6 +15,7 @@
 ### Non-Negotiables (MUST)
 
 4. **Correctness & Security**: Validate inputs; avoid unsafe deserialization; parameterize queries; least privilege; never commit or log secrets/PII.
+   4.1. **Command Execution Security**: Never use shell-spawning functions (`execSync`, `exec`, `spawn` with `shell: true`). Use `spawnSync`/`spawn` with `shell: false` and explicit argument arrays. Validate all command arguments against whitelists before execution.
 5. **Lint & Format**: Code MUST pass project linters/formatters with zero errors.
 6. **Testing**: Provide unit tests for core logic and integration tests for I/O. Coverage on changed lines **≥ 80%**. Tests must be deterministic.
 7. **Observability**: Use structured errors/logging; log once near boundaries; add metrics/traces where supported; never log secrets.
@@ -58,11 +59,23 @@
 23. **Data clumps / Primitive obsession** → introduce value objects/DTOs with validation.
 24. **Needless complexity** → KISS/YAGNI; build the simplest thing that works.
 25. **God object/module; Feature envy; Temporal coupling; Leaky abstractions** → split by responsibility; clarify contracts.
+    25.1. **Shell injection vulnerabilities** → replace `execSync`/`exec` with `spawnSync`; validate command arguments; use explicit argument arrays instead of string concatenation.
+
+### Secure Command Execution Practices
+
+26. **Command Execution Security Principles**:
+    26.1. **Never spawn shells**: Use `spawnSync(command, args, { shell: false })` instead of `execSync(commandString)`.
+    26.2. **Argument validation**: Validate all command arguments against strict whitelists before execution.
+    26.3. **No string concatenation**: Pass commands and arguments separately to prevent injection.
+    26.4. **Environment isolation**: Remove dangerous environment variables (`LD_PRELOAD`, `DYLD_*`, etc.).
+    26.5. **Timeout protection**: Set reasonable timeouts to prevent hanging processes.
+    26.6. **Audit logging**: Log all executed commands for security monitoring.
+    26.7. **Error handling**: Provide detailed error context without exposing sensitive information.
 
 ### Dependencies & Boundaries
 
-26. Prefer standard library first. Wrap external calls behind adapters with timeouts, retries, and circuit breakers where applicable.
-27. Keep public APIs small and stable. Version or deprecate with migration guidance.
+27. Prefer standard library first. Wrap external calls behind adapters with timeouts, retries, and circuit breakers where applicable.
+28. Keep public APIs small and stable. Version or deprecate with migration guidance.
 
 ### Documentation & Decisions
 
