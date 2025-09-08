@@ -42,6 +42,12 @@
 16. Configuration via environment with schema validation and safe defaults.
 17. Error handling: do not swallow errors; propagate with context; return typed/structured errors; log once.
 
+### First Principles & Pragmatism
+
+17.1. Start from first principles to clarify constraints and intent.
+17.2. Avoid over-engineering: prefer mature libraries and frameworks for routine business logic.
+17.3. Avoid “Not Invented Here”: study existing solutions' principles before choosing to adopt, extend, or rewrite.
+
 ### Code Smells → Immediate Action (with Remedies)
 
 18. **Rigidity / Shotgun surgery** → raise cohesion; add seams/ports; reduce cross-module knowledge.
