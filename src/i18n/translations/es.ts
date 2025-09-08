@@ -87,6 +87,7 @@ export default {
       'La configuración actual es bastante restrictiva. Podrías obtener menos problemas de los solicitados.',
   },
   messages: {
+    loading: 'Cargando...',
     success: {
       problemsGenerated: '¡Se generaron {{count}} problemas exitosamente!',
       settingsImported: '¡Configuración importada exitosamente!',

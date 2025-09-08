@@ -1,3 +1,5 @@
+import LoadingButton from '@/components/LoadingButton';
+import { generatePdf } from '@/utils/pdf';
 import React, { Suspense, useEffect, useState } from 'react';
 import './App.css';
 import ErrorMessage from './components/ErrorMessage';
@@ -8,16 +10,11 @@ import QuizMode from './components/QuizMode';
 import './components/QuizMode.css';
 import SettingsPresets from './components/SettingsPresets';
 import TranslationLoader from './components/TranslationLoader';
+import { useProblemGenerator } from './hooks/useProblemGenerator';
+import { useSettings } from './hooks/useSettings';
 import { useTranslation } from './i18n';
 import './styles/components.css';
-import type {
-  MessageValue,
-  Operation,
-  PaperSizeOptions,
-  Problem,
-  QuizResult,
-  Settings,
-} from './types';
+import type { MessageValue, Operation, PaperSizeOptions, QuizResult, Settings } from './types';
 import { setupWCAGEnforcement } from './utils/wcagEnforcement';
 
 const SpeedInsights = React.lazy(() =>
@@ -27,59 +24,12 @@ const SpeedInsights = React.lazy(() =>
 function App(): React.JSX.Element {
   const { t, isLoading } = useTranslation();
 
-  const defaultSettings: Settings = {
-    operations: ['+', '-'],
-    numProblems: 20,
-    numRange: [1, 20],
-    resultRange: [0, 20],
-    numOperandsRange: [2, 3],
-    allowNegative: false,
-    showAnswers: false,
-    fontSize: 16,
-    lineSpacing: 12,
-    paperSize: 'a4',
-  };
-
-  // Load settings from localStorage or use defaults
-  const loadSettings = (): Settings => {
-    try {
-      const saved = localStorage.getItem('mathgenie-settings');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        // Validate parsed settings to prevent errors
-        return {
-          ...defaultSettings,
-          ...parsed,
-          operations: Array.isArray(parsed.operations)
-            ? parsed.operations
-            : defaultSettings.operations,
-          numRange:
-            Array.isArray(parsed.numRange) && parsed.numRange.length === 2
-              ? parsed.numRange
-              : defaultSettings.numRange,
-          resultRange:
-            Array.isArray(parsed.resultRange) && parsed.resultRange.length === 2
-              ? parsed.resultRange
-              : defaultSettings.resultRange,
-          numOperandsRange:
-            Array.isArray(parsed.numOperandsRange) && parsed.numOperandsRange.length === 2
-              ? parsed.numOperandsRange
-              : defaultSettings.numOperandsRange,
-        };
-      }
-    } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('Failed to load settings from localStorage:', error);
-      }
-    }
-    return defaultSettings;
-  };
-
-  const [settings, setSettings] = useState<Settings>(() => loadSettings());
-  const [problems, setProblems] = useState<Problem[]>([]);
+  const { settings, setSettings, validateSettings } = useSettings();
+  const { problems, generateProblems } = useProblemGenerator(settings, isLoading, validateSettings);
   const [error, setError] = useState<MessageValue>('');
   const [warning, setWarning] = useState<MessageValue>('');
   const [successMessage, setSuccessMessage] = useState<MessageValue>('');
+
   const [isQuizMode, setIsQuizMode] = useState<boolean>(false);
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
   const [hasInitialGenerated, setHasInitialGenerated] = useState<boolean>(false);
@@ -90,230 +40,7 @@ function App(): React.JSX.Element {
     legal: 'legal',
   };
 
-  // Save settings to localStorage
-  const saveSettings = (newSettings: Settings): void => {
-    try {
-      localStorage.setItem('mathgenie-settings', JSON.stringify(newSettings));
-    } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('Failed to save settings to localStorage:', error);
-      }
-    }
-  };
-
-  // Validate settings
-  const validateSettings = (newSettings: Settings): MessageValue => {
-    if (newSettings.operations.length === 0) {
-      return { key: 'errors.noOperations' };
-    }
-    if (newSettings.numProblems <= 0 || newSettings.numProblems > 100) {
-      return { key: 'errors.invalidProblemCount' };
-    }
-    if (newSettings.numRange[0] > newSettings.numRange[1]) {
-      return { key: 'errors.invalidNumberRange' };
-    }
-    if (newSettings.resultRange[0] > newSettings.resultRange[1]) {
-      return { key: 'errors.invalidResultRange' };
-    }
-    if (
-      newSettings.numOperandsRange[0] > newSettings.numOperandsRange[1] ||
-      newSettings.numOperandsRange[0] < 2
-    ) {
-      return { key: 'errors.invalidOperandsRange' };
-    }
-    return '';
-  };
-
-  const calculateExpression = (operands: number[], operators: string[]): number | null => {
-    let result = operands[0];
-
-    for (let i = 0; i < operators.length; i++) {
-      const operator = operators[i];
-      const operand = operands[i + 1];
-
-      switch (operator) {
-        case '+':
-          result += operand;
-          break;
-        case '-':
-          result -= operand;
-          break;
-        case '*':
-          result *= operand;
-          break;
-        case '/':
-          if (operand === 0 || result % operand !== 0) {
-            return null;
-          }
-          result = result / operand;
-          break;
-        default:
-          return null;
-      }
-    }
-
-    return result;
-  };
-
-  const generateProblem = (): string => {
-    const crypto = window.crypto || (window as any).msCrypto;
-    const random = (min: number, max: number): number => {
-      const array = new Uint32Array(1);
-      crypto.getRandomValues(array);
-      const val = array[0] / (0xffffffff + 1);
-      return min + Math.floor((max - min + 1) * val);
-    };
-
-    const randomNonZero = (min: number, max: number): number | null => {
-      const values: number[] = [];
-      for (let i = min; i <= max; i++) {
-        if (i !== 0) {
-          values.push(i);
-        }
-      }
-      if (values.length === 0) {
-        return null;
-      }
-      const idx = random(0, values.length - 1);
-      return values[idx];
-    };
-
-    const buildExpression = (count: number): { operands: number[]; operators: string[] } | null => {
-      const operands = [random(settings.numRange[0], settings.numRange[1])];
-      const operators: string[] = [];
-      for (let i = 0; i < count - 1; i++) {
-        const operator = settings.operations[random(0, settings.operations.length - 1)];
-        operators.push(operator);
-        const next =
-          operator === '/'
-            ? randomNonZero(settings.numRange[0], settings.numRange[1])
-            : random(settings.numRange[0], settings.numRange[1]);
-        if (next === null) {
-          return null;
-        }
-        operands.push(next);
-      }
-      return { operands, operators };
-    };
-
-    const numOperands = random(settings.numOperandsRange[0], settings.numOperandsRange[1]);
-    if (numOperands < 2) {
-      return '';
-    }
-
-    const MAX_ATTEMPTS = 10000;
-    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-      const expression = buildExpression(numOperands);
-      if (!expression) {
-        return '';
-      }
-      const { operands, operators } = expression;
-
-      const result = calculateExpression(operands, operators);
-      const invalid =
-        result === null ||
-        result < settings.resultRange[0] ||
-        result > settings.resultRange[1] ||
-        (!settings.allowNegative && result < 0);
-
-      if (invalid) {
-        continue;
-      }
-
-      let problem = operands[0].toString();
-      operators.forEach((operator, index) => {
-        problem += ` ${operator} ${operands[index + 1]}`;
-      });
-
-      problem = problem.replace(/\*/g, '✖').replace(/\//g, '➗');
-
-      return settings.showAnswers ? `${problem} = ${result}` : `${problem} = `;
-    }
-
-    return '';
-  };
-
-  const generateProblems = (showSuccessMessage: boolean = true): void => {
-    // Clear previous messages
-    setError('');
-    setWarning('');
-    setSuccessMessage('');
-
-    // Don't show any messages if i18n is still loading
-    if (isLoading) {
-      return;
-    }
-
-    // Validate settings first
-    const validationError = validateSettings(settings);
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
-
-    // Show warning for large number of problems
-    if (settings.numProblems > 50) {
-      setWarning({
-        key: 'warnings.largeNumberOfProblems',
-        params: { count: settings.numProblems },
-      });
-    }
-
-    try {
-      const generatedProblems = Array.from({ length: settings.numProblems }, () =>
-        generateProblem()
-      )
-        .filter(problem => problem !== '')
-        .map((problem, index) => ({ id: index, text: problem }));
-
-      if (generatedProblems.length === 0) {
-        // Only show error if i18n is loaded and this is not initial generation
-        if (!isLoading && showSuccessMessage) {
-          setError({ key: 'errors.noProblemsGenerated' });
-        }
-      } else if (generatedProblems.length < settings.numProblems) {
-        // Partial generation - show warning only if i18n is loaded
-        if (!isLoading && showSuccessMessage) {
-          setWarning({
-            key: 'errors.partialGeneration',
-            params: {
-              generated: generatedProblems.length,
-              requested: settings.numProblems,
-            },
-          });
-        }
-        setProblems(generatedProblems);
-      } else {
-        // Full success - only show message if not initial load and i18n is loaded
-        if (showSuccessMessage && !isLoading) {
-          if (process.env.NODE_ENV === 'development') {
-            console.log('Setting success message:', {
-              showSuccessMessage,
-              isLoading,
-              count: generatedProblems.length,
-            });
-          }
-          setSuccessMessage({
-            key: 'messages.success.problemsGenerated',
-            params: { count: generatedProblems.length },
-          });
-          // Clear success message after 5 seconds
-          setTimeout(() => setSuccessMessage(''), 5000);
-        }
-        setProblems(generatedProblems);
-      }
-    } catch (err) {
-      // Only show error if i18n is loaded and this is not initial generation
-      if (!isLoading && showSuccessMessage) {
-        setError({ key: 'errors.generationFailed' });
-      }
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Problem generation error:', err);
-      }
-    }
-  };
-
-  const downloadPdf = (): void => {
+  const downloadPdf = async (): Promise<void> => {
     if (problems.length === 0) {
       // Only show error if i18n is loaded
       if (!isLoading) {
@@ -328,57 +55,17 @@ function App(): React.JSX.Element {
     setSuccessMessage('');
 
     try {
-      import('jspdf').then(({ default: jsPDF }) => {
-        const doc = new jsPDF({
-          format: paperSizeOptions[settings.paperSize],
-        });
-
-        doc.setFontSize(settings.fontSize);
-        const pageHeight = doc.internal.pageSize.getHeight();
-        const pageWidth = doc.internal.pageSize.getWidth();
-
-        const marginLeft = 10;
-        const marginTop = 10;
-        const lineSpacing = settings.lineSpacing;
-        const colWidth = (pageWidth - 3 * marginLeft) / 2;
-
-        let currYLeft = marginTop;
-        let currYRight = marginTop;
-
-        problems.forEach((problem, index) => {
-          if (index % 2 === 0) {
-            if (currYLeft + lineSpacing > pageHeight) {
-              doc.addPage();
-              currYLeft = marginTop;
-              currYRight = marginTop;
-            }
-            doc.text(problem.text, marginLeft, currYLeft);
-            currYLeft += lineSpacing;
-          } else {
-            if (currYRight + lineSpacing > pageHeight) {
-              doc.addPage();
-              currYLeft = marginTop;
-              currYRight = marginTop;
-            }
-            doc.text(problem.text, marginLeft + colWidth + marginLeft, currYRight);
-            currYRight += lineSpacing;
-          }
-        });
-
-        doc.save('problems.pdf');
-
-        // Show success message only if i18n is loaded
-        if (!isLoading) {
-          setSuccessMessage({ key: 'messages.success.pdfGenerated' });
-          setTimeout(() => setSuccessMessage(''), 5000);
-        }
-      });
+      await generatePdf(problems, settings, paperSizeOptions);
+      if (!isLoading) {
+        setSuccessMessage({ key: 'messages.success.pdfGenerated' });
+        setTimeout(() => setSuccessMessage(''), 5000);
+      }
     } catch (err) {
       // Only show error if i18n is loaded
       if (!isLoading) {
         setError({ key: 'errors.pdfFailed' });
       }
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.DEV) {
         console.error('PDF generation error:', err);
       }
     }
@@ -392,7 +79,15 @@ function App(): React.JSX.Element {
 
     const validationError = validateSettings(settings);
     if (!validationError) {
-      generateProblems(hasInitialGenerated);
+      const messages = generateProblems(hasInitialGenerated);
+      setError(messages.error);
+      setWarning(messages.warning);
+      if (messages.successMessage) {
+        setSuccessMessage(messages.successMessage);
+        setTimeout(() => setSuccessMessage(''), 5000);
+      } else {
+        setSuccessMessage('');
+      }
       if (!hasInitialGenerated) {
         setHasInitialGenerated(true);
       }
@@ -445,12 +140,10 @@ function App(): React.JSX.Element {
     }
 
     setSettings(newSettings);
-    saveSettings(newSettings);
   };
 
   const handleApplyPreset = (presetSettings: Settings): void => {
     setSettings(presetSettings);
-    saveSettings(presetSettings);
 
     // Clear messages and show success only if i18n is loaded
     setError('');
@@ -497,7 +190,7 @@ function App(): React.JSX.Element {
       }
       localStorage.setItem('mathgenie-quiz-results', JSON.stringify(results));
     } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.DEV) {
         console.warn('Failed to save quiz result:', error);
       }
     }
@@ -772,7 +465,15 @@ function App(): React.JSX.Element {
               <div className='results-section'>
                 <div className='action-cards-grid'>
                   <button
-                    onClick={() => generateProblems()}
+                    onClick={() => {
+                      const messages = generateProblems();
+                      setError(messages.error);
+                      setWarning(messages.warning);
+                      setSuccessMessage(messages.successMessage);
+                      if (messages.successMessage) {
+                        setTimeout(() => setSuccessMessage(''), 5000);
+                      }
+                    }}
                     className='action-card generate-card'
                     aria-label={`${t('buttons.generate')} - ${t('accessibility.generateButton')}`}
                     tabIndex={0}
@@ -789,12 +490,24 @@ function App(): React.JSX.Element {
                     </div>
                   </button>
 
-                  <button
+                  <LoadingButton
                     onClick={downloadPdf}
                     className='action-card download-card'
                     aria-label={`${t('buttons.download')} - ${t('accessibility.downloadButton')}`}
                     disabled={problems.length === 0}
                     tabIndex={0}
+                    loadingContent={
+                      <div className='action-card-content'>
+                        <div className='action-icon'>📄</div>
+                        <div className='action-text'>
+                          <div
+                            className='loading-spinner'
+                            aria-live='polite'
+                            aria-label={t('messages.loading')}
+                          ></div>
+                        </div>
+                      </div>
+                    }
                   >
                     <div className='action-card-content'>
                       <div className='action-icon'>📄</div>
@@ -806,7 +519,7 @@ function App(): React.JSX.Element {
                         <span className='action-arrow'>→</span>
                       </div>
                     </div>
-                  </button>
+                  </LoadingButton>
 
                   <button
                     onClick={startQuizMode}
@@ -896,7 +609,15 @@ function App(): React.JSX.Element {
                 <InfoPanel
                   problems={problems}
                   settings={settings}
-                  onGenerateProblems={generateProblems}
+                  onGenerateProblems={() => {
+                    const messages = generateProblems();
+                    setError(messages.error);
+                    setWarning(messages.warning);
+                    setSuccessMessage(messages.successMessage);
+                    if (messages.successMessage) {
+                      setTimeout(() => setSuccessMessage(''), 5000);
+                    }
+                  }}
                   onDownloadPdf={downloadPdf}
                   quizResult={quizResult}
                   onStartQuiz={startQuizMode}
@@ -905,7 +626,7 @@ function App(): React.JSX.Element {
             </div>
           )}
 
-          {process.env.NODE_ENV === 'production' && (
+          {import.meta.env.PROD && (
             <Suspense fallback={<div>{t('loading.insights')}</div>}>
               <SpeedInsights />
             </Suspense>

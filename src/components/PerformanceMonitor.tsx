@@ -30,13 +30,13 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({ children }) => 
     const observer = new PerformanceObserver(list => {
       list.getEntries().forEach(entry => {
         // Log performance metrics in development
-        if (process.env.NODE_ENV === 'development') {
+        if (import.meta.env.DEV) {
           const value = 'value' in entry ? (entry as any).value : entry.duration;
           console.log(`${entry.name}: ${value}ms`);
         }
 
         // Report to analytics in production (if needed)
-        if (process.env.NODE_ENV === 'production' && window.gtag) {
+        if (import.meta.env.PROD && window.gtag) {
           const value = 'value' in entry ? (entry as any).value : entry.duration;
           window.gtag('event', 'web_vitals', {
             event_category: 'Performance',
@@ -61,7 +61,7 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({ children }) => 
     if (extendedPerformance.memory) {
       const logMemoryUsage = (): void => {
         const memory = extendedPerformance.memory!;
-        if (process.env.NODE_ENV === 'development') {
+        if (import.meta.env.DEV) {
           console.log('Memory usage:', {
             used: Math.round(memory.usedJSHeapSize / 1048576) + ' MB',
             total: Math.round(memory.totalJSHeapSize / 1048576) + ' MB',
