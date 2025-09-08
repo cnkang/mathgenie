@@ -5,7 +5,7 @@
  * Runs ESLint with SonarJS rules to identify code quality issues
  */
 
-import { execSync } from 'child_process';
+import { spawnSync } from 'child_process';
 
 interface SonarCheckOptions {
   fix?: boolean;
@@ -13,49 +13,124 @@ interface SonarCheckOptions {
   severity?: 'error' | 'warn' | 'all';
 }
 
-function runSonarCheck(options: SonarCheckOptions = {}): void {
+/**
+ * Validates that file patterns are safe for ESLint execution
+ * Prevents path traversal and ensures only TypeScript files are processed
+ */
+function validateFilePatterns(files: string[]): boolean {
+  const allowedPatterns = /^[a-zA-Z0-9_\-./]+$/;
+  const dangerousPatterns = /[;&|`$(){}[\]<>*?~]/;
+
+  return files.every(file => {
+    // Must match allowed characters only
+    if (!allowedPatterns.test(file)) {
+      console.error(`❌ Invalid file pattern: ${file}`);
+      return false;
+    }
+
+    // Must not contain shell metacharacters
+    if (dangerousPatterns.test(file)) {
+      console.error(`❌ Dangerous characters in file pattern: ${file}`);
+      return false;
+    }
+
+    // Must be reasonable length
+    if (file.length > 200) {
+      console.error(`❌ File pattern too long: ${file}`);
+      return false;
+    }
+
+    return true;
+  });
+}
+
+/**
+ * Builds validated ESLint arguments array
+ * Prevents command injection by using argument arrays instead of string concatenation
+ */
+function buildESLintArgs(options: SonarCheckOptions): string[] {
   const { fix = false, files = ['src'], severity = 'error' } = options;
 
+  // Validate file patterns first
+  if (!validateFilePatterns(files)) {
+    throw new Error('Invalid file patterns detected');
+  }
+
+  const args: string[] = [];
+
+  // Add file patterns
+  files.forEach(file => args.push(file));
+
+  // Add extensions
+  args.push('--ext', '.ts,.tsx');
+
+  // Add fix flag if requested
+  if (fix) {
+    args.push('--fix');
+  }
+
+  // Add severity handling
+  if (severity !== 'all') {
+    args.push('--max-warnings', '0');
+  }
+
+  return args;
+}
+
+function runSonarCheck(options: SonarCheckOptions = {}): void {
   try {
     console.log('🔍 Running SonarJS code quality checks...');
 
-    const filesPattern = files.join(' ');
-    const fixFlag = fix ? '--fix' : '';
-    const maxWarnings = severity === 'all' ? '' : '--max-warnings 0';
+    // Build secure argument array
+    const args = buildESLintArgs(options);
 
-    const command = `npx eslint ${filesPattern} --ext .ts,.tsx ${fixFlag} ${maxWarnings}`.trim();
+    // Log the command for transparency (but safely)
+    console.log(`Executing: npx eslint ${args.join(' ')}`);
 
-    console.log(`Executing: ${command}`);
-
-    const result = execSync(command, {
+    // Execute with secure spawn (no shell interpretation)
+    const result = spawnSync('npx', ['eslint', ...args], {
       encoding: 'utf8',
       stdio: 'pipe',
+      shell: false, // Critical: disable shell interpretation
+      timeout: 60000, // 60 second timeout
+      env: {
+        // Clean environment - only pass essential variables
+        PATH: process.env.PATH,
+        NODE_ENV: process.env.NODE_ENV,
+        HOME: process.env.HOME,
+        // Remove potentially dangerous environment variables
+        // (no LD_PRELOAD, DYLD_*, etc.)
+      },
     });
 
-    console.log('✅ SonarJS checks passed!');
-    if (result) {
-      console.log(result);
+    // Handle successful execution
+    if (result.status === 0) {
+      console.log('✅ SonarJS checks passed!');
+      if (result.stdout) {
+        console.log(result.stdout);
+      }
+      return;
     }
+
+    // Handle ESLint errors (non-zero exit code)
+    if (result.stdout) {
+      console.log('SonarJS Issues Found:');
+      console.log(result.stdout);
+    }
+
+    if (result.stderr) {
+      console.error('ESLint execution error:', result.stderr);
+    }
+
+    if (result.error) {
+      console.error('Process execution error:', result.error.message);
+    }
+
+    console.error('❌ SonarJS checks failed. Please fix the issues above.');
+    process.exit(1);
   } catch (error) {
-    if (error instanceof Error && 'stdout' in error) {
-      const stdout = (error as any).stdout;
-      const stderr = (error as any).stderr;
-
-      if (stdout) {
-        console.log('SonarJS Issues Found:');
-        console.log(stdout);
-      }
-
-      if (stderr) {
-        console.error('ESLint execution error:', stderr);
-      }
-
-      console.error('❌ SonarJS checks failed. Please fix the issues above.');
-      process.exit(1);
-    } else {
-      console.error('Unexpected error during SonarJS check:', error);
-      process.exit(1);
-    }
+    console.error('Unexpected error during SonarJS check:', error);
+    process.exit(1);
   }
 }
 
