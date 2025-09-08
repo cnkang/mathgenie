@@ -17,7 +17,9 @@ const safeEvaluateExpression = (expression: string): number => {
   try {
     // Split into tokens using a linear-time regex
     const tokens = cleanExpression.match(/\d+(?:\.\d+)?|[+\-*/()]/g);
-    if (!tokens) throw new Error('Invalid expression format');
+    if (!tokens) {
+      throw new Error('Invalid expression format');
+    }
 
     // Simple recursive descent parser for basic arithmetic
     let index = 0;
