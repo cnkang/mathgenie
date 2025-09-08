@@ -1,3 +1,5 @@
+import LoadingButton from '@/components/LoadingButton';
+import { generatePdf } from '@/utils/pdf';
 import React, { Suspense, useEffect, useState } from 'react';
 import './App.css';
 import ErrorMessage from './components/ErrorMessage';
@@ -8,14 +10,12 @@ import QuizMode from './components/QuizMode';
 import './components/QuizMode.css';
 import SettingsPresets from './components/SettingsPresets';
 import TranslationLoader from './components/TranslationLoader';
+import { useProblemGenerator } from './hooks/useProblemGenerator';
+import { useSettings } from './hooks/useSettings';
 import { useTranslation } from './i18n';
 import './styles/components.css';
 import type { MessageValue, Operation, PaperSizeOptions, QuizResult, Settings } from './types';
 import { setupWCAGEnforcement } from './utils/wcagEnforcement';
-import { useProblemGenerator } from './hooks/useProblemGenerator';
-import { useSettings } from './hooks/useSettings';
-import LoadingButton from '@/components/LoadingButton';
-import { generatePdf } from '@/utils/pdf';
 
 const SpeedInsights = React.lazy(() =>
   import('@vercel/speed-insights/react').then(module => ({ default: module.SpeedInsights }))
