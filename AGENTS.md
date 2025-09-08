@@ -16,6 +16,9 @@
 
 4. **Correctness & Security**: Validate inputs; avoid unsafe deserialization; parameterize queries; least privilege; never commit or log secrets/PII.
    4.1. **Command Execution Security**: Never use shell-spawning functions (`execSync`, `exec`, `spawn` with `shell: true`). Use `spawnSync`/`spawn` with `shell: false` and explicit argument arrays. Validate all command arguments against whitelists before execution.
+   4.2. **Input Validation & Sanitization**: All user inputs MUST be validated and sanitized before processing. Use strict regex patterns, length limits, and character whitelists. Reject inputs containing shell metacharacters (;&|`$(){}[]<>*?~).
+4.3. **Library Injection Prevention**: Remove dangerous environment variables (`LD_PRELOAD`, `LD_LIBRARY_PATH`, `DYLD_INSERT_LIBRARIES`, `DYLD_LIBRARY_PATH`) from child process environments to prevent library injection attacks.
+   4.4. **Process Execution Security**: Set timeouts for all child processes, use clean environments, and implement proper error handling without exposing sensitive information.
 5. **Lint & Format**: Code MUST pass project linters/formatters with zero errors.
 6. **Code Quality Gates**: Code MUST pass static analysis tools (SonarQube, ESLint with SonarJS rules, etc.) with zero critical issues before commit. Run quality checks locally before pushing.
    6.1. **Pre-commit Quality Checks**: Always run code quality analysis tools locally before committing. Never bypass quality gates with `--no-verify` or similar flags.
@@ -76,6 +79,35 @@
     26.5. **Timeout protection**: Set reasonable timeouts to prevent hanging processes.
     26.6. **Audit logging**: Log all executed commands for security monitoring.
     26.7. **Error handling**: Provide detailed error context without exposing sensitive information.
+
+### Comprehensive Security Framework
+
+27. **🔒 Command Injection Prevention**:
+    27.1. **Whitelist validation**: Only allow pre-approved commands and arguments.
+    27.2. **Regex validation**: Use strict patterns like `/^[a-zA-Z0-9_\-./]+$/` for file paths.
+    27.3. **Length limits**: Enforce reasonable limits (e.g., 200 chars for paths).
+    27.4. **Metacharacter detection**: Block shell metacharacters `[;&|`$(){}[]<>\*?~]`.
+    27.5. **Argument arrays**: Always use argument arrays, never string concatenation.
+
+28. **🔒 Library Injection Prevention**:
+    28.1. **Environment cleaning**: Remove `LD_PRELOAD`, `LD_LIBRARY_PATH`, `DYLD_INSERT_LIBRARIES`, `DYLD_LIBRARY_PATH`.
+    28.2. **Safe environment**: Use `{ ...process.env, DANGEROUS_VAR: undefined }` pattern.
+    28.3. **Library path validation**: Validate any library paths before use.
+    28.4. **Dynamic loading security**: Avoid dynamic library loading from user-controlled paths.
+
+29. **🔒 Input Validation & Sanitization**:
+    29.1. **Validation functions**: Create dedicated validation functions for each input type.
+    29.2. **Fail-fast principle**: Reject invalid inputs immediately with clear error messages.
+    29.3. **Type safety**: Use TypeScript interfaces and runtime validation.
+    29.4. **Boundary validation**: Validate at system boundaries (API endpoints, file inputs, CLI args).
+    29.5. **Encoding safety**: Properly encode outputs to prevent XSS and injection attacks.
+
+30. **🔒 Secure Process Execution**:
+    30.1. **Process isolation**: Use separate processes for untrusted operations.
+    30.2. **Resource limits**: Set memory, CPU, and time limits for child processes.
+    30.3. **Signal handling**: Properly handle process termination and cleanup.
+    30.4. **Error boundaries**: Implement error boundaries to contain failures.
+    30.5. **Monitoring**: Log process execution for security auditing.
 
 ### Dependencies & Boundaries
 

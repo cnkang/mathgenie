@@ -474,6 +474,102 @@ select,
 - **ALWAYS** validate and sanitize user inputs
 - **ALWAYS** use secure parsers for math expressions
 
+### 🔒 Command Injection Prevention
+
+#### Secure Command Execution (Mandatory)
+
+- **NEVER** use `execSync`, `exec`, or `spawn` with `shell: true`
+- **ALWAYS** use `spawnSync` or `spawn` with `shell: false`
+- **ALWAYS** pass commands and arguments separately (no string concatenation)
+- **ALWAYS** validate command arguments against strict whitelists
+
+#### Implementation Pattern
+
+```typescript
+// ❌ NEVER DO THIS - Vulnerable to injection
+const result = execSync(`command ${userInput}`);
+
+// ✅ ALWAYS DO THIS - Secure execution
+const result = spawnSync('command', [validatedArg], {
+  shell: false,
+  timeout: 60000,
+  env: { ...process.env, LD_PRELOAD: undefined },
+});
+```
+
+#### Input Validation Requirements
+
+- Use regex patterns: `/^[a-zA-Z0-9_\-./]+$/` for file paths
+- Block shell metacharacters: `[;&|`$(){}[]<>\*?~]`
+- Enforce length limits (e.g., 200 chars for paths)
+- Provide clear error messages for invalid inputs
+
+### 🔒 Library Injection Prevention
+
+#### Environment Variable Security
+
+- **ALWAYS** remove dangerous environment variables from child processes:
+  - `LD_PRELOAD` (Linux library preloading)
+  - `LD_LIBRARY_PATH` (Linux library path)
+  - `DYLD_INSERT_LIBRARIES` (macOS library injection)
+  - `DYLD_LIBRARY_PATH` (macOS library path)
+
+#### Safe Environment Pattern
+
+```typescript
+// ✅ Safe environment handling
+const safeEnv = {
+  ...process.env,
+  // Explicitly remove dangerous variables
+  LD_PRELOAD: undefined,
+  LD_LIBRARY_PATH: undefined,
+  DYLD_INSERT_LIBRARIES: undefined,
+  DYLD_LIBRARY_PATH: undefined,
+};
+```
+
+### 🔒 Input Validation & Sanitization
+
+#### Validation Strategy
+
+- **Validate at boundaries**: API endpoints, file inputs, CLI arguments
+- **Fail-fast principle**: Reject invalid inputs immediately
+- **Type safety**: Use TypeScript interfaces + runtime validation
+- **Whitelist approach**: Allow only known-safe patterns
+
+#### Validation Functions
+
+```typescript
+// ✅ Example validation function
+function validateFilePattern(input: string): boolean {
+  const allowedPattern = /^[a-zA-Z0-9_\-./]+$/;
+  const dangerousPattern = /[;&|`$(){}[\]<>*?~]/;
+
+  return allowedPattern.test(input) && !dangerousPattern.test(input) && input.length <= 200;
+}
+```
+
+### 🔒 Secure Process Execution
+
+#### Process Security Requirements
+
+- **Timeout protection**: Set reasonable timeouts (e.g., 60 seconds)
+- **Resource limits**: Prevent resource exhaustion
+- **Error handling**: Don't expose sensitive information in errors
+- **Audit logging**: Log security-relevant operations
+
+#### Security Checklist
+
+Before executing any external command:
+
+- [ ] Command is in approved whitelist
+- [ ] All arguments are validated
+- [ ] No shell metacharacters present
+- [ ] Environment variables cleaned
+- [ ] Timeout configured
+- [ ] Error handling implemented
+- [ ] Logging configured
+
 ### Dependencies
 
 - Run `pnpm audit` before releases
@@ -794,12 +890,34 @@ Before writing tests, evaluate:
 
 ## Decision Priority
 
-1. **Test Coverage** - Does this meet 80% coverage with meaningful tests?
-2. **Internationalization** - Are all user-facing strings properly translated?
-3. **Accessibility (WCAG 2.2 AAA)** - Meets highest accessibility standards for all users?
-4. **User Experience** - Follows mobile-first, card-based interaction principles?
-5. **Security** - Safe and secure implementation?
+1. **🔒 Security** - Safe and secure implementation with no injection vulnerabilities?
+   - Command injection prevention ✅
+   - Library injection prevention ✅
+   - Input validation & sanitization ✅
+   - Secure process execution ✅
+2. **Test Coverage** - Does this meet 80% coverage with meaningful tests?
+3. **Internationalization** - Are all user-facing strings properly translated?
+4. **Accessibility (WCAG 2.2 AAA)** - Meets highest accessibility standards for all users?
+5. **User Experience** - Follows mobile-first, card-based interaction principles?
 6. **Simplicity** - Is this the simplest effective solution with intuitive interactions?
 7. **Performance** - Optimized for use case without compromising accessibility or UX?
 8. **Testability** - Easily testable with accessibility validation?
 9. **Consistency** - Matches existing accessible and modern design patterns?
+
+### Security-First Development
+
+**Security is the top priority** - No feature or optimization should compromise security:
+
+- 🔒 **Command Injection**: All external command execution must be secure
+- 🔒 **Library Injection**: Environment variables must be cleaned
+- 🔒 **Input Validation**: All inputs must be validated and sanitized
+- 🔒 **Process Security**: All child processes must have proper isolation
+
+**Security Review Checklist** (mandatory before commit):
+
+- [ ] No `execSync`, `exec`, or `spawn` with `shell: true`
+- [ ] All command arguments validated against whitelists
+- [ ] Dangerous environment variables removed
+- [ ] Input validation functions implemented
+- [ ] Timeout and error handling configured
+- [ ] Security logging implemented
