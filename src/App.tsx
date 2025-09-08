@@ -21,6 +21,13 @@ const SpeedInsights = React.lazy(() =>
   import('@vercel/speed-insights/react').then(module => ({ default: module.SpeedInsights }))
 );
 
+// Constants to avoid duplicate strings
+const FORM_INPUT_CLASS = 'form-input';
+const DECIMAL_RADIX = 10;
+const SETTINGS_FROM_KEY = 'settings.from';
+const SETTINGS_TO_KEY = 'settings.to';
+const BUTTONS_GENERATE_KEY = 'buttons.generate';
+
 function App(): React.JSX.Element {
   const { t, isLoading } = useTranslation();
 
@@ -92,14 +99,13 @@ function App(): React.JSX.Element {
         setHasInitialGenerated(true);
       }
     } else {
-      setError(validationError);
+      setError({ key: validationError });
     }
   }, [settings, isLoading]);
 
   // WCAG 2.2 AAA Enforcement
   useEffect(() => {
-    const cleanup = setupWCAGEnforcement();
-    return cleanup;
+    return setupWCAGEnforcement();
   }, []);
 
   const handleChange = <K extends keyof Settings>(field: K, value: Settings[K]): void => {
@@ -125,7 +131,7 @@ function App(): React.JSX.Element {
       if (validationError) {
         // Only show error if i18n is loaded
         if (!isLoading) {
-          setError(validationError);
+          setError({ key: validationError });
         }
       } else {
         // Check for restrictive settings
@@ -274,10 +280,12 @@ function App(): React.JSX.Element {
                     type='number'
                     id='numProblems'
                     value={settings.numProblems}
-                    onChange={e => handleChange('numProblems', parseInt(e.target.value, 10))}
+                    onChange={e =>
+                      handleChange('numProblems', parseInt(e.target.value, DECIMAL_RADIX))
+                    }
                     aria-label={t('accessibility.numProblemsInput')}
                     tabIndex={0}
-                    className='form-input'
+                    className={FORM_INPUT_CLASS}
                   />
                 </div>
                 <div className='form-row'>
@@ -289,16 +297,16 @@ function App(): React.JSX.Element {
                       value={settings.numRange[0]}
                       onChange={e =>
                         handleChange('numRange', [
-                          parseInt(e.target.value, 10),
+                          parseInt(e.target.value, DECIMAL_RADIX),
                           settings.numRange[1],
                         ])
                       }
                       aria-label={t('accessibility.minNumber')}
-                      placeholder={t('settings.from')}
+                      placeholder={t(SETTINGS_FROM_KEY)}
                       tabIndex={0}
-                      className='form-input'
+                      className={FORM_INPUT_CLASS}
                     />
-                    <span>{t('settings.to')}</span>
+                    <span>{t(SETTINGS_TO_KEY)}</span>
                     <input
                       type='number'
                       id='numRangeTo'
@@ -306,13 +314,13 @@ function App(): React.JSX.Element {
                       onChange={e =>
                         handleChange('numRange', [
                           settings.numRange[0],
-                          parseInt(e.target.value, 10),
+                          parseInt(e.target.value, DECIMAL_RADIX),
                         ])
                       }
                       aria-label={t('accessibility.maxNumber')}
-                      placeholder={t('settings.to')}
+                      placeholder={t(SETTINGS_TO_KEY)}
                       tabIndex={0}
-                      className='form-input'
+                      className={FORM_INPUT_CLASS}
                     />
                   </div>
                 </div>
@@ -325,16 +333,16 @@ function App(): React.JSX.Element {
                       value={settings.resultRange[0]}
                       onChange={e =>
                         handleChange('resultRange', [
-                          parseInt(e.target.value, 10),
+                          parseInt(e.target.value, DECIMAL_RADIX),
                           settings.resultRange[1],
                         ])
                       }
                       aria-label={t('accessibility.minResult')}
-                      placeholder={t('settings.from')}
+                      placeholder={t(SETTINGS_FROM_KEY)}
                       tabIndex={0}
-                      className='form-input'
+                      className={FORM_INPUT_CLASS}
                     />
-                    <span>{t('settings.to')}</span>
+                    <span>{t(SETTINGS_TO_KEY)}</span>
                     <input
                       type='number'
                       id='resultRangeTo'
@@ -342,13 +350,13 @@ function App(): React.JSX.Element {
                       onChange={e =>
                         handleChange('resultRange', [
                           settings.resultRange[0],
-                          parseInt(e.target.value, 10),
+                          parseInt(e.target.value, DECIMAL_RADIX),
                         ])
                       }
                       aria-label={t('accessibility.maxResult')}
-                      placeholder={t('settings.to')}
+                      placeholder={t(SETTINGS_TO_KEY)}
                       tabIndex={0}
-                      className='form-input'
+                      className={FORM_INPUT_CLASS}
                     />
                   </div>
                 </div>
@@ -361,16 +369,16 @@ function App(): React.JSX.Element {
                       value={settings.numOperandsRange[0]}
                       onChange={e =>
                         handleChange('numOperandsRange', [
-                          parseInt(e.target.value, 10),
+                          parseInt(e.target.value, DECIMAL_RADIX),
                           settings.numOperandsRange[1],
                         ])
                       }
                       aria-label={t('accessibility.minOperands')}
-                      placeholder={t('settings.from')}
+                      placeholder={t(SETTINGS_FROM_KEY)}
                       tabIndex={0}
-                      className='form-input'
+                      className={FORM_INPUT_CLASS}
                     />
-                    <span>{t('settings.to')}</span>
+                    <span>{t(SETTINGS_TO_KEY)}</span>
                     <input
                       type='number'
                       id='numOperandsRangeTo'
@@ -378,13 +386,13 @@ function App(): React.JSX.Element {
                       onChange={e =>
                         handleChange('numOperandsRange', [
                           settings.numOperandsRange[0],
-                          parseInt(e.target.value, 10),
+                          parseInt(e.target.value, DECIMAL_RADIX),
                         ])
                       }
                       aria-label={t('accessibility.maxOperands')}
-                      placeholder={t('settings.to')}
+                      placeholder={t(SETTINGS_TO_KEY)}
                       tabIndex={0}
-                      className='form-input'
+                      className={FORM_INPUT_CLASS}
                     />
                   </div>
                 </div>
@@ -422,10 +430,12 @@ function App(): React.JSX.Element {
                       type='number'
                       id='fontSize'
                       value={settings.fontSize}
-                      onChange={e => handleChange('fontSize', parseInt(e.target.value, 10))}
+                      onChange={e =>
+                        handleChange('fontSize', parseInt(e.target.value, DECIMAL_RADIX))
+                      }
                       aria-label={t('accessibility.fontSizeInput')}
                       tabIndex={0}
-                      className='form-input'
+                      className={FORM_INPUT_CLASS}
                     />
                   </div>
                   <div className='form-row'>
@@ -434,10 +444,12 @@ function App(): React.JSX.Element {
                       type='number'
                       id='lineSpacing'
                       value={settings.lineSpacing}
-                      onChange={e => handleChange('lineSpacing', parseInt(e.target.value, 10))}
+                      onChange={e =>
+                        handleChange('lineSpacing', parseInt(e.target.value, DECIMAL_RADIX))
+                      }
                       aria-label={t('accessibility.lineSpacingInput')}
                       tabIndex={0}
-                      className='form-input'
+                      className={FORM_INPUT_CLASS}
                     />
                   </div>
                   <div className='form-row'>
@@ -475,13 +487,13 @@ function App(): React.JSX.Element {
                       }
                     }}
                     className='action-card generate-card'
-                    aria-label={`${t('buttons.generate')} - ${t('accessibility.generateButton')}`}
+                    aria-label={`${t(BUTTONS_GENERATE_KEY)} - ${t('accessibility.generateButton')}`}
                     tabIndex={0}
                   >
                     <div className='action-card-content'>
                       <div className='action-icon'>🎲</div>
                       <div className='action-text'>
-                        <h3>{t('buttons.generate')}</h3>
+                        <h3>{t(BUTTONS_GENERATE_KEY)}</h3>
                         <p>{t('buttons.generateDescription')}</p>
                       </div>
                       <div className='action-indicator'>
@@ -599,7 +611,7 @@ function App(): React.JSX.Element {
                         <div className='no-problems-icon'>🎯</div>
                         <div className='no-problems-text'>{t('results.noProblems')}</div>
                         <div className='no-problems-hint'>
-                          {t('results.clickToStart', { generateButton: t('buttons.generate') })}
+                          {t('results.clickToStart', { generateButton: t(BUTTONS_GENERATE_KEY) })}
                         </div>
                       </div>
                     )}
