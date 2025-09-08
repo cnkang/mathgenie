@@ -79,7 +79,7 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
             type='number'
             value={userInput}
             onChange={e => setUserInput(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyPress}
             placeholder={t('quiz.enterAnswer') || 'Enter answer'}
             disabled={isSubmitted || disabled}
             className='answer-input'

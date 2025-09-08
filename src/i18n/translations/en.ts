@@ -46,7 +46,7 @@ export default {
     download: 'Download PDF',
     downloadDescription: 'Save your problems as a printable PDF file',
     quizDescription: 'Test your skills with an interactive quiz',
-    downloadEmpty: 'Download PDF',
+    downloadEmpty: 'Generate & Download PDF',
   },
   results: {
     title: 'Generated Problems ({{count}})',
