@@ -94,12 +94,14 @@ function runSonarCheck(options: SonarCheckOptions = {}): void {
       shell: false, // Critical: disable shell interpretation
       timeout: 60000, // 60 second timeout
       env: {
-        // Clean environment - only pass essential variables
-        PATH: process.env.PATH,
-        NODE_ENV: process.env.NODE_ENV,
-        HOME: process.env.HOME,
-        // Remove potentially dangerous environment variables
-        // (no LD_PRELOAD, DYLD_*, etc.)
+        // Use current environment but remove dangerous variables
+        ...process.env,
+        // Remove potentially dangerous environment variables that could affect execution
+        LD_PRELOAD: undefined,
+        LD_LIBRARY_PATH: undefined,
+        DYLD_INSERT_LIBRARIES: undefined,
+        DYLD_LIBRARY_PATH: undefined,
+        // Keep other environment variables as they may be needed for ESLint/Node.js
       },
     });
 
