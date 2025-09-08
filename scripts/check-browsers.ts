@@ -101,7 +101,7 @@ function validateAndParseCommand(command: string): { command: string; args: stri
   const trimmedCommand = command.trim();
 
   // Check against each allowed command pattern
-  for (const [key, config] of Object.entries(ALLOWED_COMMANDS)) {
+  for (const config of Object.values(ALLOWED_COMMANDS)) {
     const expectedCommand = `${config.command} ${config.args.join(' ')}`;
     if (trimmedCommand === expectedCommand) {
       return {
@@ -202,12 +202,17 @@ function checkBrowsersInstalled(): boolean {
         stdio: 'pipe',
       });
       return true;
-    } catch (error) {
+    } catch (dryRunError) {
       // If dry-run fails, browsers might not be installed
+      // This is expected behavior when browsers are not installed
+      logInfo('Dry-run check indicates browsers may not be installed');
       return false;
     }
-  } catch (error) {
-    logError('Playwright is not installed or not accessible');
+  } catch (playwrightError) {
+    // Playwright itself is not accessible or not installed
+    const errorMessage =
+      playwrightError instanceof Error ? playwrightError.message : String(playwrightError);
+    logError(`Playwright is not installed or not accessible: ${errorMessage}`);
     return false;
   }
 }
