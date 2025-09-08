@@ -25,8 +25,14 @@ export class SettingsParseError extends Error {
   }
 }
 
-export const validateSettingsData = (data: any): data is SettingsData =>
-  !!(data && data.settings && typeof data.settings === 'object');
+export const validateSettingsData = (data: unknown): data is SettingsData =>
+  !!(
+    data &&
+    typeof data === 'object' &&
+    'settings' in data &&
+    typeof (data as Record<string, unknown>).settings === 'object' &&
+    (data as Record<string, unknown>).settings !== null
+  );
 
 export const parseSettingsFile = (content: string): SettingsData => {
   let data: unknown;

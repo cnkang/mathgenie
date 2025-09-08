@@ -1,25 +1,7 @@
 // Setup for testing environment with happy-dom only
 import { vi } from 'vitest';
 
-// Extend expect with custom matchers
-declare global {
-  namespace Vi {
-    interface Assertion<T = any> {
-      toBeInTheDocument(): T;
-      toHaveTextContent(text: string): T;
-      toHaveValue(value: any): T;
-    }
-  }
-}
-
-// Also extend the global expect interface
-declare module 'vitest' {
-  interface Assertion<T = any> {
-    toBeInTheDocument(): T;
-    toHaveTextContent(text: string): T;
-    toHaveValue(value: any): T;
-  }
-}
+// Custom matchers are declared in src/types/vitest.d.ts
 
 // Extend HTMLElement interface for testing
 declare global {

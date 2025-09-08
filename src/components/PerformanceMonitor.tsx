@@ -4,7 +4,7 @@ import type { PerformanceMonitorProps } from '../types';
 // Extend Window interface for gtag
 declare global {
   interface Window {
-    gtag?: (...args: any[]) => void;
+    gtag?: (command: string, action: string, parameters?: Record<string, unknown>) => void;
   }
 }
 
@@ -20,6 +20,11 @@ interface ExtendedPerformance extends Performance {
   memory?: PerformanceMemory;
 }
 
+// Performance entry with value property
+interface PerformanceEntryWithValue extends PerformanceEntry {
+  value?: number;
+}
+
 /**
  * Performance Monitor Component with TypeScript support
  * Tracks and reports performance metrics for optimization
@@ -31,13 +36,15 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({ children }) => 
       list.getEntries().forEach(entry => {
         // Log performance metrics in development
         if (import.meta.env.DEV) {
-          const value = 'value' in entry ? (entry as any).value : entry.duration;
+          const entryWithValue = entry as PerformanceEntryWithValue;
+          const value = entryWithValue.value ?? entry.duration;
           console.log(`${entry.name}: ${value}ms`);
         }
 
         // Report to analytics in production (if needed)
         if (import.meta.env.PROD && window.gtag) {
-          const value = 'value' in entry ? (entry as any).value : entry.duration;
+          const entryWithValue = entry as PerformanceEntryWithValue;
+          const value = entryWithValue.value ?? entry.duration;
           window.gtag('event', 'web_vitals', {
             event_category: 'Performance',
             event_label: entry.name,
