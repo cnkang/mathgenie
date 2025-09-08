@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import type { Settings } from '../types';
 import {
+  SettingsParseError,
   createDownloadBlob,
   createSettingsData,
   generateFilename,
   parseSettingsFile,
   serializeSettings,
   validateSettingsData,
-  SettingsParseError,
 } from './settingsManager';
 
 describe('Settings Manager Utils', () => {
@@ -65,11 +65,15 @@ describe('Settings Manager Utils', () => {
 
   it('throws SettingsParseError for invalid JSON', () => {
     expect(() => parseSettingsFile('invalid json')).toThrow(SettingsParseError);
+    expect(() => parseSettingsFile('invalid json')).toThrow(
+      'Settings file contains invalid JSON syntax'
+    );
   });
 
   it('throws SettingsParseError for invalid structure', () => {
     const invalid = JSON.stringify({ version: '1.0' });
     expect(() => parseSettingsFile(invalid)).toThrow(SettingsParseError);
+    expect(() => parseSettingsFile(invalid)).toThrow('Settings file structure is invalid');
   });
 
   it('validates correct settings data', () => {

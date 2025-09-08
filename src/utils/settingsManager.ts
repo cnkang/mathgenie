@@ -33,11 +33,11 @@ export const parseSettingsFile = (content: string): SettingsData => {
   try {
     data = JSON.parse(content);
   } catch {
-    throw new SettingsParseError();
+    throw new SettingsParseError('Settings file contains invalid JSON syntax');
   }
 
   if (!validateSettingsData(data)) {
-    throw new SettingsParseError();
+    throw new SettingsParseError('Settings file structure is invalid');
   }
 
   return data;
