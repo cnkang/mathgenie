@@ -22,8 +22,8 @@ jobs:
       issues: write
 
     outputs:
-      auto-merge: ${{ steps.analysis.outputs.auto-merge }}
-      update-type: ${{ steps.analysis.outputs.update-type }}
+      auto_merge: ${{ steps.analysis.outputs.auto_merge }}
+      update_type: ${{ steps.analysis.outputs.update_type }}
 
     steps:
       - name: 📥 Checkout code
@@ -47,8 +47,8 @@ jobs:
             const autoMerge = updateType === 'patch' || 
                              (updateType === 'minor' && !title.includes('breaking'));
 
-            core.setOutput('update-type', updateType);
-            core.setOutput('auto-merge', autoMerge);
+            core.setOutput('update_type', updateType);
+            core.setOutput('auto_merge', autoMerge.toString());
 
             // Add labels
             await github.rest.issues.addLabels({
@@ -126,7 +126,7 @@ jobs:
     needs: [dependabot-analysis, dependabot-ci]
     if: |
       github.actor == 'dependabot[bot]' && 
-      needs.dependabot-analysis.outputs.auto-merge == 'true' &&
+      needs.dependabot-analysis.outputs.auto_merge == 'true' &&
       needs.dependabot-ci.result == 'success'
     timeout-minutes: 5
     permissions:
@@ -188,7 +188,7 @@ jobs:
     needs: [dependabot-analysis, dependabot-ci]
     if: |
       github.actor == 'dependabot[bot]' && 
-      needs.dependabot-analysis.outputs.auto-merge == 'false' &&
+      needs.dependabot-analysis.outputs.auto_merge == 'false' &&
       needs.dependabot-ci.result == 'success'
     timeout-minutes: 5
     permissions:
@@ -199,7 +199,7 @@ jobs:
       - name: 📢 Request manual review
         uses: actions/github-script@v7
         env:
-          UPDATE_TYPE: ${{ needs.dependabot-analysis.outputs.update-type }}
+          UPDATE_TYPE: ${{ needs.dependabot-analysis.outputs.update_type }}
         with:
           script: |
             const pr = context.payload.pull_request;
