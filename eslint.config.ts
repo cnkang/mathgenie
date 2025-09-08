@@ -40,7 +40,7 @@ const config: Linter.FlatConfig[] = [
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
       semi: ['error', 'always'],
-      quotes: ['error', 'single'],
+      quotes: ['error', 'single', { avoidEscape: true }],
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/explicit-function-return-type': 'off',
@@ -108,7 +108,7 @@ const config: Linter.FlatConfig[] = [
       '@typescript-eslint/no-explicit-any': 'off', // More lenient in tests
       'prefer-const': 'error',
       semi: ['error', 'always'],
-      quotes: ['error', 'single'],
+      quotes: ['error', 'single', { avoidEscape: true }],
       'no-unused-vars': 'off',
       'no-console': 'off',
     },

@@ -1,7 +1,7 @@
+import type { Settings } from '@/types';
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { useSettings } from './useSettings';
-import type { Settings } from '@/types';
 
 const localStorageMock = {
   getItem: vi.fn(),
@@ -45,20 +45,20 @@ describe('useSettings', () => {
     localStorageMock.getItem.mockReturnValue(null);
     const { result } = renderHook(() => useSettings());
     expect(result.current.validateSettings({ ...result.current.settings, operations: [] })).toEqual(
-      { key: 'errors.noOperations' }
+      'errors.noOperations'
     );
     expect(result.current.validateSettings({ ...result.current.settings, numProblems: 0 })).toEqual(
-      { key: 'errors.invalidProblemCount' }
+      'errors.invalidProblemCount'
     );
     expect(
       result.current.validateSettings({ ...result.current.settings, numRange: [5, 1] })
-    ).toEqual({ key: 'errors.invalidNumberRange' });
+    ).toEqual('errors.invalidNumberRange');
     expect(
       result.current.validateSettings({ ...result.current.settings, resultRange: [5, 1] })
-    ).toEqual({ key: 'errors.invalidResultRange' });
+    ).toEqual('errors.invalidResultRange');
     expect(
       result.current.validateSettings({ ...result.current.settings, numOperandsRange: [5, 2] })
-    ).toEqual({ key: 'errors.invalidOperandsRange' });
+    ).toEqual('errors.invalidOperandsRange');
   });
 
   it('loads saved settings from storage', () => {

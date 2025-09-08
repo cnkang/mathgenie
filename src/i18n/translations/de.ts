@@ -46,7 +46,7 @@ export default {
     download: 'PDF herunterladen',
     downloadDescription: 'Ihre Aufgaben als druckbare PDF-Datei speichern',
     quizDescription: 'Testen Sie Ihre Fähigkeiten mit einem interaktiven Quiz',
-    downloadEmpty: 'PDF herunterladen',
+    downloadEmpty: 'Leere PDF herunterladen',
   },
   results: {
     title: 'Generierte Aufgaben ({{count}})',

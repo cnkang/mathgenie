@@ -126,6 +126,27 @@ const getFallbackText = (key: string): string | null => {
   return fallbacks[key] || null;
 };
 
+const loadTranslationFile = async (language: string): Promise<Translations> => {
+  const translations = await import(`./translations/${language}.ts`);
+  return translations.default;
+};
+
+const waitForRetry = async (attempt: number): Promise<void> => {
+  await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 100));
+};
+
+const loadFallbackTranslations = async (): Promise<Translations> => {
+  try {
+    const fallback = await import('./translations/en');
+    return fallback.default;
+  } catch (fallbackError) {
+    if (__DEV__) {
+      console.error('🌐 Failed to load fallback English translations:', fallbackError);
+    }
+    return {};
+  }
+};
+
 const loadTranslations = async (language: string): Promise<Translations> => {
   const maxRetries = 3;
   let lastError: Error | null = null;
@@ -136,13 +157,13 @@ const loadTranslations = async (language: string): Promise<Translations> => {
         console.log(`🌐 Loading translations for "${language}" (attempt ${attempt})`);
       }
 
-      const translations = await import(`./translations/${language}.ts`);
+      const translations = await loadTranslationFile(language);
 
       if (__DEV__) {
         console.log(`🌐 Successfully loaded translations for "${language}"`);
       }
 
-      return translations.default;
+      return translations;
     } catch (error) {
       lastError = error as Error;
 
@@ -150,14 +171,12 @@ const loadTranslations = async (language: string): Promise<Translations> => {
         console.warn(`🌐 Attempt ${attempt} failed to load translations for "${language}":`, error);
       }
 
-      // Wait before retry (exponential backoff)
       if (attempt < maxRetries) {
-        await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 100));
+        await waitForRetry(attempt);
       }
     }
   }
 
-  // All retries failed, fall back to English
   if (__DEV__) {
     console.error(
       `🌐 All attempts failed to load translations for "${language}", falling back to English. Last error:`,
@@ -165,16 +184,7 @@ const loadTranslations = async (language: string): Promise<Translations> => {
     );
   }
 
-  try {
-    const fallback = await import('./translations/en');
-    return fallback.default;
-  } catch (fallbackError) {
-    if (__DEV__) {
-      console.error('🌐 Failed to load fallback English translations:', fallbackError);
-    }
-    // Return empty translations as last resort
-    return {};
-  }
+  return loadFallbackTranslations();
 };
 
 interface I18nProviderProps {
@@ -236,11 +246,13 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
 
   const t = (key: string, params: Record<string, string | number> = {}): string => {
     const keys = key.split('.');
-    let value: any = translations;
+    let value: unknown = translations;
 
     for (const k of keys) {
-      value = value?.[k];
-      if (value === undefined) {
+      if (value && typeof value === 'object' && k in value) {
+        value = (value as Record<string, unknown>)[k];
+      } else {
+        value = undefined;
         break;
       }
     }

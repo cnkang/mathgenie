@@ -17,9 +17,14 @@
 4. **Correctness & Security**: Validate inputs; avoid unsafe deserialization; parameterize queries; least privilege; never commit or log secrets/PII.
    4.1. **Command Execution Security**: Never use shell-spawning functions (`execSync`, `exec`, `spawn` with `shell: true`). Use `spawnSync`/`spawn` with `shell: false` and explicit argument arrays. Validate all command arguments against whitelists before execution.
 5. **Lint & Format**: Code MUST pass project linters/formatters with zero errors.
-6. **Testing**: Provide unit tests for core logic and integration tests for I/O. Coverage on changed lines **≥ 80%**. Tests must be deterministic.
-7. **Observability**: Use structured errors/logging; log once near boundaries; add metrics/traces where supported; never log secrets.
-8. **Licensing & Dependencies**: Only approved licenses; add dependencies sparingly; pin or follow project policy; avoid abandoned libraries.
+6. **Code Quality Gates**: Code MUST pass static analysis tools (SonarQube, ESLint with SonarJS rules, etc.) with zero critical issues before commit. Run quality checks locally before pushing.
+   6.1. **Pre-commit Quality Checks**: Always run code quality analysis tools locally before committing. Never bypass quality gates with `--no-verify` or similar flags.
+   6.2. **Language-Specific Quality Tools**: - **TypeScript/JavaScript**: ESLint with SonarJS plugin, Prettier, TypeScript compiler - **Python**: Ruff, Black, mypy, Bandit, Safety - **Java**: SpotBugs, PMD, Checkstyle, SonarJava - **C#**: SonarAnalyzer, StyleCop, FxCop - **Go**: golangci-lint, gosec, staticcheck - **Rust**: Clippy, rustfmt, cargo audit - **PHP**: PHPStan, Psalm, PHP_CodeSniffer
+   6.3. **Quality Metrics Thresholds**: Maintain code quality metrics within acceptable ranges: - Cognitive complexity ≤ 15 per function - Cyclomatic complexity ≤ 10 per function
+   - No duplicate code blocks > 3 lines - No hardcoded secrets or credentials - No unused variables or imports - Consistent code formatting
+7. **Testing**: Provide unit tests for core logic and integration tests for I/O. Coverage on changed lines **≥ 80%**. Tests must be deterministic.
+8. **Observability**: Use structured errors/logging; log once near boundaries; add metrics/traces where supported; never log secrets.
+9. **Licensing & Dependencies**: Only approved licenses; add dependencies sparingly; pin or follow project policy; avoid abandoned libraries.
 
 ### Structure Limits (Targets + Caps)
 
@@ -98,11 +103,12 @@
 ### Review Checklist (Verify Before Returning Output)
 
 38. Lints/formatters clean.
-39. Tests pass; changed-lines coverage ≥ 80%.
-40. No circular dependencies; complexity within bounds or justified by `@deviation`.
-41. Inputs validated; secrets/PII absent from code and logs.
-42. Docs updated (README/docstrings/ADR if architecture changed).
-43. Public API preserved or deprecated with migration notes.
+39. **Code quality analysis passed**: Static analysis tools report zero critical issues; complexity metrics within thresholds; no code smells above acceptable levels.
+40. Tests pass; changed-lines coverage ≥ 80%.
+41. No circular dependencies; complexity within bounds or justified by `@deviation`.
+42. Inputs validated; secrets/PII absent from code and logs.
+43. Docs updated (README/docstrings/ADR if architecture changed).
+44. Public API preserved or deprecated with migration notes.
 
 ### Deviation Policy
 
@@ -123,8 +129,9 @@
 ### 1) Discover & Baseline
 
 48. Run repo-wide scans: lint/format, static analysis, dependency audit, test coverage, complexity, import cycles.
+    48.1. **Quality Analysis Tools Setup**: Configure and run appropriate static analysis tools for the project's language stack: - Set up SonarQube/SonarCloud for comprehensive code quality analysis - Configure language-specific linters with quality rules enabled - Establish quality gates and thresholds for metrics - Integrate tools into local development workflow and CI/CD pipeline
 49. Build a hotspot map (change frequency × complexity × defect density).
-50. Publish a baseline report (`quality/baseline.md`) with key metrics (e.g., coverage, complexity, cycles, vulnerable deps).
+50. Publish a baseline report (`quality/baseline.md`) with key metrics (e.g., coverage, complexity, cycles, vulnerable deps, code smells, duplications).
 
 ### 2) Triage & Prioritize
 
@@ -168,22 +175,32 @@
     68.4 Complexity budgets; no import cycles.
     68.5 Architectural boundary rules (e.g., `domain/*` MUST NOT import `adapters/*`).
     68.6 Required code-owner reviews for critical modules.
-69. Nightly jobs: full static analysis, SBOM regeneration, flaky test detection.
+    68.7 **Code Quality Gates**: Static analysis tools must pass with zero critical issues: - SonarQube Quality Gate must pass - No code smells above configured thresholds - No duplicated code blocks - Maintainability rating ≥ A - Reliability rating ≥ A - Security rating ≥ A
+69. Nightly jobs: full static analysis, SBOM regeneration, flaky test detection, comprehensive quality analysis.
 
 ### 7) Tooling (Choose per Stack)
 
 70. **Autofixers**: ESLint/Prettier; Ruff/Black; gofmt/golangci-lint; Rustfmt/Clippy.
-71. **Architectural lint**: eslint-plugin-boundaries / import-no-cycle; ArchUnit (JVM); `go vet` + `go mod graph`; Deptrac (PHP).
-72. **Codemods**: jscodeshift / ts-morph (JS/TS); OpenRewrite (JVM); Bowler/libCST (Python); `rustfix`; `gofix`.
-73. **Security**: Semgrep rulesets; osv-scanner; OWASP Dependency-Check.
-74. **Coverage**: Jest/Vitest + c8; coverage.py; `go test -coverprofile`; tarpaulin (Rust).
-75. **Observability**: structured logging; tracing SDKs; metrics libraries.
+71. **Code Quality Analysis**:
+    71.1 **Multi-language**: SonarQube/SonarCloud; CodeClimate; Codacy
+    71.2 **TypeScript/JavaScript**: ESLint + eslint-plugin-sonarjs; JSHint; TSLint (deprecated)
+    71.3 **Python**: Ruff; Pylint; Flake8; Bandit (security); mypy (types)
+    71.4 **Java**: SpotBugs; PMD; Checkstyle; SonarJava; Error Prone
+    71.5 **C#**: SonarAnalyzer; StyleCop; FxCop; Roslyn analyzers
+    71.6 **Go**: golangci-lint; gosec; staticcheck; ineffassign
+    71.7 **Rust**: Clippy; rustfmt; cargo audit; cargo deny
+    71.8 **PHP**: PHPStan; Psalm; PHP_CodeSniffer; PHPMD
+72. **Architectural lint**: eslint-plugin-boundaries / import-no-cycle; ArchUnit (JVM); `go vet` + `go mod graph`; Deptrac (PHP).
+73. **Codemods**: jscodeshift / ts-morph (JS/TS); OpenRewrite (JVM); Bowler/libCST (Python); `rustfix`; `gofix`.
+74. **Security**: Semgrep rulesets; osv-scanner; OWASP Dependency-Check; Trivy; Snyk.
+75. **Coverage**: Jest/Vitest + c8; coverage.py; `go test -coverprofile`; tarpaulin (Rust).
+76. **Observability**: structured logging; tracing SDKs; metrics libraries.
 
 ### 8) Enforcement Cadence (Progressive Hardening)
 
-76. Month 1: Fail build on lint and security criticals; warn on cycles/complexity/coverage.
-77. Month 2: Fail build on cycles and changed-line coverage floor; enforce boundary rules.
-78. Month 3: Tighten complexity limits; raise coverage floor; require ADR for deviations.
+77. Month 1: Fail build on lint and security criticals; warn on cycles/complexity/coverage; establish quality baseline.
+78. Month 2: Fail build on cycles and changed-line coverage floor; enforce boundary rules; enable code quality gates.
+79. Month 3: Tighten complexity limits; raise coverage floor; require ADR for deviations; enforce maintainability ratings.
 
 ### 9) Release & Communication
 
@@ -206,6 +223,47 @@
 
 ---
 
+## DEVELOPER — Code Quality Workflow (Universal)
+
+### Pre-Commit Quality Checklist (MANDATORY)
+
+1. **Run Static Analysis**: Execute appropriate code quality tools for your language stack before every commit:
+   - **TypeScript/JavaScript**: `npm run lint:sonar:all` or `eslint --ext .ts,.tsx src`
+   - **Python**: `ruff check .` and `mypy .` and `bandit -r .`
+   - **Java**: `mvn spotbugs:check pmd:check checkstyle:check`
+   - **C#**: `dotnet build --verbosity normal` with analyzers enabled
+   - **Go**: `golangci-lint run` and `gosec ./...`
+   - **Rust**: `cargo clippy -- -D warnings` and `cargo audit`
+   - **PHP**: `phpstan analyse` and `psalm` and `phpcs`
+
+2. **Fix Critical Issues**: Address all critical and high-severity issues before committing. Use auto-fix when available:
+   - **TypeScript/JavaScript**: `npm run lint:sonar:fix` or `eslint --fix`
+   - **Python**: `ruff check --fix .` and `black .`
+   - **Go**: `golangci-lint run --fix`
+   - **Rust**: `cargo clippy --fix` and `cargo fmt`
+
+3. **Verify Quality Gates**: Ensure all quality metrics pass:
+   - Zero critical security vulnerabilities
+   - Cognitive complexity ≤ 15 per function
+   - No code duplication > 3 lines
+   - No hardcoded secrets or credentials
+   - All linting rules pass
+   - Code coverage ≥ 80% on changed lines
+
+4. **Document Deviations**: If quality rules must be bypassed, add `@deviation` comments with justification and remediation plan.
+
+### Quality Tools Integration
+
+5. **Local Development Setup**: Configure your IDE/editor with quality tools:
+   - Install language-specific extensions (ESLint, SonarLint, etc.)
+   - Enable real-time quality feedback
+   - Set up pre-commit hooks to run quality checks automatically
+
+6. **CI/CD Integration**: Ensure quality gates are enforced in continuous integration:
+   - Quality checks must pass before merge
+   - Block deployments on quality gate failures
+   - Generate quality reports for tracking trends
+
 ## DEVELOPER — Project-Specific Constraints (MathGenie)
 
 - **Languages/Frameworks**: TypeScript 5.9 + React 19.1.1; Node.js 22.19.1; Vite 7.1.4; pnpm 10.15.1.
@@ -220,7 +278,8 @@
   - 90% coverage required per component/utility; changed lines ≥80%. Tests focus on behavior.
 - **Documentation**:
   - Update README, TESTING, CONTRIBUTING, and related docs in the same commit as code changes. Keep examples current.
-- **CI Commands**: `pnpm lint`, `pnpm type-check`, `pnpm test`, optional `pnpm test:e2e`, `pnpm format`.
+- **CI Commands**: `pnpm lint`, `pnpm lint:sonar:all` (code quality check), `pnpm type-check`, `pnpm test`, optional `pnpm test:e2e`, `pnpm format`.
+- **Pre-commit Quality Workflow**: Always run `pnpm lint:sonar:all` before committing to catch code quality issues early. Use `pnpm lint:sonar:fix` to auto-fix issues when possible.
 - **Dependency Policy**: Use pnpm; avoid npm/yarn; add deps sparingly with approved licenses.
 - **Observability & Security**: Use structured logging; monitor with Vercel Speed Insights and Web Vitals; never log secrets; run security scanners as configured.
 - **Environment Handling**:
@@ -311,3 +370,144 @@ Owner / Timeline
 98. “Lines” refers to **source lines of code** (SLoC), excluding comments/blank lines.
 99. When encountering a **code smell**, the agent MUST surface it, propose remedies, and—if within scope—apply a targeted refactor or add a `@deviation` with a refactor plan.
 100.  **Enforcement stance**: If constraints conflict with correctness, ship the correct solution with a brief `@deviation` and a refactor plan.
+
+---
+
+## Appendix C — Code Quality Tools Quick Reference
+
+### Command Templates by Language
+
+**TypeScript/JavaScript**
+
+```bash
+# Quality check
+npm run lint:sonar:all || pnpm lint:sonar:all
+eslint --ext .ts,.tsx src
+
+# Auto-fix
+npm run lint:sonar:fix || pnpm lint:sonar:fix
+eslint --fix --ext .ts,.tsx src
+prettier --write "src/**/*.{ts,tsx}"
+```
+
+**Python**
+
+```bash
+# Quality check
+ruff check .
+mypy .
+bandit -r .
+safety check
+
+# Auto-fix
+ruff check --fix .
+black .
+isort .
+```
+
+**Java**
+
+```bash
+# Quality check
+mvn spotbugs:check pmd:check checkstyle:check
+./gradlew spotbugsMain pmdMain checkstyleMain
+
+# Auto-fix (limited)
+mvn spotless:apply
+./gradlew spotlessApply
+```
+
+**C#**
+
+```bash
+# Quality check
+dotnet build --verbosity normal
+dotnet format --verify-no-changes
+
+# Auto-fix
+dotnet format
+```
+
+**Go**
+
+```bash
+# Quality check
+golangci-lint run
+gosec ./...
+staticcheck ./...
+
+# Auto-fix
+golangci-lint run --fix
+gofmt -w .
+goimports -w .
+```
+
+**Rust**
+
+```bash
+# Quality check
+cargo clippy -- -D warnings
+cargo audit
+cargo fmt -- --check
+
+# Auto-fix
+cargo clippy --fix
+cargo fmt
+```
+
+**PHP**
+
+```bash
+# Quality check
+phpstan analyse
+psalm
+phpcs
+
+# Auto-fix
+phpcbf
+php-cs-fixer fix
+```
+
+### Quality Metrics Thresholds
+
+- **Cognitive Complexity**: ≤ 15 per function
+- **Cyclomatic Complexity**: ≤ 10 per function
+- **Code Duplication**: No blocks > 3 lines
+- **Test Coverage**: ≥ 80% on changed lines
+- **Security**: Zero critical vulnerabilities
+- **Maintainability**: Rating A (SonarQube scale)
+- **Reliability**: Rating A (SonarQube scale)
+
+### Pre-Commit Hook Template
+
+```bash
+#!/bin/sh
+# .git/hooks/pre-commit
+
+echo "Running code quality checks..."
+
+# Run language-specific quality tools
+case "$(basename "$PWD")" in
+  *typescript*|*javascript*|*react*|*vue*|*angular*)
+    npm run lint:sonar:all || exit 1
+    ;;
+  *python*)
+    ruff check . || exit 1
+    mypy . || exit 1
+    ;;
+  *java*)
+    mvn spotbugs:check pmd:check checkstyle:check || exit 1
+    ;;
+  *go*)
+    golangci-lint run || exit 1
+    ;;
+  *rust*)
+    cargo clippy -- -D warnings || exit 1
+    ;;
+  *)
+    echo "No specific quality checks configured for this project type"
+    ;;
+esac
+
+echo "Code quality checks passed ✅"
+```

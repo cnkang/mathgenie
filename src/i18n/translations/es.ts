@@ -46,7 +46,7 @@ export default {
     download: 'Descargar PDF',
     downloadDescription: 'Guardar tus problemas como un archivo PDF imprimible',
     quizDescription: 'Pon a prueba tus habilidades con un quiz interactivo',
-    downloadEmpty: 'Descargar PDF',
+    downloadEmpty: 'Descargar PDF vacío',
   },
   results: {
     title: 'Problemas Generados ({{count}})',
