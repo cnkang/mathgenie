@@ -48,11 +48,18 @@ function logError(message: string): void {
   log(`[ERROR] ${message}`, 'red');
 }
 
+interface ExecOptions {
+  encoding?: BufferEncoding | 'buffer';
+  stdio?: 'pipe' | 'inherit' | 'ignore';
+  timeout?: number;
+  [key: string]: unknown;
+}
+
 /**
  * Create secure execution options for child processes
  * This approach is more secure and maintainable than PATH filtering
  */
-function createSecureExecOptions(options: any = {}) {
+function createSecureExecOptions(options: ExecOptions = {}) {
   return {
     ...options,
     // Use current environment but remove dangerous variables
@@ -118,7 +125,7 @@ function validateAndParseCommand(command: string): { command: string; args: stri
  * Enhanced secure wrapper using spawnSync (no shell spawning)
  * This is the most secure approach as it doesn't spawn a shell at all
  */
-function secureExecSync(command: string, options: any = {}): Buffer | string {
+function secureExecSync(command: string, options: ExecOptions = {}): Buffer | string {
   // Validate and parse the command
   const parsedCommand = validateAndParseCommand(command);
   if (!parsedCommand) {
@@ -205,7 +212,8 @@ function checkBrowsersInstalled(): boolean {
     } catch (dryRunError) {
       // If dry-run fails, browsers might not be installed
       // This is expected behavior when browsers are not installed
-      logInfo('Dry-run check indicates browsers may not be installed');
+      const errorMessage = dryRunError instanceof Error ? dryRunError.message : String(dryRunError);
+      logInfo(`Dry-run check indicates browsers may not be installed: ${errorMessage}`);
       return false;
     }
   } catch (playwrightError) {
