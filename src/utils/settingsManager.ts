@@ -18,10 +18,36 @@ export const generateFilename = (date: Date = new Date()): string =>
 export const serializeSettings = (settingsData: SettingsData): string =>
   JSON.stringify(settingsData, null, 2);
 
-export const parseSettingsFile = (content: string): SettingsData => JSON.parse(content);
+export class SettingsParseError extends Error {
+  constructor(message = 'Invalid settings file format') {
+    super(message);
+    this.name = 'SettingsParseError';
+  }
+}
 
-export const validateSettingsData = (data: any): data is SettingsData =>
-  !!(data && data.settings && typeof data.settings === 'object');
+export const validateSettingsData = (data: unknown): data is SettingsData =>
+  !!(
+    data &&
+    typeof data === 'object' &&
+    'settings' in data &&
+    typeof (data as Record<string, unknown>).settings === 'object' &&
+    (data as Record<string, unknown>).settings !== null
+  );
+
+export const parseSettingsFile = (content: string): SettingsData => {
+  let data: unknown;
+  try {
+    data = JSON.parse(content);
+  } catch {
+    throw new SettingsParseError('Settings file contains invalid JSON syntax');
+  }
+
+  if (!validateSettingsData(data)) {
+    throw new SettingsParseError('Settings file structure is invalid');
+  }
+
+  return data;
+};
 
 export const createDownloadBlob = (data: string): Blob =>
   new Blob([data], { type: 'application/json' });
