@@ -82,6 +82,7 @@ export default {
       '現在の設定は非常に制限的です。要求された数より少ない問題が生成される可能性があります。',
   },
   messages: {
+    loading: '読み込み中...',
     success: {
       problemsGenerated: '{{count}}問の問題を正常に生成しました！',
       settingsImported: '設定が正常にインポートされました！',

@@ -88,6 +88,7 @@ export default {
       'Die aktuellen Einstellungen sind ziemlich restriktiv. Sie könnten weniger Aufgaben erhalten als angefordert.',
   },
   messages: {
+    loading: 'Wird geladen...',
     success: {
       problemsGenerated: '{{count}} Aufgaben erfolgreich generiert!',
       settingsImported: 'Einstellungen erfolgreich importiert!',

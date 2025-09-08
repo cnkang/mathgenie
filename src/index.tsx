@@ -21,15 +21,15 @@ root.render(
 );
 
 // Register service worker for offline functionality
-if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
   serviceWorker.register({
     onSuccess: () => {
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.DEV) {
         console.log('MathGenie is now available offline!');
       }
     },
     onUpdate: () => {
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.DEV) {
         console.log('New version available! Please refresh the page.');
       }
     },
@@ -37,6 +37,6 @@ if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
 }
 
 // Load web vitals reporting
-if (process.env.NODE_ENV === 'production') {
+if (import.meta.env.PROD) {
   reportWebVitals();
 }

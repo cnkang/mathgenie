@@ -1,6 +1,7 @@
 import { fireEvent, render, renderHook, screen } from '@testing-library/react';
 import React, { act } from 'react';
 import { afterAll, beforeAll, describe, expect, vi } from 'vitest';
+import { setViteEnv, useViteEnv } from '../../tests/helpers/viteEnv';
 import ErrorBoundary, { useErrorHandler } from './ErrorBoundary';
 
 // Create a component that throws errors
@@ -21,6 +22,8 @@ describe('ErrorBoundary', () => {
   afterAll(() => {
     console.error = originalError;
   });
+
+  useViteEnv();
 
   test('renders children when there is no error', () => {
     render(
@@ -44,7 +47,7 @@ describe('ErrorBoundary', () => {
     expect(screen.getByText(/Reload Page/)).toBeDefined();
 
     // In development environment, error details should exist
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       expect(screen.getByText(/Error Details/)).toBeDefined();
     }
   });
@@ -117,8 +120,7 @@ describe('ErrorBoundary', () => {
   });
 
   test('shows error details in development mode', () => {
-    const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'development';
+    setViteEnv('development');
 
     render(
       <ErrorBoundary>
@@ -128,13 +130,10 @@ describe('ErrorBoundary', () => {
 
     expect(screen.getByText(/Error Details/)).toBeDefined();
     expect(screen.getByText(/Test error/)).toBeDefined();
-
-    process.env.NODE_ENV = originalEnv;
   });
 
   test('hides error details in production mode', () => {
-    const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'production';
+    setViteEnv('production');
 
     render(
       <ErrorBoundary>
@@ -143,8 +142,6 @@ describe('ErrorBoundary', () => {
     );
 
     expect(screen.queryByText(/Error Details/)).toBeNull();
-
-    process.env.NODE_ENV = originalEnv;
   });
 
   test('handles error with custom error info', () => {
@@ -213,6 +210,8 @@ describe('ErrorBoundary', () => {
 });
 
 describe('useErrorHandler', () => {
+  useViteEnv();
+
   test('initializes with no error', () => {
     const { result } = renderHook(() => useErrorHandler());
 
@@ -222,9 +221,8 @@ describe('useErrorHandler', () => {
   });
 
   test('handles error in production', () => {
-    const originalEnv = process.env.NODE_ENV;
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    process.env.NODE_ENV = 'production';
+    setViteEnv('production');
 
     const TestComponent = () => {
       const { handleError, error } = useErrorHandler();
@@ -248,7 +246,6 @@ describe('useErrorHandler', () => {
 
     expect(consoleSpy).toHaveBeenCalledWith('Application error:', expect.any(Error));
 
-    process.env.NODE_ENV = originalEnv;
     consoleSpy.mockRestore();
   });
 
