@@ -5,9 +5,14 @@
  *
  * This script checks if Playwright browsers are installed and installs them if needed.
  * It's designed to be run before E2E tests to ensure browsers are available.
+ *
+ * Security approach: Command validation instead of PATH filtering
+ * - Validates specific commands before execution
+ * - Removes dangerous environment variables
+ * - Uses timeouts and proper error handling
  */
 
-import { execSync } from 'child_process';
+import { spawnSync } from 'child_process';
 import { existsSync, readdirSync, statSync } from 'fs';
 import { homedir, platform } from 'os';
 import { join } from 'path';
@@ -44,21 +49,155 @@ function logError(message: string): void {
 }
 
 /**
+ * Create secure execution options for child processes
+ * This approach is more secure and maintainable than PATH filtering
+ */
+function createSecureExecOptions(options: any = {}) {
+  return {
+    ...options,
+    // Use current environment but remove dangerous variables
+    env: {
+      ...process.env,
+      // Remove potentially dangerous environment variables that could affect execution
+      LD_PRELOAD: undefined,
+      LD_LIBRARY_PATH: undefined,
+      DYLD_INSERT_LIBRARIES: undefined,
+      DYLD_LIBRARY_PATH: undefined,
+      // Keep PATH as-is since we're validating the command itself
+    },
+    // Set reasonable timeouts
+    timeout: options.timeout || 300000, // 5 minutes max
+    // Ensure we don't inherit stdio unless explicitly requested
+    stdio: options.stdio || 'pipe',
+  };
+}
+
+/**
+ * Allowed Playwright commands with their exact parameters
+ * Using a more restrictive approach with command + args validation
+ */
+const ALLOWED_COMMANDS = {
+  version: {
+    command: 'npx',
+    args: ['playwright', '--version'],
+    description: 'Get Playwright version',
+  },
+  dryRun: {
+    command: 'npx',
+    args: ['playwright', 'install', '--dry-run', 'chromium', 'firefox', 'webkit'],
+    description: 'Check browser installation status',
+  },
+  install: {
+    command: 'npx',
+    args: ['playwright', 'install', 'chromium', 'firefox', 'webkit', '--with-deps'],
+    description: 'Install Playwright browsers',
+  },
+} as const;
+
+/**
+ * Validate and parse command into safe components
+ */
+function validateAndParseCommand(command: string): { command: string; args: string[] } | null {
+  const trimmedCommand = command.trim();
+
+  // Check against each allowed command pattern
+  for (const [key, config] of Object.entries(ALLOWED_COMMANDS)) {
+    const expectedCommand = `${config.command} ${config.args.join(' ')}`;
+    if (trimmedCommand === expectedCommand) {
+      return {
+        command: config.command,
+        args: [...config.args], // Convert readonly array to mutable array
+      };
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Enhanced secure wrapper using spawnSync (no shell spawning)
+ * This is the most secure approach as it doesn't spawn a shell at all
+ */
+function secureExecSync(command: string, options: any = {}): Buffer | string {
+  // Validate and parse the command
+  const parsedCommand = validateAndParseCommand(command);
+  if (!parsedCommand) {
+    throw new Error(`Unauthorized command attempted: ${command}`);
+  }
+
+  // Additional security checks
+  if (parsedCommand.command !== 'npx') {
+    throw new Error(`Only npx commands are allowed, got: ${parsedCommand.command}`);
+  }
+
+  // Validate each argument doesn't contain shell metacharacters
+  const dangerousChars = /[;&|`$(){}[\]<>*?~]/;
+  for (const arg of parsedCommand.args) {
+    if (dangerousChars.test(arg)) {
+      throw new Error(`Dangerous characters detected in argument: ${arg}`);
+    }
+  }
+
+  // Create secure spawn options (explicitly disable shell)
+  const secureSpawnOptions = {
+    ...createSecureExecOptions(options),
+    shell: false, // Explicitly disable shell spawning for maximum security
+    encoding: options.encoding || 'utf8',
+  };
+
+  // Log the command being executed for audit purposes
+  if (process.env.NODE_ENV !== 'test') {
+    logInfo(`Executing secure command: ${parsedCommand.command} ${parsedCommand.args.join(' ')}`);
+  }
+
+  try {
+    // Use spawnSync with explicit command and arguments (no shell)
+    const result = spawnSync(parsedCommand.command, parsedCommand.args, secureSpawnOptions);
+
+    // Check for execution errors
+    if (result.error) {
+      throw result.error;
+    }
+
+    // Check exit code
+    if (result.status !== 0) {
+      const stderr = result.stderr?.toString() || 'Unknown error';
+      throw new Error(`Command failed with exit code ${result.status}: ${stderr}`);
+    }
+
+    // Return stdout based on requested format
+    if (options.stdio === 'inherit') {
+      return ''; // When stdio is inherit, output goes directly to console
+    }
+
+    return options.encoding === 'utf8' || !options.encoding
+      ? result.stdout?.toString() || ''
+      : result.stdout || Buffer.alloc(0);
+  } catch (error) {
+    // Enhanced error handling with context
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    throw new Error(
+      `Command execution failed: ${parsedCommand.command} ${parsedCommand.args.join(' ')} - ${errorMessage}`
+    );
+  }
+}
+
+/**
  * Check if Playwright browsers are installed
  */
 function checkBrowsersInstalled(): boolean {
   try {
     // Try to get browser info - this will fail if browsers aren't installed
-    const result = execSync('npx playwright --version', {
+    const result = secureExecSync('npx playwright --version', {
       encoding: 'utf8',
       stdio: 'pipe',
     });
 
-    logInfo(`Playwright version: ${result.trim()}`);
+    logInfo(`Playwright version: ${result.toString().trim()}`);
 
     // Check if browsers are actually installed by trying to list them
     try {
-      execSync('npx playwright install --dry-run chromium firefox webkit', {
+      secureExecSync('npx playwright install --dry-run chromium firefox webkit', {
         encoding: 'utf8',
         stdio: 'pipe',
       });
@@ -81,7 +220,7 @@ function installBrowsers(): boolean {
 
   try {
     // Install browsers with dependencies
-    execSync('npx playwright install chromium firefox webkit --with-deps', {
+    secureExecSync('npx playwright install chromium firefox webkit --with-deps', {
       stdio: 'inherit',
       encoding: 'utf8',
     });
