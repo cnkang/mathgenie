@@ -7,6 +7,7 @@ import {
   parseSettingsFile,
   serializeSettings,
   validateSettingsData,
+  SettingsParseError,
 } from './settingsManager';
 
 describe('Settings Manager Utils', () => {
@@ -62,8 +63,13 @@ describe('Settings Manager Utils', () => {
     expect(parsed).toEqual(settingsData);
   });
 
-  it('throws error for invalid JSON', () => {
-    expect(() => parseSettingsFile('invalid json')).toThrow();
+  it('throws SettingsParseError for invalid JSON', () => {
+    expect(() => parseSettingsFile('invalid json')).toThrow(SettingsParseError);
+  });
+
+  it('throws SettingsParseError for invalid structure', () => {
+    const invalid = JSON.stringify({ version: '1.0' });
+    expect(() => parseSettingsFile(invalid)).toThrow(SettingsParseError);
   });
 
   it('validates correct settings data', () => {
