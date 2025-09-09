@@ -28,6 +28,14 @@
   box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1));
   overflow: hidden;
   position: relative;
+  /* Fix stacking and prevent overlap */
+  z-index: 2;
+  /* Ensure proper sizing */
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  /* Prevent layout issues */
+  contain: layout style;
 }
 
 .problems-container::before {
