@@ -3,7 +3,12 @@
 import { AxeBuilder } from '@axe-core/playwright';
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
-import { createValidationError, waitForAppLoad, waitForErrorMessage } from './test-utils';
+import {
+  createValidationError,
+  expandAdvancedSettings,
+  waitForAppLoad,
+  waitForErrorMessage,
+} from './test-utils';
 
 // Device configurations for testing
 const testDevices = {
@@ -58,6 +63,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
     test('should pass accessibility with form interactions', async ({ page }: { page: Page }) => {
       await page.fill('#numProblems', '25');
       await page.selectOption('#operations', ['+', '-']);
+      await expandAdvancedSettings(page);
       await page.check('#allowNegative');
       await page.click('.generate-card');
       await page.waitForTimeout(1000);
@@ -316,6 +322,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
       await page.keyboard.type('25');
       await expect(page.locator('#numProblems')).toHaveValue('25');
 
+      await expandAdvancedSettings(page);
       await page.locator('#allowNegative').focus();
       await page.keyboard.press('Space');
       await expect(page.locator('#allowNegative')).toBeChecked();
