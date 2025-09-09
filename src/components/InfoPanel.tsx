@@ -97,10 +97,10 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
 
   return (
     <div className='info-panel'>
-      <h3>
+      <h2>
         <span>📊</span>
         {t('infoPanel.title')}
-      </h3>
+      </h2>
 
       <div className='stats-grid'>
         <div
@@ -145,7 +145,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
       </div>
 
       <div className='progress-section'>
-        <h4>🎯 {t('infoPanel.progress.title')}</h4>
+        <h3>🎯 {t('infoPanel.progress.title')}</h3>
         <ProgressBar value={learningProgress} />
         <div className='progress-text'>
           {t('infoPanel.progress.completed', { percent: Math.round(learningProgress) })}
@@ -153,7 +153,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
       </div>
 
       <div className='tips-section'>
-        <h4>⚡ {t('infoPanel.quickActions.title')}</h4>
+        <h3>⚡ {t('infoPanel.quickActions.title')}</h3>
         <div className='quick-actions-grid'>
           <button className='quick-action-card' onClick={onGenerateProblems}>
             <div className='quick-action-content'>
@@ -228,7 +228,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
 
       {quizResult && (
         <div className='tips-section'>
-          <h4>🏆 {t('infoPanel.recentResults.title')}</h4>
+          <h3>🏆 {t('infoPanel.recentResults.title')}</h3>
           <div className='quiz-result-summary'>
             <div className='result-item'>
               <span className='result-label'>
@@ -250,7 +250,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
       )}
 
       <div className='tips-section'>
-        <h4>💡 {t('infoPanel.tips.title')}</h4>
+        <h3>💡 {t('infoPanel.tips.title')}</h3>
         <ul className='tips-list'>
           {tips.slice(0, 3).map((tip, index) => (
             <li key={index}>{tip}</li>
@@ -259,7 +259,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
       </div>
 
       <div className='tips-section'>
-        <h4>⚙️ {t('infoPanel.currentConfig.title')}</h4>
+        <h3>⚙️ {t('infoPanel.currentConfig.title')}</h3>
         <ul className='tips-list'>
           <li>
             {t('infoPanel.currentConfig.operations', {
