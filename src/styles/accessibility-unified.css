@@ -2,6 +2,19 @@
 /* This file consolidates all accessibility fixes for maximum compliance */
 /* WCAG 2.2 AAA requires minimum 44x44px touch targets for Level AAA compliance */
 
+/* Screen reader only content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* CRITICAL: Universal touch target enforcement - covers ALL interactive elements */
 *[onclick],
 *[onmousedown],

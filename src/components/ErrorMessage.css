@@ -9,6 +9,12 @@
   font-size: 14px;
   line-height: 1.5;
   animation: slideIn 0.3s ease-out;
+  /* Fix stacking and prevent overlap */
+  position: relative;
+  z-index: 10;
+  /* Ensure proper sizing */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .message-error {

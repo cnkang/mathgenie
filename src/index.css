@@ -4,6 +4,8 @@
 @import './styles/base-components.css';
 @import './styles/utilities.css';
 @import './styles/action-cards.css';
+/* CRITICAL: Load international layout fixes for text length variations */
+@import './styles/international-layout.css';
 /* CRITICAL: Load unified accessibility fixes last to ensure they take precedence */
 @import './styles/accessibility-unified.css';
 

@@ -1,6 +1,11 @@
 #!/bin/sh
 echo "🔍 Running pre-commit checks..."
 
+if git diff --cached --name-only | grep -q '^\.git/'; then
+  echo "❌ Abort: trying to commit files under .git/"
+  exit 1
+fi
+
 # 检查Node.js版本
 if command -v node >/dev/null 2>&1; then
   NODE_VERSION=$(node --version)

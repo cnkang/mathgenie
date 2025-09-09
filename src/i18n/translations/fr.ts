@@ -23,6 +23,7 @@ export default {
     allowNegativeDesc: 'Autoriser que les résultats de calculs soient des nombres négatifs',
     showAnswers: 'Afficher les réponses',
     showAnswersDesc: 'Afficher les réponses directement à côté des problèmes',
+    advanced: 'Paramètres Avancés',
     from: 'De',
     to: 'à',
     manager: {
@@ -128,6 +129,15 @@ export default {
     infoMessage: "Message d'information",
     dismissMessage: 'Ignorer le message',
     problemsList: 'Liste des problèmes mathématiques générés',
+    clickToExpand: 'Cliquer pour développer',
+    advancedSettingsExpanded: 'Paramètres avancés développés',
+    advancedSettingsCollapsed: 'Paramètres avancés réduits',
+    advancedSettingsDesc:
+      "Paramètres avancés pour la génération de problèmes incluant les nombres négatifs et les options d'affichage des réponses",
+    pdfSettingsExpanded: 'Paramètres PDF développés',
+    pdfSettingsCollapsed: 'Paramètres PDF réduits',
+    pdfSettingsDesc:
+      "Paramètres d'exportation PDF incluant la taille de police, l'espacement des lignes et les options de taille de papier",
   },
   language: {
     select: 'Langue',
@@ -140,7 +150,7 @@ export default {
   presets: {
     title: 'Préréglages rapides',
     apply: 'Appliquer',
-    clickToApply: 'Cliquez pour appliquer',
+    clickToApply: 'Appliquer',
     beginner: {
       name: 'Débutant (1-10)',
       description: 'Addition et soustraction simples',

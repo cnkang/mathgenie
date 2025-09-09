@@ -4,6 +4,11 @@ export NO_COLOR=1
 
 echo "🚀 Running pre-push checks..."
 
+if git diff --cached --name-only | grep -q '^\.git/'; then
+  echo "❌ Abort: trying to commit files under .git/"
+  exit 1
+fi
+
 # 获取当前分支
 current_branch=$(git branch --show-current)
 echo "📍 Current branch: $current_branch"

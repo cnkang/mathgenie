@@ -280,3 +280,67 @@ export async function corruptLocalStorage(page: Page): Promise<void> {
     localStorage.setItem('mathgenie-settings', 'invalid-json-data');
   });
 }
+
+/**
+ * Expand collapsible settings sections to make elements visible
+ */
+export async function expandAdvancedSettings(page: Page): Promise<void> {
+  // Expand advanced settings if it exists and is not already open
+  const advancedSettings = page.locator('.advanced-settings');
+  if ((await advancedSettings.count()) > 0) {
+    const isOpen = await advancedSettings.getAttribute('open');
+    if (!isOpen) {
+      await advancedSettings.locator('summary').click();
+      await page.waitForTimeout(300); // Wait for animation
+    }
+  }
+}
+
+/**
+ * Expand PDF settings section to make PDF elements visible
+ */
+export async function expandPdfSettings(page: Page): Promise<void> {
+  // Expand PDF settings if it exists and is not already open
+  const pdfSettings = page.locator('.pdf-settings-collapsible');
+  if ((await pdfSettings.count()) > 0) {
+    const isOpen = await pdfSettings.getAttribute('open');
+    if (!isOpen) {
+      await pdfSettings.locator('summary').click();
+      await page.waitForTimeout(300); // Wait for animation
+    }
+  }
+}
+
+/**
+ * Expand all collapsible settings sections
+ */
+export async function expandAllSettings(page: Page): Promise<void> {
+  await expandAdvancedSettings(page);
+  await expandPdfSettings(page);
+}
+
+/**
+ * Ensure element is visible by expanding its parent section if needed
+ */
+export async function ensureElementVisible(page: Page, selector: string): Promise<void> {
+  // Check if element is already visible
+  const element = page.locator(selector);
+  const isVisible = await element.isVisible().catch(() => false);
+
+  if (!isVisible) {
+    // Try to expand sections that might contain this element
+    if (selector.includes('allowNegative') || selector.includes('showAnswers')) {
+      await expandAdvancedSettings(page);
+    }
+    if (
+      selector.includes('fontSize') ||
+      selector.includes('lineSpacing') ||
+      selector.includes('paperSize')
+    ) {
+      await expandPdfSettings(page);
+    }
+
+    // Wait a bit for the element to become visible
+    await page.waitForTimeout(300);
+  }
+}
