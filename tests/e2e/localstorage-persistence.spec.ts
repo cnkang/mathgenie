@@ -179,8 +179,9 @@ test.describe('localStorage Persistence', () => {
     await page.waitForSelector('.settings-presets', { timeout: 10000 });
 
     // Apply a preset
-    const beginnerPreset = page.locator('.preset-card').first();
+    const beginnerPreset = page.locator('.settings-section .preset-card').first();
     await expect(beginnerPreset).toBeVisible();
+    await beginnerPreset.scrollIntoViewIfNeeded();
     await beginnerPreset.click();
 
     await page.waitForTimeout(1000); // Wait for settings to be saved
