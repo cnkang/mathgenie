@@ -52,6 +52,25 @@ export const useTranslation = (): I18nContextType => {
   return context;
 };
 
+// Safe translation function that can be used during initial render
+const safeT = (key: string, params: Record<string, string | number> = {}): string => {
+  const fallbackText = getFallbackText(key);
+  if (fallbackText) {
+    if (Object.keys(params).length > 0) {
+      let result = fallbackText;
+      Object.entries(params).forEach(([paramKey, paramValue]) => {
+        const placeholder = '{{' + paramKey + '}}';
+        while (result.includes(placeholder)) {
+          result = result.replace(placeholder, String(paramValue));
+        }
+      });
+      return result;
+    }
+    return fallbackText;
+  }
+  return key;
+};
+
 const getBrowserLanguage = (): string => {
   if (typeof navigator === 'undefined') {
     return 'en';
@@ -100,11 +119,9 @@ const getFallbackText = (key: string): string | null => {
     'presets.multiplication.name': 'Multiplication Focus',
     'presets.multiplication.description': 'Focus on multiplication tables',
     'settings.manager.title': 'Settings Manager',
-    'settings.export': 'Export Settings',
-    'settings.import': 'Import Settings',
-    'settings.importError': 'Error importing settings file',
     'settings.manager.export': 'Export Settings',
     'settings.manager.import': 'Import Settings',
+    'settings.importError': 'Error importing settings file',
     'language.select': 'Language',
     'errors.noOperations': 'Please select at least one operation.',
     'errors.invalidProblemCount': 'Number of problems must be between 1 and 100.',
@@ -203,6 +220,10 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   const [translations, setTranslations] = useState<Translations>({});
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isPending, startTransition] = useTransition();
+  const [hasInitialLoad, setHasInitialLoad] = useState<boolean>(false);
+
+  // Initialize with fallback translations to prevent warnings
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -216,6 +237,8 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
         if (!isMounted) return;
 
         setTranslations(newTranslations);
+        setHasInitialLoad(true);
+        setIsInitialized(true);
 
         // Safe localStorage access
         if (typeof window !== 'undefined' && window.localStorage) {
@@ -245,6 +268,11 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   }, [currentLanguage]);
 
   const t = (key: string, params: Record<string, string | number> = {}): string => {
+    // Always try fallback first if translations are not loaded or empty
+    if (!isInitialized || isLoading || Object.keys(translations).length === 0) {
+      return safeT(key, params);
+    }
+
     const keys = key.split('.');
     let value: unknown = translations;
 
@@ -258,14 +286,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
     }
 
     if (value === undefined) {
-      // Only show warning in development mode
-      if (__DEV__) {
-        console.warn(`🌐 Translation missing for key: ${key}`);
-      }
-
-      // Return a more user-friendly fallback
-      const fallbackText = getFallbackText(key);
-      value = fallbackText || key;
+      return safeT(key, params);
     }
 
     // Apply parameter substitution to both translations and fallback text
@@ -300,7 +321,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
       t,
       changeLanguage,
     }),
-    [currentLanguage, translations, isLoading, isPending]
+    [currentLanguage, translations, isLoading, isPending, hasInitialLoad]
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
