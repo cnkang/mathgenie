@@ -73,6 +73,11 @@
   border-radius: var(--radius-md);
   margin: var(--space-md) 0;
   background: var(--bg-secondary);
+  /* Ensure proper stacking order */
+  position: relative;
+  z-index: 2;
+  /* Prevent overlap */
+  isolation: isolate;
 }
 
 .advanced-settings-toggle,
@@ -90,6 +95,10 @@
   text-align: left;
   /* WCAG 2.2 AAA: Minimum touch target */
   min-height: 44px;
+  /* Ensure clickability */
+  position: relative;
+  z-index: 3;
+  pointer-events: auto;
 }
 
 .advanced-settings-toggle:hover,
@@ -178,6 +187,8 @@
     overflow: visible;
     /* Ensure minimum height for content */
     min-height: auto;
+    /* Ensure sufficient gap to prevent visual overlap */
+    column-gap: calc(var(--space-2xl) + var(--space-lg));
   }
 
   /* Messages container - highest priority */
@@ -204,16 +215,18 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-lg);
-    /* Remove sticky positioning to allow natural height */
+    /* Ensure proper positioning */
     position: relative;
     /* Remove height restrictions to allow content to expand naturally */
     min-height: auto;
     max-height: none;
     /* Remove overflow to prevent scrollbars */
     overflow: visible;
-    /* Ensure proper stacking */
-    z-index: 5;
-    /* Prevent overlap */
+    /* Ensure highest stacking priority */
+    z-index: 50;
+    /* Create new stacking context */
+    isolation: isolate;
+    /* Prevent overlap with clear boundaries */
     width: 100%;
     min-width: 0;
     max-width: 420px;
@@ -238,8 +251,10 @@
     flex-direction: column;
     gap: var(--space-lg);
     min-height: 600px;
-    /* Ensure proper stacking */
-    z-index: 5;
+    /* Ensure lower stacking priority than settings section */
+    z-index: 10;
+    /* Create new stacking context */
+    isolation: isolate;
     /* Prevent overlap */
     width: 100%;
     min-width: 0;
@@ -258,9 +273,9 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--space-sm);
-    /* Fix positioning */
+    /* Fix positioning - lower than preset cards */
     position: relative;
-    z-index: 6;
+    z-index: 8;
     width: 100%;
     margin: var(--space-lg) 0;
     box-sizing: border-box;
@@ -483,7 +498,9 @@
   /* Settings presets - within settings section */
   .settings-presets {
     position: relative;
-    z-index: 6;
+    z-index: 60;
+    /* Create new stacking context */
+    isolation: isolate;
     margin-bottom: var(--space-xl);
     width: 100%;
     box-sizing: border-box;
@@ -506,11 +523,24 @@
     margin-bottom: var(--space-xl);
   }
 
-  /* Individual action cards and preset cards */
-  .action-card,
+  /* Individual preset cards - highest priority in settings section */
   .preset-card.clickable-card {
     position: relative;
-    z-index: 7;
+    z-index: 70;
+    width: 100%;
+    box-sizing: border-box;
+    /* Ensure entire card is clickable */
+    pointer-events: auto;
+    /* Force hardware acceleration for smooth rendering */
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  /* Individual action cards - lower priority in results section */
+  .action-card {
+    position: relative;
+    z-index: 15;
     width: 100%;
     box-sizing: border-box;
     /* Force hardware acceleration for smooth rendering */

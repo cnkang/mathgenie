@@ -23,8 +23,8 @@ env:
   PNPM_VERSION: '10.15.1'
   NODE_OPTIONS: '--max-old-space-size=4096'
   PLAYWRIGHT_BROWSERS_PATH: 0
-  # Disable color output for CI consistency (NO_COLOR takes precedence)
-  NO_COLOR: 1
+  # Disable color output for CI consistency (FORCE_COLOR takes precedence over NO_COLOR)
+  FORCE_COLOR: 0
   CI: true
   # Playwright optimizations
   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 0
@@ -56,7 +56,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🗂️ Cache TypeScript
-        uses: actions/cache@v4
+        uses: actions/cache@v4.2.4
         with:
           path: |
             .tsbuildinfo
@@ -101,7 +101,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🗂️ Cache ESLint
-        uses: actions/cache@v4
+        uses: actions/cache@v4.2.4
         with:
           path: .eslintcache
           key: ${{ runner.os }}-eslint-${{ hashFiles('**/.eslintrc*', '**/eslint.config.*') }}
@@ -155,7 +155,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🗂️ Cache Vitest
-        uses: actions/cache@v4
+        uses: actions/cache@v4.2.4
         with:
           path: |
             node_modules/.vitest
@@ -240,7 +240,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🗂️ Cache build output
-        uses: actions/cache@v4
+        uses: actions/cache@v4.2.4
         with:
           path: |
             dist
@@ -302,7 +302,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🎭 Cache Playwright browsers
-        uses: actions/cache@v4
+        uses: actions/cache@v4.2.4
         id: playwright-cache
         with:
           path: |
@@ -318,7 +318,6 @@ jobs:
       - name: 🎭 Install Playwright browsers
         run: |
           # Use the cache helper script for smart browser installation
-          CACHE_HIT="${{ steps.playwright-cache.outputs.cache-hit }}" \
           ./scripts/playwright-cache-helper.sh smart-install all
         timeout-minutes: 15
 
@@ -448,7 +447,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🎭 Cache Playwright browsers
-        uses: actions/cache@v4
+        uses: actions/cache@v4.2.4
         id: playwright-cache
         with:
           path: |
@@ -471,7 +470,6 @@ jobs:
           pnpm exec playwright --version
 
           # Use the cache helper script for smart browser installation
-          CACHE_HIT="${{ steps.playwright-cache.outputs.cache-hit }}" \
           ./scripts/playwright-cache-helper.sh smart-install ${{ matrix.browser }}
         timeout-minutes: 10
 

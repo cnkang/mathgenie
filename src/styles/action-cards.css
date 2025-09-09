@@ -4,14 +4,18 @@
 .action-cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: var(--space-md);
+  gap: var(--space-lg);
   margin: var(--space-xl) 0;
-  /* Fix positioning and prevent overlap */
+  /* Fix positioning and prevent overlap - higher than preset cards */
   position: relative;
-  z-index: 3;
+  z-index: 10;
+  /* Create new stacking context */
+  isolation: isolate;
   width: 100%;
   /* Ensure proper grid behavior */
   grid-auto-rows: min-content;
+  /* Prevent button overlap on mobile */
+  contain: layout style;
 }
 
 /* WCAG 2.2 AAA: Large clickable action cards */
@@ -33,13 +37,15 @@
   font-family: inherit;
   font-size: inherit;
   box-shadow: var(--shadow-sm);
-  /* Fix stacking and prevent overlap */
-  z-index: 4;
+  /* Fix stacking and prevent overlap - higher than preset cards */
+  z-index: 11;
   /* Ensure proper sizing */
   width: 100%;
   box-sizing: border-box;
-  /* Prevent content overflow */
+  /* Prevent content overflow and button overlap */
   contain: layout style;
+  /* Ensure buttons don't overlap */
+  margin-bottom: var(--space-sm);
 }
 
 .action-card-content {
@@ -179,6 +185,11 @@
   transform: none;
   border-color: var(--border-color);
   background: var(--bg-secondary);
+  /* Prevent disabled buttons from intercepting clicks */
+  pointer-events: none !important;
+  /* Ensure disabled buttons are positioned correctly */
+  position: relative;
+  z-index: 1;
 }
 
 .action-card:disabled:hover {
@@ -200,6 +211,19 @@
 
 .action-card:disabled .action-arrow {
   color: var(--text-muted);
+}
+
+/* Specific fix for download button overlap issue */
+.download-card:disabled {
+  pointer-events: none !important;
+  position: relative;
+  z-index: 1 !important;
+}
+
+/* Ensure generate button is always clickable */
+.generate-card {
+  z-index: 12 !important;
+  pointer-events: auto !important;
 }
 
 /* Desktop layout optimizations */
@@ -240,21 +264,32 @@
 @media (max-width: 1199px) {
   .action-cards-grid {
     grid-template-columns: 1fr;
-    gap: var(--space-md);
+    gap: var(--space-lg);
   }
 
   .action-card {
     min-width: 100%;
     max-width: 600px;
-    margin: 0 auto;
+    margin: 0 auto var(--space-md) auto;
   }
 }
 
 @media (max-width: 767px) {
+  .action-cards-grid {
+    gap: var(--space-xl);
+    /* Ensure proper grid layout on mobile */
+    grid-template-columns: 1fr;
+    grid-auto-rows: minmax(140px, auto);
+  }
+
   .action-card {
     /* WCAG 2.2 AAA: Enhanced mobile touch targets */
     min-height: 140px; /* 增加移动端最小高度 */
     min-width: 100%;
+    margin-bottom: var(--space-lg);
+    /* Ensure buttons don't overlap */
+    position: relative;
+    clear: both;
   }
 
   .action-card-content {
@@ -288,10 +323,24 @@
 }
 
 @media (max-width: 480px) {
+  .action-cards-grid {
+    gap: var(--space-xl);
+    margin: var(--space-xl) 0 var(--space-2xl) 0;
+    /* Force single column layout */
+    grid-template-columns: 1fr;
+    grid-auto-rows: minmax(160px, auto);
+  }
+
   .action-card {
     /* WCAG 2.2 AAA: Extra large touch targets for small screens */
     min-height: 160px; /* 进一步增加小屏幕的最小高度 */
     min-width: 100%;
+    margin-bottom: var(--space-xl);
+    /* Ensure buttons don't overlap */
+    position: relative;
+    clear: both;
+    /* Add explicit positioning to prevent overlap */
+    display: block;
   }
 
   .action-card-content {
