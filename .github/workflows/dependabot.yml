@@ -47,8 +47,13 @@ jobs:
             const autoMerge = updateType === 'patch' || 
                              (updateType === 'minor' && !title.includes('breaking'));
 
-            core.setOutput('update_type', updateType);
-            core.setOutput('auto_merge', autoMerge.toString());
+            core.exportVariable('update_type', updateType);
+            core.exportVariable('auto_merge', autoMerge.toString());
+            
+            // Use environment file for outputs (GitHub Actions new method)
+            const fs = require('fs');
+            fs.appendFileSync(process.env.GITHUB_OUTPUT, `update_type=${updateType}\n`);
+            fs.appendFileSync(process.env.GITHUB_OUTPUT, `auto_merge=${autoMerge.toString()}\n`);
 
             // Add labels
             await github.rest.issues.addLabels({
