@@ -14,8 +14,10 @@
   min-height: auto;
   display: flex;
   flex-direction: column;
-  /* Fix stacking and prevent overlap */
+  /* Fix stacking and prevent overlap - lower than action cards */
   z-index: 5;
+  /* Create new stacking context */
+  isolation: isolate;
   /* Ensure proper sizing */
   width: 100%;
   box-sizing: border-box;
@@ -84,6 +86,10 @@
   font-family: inherit !important;
   font-size: inherit !important;
   justify-content: flex-start !important;
+  /* Ensure proper z-index for clickability - lower than action cards */
+  z-index: 6 !important;
+  /* Ensure entire card is clickable */
+  pointer-events: auto !important;
 }
 
 /* Clickable card content container */
