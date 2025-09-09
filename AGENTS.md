@@ -543,3 +543,61 @@ esac
 
 echo "Code quality checks passed ✅"
 ```
+
+---
+
+## Appendix D — Internationalization Layout Guidelines
+
+### Critical I18n Layout Rules
+
+101. **Text Length Variation Management**: Different languages have significantly different text lengths. Plan UI layouts to accommodate text expansion/contraction:
+
+
+    - **English to German**: Text can expand by 30-50%
+    - **English to Chinese/Japanese**: Text typically contracts by 20-30%
+    - **English to French/Spanish**: Text can expand by 15-25%
+
+102. **Layout Compatibility Requirements**:
+
+
+    - Use flexible CSS layouts (flexbox, grid) that adapt to content length
+    - Avoid fixed-width containers for text elements
+    - Test UI with longest expected translations in all supported languages
+    - Ensure adequate spacing between UI elements to prevent overlap
+    - Use `min-width` and `max-width` constraints appropriately
+
+103. **Translation Text Guidelines**:
+
+
+    - Prefer concise, clear translations over verbose ones
+    - Standardize action button text across languages (e.g., "Apply" vs "Click to Apply")
+    - Consider text length impact during translation key design
+    - Provide context to translators about UI space constraints
+
+104. **CSS Layout Best Practices for I18n**:
+
+
+    - Use `gap` properties in flexbox/grid for consistent spacing
+    - Implement `overflow: hidden` and `text-overflow: ellipsis` for constrained spaces
+    - Set appropriate `flex-shrink` and `flex-grow` values
+    - Reserve adequate space for action buttons and indicators
+    - Test layouts at different viewport sizes with various language content
+
+105. **Quality Assurance for I18n Layouts**:
+
+
+    - Visual regression testing across all supported languages
+    - Automated layout testing with longest/shortest text variations
+    - Manual testing of critical user flows in each language
+    - Responsive design validation with international content
+
+### Example Layout Issue Resolution
+
+**Problem**: English "Click to Apply" (13 characters) vs Chinese "点击应用" (4 characters) causing layout inconsistency and overlap.
+
+**Solution**:
+
+- Shortened all translations to single action words: "Apply", "应用", "Aplicar", "Appliquer", "Anwenden", "適用"
+- Updated CSS to use flexible layouts with adequate spacing
+- Added minimum width constraints for action buttons
+- Implemented proper text overflow handling
