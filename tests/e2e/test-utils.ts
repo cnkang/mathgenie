@@ -305,7 +305,19 @@ export async function expandPdfSettings(page: Page): Promise<void> {
   if ((await pdfSettings.count()) > 0) {
     const isOpen = await pdfSettings.getAttribute('open');
     if (!isOpen) {
-      await pdfSettings.locator('summary').click();
+      // Use more specific selector to avoid conflicts with advanced settings
+      const pdfToggle = page.locator('.pdf-settings-toggle');
+      await pdfToggle.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(200); // Wait for scroll
+
+      // Try clicking with force if normal click fails
+      try {
+        await pdfToggle.click({ timeout: 5000 });
+      } catch (error) {
+        // Fallback: force click if element is intercepted
+        await pdfToggle.click({ force: true });
+      }
+
       await page.waitForTimeout(300); // Wait for animation
     }
   }

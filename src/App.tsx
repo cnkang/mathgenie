@@ -762,7 +762,7 @@ function App(): React.JSX.Element {
           )}
 
           {import.meta.env.PROD && (
-            <Suspense fallback={<div>{t('loading.insights')}</div>}>
+            <Suspense fallback={null}>
               <SpeedInsights />
             </Suspense>
           )}
