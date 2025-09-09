@@ -23,8 +23,8 @@ env:
   PNPM_VERSION: '10.15.1'
   NODE_OPTIONS: '--max-old-space-size=4096'
   PLAYWRIGHT_BROWSERS_PATH: 0
-  # Disable color output for CI consistency (NO_COLOR takes precedence)
-  NO_COLOR: 1
+  # Disable color output for CI consistency (FORCE_COLOR takes precedence over NO_COLOR)
+  FORCE_COLOR: 0
   CI: true
   # Playwright optimizations
   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 0
@@ -318,7 +318,6 @@ jobs:
       - name: 🎭 Install Playwright browsers
         run: |
           # Use the cache helper script for smart browser installation
-          CACHE_HIT="${{ steps.playwright-cache.outputs.cache-hit }}" \
           ./scripts/playwright-cache-helper.sh smart-install all
         timeout-minutes: 15
 
@@ -471,7 +470,6 @@ jobs:
           pnpm exec playwright --version
 
           # Use the cache helper script for smart browser installation
-          CACHE_HIT="${{ steps.playwright-cache.outputs.cache-hit }}" \
           ./scripts/playwright-cache-helper.sh smart-install ${{ matrix.browser }}
         timeout-minutes: 10
 
