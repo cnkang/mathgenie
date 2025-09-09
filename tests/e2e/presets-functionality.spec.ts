@@ -1,6 +1,7 @@
 // Presets functionality e2e tests
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
+import { ensureElementVisible } from './test-utils';
 
 test.describe('Presets Functionality', () => {
   test.beforeEach(async ({ page }: { page: Page }) => {
@@ -83,8 +84,10 @@ test.describe('Presets Functionality', () => {
     await expect(page.locator('#resultRangeTo')).toHaveValue('20');
     await expect(page.locator('#numOperandsRangeFrom')).toHaveValue('2');
     await expect(page.locator('#numOperandsRangeTo')).toHaveValue('2');
+    await ensureElementVisible(page, '#allowNegative');
     await expect(page.locator('#allowNegative')).not.toBeChecked();
     await expect(page.locator('#showAnswers')).not.toBeChecked();
+    await ensureElementVisible(page, '#fontSize');
     await expect(page.locator('#fontSize')).toHaveValue('18');
     await expect(page.locator('#lineSpacing')).toHaveValue('16');
     await expect(page.locator('#paperSize')).toHaveValue('a4');
@@ -145,6 +148,7 @@ test.describe('Presets Functionality', () => {
     await expect(page.locator('#resultRangeTo')).toHaveValue('200');
     await expect(page.locator('#numOperandsRangeFrom')).toHaveValue('2');
     await expect(page.locator('#numOperandsRangeTo')).toHaveValue('4');
+    await ensureElementVisible(page, '#allowNegative');
     await expect(page.locator('#allowNegative')).toBeChecked();
 
     // Check operations selection (should include all operations)
@@ -176,6 +180,7 @@ test.describe('Presets Functionality', () => {
     await expect(page.locator('#resultRangeTo')).toHaveValue('144');
     await expect(page.locator('#numOperandsRangeFrom')).toHaveValue('2');
     await expect(page.locator('#numOperandsRangeTo')).toHaveValue('2');
+    await ensureElementVisible(page, '#allowNegative');
     await expect(page.locator('#allowNegative')).not.toBeChecked();
 
     // Check operations selection (should only include multiplication)
@@ -236,6 +241,7 @@ test.describe('Presets Functionality', () => {
 
     // Verify advanced settings
     await expect(page.locator('#numProblems')).toHaveValue('25');
+    await ensureElementVisible(page, '#allowNegative');
     await expect(page.locator('#allowNegative')).toBeChecked();
   });
 
@@ -338,6 +344,7 @@ test.describe('Presets Functionality', () => {
     await page.waitForSelector('#numProblems', { timeout: 10000 });
 
     await expect(page.locator('#numProblems')).toHaveValue('25');
+    await ensureElementVisible(page, '#allowNegative');
     await expect(page.locator('#allowNegative')).toBeChecked();
   });
 
