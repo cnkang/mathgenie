@@ -22,6 +22,7 @@ export default {
     allowNegativeDesc: 'Allow calculation results to be negative numbers',
     showAnswers: 'Show Answers',
     showAnswersDesc: 'Display answers directly next to problems',
+    advanced: 'Advanced Settings',
     from: 'From',
     to: 'to',
     manager: {
@@ -117,6 +118,15 @@ export default {
     errorMessage: 'Error message',
     warningMessage: 'Warning message',
     infoMessage: 'Information message',
+    clickToExpand: 'Click to expand',
+    advancedSettingsExpanded: 'Advanced settings expanded',
+    advancedSettingsCollapsed: 'Advanced settings collapsed',
+    advancedSettingsDesc:
+      'Advanced settings for problem generation including negative numbers and answer display options',
+    pdfSettingsExpanded: 'PDF settings expanded',
+    pdfSettingsCollapsed: 'PDF settings collapsed',
+    pdfSettingsDesc:
+      'PDF export settings including font size, line spacing, and paper size options',
     dismissMessage: 'Dismiss message',
     problemsList: 'List of generated math problems',
   },
@@ -131,7 +141,7 @@ export default {
   presets: {
     title: 'Quick Presets',
     apply: 'Apply',
-    clickToApply: 'Click to apply',
+    clickToApply: 'Apply',
     beginner: {
       name: 'Beginner (1-10)',
       description: 'Simple addition and subtraction',
