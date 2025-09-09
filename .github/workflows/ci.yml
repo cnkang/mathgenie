@@ -56,7 +56,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🗂️ Cache TypeScript
-        uses: actions/cache@v4
+        uses: actions/cache@v4.2.4
         with:
           path: |
             .tsbuildinfo
@@ -101,7 +101,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🗂️ Cache ESLint
-        uses: actions/cache@v4
+        uses: actions/cache@v4.2.4
         with:
           path: .eslintcache
           key: ${{ runner.os }}-eslint-${{ hashFiles('**/.eslintrc*', '**/eslint.config.*') }}
@@ -155,7 +155,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🗂️ Cache Vitest
-        uses: actions/cache@v4
+        uses: actions/cache@v4.2.4
         with:
           path: |
             node_modules/.vitest
@@ -240,7 +240,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🗂️ Cache build output
-        uses: actions/cache@v4
+        uses: actions/cache@v4.2.4
         with:
           path: |
             dist
@@ -302,7 +302,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🎭 Cache Playwright browsers
-        uses: actions/cache@v4
+        uses: actions/cache@v4.2.4
         id: playwright-cache
         with:
           path: |
@@ -447,7 +447,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🎭 Cache Playwright browsers
-        uses: actions/cache@v4
+        uses: actions/cache@v4.2.4
         id: playwright-cache
         with:
           path: |
