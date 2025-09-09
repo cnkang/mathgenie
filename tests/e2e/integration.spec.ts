@@ -1,6 +1,7 @@
 // Integration tests for error handling, localStorage, and presets
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
+import { ensureElementVisible, expandAdvancedSettings, expandPdfSettings } from './test-utils';
 
 test.describe('Integration Tests', () => {
   test.beforeEach(async ({ page }: { page: Page }) => {
@@ -180,6 +181,7 @@ test.describe('Integration Tests', () => {
 
     // Step 2: Make custom changes
     await page.fill('#numProblems', '35');
+    await expandAdvancedSettings(page);
     await page.check('#allowNegative');
     await page.waitForTimeout(500);
 
@@ -214,6 +216,7 @@ test.describe('Integration Tests', () => {
     await page.waitForSelector('#numProblems', { timeout: 10000 });
 
     await expect(page.locator('#numProblems')).toHaveValue('35');
+    await ensureElementVisible(page, '#allowNegative');
     await expect(page.locator('#allowNegative')).toBeChecked();
     await expect(page.locator('#resultRangeFrom')).toHaveValue('100');
     await expect(page.locator('#resultRangeTo')).toHaveValue('150');
@@ -320,7 +323,9 @@ test.describe('Integration Tests', () => {
     await page.locator('.preset-card').first().click(); // Apply preset
     await page.fill('#numProblems', '999'); // Create another error
     await page.locator('.preset-card').nth(1).click(); // Apply different preset
+    await expandAdvancedSettings(page);
     await page.check('#allowNegative'); // Custom change
+    await expandPdfSettings(page);
     await page.fill('#fontSize', '24'); // Another custom change
 
     // Wait for all changes to settle
@@ -328,7 +333,9 @@ test.describe('Integration Tests', () => {
 
     // Final state should be consistent
     await expect(page.locator('#numProblems')).toHaveValue('20'); // Intermediate preset value
+    await ensureElementVisible(page, '#allowNegative');
     await expect(page.locator('#allowNegative')).toBeChecked(); // Custom change preserved
+    await ensureElementVisible(page, '#fontSize');
     await expect(page.locator('#fontSize')).toHaveValue('24'); // Custom change preserved
 
     // No errors should be present

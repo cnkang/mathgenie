@@ -60,7 +60,7 @@ export default defineConfig(({ mode }) => ({
           if (id.includes('src/i18n/translations/')) {
             const match = id.match(/translations\/([a-z]{2})\.ts$/);
             if (match) {
-              return match[1]; // Return language code as chunk name
+              return `i18n-${match[1]}`; // Use prefixed chunk name to avoid conflicts
             }
           }
           // Bundle React-related libraries separately

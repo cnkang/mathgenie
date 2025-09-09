@@ -8,6 +8,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
+  z-index: 0;
 }
 
 /* Main container */
@@ -37,37 +39,316 @@
 
 /* ===== RESPONSIVE BREAKPOINTS ===== */
 
+/* Mobile-first layout optimization */
+.mobile-priority-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.desktop-only {
+  display: none;
+}
+
+/* Mobile layout - show sections in single column */
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  width: 100%;
+  margin-bottom: var(--space-xl);
+}
+
+.results-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  width: 100%;
+}
+
+/* Advanced settings collapsible on mobile */
+.advanced-settings,
+.pdf-settings-collapsible {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  margin: var(--space-md) 0;
+  background: var(--bg-secondary);
+}
+
+.advanced-settings-toggle,
+.pdf-settings-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  /* WCAG 2.2 AAA: Minimum touch target */
+  min-height: 44px;
+}
+
+.advanced-settings-toggle:hover,
+.pdf-settings-toggle:hover {
+  background: var(--bg-accent);
+}
+
+.toggle-indicator {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.toggle-icon {
+  transition: transform var(--transition-fast);
+  font-size: 0.8em;
+  color: var(--text-secondary);
+  display: inline-block;
+}
+
+.advanced-settings[open] .toggle-icon,
+.pdf-settings-collapsible[open] .toggle-icon {
+  transform: rotate(180deg);
+}
+
+/* Enhanced visual feedback for expanded state */
+.advanced-settings[open] .advanced-settings-toggle,
+.pdf-settings-collapsible[open] .pdf-settings-toggle {
+  background: var(--bg-accent);
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Status text for screen readers */
+.toggle-status {
+  font-size: var(--font-size-xs);
+}
+
+/* Improve visual feedback for collapsible sections */
+.advanced-settings summary,
+.pdf-settings-collapsible summary {
+  list-style: none;
+  outline: none;
+}
+
+.advanced-settings summary::-webkit-details-marker,
+.pdf-settings-collapsible summary::-webkit-details-marker {
+  display: none;
+}
+
+.advanced-settings:not([open]) .advanced-settings-content,
+.pdf-settings-collapsible:not([open]) .pdf-settings {
+  display: none;
+}
+
+.advanced-settings-content {
+  padding: 0 var(--space-md) var(--space-md);
+  border-top: 1px solid var(--border-color);
+}
+
+.core-settings {
+  background: var(--bg-primary);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-md);
+  border: 1px solid var(--border-color);
+}
+
 /* Large desktop styles */
 @media (min-width: 1200px) {
   .container {
     display: grid;
-    grid-template-columns: 1fr 1.5fr;
+    grid-template-columns: minmax(420px, 450px) 1fr;
     gap: var(--space-2xl);
-    max-width: 1800px;
+    max-width: 1600px;
     padding: var(--space-2xl);
+    align-items: start;
+    /* Fix z-index stacking context */
+    position: relative;
+    z-index: 1;
+    isolation: isolate; /* Create new stacking context */
+    /* Ensure proper grid behavior - allow natural height */
+    grid-auto-rows: auto;
+    grid-template-rows: auto auto;
+    /* Prevent overflow issues */
+    overflow: visible;
+    /* Ensure minimum height for content */
+    min-height: auto;
+  }
+
+  /* Messages container - highest priority */
+  .messages-container {
+    position: relative;
+    z-index: 20;
+    width: 100%;
+    margin-bottom: var(--space-lg);
+    /* Ensure it doesn't interfere with grid layout */
+    grid-column: 1 / -1;
+  }
+
+  .mobile-priority-section {
+    display: none;
+  }
+
+  .desktop-only {
+    display: flex;
   }
 
   .settings-section {
     grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    /* Remove sticky positioning to allow natural height */
+    position: relative;
+    /* Remove height restrictions to allow content to expand naturally */
+    min-height: auto;
+    max-height: none;
+    /* Remove overflow to prevent scrollbars */
+    overflow: visible;
+    /* Ensure proper stacking */
+    z-index: 5;
+    /* Prevent overlap */
+    width: 100%;
+    min-width: 0;
+    max-width: 420px;
+    /* Remove scrollbar gutter since we're not scrolling */
+    scrollbar-gutter: auto;
+    /* Add padding to ensure content is not cut off */
+    padding-bottom: var(--space-2xl);
+    /* Prevent transform issues */
+    transform-style: preserve-3d;
+    /* Force hardware acceleration for smooth rendering */
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    /* Ensure proper containment */
+    contain: layout style;
   }
 
   .results-section {
     grid-column: 2;
+    grid-row: 1;
     display: flex;
     flex-direction: column;
     gap: var(--space-lg);
+    min-height: 600px;
+    /* Ensure proper stacking */
+    z-index: 5;
+    /* Prevent overlap */
+    width: 100%;
+    min-width: 0;
+    /* Ensure content doesn't overflow */
+    overflow: visible;
+    /* Force hardware acceleration for smooth rendering */
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    /* Ensure proper containment */
+    contain: layout style;
+  }
+
+  /* Desktop action buttons styling */
+  .desktop-action-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-sm);
+    /* Fix positioning */
+    position: relative;
+    z-index: 6;
+    width: 100%;
+    margin: var(--space-lg) 0;
+    box-sizing: border-box;
+  }
+
+  .desktop-action-grid .action-card {
+    min-height: 60px;
+    padding: var(--space-sm);
+    /* Ensure proper sizing */
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .desktop-action-grid .action-card .action-text h3 {
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-xs);
+  }
+
+  .desktop-action-grid .action-card .action-text p {
+    font-size: var(--font-size-xs);
+    line-height: 1.3;
+  }
+
+  .desktop-action-grid .action-icon {
+    font-size: var(--font-size-lg);
+  }
+
+  /* Desktop problems container */
+  .desktop-problems-container,
+  .problems-container {
+    background: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+    margin-bottom: var(--space-lg);
+    flex: 1;
+    position: relative;
+    z-index: 6;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    /* Force hardware acceleration for smooth rendering */
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  .desktop-problems-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: var(--space-md);
+    max-height: 500px;
+    overflow-y: auto;
+    padding: var(--space-sm);
+  }
+
+  .desktop-problems-grid .problem-item {
+    font-size: var(--font-size-base);
+    padding: var(--space-md);
+    text-align: center;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    transition: all var(--transition-fast);
+    font-weight: 500;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .desktop-problems-grid .problem-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+    background: var(--bg-accent);
   }
 
   .info-panel {
     background: var(--bg-primary);
     border-radius: var(--radius-lg);
-    padding: var(--space-lg);
+    padding: var(--space-xl);
     border: 1px solid var(--border-color);
     box-shadow: var(--shadow-md);
-    min-height: 300px;
+    min-height: 400px;
     display: flex;
     flex-direction: column;
-    gap: var(--space-md);
+    gap: var(--space-lg);
   }
 
   .stats-grid {
@@ -78,7 +359,7 @@
 
   .stat-card {
     background: var(--bg-secondary);
-    padding: var(--space-md);
+    padding: var(--space-lg);
     border-radius: var(--radius-md);
     text-align: center;
     border: 1px solid var(--border-color);
@@ -102,6 +383,198 @@
     color: var(--text-secondary);
     margin-top: var(--space-xs);
   }
+
+  /* Show desktop layout for advanced settings */
+  .advanced-settings,
+  .pdf-settings-collapsible {
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    margin: var(--space-md) 0;
+  }
+
+  .advanced-settings-toggle,
+  .pdf-settings-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--text-primary);
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    min-height: 44px;
+  }
+
+  .advanced-settings[open] .advanced-settings-content,
+  .advanced-settings-content {
+    padding: 0 var(--space-md) var(--space-md);
+    border-top: 1px solid var(--border-color);
+  }
+
+  .core-settings {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    margin-bottom: var(--space-lg);
+    /* Fix stacking */
+    position: relative;
+    z-index: 6;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Advanced settings and PDF settings */
+  .advanced-settings,
+  .pdf-settings-collapsible {
+    position: relative;
+    z-index: 6;
+    margin: var(--space-md) 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .advanced-settings-content .checkbox-item {
+    margin-bottom: var(--space-md);
+  }
+
+  .advanced-settings-content .checkbox-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .pdf-settings-collapsible {
+    margin-top: var(--space-lg);
+  }
+
+  .pdf-settings .form-row {
+    padding: var(--space-md);
+    margin-bottom: var(--space-sm);
+  }
+
+  .advanced-settings-toggle,
+  .pdf-settings-toggle {
+    padding: var(--space-md);
+    margin-bottom: var(--space-sm);
+  }
+
+  /* Improve settings section scrolling */
+  .settings-section::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .settings-section::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+  }
+
+  .settings-section::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: var(--radius-sm);
+  }
+
+  .settings-section::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+  }
+
+  /* Settings presets - within settings section */
+  .settings-presets {
+    position: relative;
+    z-index: 6;
+    margin-bottom: var(--space-xl);
+    width: 100%;
+    box-sizing: border-box;
+    /* Increase minimum height to accommodate all 4 presets */
+    min-height: 550px;
+    overflow: visible;
+    /* Add extra bottom padding */
+    padding-bottom: calc(var(--space-xl) + var(--space-lg));
+  }
+
+  /* Ensure presets grid has proper spacing */
+  .presets-grid {
+    padding-bottom: var(--space-xl);
+    gap: var(--space-lg);
+  }
+
+  /* Ensure last preset card (乘法表) is fully visible */
+  .preset-card.clickable-card:nth-child(4),
+  .preset-card.clickable-card:last-child {
+    margin-bottom: var(--space-xl);
+  }
+
+  /* Individual action cards and preset cards */
+  .action-card,
+  .preset-card.clickable-card {
+    position: relative;
+    z-index: 7;
+    width: 100%;
+    box-sizing: border-box;
+    /* Force hardware acceleration for smooth rendering */
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  /* Problem items */
+  .problem-item {
+    position: relative;
+    z-index: 7;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Form elements */
+  .form-row {
+    position: relative;
+    z-index: 7;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: var(--space-md);
+  }
+
+  /* Add a spacer after the presets to ensure visibility */
+  .settings-presets + * {
+    margin-top: var(--space-xl);
+  }
+
+  /* Ensure proper spacing between sections */
+  .settings-section > * {
+    margin-bottom: var(--space-lg);
+  }
+
+  .settings-section > *:last-child {
+    margin-bottom: 0;
+  }
+
+  .results-section > * {
+    margin-bottom: var(--space-lg);
+  }
+
+  .results-section > *:last-child {
+    margin-bottom: 0;
+  }
+}
+
+/* Additional fixes for shorter screens */
+@media (min-width: 1200px) and (max-height: 900px) {
+  .settings-section {
+    /* Ensure scrolling works properly */
+    overflow-y: auto;
+    /* Add scroll padding */
+    scroll-padding-bottom: var(--space-xl);
+  }
+}
+
+/* Fix for very large screens */
+@media (min-width: 1600px) {
+  .container {
+    grid-template-columns: minmax(420px, 450px) 1fr;
+    gap: var(--space-2xl);
+  }
 }
 
 /* Desktop styles */
@@ -109,6 +582,24 @@
   .container {
     max-width: 1200px;
     padding: var(--space-2xl);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+
+  .settings-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    width: 100%;
+    margin-bottom: var(--space-xl);
+  }
+
+  .results-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    width: 100%;
   }
 }
 
@@ -118,6 +609,24 @@
     max-width: 100%;
     padding: var(--space-xl);
     margin: 0 var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+
+  .settings-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    width: 100%;
+    margin-bottom: var(--space-xl);
+  }
+
+  .results-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    width: 100%;
   }
 }
 
@@ -130,6 +639,24 @@
   .container {
     padding: var(--space-lg);
     margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  .settings-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    width: 100%;
+    margin-bottom: var(--space-lg);
+  }
+
+  .results-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    width: 100%;
   }
 
   h1 {
@@ -155,6 +682,24 @@
   .container {
     padding: var(--space-md);
     border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .settings-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    width: 100%;
+    margin-bottom: var(--space-md);
+  }
+
+  .results-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    width: 100%;
   }
 
   h1 {
@@ -170,6 +715,35 @@
   h3 {
     font-size: var(--font-size-base);
     margin: var(--space-md) 0 var(--space-sm) 0;
+  }
+
+  /* Mobile-specific optimizations */
+  .mobile-priority-section {
+    gap: var(--space-md);
+  }
+
+  .advanced-settings-toggle,
+  .pdf-settings-toggle {
+    font-size: var(--font-size-sm);
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .advanced-settings-content {
+    padding: var(--space-sm) var(--space-md) var(--space-md);
+  }
+
+  .core-settings {
+    padding: var(--space-md);
+    margin-bottom: var(--space-sm);
+  }
+
+  /* Ensure settings are easily accessible on mobile */
+  .settings-section {
+    order: 2;
+  }
+
+  .mobile-priority-section {
+    order: 1;
   }
 }
 

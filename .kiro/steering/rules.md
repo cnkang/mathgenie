@@ -231,12 +231,32 @@ Before creating a new file, ask:
 - Placeholder text and accessibility labels MUST use translation keys
 - Dynamic content with interpolation MUST use proper i18n formatting
 
+#### Layout Compatibility Requirements (Critical)
+
+- **Text Length Variation Management**: Different languages have significantly different text lengths that can cause layout issues:
+  - English to German: Text can expand by 30-50%
+  - English to Chinese/Japanese: Text typically contracts by 20-30%
+  - English to French/Spanish: Text can expand by 15-25%
+- **UI Layout Guidelines**:
+  - Use flexible CSS layouts (flexbox, grid) that adapt to content length
+  - Avoid fixed-width containers for text elements
+  - Test UI with longest expected translations in all supported languages
+  - Ensure adequate spacing between UI elements to prevent overlap
+  - Use `min-width` and `max-width` constraints appropriately
+- **Translation Text Guidelines**:
+  - Prefer concise, clear translations over verbose ones
+  - Standardize action button text across languages (e.g., "Apply" vs "Click to Apply")
+  - Consider text length impact during translation key design
+  - Provide context to translators about UI space constraints
+
 #### Code Review Requirements
 
 - Reject any PR with hardcoded user-facing strings
 - Verify all new translation keys exist in all language files
 - Test language switching functionality for new features
 - Ensure proper fallback behavior for missing translations
+- **Visual Layout Testing**: Test UI layouts with all supported languages to prevent text overlap or layout breaking
+- **Responsive Design Validation**: Ensure layouts work across different viewport sizes with international content
 
 ### Settings
 

@@ -1,6 +1,7 @@
 // localStorage persistence e2e tests
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
+import { ensureElementVisible, expandAdvancedSettings, expandPdfSettings } from './test-utils';
 
 test.describe('localStorage Persistence', () => {
   test.beforeEach(async ({ page }: { page: Page }) => {
@@ -56,6 +57,7 @@ test.describe('localStorage Persistence', () => {
 
   test('should persist checkbox settings in localStorage', async ({ page }: { page: Page }) => {
     // Change checkbox settings
+    await expandAdvancedSettings(page);
     await page.check('#allowNegative');
     await page.waitForTimeout(500);
 
@@ -75,6 +77,7 @@ test.describe('localStorage Persistence', () => {
 
   test('should persist PDF settings in localStorage', async ({ page }: { page: Page }) => {
     // Change PDF settings
+    await expandPdfSettings(page);
     await page.fill('#fontSize', '18');
     await page.waitForTimeout(500);
 
@@ -100,7 +103,9 @@ test.describe('localStorage Persistence', () => {
     // Set specific settings
     await page.fill('#numProblems', '30');
     await page.selectOption('#operations', ['+', '*']);
+    await expandAdvancedSettings(page);
     await page.check('#allowNegative');
+    await expandPdfSettings(page);
     await page.fill('#fontSize', '20');
     await page.selectOption('#paperSize', 'legal');
     await page.waitForTimeout(1000); // Wait for all saves to complete
@@ -111,7 +116,9 @@ test.describe('localStorage Persistence', () => {
 
     // Verify settings are restored
     await expect(page.locator('#numProblems')).toHaveValue('30');
+    await ensureElementVisible(page, '#allowNegative');
     await expect(page.locator('#allowNegative')).toBeChecked();
+    await ensureElementVisible(page, '#fontSize');
     await expect(page.locator('#fontSize')).toHaveValue('20');
     await expect(page.locator('#paperSize')).toHaveValue('legal');
 
@@ -241,6 +248,7 @@ test.describe('localStorage Persistence', () => {
 
     // Change settings in first tab
     await page1.fill('#numProblems', '35');
+    await expandAdvancedSettings(page1);
     await page1.check('#allowNegative');
     await page1.waitForTimeout(1000);
 
@@ -250,6 +258,7 @@ test.describe('localStorage Persistence', () => {
 
     // Settings should be synchronized
     await expect(page2.locator('#numProblems')).toHaveValue('35');
+    await ensureElementVisible(page2, '#allowNegative');
     await expect(page2.locator('#allowNegative')).toBeChecked();
 
     await context.close();
@@ -261,6 +270,7 @@ test.describe('localStorage Persistence', () => {
 
     // Change settings while offline
     await page.fill('#numProblems', '40');
+    await expandAdvancedSettings(page);
     await page.check('#showAnswers');
     await page.waitForTimeout(500);
 
@@ -282,6 +292,7 @@ test.describe('localStorage Persistence', () => {
     await page.waitForSelector('#numProblems', { timeout: 10000 });
 
     await expect(page.locator('#numProblems')).toHaveValue('40');
+    await ensureElementVisible(page, '#showAnswers');
     await expect(page.locator('#showAnswers')).toBeChecked();
   });
 });
