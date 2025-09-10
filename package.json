@@ -97,11 +97,6 @@
     "lighthouse:upload": "lhci upload",
     "i18n:check": "tsx scripts/check-i18n.ts"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app"
-    ]
-  },
   "browserslist": {
     "production": [
       ">0.2%",

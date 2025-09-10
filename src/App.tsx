@@ -101,7 +101,7 @@ function App(): React.JSX.Element {
     } else {
       setError({ key: validationError });
     }
-  }, [settings, isLoading]);
+  }, [settings, isLoading, validateSettings, generateProblems, hasInitialGenerated]);
 
   // WCAG 2.2 AAA Enforcement
   useEffect(() => {

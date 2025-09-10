@@ -6,6 +6,7 @@ import React, {
   useMemo,
   useState,
   useTransition,
+  useCallback,
 } from 'react';
 import type { I18nContextType, Language, Translations } from '../types';
 
@@ -220,7 +221,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   const [translations, setTranslations] = useState<Translations>({});
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isPending, startTransition] = useTransition();
-  const [hasInitialLoad, setHasInitialLoad] = useState<boolean>(false);
+  // Removed hasInitialLoad: not used; avoided dead store and unused warnings
 
   // Initialize with fallback translations to prevent warnings
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
@@ -229,15 +230,19 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
     let isMounted = true;
 
     const loadLanguage = async (): Promise<void> => {
-      if (!isMounted) return;
+      if (!isMounted) {
+        return;
+      }
 
       setIsLoading(true);
       try {
         const newTranslations = await loadTranslations(currentLanguage);
-        if (!isMounted) return;
+        if (!isMounted) {
+          return;
+        }
 
         setTranslations(newTranslations);
-        setHasInitialLoad(true);
+        // initial load completed
         setIsInitialized(true);
 
         // Safe localStorage access
@@ -267,46 +272,49 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
     };
   }, [currentLanguage]);
 
-  const t = (key: string, params: Record<string, string | number> = {}): string => {
-    // Always try fallback first if translations are not loaded or empty
-    if (!isInitialized || isLoading || Object.keys(translations).length === 0) {
-      return safeT(key, params);
-    }
-
-    const keys = key.split('.');
-    let value: unknown = translations;
-
-    for (const k of keys) {
-      if (value && typeof value === 'object' && k in value) {
-        value = (value as Record<string, unknown>)[k];
-      } else {
-        value = undefined;
-        break;
+  const t = useCallback(
+    (key: string, params: Record<string, string | number> = {}): string => {
+      // Always try fallback first if translations are not loaded or empty
+      if (!isInitialized || isLoading || Object.keys(translations).length === 0) {
+        return safeT(key, params);
       }
-    }
 
-    if (value === undefined) {
-      return safeT(key, params);
-    }
+      const keys = key.split('.');
+      let value: unknown = translations;
 
-    // Apply parameter substitution to both translations and fallback text
-    if (typeof value === 'string' && Object.keys(params).length > 0) {
-      let result = value;
-      Object.entries(params).forEach(([paramKey, paramValue]) => {
-        const placeholder = '{{' + paramKey + '}}';
-        while (result.includes(placeholder)) {
-          result = result.replace(placeholder, String(paramValue));
+      for (const k of keys) {
+        if (value && typeof value === 'object' && k in value) {
+          value = (value as Record<string, unknown>)[k];
+        } else {
+          value = undefined;
+          break;
         }
-      });
-      return result;
-    }
+      }
 
-    // Ensure we never return "[object Object]"
-    if (typeof value === 'string') {
-      return value;
-    }
-    return safeT(key, params);
-  };
+      if (value === undefined) {
+        return safeT(key, params);
+      }
+
+      // Apply parameter substitution to both translations and fallback text
+      if (typeof value === 'string' && Object.keys(params).length > 0) {
+        let result = value;
+        Object.entries(params).forEach(([paramKey, paramValue]) => {
+          const placeholder = '{{' + paramKey + '}}';
+          while (result.includes(placeholder)) {
+            result = result.replace(placeholder, String(paramValue));
+          }
+        });
+        return result;
+      }
+
+      // Ensure we never return "[object Object]"
+      if (typeof value === 'string') {
+        return value;
+      }
+      return safeT(key, params);
+    },
+    [isInitialized, isLoading, translations]
+  );
 
   const changeLanguage = (newLanguage: string): void => {
     if (languages[newLanguage]) {
@@ -325,7 +333,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
       t,
       changeLanguage,
     }),
-    [currentLanguage, translations, isLoading, isPending, hasInitialLoad]
+    [currentLanguage, translations, isLoading, isPending, t]
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;

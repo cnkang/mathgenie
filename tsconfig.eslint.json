@@ -8,7 +8,8 @@
     "playwright.e2e.config.ts",
     "playwright.test.config.ts",
     "src/types/vitest.d.ts",
-    "scripts/**/*"
+    "scripts/**/*",
+    "eslint.config.ts"
   ],
   "exclude": ["node_modules", "dist", "coverage"]
 }

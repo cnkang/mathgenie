@@ -1,5 +1,5 @@
 import type { Settings } from '@/types';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 // Constants to avoid duplicate strings
 const SETTINGS_STORAGE_KEY = 'mathgenie-settings';
@@ -64,7 +64,7 @@ export const useSettings = () => {
     }
   }, [settings]);
 
-  const validateSettings = (newSettings: Settings): string => {
+  const validateSettings = useCallback((newSettings: Settings): string => {
     if (newSettings.operations.length === 0) {
       return 'errors.noOperations';
     }
@@ -84,7 +84,7 @@ export const useSettings = () => {
       return 'errors.invalidOperandsRange';
     }
     return '';
-  };
+  }, []);
 
   return { settings, setSettings, validateSettings };
 };
