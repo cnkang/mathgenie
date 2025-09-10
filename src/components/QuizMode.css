@@ -443,7 +443,7 @@
   color: var(--text-secondary);
 }
 
-.problem-expression {
+.problem-review .problem-expression {
   font-weight: 500;
   color: var(--text-primary);
 }

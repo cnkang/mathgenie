@@ -742,6 +742,7 @@
     gap: var(--space-md);
     width: 100%;
     margin-bottom: var(--space-md);
+    order: 2; /* Ensure settings are easily accessible on mobile */
   }
 
   .results-section {
@@ -787,10 +788,7 @@
     margin-bottom: var(--space-sm);
   }
 
-  /* Ensure settings are easily accessible on mobile */
-  .settings-section {
-    order: 2;
-  }
+  /* Removed duplicate .settings-section block (merged above) */
 
   /* (removed duplicate .mobile-priority-section order declaration) */
 }
