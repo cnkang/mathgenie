@@ -52,7 +52,7 @@ function logError(message: string): void {
 // Execute Playwright via Node with absolute CLI bin path
 function execPlaywright(
   args: string[],
-  opts: { stdio?: 'pipe' | 'inherit'; encoding?: 'utf8' | 'buffer'; timeout?: number } = {}
+  opts: { stdio?: 'pipe' | 'inherit'; encoding?: 'utf8'; timeout?: number } = {}
 ) {
   const { stdio = 'pipe', encoding = 'utf8', timeout = 300000 } = opts; // default 5 min
   return spawnNodeCli('playwright', 'playwright', args, {
