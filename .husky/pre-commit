@@ -26,6 +26,7 @@ pnpm format
 
 echo "🧹 Running lint-staged..."
 # Ensure consistent color output in CI environments
+unset FORCE_COLOR
 export NO_COLOR=1
 npx lint-staged
 
