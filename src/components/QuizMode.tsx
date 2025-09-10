@@ -94,7 +94,6 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
   const [showResults, setShowResults] = useState(false);
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
   const [timeElapsed, setTimeElapsed] = useState(0);
-  const [, setStartTime] = useState<number>(Date.now());
 
   useEffect(() => {
     // Calculate the correct answer for each problem
@@ -127,7 +126,7 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
     setShowResults(false);
     setQuizResult(null);
     setTimeElapsed(0);
-    setStartTime(Date.now());
+    // Reset start timestamp implicitly via timeElapsed
   }, [problems]);
 
   useEffect(() => {
@@ -282,7 +281,7 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
                     isAnswered: false,
                   }))
                 );
-                setStartTime(Date.now());
+                // Reset timer start implicitly; timeElapsed is already reset on retry
               }}
               className='retry-quiz-btn'
             >
