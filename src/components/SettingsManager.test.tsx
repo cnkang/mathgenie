@@ -4,6 +4,71 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Settings } from '../types';
 import SettingsManager from './SettingsManager';
 
+// Helper components to reduce nesting in tests
+const FallbackComponent = () => {
+  const mockT = (key: string) => key;
+  return (
+    <div className='settings-manager'>
+      <h3>{mockT('settings.manager.title') ?? 'Settings Manager'}</h3>
+      <div className='settings-actions'>
+        <button
+          className='export-button'
+          aria-label={mockT('settings.export.aria') ?? 'Export current settings to file'}
+        >
+          <span className='button-icon'>📤</span>
+          {mockT('settings.export') ?? '📤 Export Settings'}
+        </button>
+        <button
+          className='import-button'
+          aria-label={mockT('settings.import.aria') ?? 'Import settings from file'}
+        >
+          <span className='button-icon'>📥</span>
+          {mockT('settings.import') ?? '📥 Import Settings'}
+        </button>
+        <input
+          type='file'
+          accept='.json'
+          style={{ display: 'none' }}
+          aria-label={mockT('settings.fileInput.aria') ?? 'Select settings file to import'}
+        />
+      </div>
+    </div>
+  );
+};
+
+type FileInputProps = {
+  onImport: (settings: any) => void;
+  parseFn: (raw: string) => any;
+  ParseError: new (...args: any[]) => Error;
+};
+
+const FileInputComponent = ({ onImport, parseFn, ParseError }: FileInputProps) => {
+  const mockT = (key: string) => key;
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const result = e.target?.result;
+        if (typeof result !== 'string') return;
+        const parsedData = parseFn(result);
+        onImport(parsedData.settings);
+      } catch (error) {
+        if (error instanceof ParseError) {
+          alert(mockT('settings.importError') ?? 'Invalid settings file format');
+        } else {
+          console.error('Settings import error:', error);
+          alert(mockT('settings.importError') ?? 'Error importing settings file');
+        }
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+  };
+  return <input type='file' accept='.json' onChange={handleFileChange} data-testid='file-input' />;
+};
+
 // Mock translation hook
 vi.mock('../i18n', () => ({
   useTranslation: () => ({
@@ -79,7 +144,7 @@ describe('SettingsManager Component', () => {
     const fileInput = document.querySelector('input[type="file"]');
     expect(fileInput).toBeInTheDocument();
     expect(fileInput?.getAttribute('accept')).toBe('.json');
-    expect(fileInput?.getAttribute('aria-hidden')).toBe('true');
+    expect(fileInput?.getAttribute('aria-hidden')).toBeNull();
   });
 
   it('handles export settings click', () => {
@@ -356,39 +421,7 @@ describe('SettingsManager Component', () => {
       }),
     }));
 
-    // Create a test component that simulates the fallback behavior
-    const TestComponent = () => {
-      const mockT = (key: string) => key;
-      return (
-        <div className='settings-manager'>
-          <h3>{mockT('settings.manager.title') || 'Settings Manager'}</h3>
-          <div className='settings-actions'>
-            <button
-              className='export-button'
-              aria-label={mockT('settings.export.aria') || 'Export current settings to file'}
-            >
-              <span className='button-icon'>📤</span>
-              {mockT('settings.export') || '📤 Export Settings'}
-            </button>
-            <button
-              className='import-button'
-              aria-label={mockT('settings.import.aria') || 'Import settings from file'}
-            >
-              <span className='button-icon'>📥</span>
-              {mockT('settings.import') || '📥 Import Settings'}
-            </button>
-            <input
-              type='file'
-              accept='.json'
-              style={{ display: 'none' }}
-              aria-label={mockT('settings.fileInput.aria') || 'Select settings file to import'}
-            />
-          </div>
-        </div>
-      );
-    };
-
-    render(<TestComponent />);
+    render(<FallbackComponent />);
 
     // Should render fallback text
     expect(screen.getByText('settings.manager.title')).toBeDefined();
@@ -404,42 +437,13 @@ describe('SettingsManager Component', () => {
 
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    // Create a test component with mocked translation that returns undefined
-    const TestComponent = () => {
-      const mockT = (key: string) => key;
-      const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (!file) {
-          return;
-        }
-        const reader = new FileReader();
-        reader.onload = e => {
-          try {
-            const result = e.target?.result;
-            if (typeof result !== 'string') {
-              return;
-            }
-            const parsedData = parseSettingsFile(result);
-            mockOnImportSettings(parsedData.settings);
-          } catch (error) {
-            if (error instanceof SettingsParseError) {
-              alert(mockT('settings.importError') || 'Invalid settings file format');
-            } else {
-              console.error('Settings import error:', error);
-              alert(mockT('settings.importError') || 'Error importing settings file');
-            }
-          }
-        };
-        reader.readAsText(file);
-        event.target.value = '';
-      };
-
-      return (
-        <input type='file' accept='.json' onChange={handleFileChange} data-testid='file-input' />
-      );
-    };
-
-    render(<TestComponent />);
+    render(
+      <FileInputComponent
+        onImport={mockOnImportSettings}
+        parseFn={parseSettingsFile}
+        ParseError={SettingsParseError}
+      />
+    );
 
     const fileInput = screen.getByTestId('file-input') as HTMLInputElement;
     const file = new File(['invalid'], 'settings.json', { type: 'application/json' });
