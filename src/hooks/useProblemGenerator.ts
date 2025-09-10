@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { buildExpression, randomInt } from '@/utils/problemUtils';
 import type { MessageValue, Problem, Settings } from '@/types';
 
@@ -120,60 +120,63 @@ export const useProblemGenerator = (
 ) => {
   const [problems, setProblems] = useState<Problem[]>([]);
 
-  const generateProblems = (
-    showSuccessMessage: boolean = true
-  ): {
-    error: MessageValue;
-    warning: MessageValue;
-    successMessage: MessageValue;
-  } => {
-    if (isLoading) {
-      return { error: '', warning: '', successMessage: '' };
-    }
-
-    const validationError = validateSettings(settings);
-    if (validationError) {
-      return {
-        error: typeof validationError === 'string' ? { key: validationError } : validationError,
-        warning: '',
-        successMessage: '',
-      };
-    }
-
-    const warning: MessageValue =
-      settings.numProblems > 50
-        ? { key: 'warnings.largeNumberOfProblems', params: { count: settings.numProblems } }
-        : '';
-
-    try {
-      const generatedProblems = Array.from({ length: settings.numProblems }, () =>
-        generateProblem(settings)
-      )
-        .filter(problem => problem !== '')
-        .map((problem, index) => ({ id: index, text: problem }));
-
-      const messages = evaluateGeneratedProblems(
-        generatedProblems,
-        settings.numProblems,
-        showSuccessMessage
-      );
-
-      if (generatedProblems.length > 0) {
-        setProblems(generatedProblems);
+  const generateProblems = useCallback(
+    (
+      showSuccessMessage: boolean = true
+    ): {
+      error: MessageValue;
+      warning: MessageValue;
+      successMessage: MessageValue;
+    } => {
+      if (isLoading) {
+        return { error: '', warning: '', successMessage: '' };
       }
 
-      return { ...messages, warning: messages.warning || warning };
-    } catch (err) {
-      if (import.meta.env.DEV) {
-        console.error('Problem generation error:', err);
+      const validationError = validateSettings(settings);
+      if (validationError) {
+        return {
+          error: typeof validationError === 'string' ? { key: validationError } : validationError,
+          warning: '',
+          successMessage: '',
+        };
       }
-      return {
-        error: showSuccessMessage ? { key: 'errors.generationFailed' } : '',
-        warning,
-        successMessage: '',
-      };
-    }
-  };
+
+      const warning: MessageValue =
+        settings.numProblems > 50
+          ? { key: 'warnings.largeNumberOfProblems', params: { count: settings.numProblems } }
+          : '';
+
+      try {
+        const generatedProblems = Array.from({ length: settings.numProblems }, () =>
+          generateProblem(settings)
+        )
+          .filter(problem => problem !== '')
+          .map((problem, index) => ({ id: index, text: problem }));
+
+        const messages = evaluateGeneratedProblems(
+          generatedProblems,
+          settings.numProblems,
+          showSuccessMessage
+        );
+
+        if (generatedProblems.length > 0) {
+          setProblems(generatedProblems);
+        }
+
+        return { ...messages, warning: messages.warning || warning };
+      } catch (err) {
+        if (import.meta.env.DEV) {
+          console.error('Problem generation error:', err);
+        }
+        return {
+          error: showSuccessMessage ? { key: 'errors.generationFailed' } : '',
+          warning,
+          successMessage: '',
+        };
+      }
+    },
+    [isLoading, settings, validateSettings]
+  );
 
   return {
     problems,
