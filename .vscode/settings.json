@@ -57,5 +57,6 @@
     "ms-vscode.vscode-typescript-next",
     "bradlc.vscode-tailwindcss",
     "ms-playwright.playwright"
-  ]
+  ],
+  "chatgpt.openOnStartup": false
 }
