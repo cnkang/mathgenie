@@ -1,7 +1,6 @@
 #!/usr/bin/env tsx
 
 import { spawnSync, SpawnSyncReturns, SpawnSyncOptions } from 'node:child_process';
-import type { BufferEncoding } from 'node:buffer';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
@@ -60,7 +59,7 @@ export function resolveBin(pkgName: string, binName?: string): string {
 
 export type SpawnNodeCliOptions = Omit<SpawnSyncOptions, 'shell' | 'env' | 'encoding' | 'stdio'> & {
   removePath?: boolean;
-  encoding?: 'buffer' | BufferEncoding;
+  encoding?: 'utf8';
   stdio?: 'pipe' | 'inherit' | 'ignore';
 };
 
