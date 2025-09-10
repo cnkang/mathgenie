@@ -226,7 +226,7 @@ test.describe('Presets Functionality', () => {
     // Verify problems contain only addition and subtraction
     const problemTexts = await problems.allTextContents();
     for (const problemText of problemTexts) {
-      expect(problemText).toMatch(/[+\-]/); // Should contain + or -
+      expect(problemText).toMatch(/[+-]/); // Should contain + or -
       expect(problemText).not.toMatch(/[×÷]/); // Should not contain × or ÷
     }
   });
