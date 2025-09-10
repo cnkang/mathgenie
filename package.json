@@ -89,7 +89,7 @@
     "pre-commit": "pnpm format && lint-staged",
     "pre-push": "pnpm type-check && pnpm i18n:check && pnpm test:unit && pnpm build",
     "commit": "git-cz",
-    "validate": "pnpm lint && pnpm type-check && pnpm i18n:check && pnpm test && pnpm build && pnpm playwright:check && pnpm test:e2e",
+    "validate": "pnpm lint && pnpm lint:css-html && pnpm type-check && pnpm i18n:check && pnpm test && pnpm build && pnpm playwright:check && pnpm test:e2e",
     "lighthouse": "lhci autorun",
     "lighthouse:ci": "lhci autorun --fatal-assert-errors",
     "lighthouse:collect": "lhci collect",
