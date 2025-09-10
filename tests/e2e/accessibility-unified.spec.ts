@@ -91,88 +91,95 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
 
   // Device-specific accessibility tests
   test.describe('Device Accessibility', () => {
-    // Mobile device tests
+    // Mobile device tests (flattened to reduce nested functions)
     for (const device of testDevices.mobile) {
-      test.describe(`${device.name} (${device.width}x${device.height})`, () => {
-        // Test both themes for comprehensive coverage
-        for (const theme of themes) {
-          test(`should pass WCAG 2.2 AAA - ${theme} theme`, async ({ page }: { page: Page }) => {
-            await page.setViewportSize({ width: device.width, height: device.height });
-            await page.emulateMedia({ colorScheme: theme });
-            await page.waitForTimeout(1000);
-
-            const accessibilityScanResults = await new AxeBuilder({ page })
-              .withTags(['wcag2a', 'wcag2aa', 'wcag2aaa', 'wcag22aa', 'wcag22aaa'])
-              .exclude('#webpack-dev-server-client-overlay')
-              .analyze();
-
-            expect(accessibilityScanResults.violations).toEqual([]);
-          });
-        }
-
-        test('should have adequate touch target sizes', async ({ page }: { page: Page }) => {
+      for (const theme of themes) {
+        test(`[mobile ${device.name} ${device.width}x${device.height}] WCAG AAA - ${theme}`, async ({
+          page,
+        }: {
+          page: Page;
+        }) => {
           await page.setViewportSize({ width: device.width, height: device.height });
-
-          // Wait for the page to fully load and WCAG enforcement to run
-          await page.waitForTimeout(3000);
-
-          // Force WCAG enforcement to run
-          await page.evaluate(() => {
-            // @ts-ignore
-            if (window.enforceWCAGTouchTargets) {
-              // @ts-ignore
-              window.enforceWCAGTouchTargets();
-            }
-          });
-
+          await page.emulateMedia({ colorScheme: theme });
           await page.waitForTimeout(1000);
 
-          const interactiveElements = page.locator('button, input, select, a, [role="button"]');
-          const count = await interactiveElements.count();
+          const accessibilityScanResults = await new AxeBuilder({ page })
+            .withTags(['wcag2a', 'wcag2aa', 'wcag2aaa', 'wcag22aa', 'wcag22aaa'])
+            .exclude('#webpack-dev-server-client-overlay')
+            .analyze();
 
-          for (let i = 0; i < count; i++) {
-            const element = interactiveElements.nth(i);
-            const boundingBox = await element.boundingBox();
+          expect(accessibilityScanResults.violations).toEqual([]);
+        });
+      }
 
-            if (boundingBox && (await element.isVisible())) {
-              const tagName = await element.evaluate(el => el.tagName);
-              const className = await element.evaluate(el => el.className);
-              const textContent = await element.evaluate(el => el.textContent?.slice(0, 50));
+      test(`[mobile ${device.name} ${device.width}x${device.height}] touch targets >= 44x44`, async ({
+        page,
+      }: {
+        page: Page;
+      }) => {
+        await page.setViewportSize({ width: device.width, height: device.height });
 
-              // Account for floating-point precision in browser rendering
-              try {
-                expect(boundingBox.width).toBeGreaterThanOrEqual(43.99);
-                expect(boundingBox.height).toBeGreaterThanOrEqual(43.99);
-              } catch (error) {
-                console.log(
-                  `Failed element ${i}: ${tagName}.${className} "${textContent}" - Size: ${boundingBox.width}x${boundingBox.height}`
-                );
-                throw error;
-              }
-            }
+        // Wait for the page to fully load and WCAG enforcement to run
+        await page.waitForTimeout(3000);
+
+        // Force WCAG enforcement to run
+        await page.evaluate(() => {
+          // @ts-ignore
+          if (window.enforceWCAGTouchTargets) {
+            // @ts-ignore
+            window.enforceWCAGTouchTargets();
           }
         });
+
+        await page.waitForTimeout(1000);
+
+        const interactiveElements = page.locator('button, input, select, a, [role="button"]');
+        const count = await interactiveElements.count();
+
+        for (let i = 0; i < count; i++) {
+          const element = interactiveElements.nth(i);
+          const boundingBox = await element.boundingBox();
+
+          if (boundingBox && (await element.isVisible())) {
+            const tagName = await element.evaluate(el => el.tagName);
+            const className = await element.evaluate(el => el.className);
+            const textContent = await element.evaluate(el => el.textContent?.slice(0, 50));
+
+            // Account for floating-point precision in browser rendering
+            try {
+              expect(boundingBox.width).toBeGreaterThanOrEqual(43.99);
+              expect(boundingBox.height).toBeGreaterThanOrEqual(43.99);
+            } catch (error) {
+              console.log(
+                `Failed element ${i}: ${tagName}.${className} "${textContent}" - Size: ${boundingBox.width}x${boundingBox.height}`
+              );
+              throw error;
+            }
+          }
+        }
       });
     }
 
-    // Tablet device tests - test both themes for comprehensive coverage
+    // Tablet device tests (flattened)
     for (const device of testDevices.tablet) {
-      test.describe(`${device.name} (${device.width}x${device.height})`, () => {
-        for (const theme of themes) {
-          test(`should pass WCAG 2.2 AAA - ${theme} theme`, async ({ page }: { page: Page }) => {
-            await page.setViewportSize({ width: device.width, height: device.height });
-            await page.emulateMedia({ colorScheme: theme });
-            await page.waitForTimeout(1000);
+      for (const theme of themes) {
+        test(`[tablet ${device.name} ${device.width}x${device.height}] WCAG AAA - ${theme}`, async ({
+          page,
+        }: {
+          page: Page;
+        }) => {
+          await page.setViewportSize({ width: device.width, height: device.height });
+          await page.emulateMedia({ colorScheme: theme });
+          await page.waitForTimeout(1000);
 
-            const accessibilityScanResults = await new AxeBuilder({ page })
-              .withTags(['wcag2a', 'wcag2aa', 'wcag2aaa', 'wcag22aa', 'wcag22aaa'])
-              .exclude('#webpack-dev-server-client-overlay')
-              .analyze();
+          const accessibilityScanResults = await new AxeBuilder({ page })
+            .withTags(['wcag2a', 'wcag2aa', 'wcag2aaa', 'wcag22aa', 'wcag22aaa'])
+            .exclude('#webpack-dev-server-client-overlay')
+            .analyze();
 
-            expect(accessibilityScanResults.violations).toEqual([]);
-          });
-        }
-      });
+          expect(accessibilityScanResults.violations).toEqual([]);
+        });
+      }
     }
   });
 

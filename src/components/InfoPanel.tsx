@@ -13,6 +13,16 @@ interface InfoPanelProps {
   onStartQuiz?: () => void;
 }
 
+// Extracted to top-level to avoid redefining on each render (Sonar S6478)
+const ProgressBar: React.FC<{ value: number }> = ({ value }) => {
+  const { progressBarProps, progressFillProps } = useProgressBar({ value });
+  return (
+    <div {...progressBarProps}>
+      <div {...progressFillProps}></div>
+    </div>
+  );
+};
+
 const InfoPanel: React.FC<InfoPanelProps> = ({
   problems,
   settings,
@@ -86,15 +96,6 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
   // Calculate learning progress (based on problem completion)
   const learningProgress = Math.min((sessionStats.totalGenerated / 100) * 100, 100);
 
-  const ProgressBar: React.FC<{ value: number }> = ({ value }) => {
-    const { progressBarProps, progressFillProps } = useProgressBar({ value });
-    return (
-      <div {...progressBarProps}>
-        <div {...progressFillProps}></div>
-      </div>
-    );
-  };
-
   return (
     <div className='info-panel'>
       <h2>
@@ -105,8 +106,6 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
       <div className='stats-grid'>
         <div
           className='stat-card'
-          tabIndex={0}
-          role='button'
           aria-label={`${t('infoPanel.stats.currentProblems')}: ${stats.totalProblems}`}
         >
           <span className='stat-value'>{stats.totalProblems}</span>
@@ -115,8 +114,6 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
 
         <div
           className='stat-card'
-          tabIndex={0}
-          role='button'
           aria-label={`${t('infoPanel.stats.totalGenerated')}: ${sessionStats.totalGenerated}`}
         >
           <span className='stat-value'>{sessionStats.totalGenerated}</span>
@@ -125,8 +122,6 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
 
         <div
           className='stat-card'
-          tabIndex={0}
-          role='button'
           aria-label={`${t('infoPanel.stats.difficultyLevel')}: ${stats.difficultyLevel}`}
         >
           <span className='stat-value'>{stats.difficultyLevel}</span>
@@ -135,8 +130,6 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
 
         <div
           className='stat-card'
-          tabIndex={0}
-          role='button'
           aria-label={`${t('infoPanel.stats.operationTypes')}: ${stats.operationTypes}`}
         >
           <span className='stat-value'>{stats.operationTypes}</span>

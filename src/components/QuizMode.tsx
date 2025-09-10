@@ -335,13 +335,17 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
     <div className='quiz-mode'>
       <div className='quiz-header'>
         <div className='quiz-progress'>
-          <div
-            className='progress-bar'
-            role='progressbar'
-            aria-valuenow={progressPercentage}
-            aria-valuemin={0}
-            aria-valuemax={100}
-          >
+          <div className='progress-bar'>
+            <progress
+              className='progress-native'
+              max={100}
+              value={progressPercentage}
+              aria-label={t('quiz.progress', {
+                current: currentProblemIndex + 1,
+                total: quizProblems.length,
+              })}
+            />
+            {/* Preserve .progress-fill for existing tests and styles */}
             <div className='progress-fill' style={{ width: `${progressPercentage}%` }}></div>
           </div>
           <span className='progress-text'>

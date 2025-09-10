@@ -301,7 +301,11 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
       return result;
     }
 
-    return String(value);
+    // Ensure we never return "[object Object]"
+    if (typeof value === 'string') {
+      return value;
+    }
+    return safeT(key, params);
   };
 
   const changeLanguage = (newLanguage: string): void => {

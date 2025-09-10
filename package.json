@@ -160,8 +160,11 @@
     "vitest": "^3.2.4"
   },
   "lint-staged": {
-    "*.{ts,tsx}": [
+    "src/**/*.{ts,tsx}": [
       "eslint --fix --max-warnings=0",
+      "prettier --write --config .prettierrc.json"
+    ],
+    "tests/e2e/**/*.{ts,tsx}": [
       "prettier --write --config .prettierrc.json"
     ],
     "*.{css,scss,less}": [

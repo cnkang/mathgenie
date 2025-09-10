@@ -118,7 +118,9 @@ export const enforceWCAGTouchTargets = (): void => {
   const elements = document.querySelectorAll(selector);
 
   elements.forEach(element => {
-    processElement(element as HTMLElement, minSize);
+    if (element instanceof HTMLElement) {
+      processElement(element, minSize);
+    }
   });
 
   if (import.meta.env.DEV) {
@@ -147,10 +149,9 @@ export const setupWCAGEnforcement = (): (() => void) => {
     mutations.forEach(mutation => {
       if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
         mutation.addedNodes.forEach(node => {
-          if (node.nodeType === Node.ELEMENT_NODE) {
-            const element = node as Element;
+          if (node instanceof Element) {
             if (
-              element.matches(
+              node.matches(
                 'button, input, select, textarea, a, [role="button"], [tabindex], [onclick]'
               )
             ) {
@@ -160,7 +161,7 @@ export const setupWCAGEnforcement = (): (() => void) => {
         });
       }
       if (mutation.type === 'attributes' && mutation.target instanceof HTMLElement) {
-        const target = mutation.target as HTMLElement;
+        const target = mutation.target;
         const style = window.getComputedStyle(target);
         if (
           style.display !== 'none' &&

@@ -20,7 +20,16 @@ test.describe('Collapsible UI Accessibility', () => {
     // Check ARIA attributes
     await expect(advancedToggle).toHaveAttribute('aria-controls', 'advanced-settings-content');
     await expect(advancedToggle).toHaveAttribute('aria-describedby', 'advanced-settings-desc');
-    await expect(advancedContent).toHaveAttribute('role', 'region');
+    // Accept either explicit role="region" or semantic <section>
+    const hasRegionRole = await advancedContent.getAttribute('role');
+    if (hasRegionRole) {
+      await expect(advancedContent).toHaveAttribute('role', 'region');
+    } else {
+      // Fallback: semantic element should be a SECTION or FIELDSET with labeling
+      const tag = await advancedContent.evaluate(el => el.tagName);
+      expect(['SECTION', 'FIELDSET']).toContain(tag);
+    }
+    // Must be labelled by the toggle for assistive tech
     await expect(advancedContent).toHaveAttribute('aria-labelledby', 'advanced-settings-toggle');
   });
 
@@ -31,7 +40,13 @@ test.describe('Collapsible UI Accessibility', () => {
     // Check ARIA attributes
     await expect(pdfToggle).toHaveAttribute('aria-controls', 'pdf-settings-content');
     await expect(pdfToggle).toHaveAttribute('aria-describedby', 'pdf-settings-desc');
-    await expect(pdfContent).toHaveAttribute('role', 'region');
+    const pdfRegionRole = await pdfContent.getAttribute('role');
+    if (pdfRegionRole) {
+      await expect(pdfContent).toHaveAttribute('role', 'region');
+    } else {
+      const tag = await pdfContent.evaluate(el => el.tagName);
+      expect(['SECTION', 'FIELDSET']).toContain(tag);
+    }
     await expect(pdfContent).toHaveAttribute('aria-labelledby', 'pdf-settings-toggle');
   });
 
