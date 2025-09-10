@@ -1,4 +1,4 @@
-import { useEffect, type FC, type PropsWithChildren } from 'react';
+import { useEffect, type FC, type ReactElement } from 'react';
 
 // Extend Window interface for gtag
 declare global {
@@ -28,7 +28,9 @@ interface PerformanceEntryWithValue extends PerformanceEntry {
  * Performance Monitor Component with TypeScript support
  * Tracks and reports performance metrics for optimization
  */
-const PerformanceMonitor: FC<PropsWithChildren> = ({ children }) => {
+type PerformanceMonitorProps = { children?: ReactElement | null };
+
+const PerformanceMonitor: FC<PerformanceMonitorProps> = ({ children }) => {
   useEffect(() => {
     // Monitor Core Web Vitals
     const observer = new PerformanceObserver(list => {
