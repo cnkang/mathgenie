@@ -693,6 +693,7 @@ function App(): React.JSX.Element {
                   <section
                     className='problems-content'
                     aria-label={t('accessibility.problemsList')}
+                    role='region'
                     tabIndex={0} // @deviation
                     // Rule: S6845 (tabIndex should only be on interactive elements)
                     // Reason: This scrollable region must be focusable for keyboard users to pass WCAG (axe: scrollable-region-focusable)
