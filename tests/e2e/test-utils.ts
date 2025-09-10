@@ -267,13 +267,9 @@ export async function fillLocalStorageQuota(page: Page): Promise<void> {
         localStorage.setItem(`large-data-${i}`, largeData);
       }
     } catch (e) {
-      // Expected to fail at some point (simulate quota exceeded); log at debug level
-      try {
-        // Browsers may drop this log; safe in test context
-        console.debug('Simulated quota exceed error while filling localStorage');
-      } catch (_ignore) {
-        // no-op
-      }
+      // Expected to fail at some point (simulate quota exceeded)
+      const message = e instanceof Error ? e.message : String(e);
+      console.debug('Simulated quota exceed while filling localStorage:', message);
     }
   });
 }
@@ -321,6 +317,7 @@ export async function expandPdfSettings(page: Page): Promise<void> {
         await pdfToggle.click({ timeout: 5000 });
       } catch (error) {
         // Fallback: force click if element is intercepted
+        console.debug('Normal click failed, falling back to force click:', error);
         await pdfToggle.click({ force: true });
       }
 

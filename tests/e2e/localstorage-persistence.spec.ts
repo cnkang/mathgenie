@@ -213,7 +213,9 @@ test.describe('localStorage Persistence', () => {
           localStorage.setItem(`large-data-${i}`, largeData);
         }
       } catch (e) {
-        // Expected to fail at some point
+        // Expected to fail at some point (quota exceeded)
+        const message = e instanceof Error ? e.message : String(e);
+        console.debug('localStorage quota exceeded during test:', message);
       }
     });
 

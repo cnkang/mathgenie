@@ -200,19 +200,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
           .exclude('#webpack-dev-server-client-overlay')
           .analyze();
 
-        if (contrastResults.violations.length > 0) {
-          console.log(`${theme} theme contrast violations:`);
-          contrastResults.violations.forEach((violation, index) => {
-            console.log(`${index + 1}. ${violation.id}`);
-            violation.nodes.forEach((node, nodeIndex) => {
-              console.log(`   Element ${nodeIndex + 1}: ${node.target.join(' ')}`);
-              if (node.any && node.any[0] && node.any[0].data) {
-                console.log(`   Contrast: ${node.any[0].data.contrastRatio}`);
-                console.log(`   Expected: ${node.any[0].data.expectedContrastRatio}`);
-              }
-            });
-          });
-        }
+        logContrastViolations(contrastResults, theme);
 
         expect(contrastResults.violations).toEqual([]);
       });
@@ -247,6 +235,29 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
     });
   });
 
+  const logContrastViolations = (contrastResults: any, theme: string): void => {
+    if (!contrastResults || !Array.isArray(contrastResults.violations)) {
+      return;
+    }
+    if (contrastResults.violations.length === 0) {
+      return;
+    }
+    console.log(`${theme} theme contrast violations:`);
+    for (let i = 0; i < contrastResults.violations.length; i++) {
+      const violation = contrastResults.violations[i];
+      console.log(`${i + 1}. ${violation.id}`);
+      for (let j = 0; j < violation.nodes.length; j++) {
+        const node = violation.nodes[j];
+        console.log(`   Element ${j + 1}: ${node.target.join(' ')}`);
+        const data = node.any && node.any[0] && node.any[0].data;
+        if (data) {
+          console.log(`   Contrast: ${data.contrastRatio}`);
+          console.log(`   Expected: ${data.expectedContrastRatio}`);
+        }
+      }
+    }
+  };
+
   // Keyboard navigation and interaction tests
   test.describe('Keyboard Navigation', () => {
     test('should support full keyboard navigation', async ({ page }: { page: Page }) => {
@@ -267,10 +278,20 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
 
       await page.waitForTimeout(500);
 
+      // Ensure page has focus before tabbing
+      await page.locator('body').click({ position: { x: 1, y: 1 } });
       // Start from the beginning of the page
       await page.keyboard.press('Tab');
 
-      const focusableElements = [];
+      interface FocusableElement {
+        tagName: string;
+        id: string;
+        className: string;
+        type: string | null;
+        role: string | null;
+      }
+
+      const focusableElements: FocusableElement[] = [];
       let currentElement = await page.evaluate(() => {
         const active = document.activeElement;
         return active
