@@ -1,14 +1,12 @@
 {
   "extends": ["html-validate:recommended"],
   "rules": {
-    "close-order": "error",
-    "void-style": ["error", { "style": "omit" }],
-    "no-trailing-whitespace": "off",
+    "no-trailing-whitespace": "error",
     "require-sri": "off",
-    "no-inline-style": "off",
+    "no-inline-style": "error",
     "prefer-native-element": "off",
     "no-redundant-for": "off",
-    "wcag/h37": "off"
+    "wcag/h37": "error"
   },
   "elements": ["html5"]
 }
