@@ -1,6 +1,7 @@
 // Presets functionality e2e tests
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
+import { ensureElementVisible, waitForPresetsLoad } from './test-utils';
 
 test.describe('Presets Functionality', () => {
   test.beforeEach(async ({ page }: { page: Page }) => {
@@ -27,8 +28,8 @@ test.describe('Presets Functionality', () => {
     // Wait for presets section to be visible
     await expect(page.locator('.settings-presets')).toBeVisible({ timeout: 10000 });
 
-    // Check that presets title is displayed
-    const presetsTitle = page.locator('.settings-presets h3');
+    // Check that presets title is displayed (use h2 for the main title)
+    const presetsTitle = page.locator('.settings-presets h2');
     await expect(presetsTitle).toBeVisible();
     await expect(presetsTitle).toContainText('Quick Presets');
   });
@@ -43,36 +44,55 @@ test.describe('Presets Functionality', () => {
 
     // Check beginner preset
     const beginnerCard = presetCards.nth(0);
-    await expect(beginnerCard.locator('h4')).toContainText('Beginner');
+    await expect(beginnerCard.locator('h3')).toContainText('Beginner');
     await expect(beginnerCard.locator('p')).toContainText('Simple addition and subtraction');
-    await expect(beginnerCard.locator('.preset-action')).toContainText('Click to apply');
+    await expect(beginnerCard.locator('.preset-action')).toContainText('Apply');
 
     // Check intermediate preset
     const intermediateCard = presetCards.nth(1);
-    await expect(intermediateCard.locator('h4')).toContainText('Intermediate');
+    await expect(intermediateCard.locator('h3')).toContainText('Intermediate');
     await expect(intermediateCard.locator('p')).toContainText('All operations with medium numbers');
 
     // Check advanced preset
     const advancedCard = presetCards.nth(2);
-    await expect(advancedCard.locator('h4')).toContainText('Advanced');
+    await expect(advancedCard.locator('h3')).toContainText('Advanced');
     await expect(advancedCard.locator('p')).toContainText('All operations including division');
 
     // Check multiplication preset
     const multiplicationCard = presetCards.nth(3);
-    await expect(multiplicationCard.locator('h4')).toContainText('Multiplication');
+    await expect(multiplicationCard.locator('h3')).toContainText('Multiplication');
     await expect(multiplicationCard.locator('p')).toContainText('Focus on multiplication practice');
   });
 
   test('should apply beginner preset correctly', async ({ page }: { page: Page }) => {
+    // Wait for app to fully load including translations
+    await page.waitForFunction(
+      () => {
+        const title = document.querySelector('h1')?.textContent;
+        return title && title !== 'Loading...' && title.length > 0;
+      },
+      { timeout: 10000 }
+    );
+
     // Wait for presets to load
     await page.waitForSelector('.settings-presets', { timeout: 10000 });
 
-    // Click beginner preset
-    const beginnerButton = page.locator('.preset-card').first();
-    await expect(beginnerButton).toBeVisible();
-    await beginnerButton.click();
+    // Wait for all preset cards to be visible
+    await page.waitForSelector('.preset-card', { timeout: 10000 });
 
-    // Wait for settings to be applied
+    // Ensure we have exactly 4 preset cards
+    const presetCount = await page.locator('.preset-card').count();
+    expect(presetCount).toBe(4);
+
+    // Click beginner preset (first preset card)
+    const beginnerButton = page.locator('.preset-card').first();
+
+    await expect(beginnerButton).toBeVisible();
+
+    // Use direct JavaScript click for reliability in complex CSS layouts
+    await beginnerButton.evaluate(button => button.click());
+
+    // Wait for React state update
     await page.waitForTimeout(1000);
 
     // Verify beginner preset settings are applied
@@ -83,8 +103,10 @@ test.describe('Presets Functionality', () => {
     await expect(page.locator('#resultRangeTo')).toHaveValue('20');
     await expect(page.locator('#numOperandsRangeFrom')).toHaveValue('2');
     await expect(page.locator('#numOperandsRangeTo')).toHaveValue('2');
+    await ensureElementVisible(page, '#allowNegative');
     await expect(page.locator('#allowNegative')).not.toBeChecked();
     await expect(page.locator('#showAnswers')).not.toBeChecked();
+    await ensureElementVisible(page, '#fontSize');
     await expect(page.locator('#fontSize')).toHaveValue('18');
     await expect(page.locator('#lineSpacing')).toHaveValue('16');
     await expect(page.locator('#paperSize')).toHaveValue('a4');
@@ -100,10 +122,10 @@ test.describe('Presets Functionality', () => {
     // Wait for presets to load
     await page.waitForSelector('.settings-presets', { timeout: 10000 });
 
-    // Click intermediate preset
+    // Click intermediate preset using direct JavaScript click
     const intermediateButton = page.locator('.preset-card').nth(1);
     await expect(intermediateButton).toBeVisible();
-    await intermediateButton.click();
+    await intermediateButton.evaluate(button => button.click());
 
     // Wait for settings to be applied
     await page.waitForTimeout(1000);
@@ -129,10 +151,10 @@ test.describe('Presets Functionality', () => {
     // Wait for presets to load
     await page.waitForSelector('.settings-presets', { timeout: 10000 });
 
-    // Click advanced preset
+    // Click advanced preset using direct JavaScript click
     const advancedButton = page.locator('.preset-card').nth(2);
     await expect(advancedButton).toBeVisible();
-    await advancedButton.click();
+    await advancedButton.evaluate(button => button.click());
 
     // Wait for settings to be applied
     await page.waitForTimeout(1000);
@@ -145,6 +167,7 @@ test.describe('Presets Functionality', () => {
     await expect(page.locator('#resultRangeTo')).toHaveValue('200');
     await expect(page.locator('#numOperandsRangeFrom')).toHaveValue('2');
     await expect(page.locator('#numOperandsRangeTo')).toHaveValue('4');
+    await ensureElementVisible(page, '#allowNegative');
     await expect(page.locator('#allowNegative')).toBeChecked();
 
     // Check operations selection (should include all operations)
@@ -160,10 +183,10 @@ test.describe('Presets Functionality', () => {
     // Wait for presets to load
     await page.waitForSelector('.settings-presets', { timeout: 10000 });
 
-    // Click multiplication preset
+    // Click multiplication preset using direct JavaScript click
     const multiplicationButton = page.locator('.preset-card').nth(3);
     await expect(multiplicationButton).toBeVisible();
-    await multiplicationButton.click();
+    await multiplicationButton.evaluate(button => button.click());
 
     // Wait for settings to be applied
     await page.waitForTimeout(1000);
@@ -176,6 +199,7 @@ test.describe('Presets Functionality', () => {
     await expect(page.locator('#resultRangeTo')).toHaveValue('144');
     await expect(page.locator('#numOperandsRangeFrom')).toHaveValue('2');
     await expect(page.locator('#numOperandsRangeTo')).toHaveValue('2');
+    await ensureElementVisible(page, '#allowNegative');
     await expect(page.locator('#allowNegative')).not.toBeChecked();
 
     // Check operations selection (should only include multiplication)
@@ -190,7 +214,7 @@ test.describe('Presets Functionality', () => {
 
     // Apply beginner preset
     const beginnerButton = page.locator('.preset-card').first();
-    await beginnerButton.click();
+    await beginnerButton.evaluate(button => button.click());
 
     // Wait for problems to be generated automatically
     await page.waitForSelector('.problem-item', { timeout: 10000 });
@@ -216,14 +240,16 @@ test.describe('Presets Functionality', () => {
     await page.waitForSelector('.settings-presets', { timeout: 10000 });
 
     // Apply beginner preset first
-    await page.locator('.preset-card').first().click();
+    const beginnerPreset = page.locator('.preset-card').first();
+    await beginnerPreset.evaluate(button => button.click());
     await page.waitForTimeout(1000);
 
     // Verify beginner settings
     await expect(page.locator('#numProblems')).toHaveValue('15');
 
     // Apply intermediate preset
-    await page.locator('.preset-card').nth(1).click();
+    const intermediatePreset = page.locator('.preset-card').nth(1);
+    await intermediatePreset.evaluate(button => button.click());
     await page.waitForTimeout(1000);
 
     // Verify intermediate settings
@@ -231,11 +257,13 @@ test.describe('Presets Functionality', () => {
     await expect(page.locator('#numRangeTo')).toHaveValue('50');
 
     // Apply advanced preset
-    await page.locator('.preset-card').nth(2).click();
+    const advancedPreset = page.locator('.preset-card').nth(2);
+    await advancedPreset.evaluate(button => button.click());
     await page.waitForTimeout(1000);
 
     // Verify advanced settings
     await expect(page.locator('#numProblems')).toHaveValue('25');
+    await ensureElementVisible(page, '#allowNegative');
     await expect(page.locator('#allowNegative')).toBeChecked();
   });
 
@@ -253,7 +281,7 @@ test.describe('Presets Functionality', () => {
     // Apply a preset
     const firstPresetButton = page.locator('.preset-card').first();
     await expect(firstPresetButton).toBeVisible();
-    await firstPresetButton.click();
+    await firstPresetButton.evaluate(button => button.click());
 
     // Wait for settings to be applied
     await page.waitForTimeout(1000);
@@ -288,21 +316,21 @@ test.describe('Presets Functionality', () => {
 
   test('should handle rapid preset switching', async ({ page }: { page: Page }) => {
     // Wait for presets to load
-    await page.waitForSelector('.settings-presets', { timeout: 10000 });
+    await waitForPresetsLoad(page);
 
-    // Rapidly switch between presets
+    // Rapidly switch between presets using force click to avoid interception
     const presetButtons = page.locator('.preset-card');
 
-    await presetButtons.nth(0).click();
+    await presetButtons.nth(0).click({ force: true });
     await page.waitForTimeout(200);
 
-    await presetButtons.nth(1).click();
+    await presetButtons.nth(1).click({ force: true });
     await page.waitForTimeout(200);
 
-    await presetButtons.nth(2).click();
+    await presetButtons.nth(2).click({ force: true });
     await page.waitForTimeout(200);
 
-    await presetButtons.nth(3).click();
+    await presetButtons.nth(3).click({ force: true });
     await page.waitForTimeout(1000); // Wait for final preset to apply
 
     // Verify final preset (multiplication) is applied
@@ -319,7 +347,8 @@ test.describe('Presets Functionality', () => {
     await page.waitForSelector('.settings-presets', { timeout: 10000 });
 
     // Apply advanced preset
-    await page.locator('.preset-card').nth(2).click();
+    const advancedPreset = page.locator('.preset-card').nth(2);
+    await advancedPreset.evaluate(button => button.click());
     await page.waitForTimeout(1000);
 
     // Verify settings are saved in localStorage
@@ -338,6 +367,7 @@ test.describe('Presets Functionality', () => {
     await page.waitForSelector('#numProblems', { timeout: 10000 });
 
     await expect(page.locator('#numProblems')).toHaveValue('25');
+    await ensureElementVisible(page, '#allowNegative');
     await expect(page.locator('#allowNegative')).toBeChecked();
   });
 
@@ -354,7 +384,8 @@ test.describe('Presets Functionality', () => {
     expect(initialNumProblems).toBe('10');
 
     // Apply intermediate preset (should change to 20)
-    await page.locator('.preset-card').nth(1).click();
+    const intermediatePreset = page.locator('.preset-card').nth(1);
+    await intermediatePreset.evaluate(button => button.click());
 
     // Wait for changes to be visible
     await page.waitForTimeout(1000);

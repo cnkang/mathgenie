@@ -17,8 +17,8 @@ vi.mock('../utils/settingsManager', () => ({
   generateFilename: vi.fn(() => 'settings.json'),
   serializeSettings: vi.fn(data => JSON.stringify(data)),
   parseSettingsFile: vi.fn(content => JSON.parse(content)),
-  validateSettingsData: vi.fn(() => true),
   createDownloadBlob: vi.fn(() => new Blob(['test'], { type: 'application/json' })),
+  SettingsParseError: class SettingsParseError extends Error {},
 }));
 
 describe('SettingsManager Component', () => {
@@ -158,14 +158,13 @@ describe('SettingsManager Component', () => {
   });
 
   it('handles successful file import', async () => {
-    const { parseSettingsFile, validateSettingsData } = await import('../utils/settingsManager');
+    const { parseSettingsFile } = await import('../utils/settingsManager');
 
     vi.mocked(parseSettingsFile).mockReturnValue({
       settings: mockSettings,
       version: '1.0.0',
       timestamp: new Date().toISOString(),
     });
-    vi.mocked(validateSettingsData).mockReturnValue(true);
 
     render(<SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />);
 
@@ -201,14 +200,11 @@ describe('SettingsManager Component', () => {
   });
 
   it('handles invalid settings file format', async () => {
-    const { parseSettingsFile, validateSettingsData } = await import('../utils/settingsManager');
+    const { parseSettingsFile, SettingsParseError } = await import('../utils/settingsManager');
 
-    vi.mocked(parseSettingsFile).mockReturnValue({
-      settings: mockSettings,
-      version: '1.0.0',
-      timestamp: new Date().toISOString(),
+    vi.mocked(parseSettingsFile).mockImplementation(() => {
+      throw new SettingsParseError('Invalid');
     });
-    vi.mocked(validateSettingsData).mockReturnValue(false);
 
     render(<SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />);
 
@@ -276,10 +272,10 @@ describe('SettingsManager Component', () => {
   });
 
   it('handles JSON parsing error', async () => {
-    const { parseSettingsFile } = await import('../utils/settingsManager');
+    const { parseSettingsFile, SettingsParseError } = await import('../utils/settingsManager');
 
     vi.mocked(parseSettingsFile).mockImplementation(() => {
-      throw new Error('Invalid JSON');
+      throw new SettingsParseError('Invalid JSON');
     });
 
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -313,7 +309,7 @@ describe('SettingsManager Component', () => {
     }
 
     expect(global.alert).toHaveBeenCalledWith('settings.importError');
-    expect(consoleSpy).toHaveBeenCalledWith('Settings import error:', expect.any(Error));
+    expect(consoleSpy).not.toHaveBeenCalled();
     expect(mockOnImportSettings).not.toHaveBeenCalled();
 
     consoleSpy.mockRestore();
@@ -400,83 +396,10 @@ describe('SettingsManager Component', () => {
     expect(screen.getByText('settings.import')).toBeDefined();
   });
 
-  it('handles alert with fallback message for validation error', async () => {
-    const { parseSettingsFile, validateSettingsData } = await import('../utils/settingsManager');
-    vi.mocked(parseSettingsFile).mockReturnValue({
-      settings: mockSettings,
-      version: '1.0.0',
-      timestamp: new Date().toISOString(),
-    });
-    vi.mocked(validateSettingsData).mockReturnValue(false);
-
-    // Create a test component with mocked translation that returns undefined
-    const TestComponent = () => {
-      const mockT = (key: string) => key;
-      const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (!file) {
-          return;
-        }
-        const reader = new FileReader();
-        reader.onload = e => {
-          try {
-            const result = e.target?.result;
-            if (typeof result !== 'string') {
-              return;
-            }
-            const parsedData = parseSettingsFile(result);
-            if (validateSettingsData(parsedData.settings)) {
-              mockOnImportSettings(parsedData.settings);
-            } else {
-              alert(mockT('settings.importError') || 'Invalid settings file format');
-            }
-          } catch (error) {
-            console.error('Settings import error:', error);
-            alert(mockT('settings.importError') || 'Error importing settings file');
-          }
-        };
-        reader.readAsText(file);
-        event.target.value = '';
-      };
-
-      return (
-        <input type='file' accept='.json' onChange={handleFileChange} data-testid='file-input' />
-      );
-    };
-
-    render(<TestComponent />);
-
-    const fileInput = screen.getByTestId('file-input') as HTMLInputElement;
-    const file = new File(['invalid'], 'settings.json', { type: 'application/json' });
-    Object.defineProperty(fileInput, 'files', {
-      value: [file],
-      configurable: true,
-    });
-
-    // Mock FileReader
-    const mockFileReader = {
-      readAsText: vi.fn(),
-      onload: null as any,
-      result: 'invalid',
-    };
-    vi.spyOn(window, 'FileReader').mockImplementation(() => mockFileReader as any);
-
-    fireEvent.change(fileInput);
-
-    // Simulate FileReader onload
-    if (mockFileReader.onload) {
-      mockFileReader.onload({
-        target: { result: 'invalid' },
-      } as any);
-    }
-
-    expect(global.alert).toHaveBeenCalledWith('settings.importError');
-  });
-
   it('handles alert with fallback message for parsing error', async () => {
-    const { parseSettingsFile } = await import('../utils/settingsManager');
+    const { parseSettingsFile, SettingsParseError } = await import('../utils/settingsManager');
     vi.mocked(parseSettingsFile).mockImplementation(() => {
-      throw new Error('Parse error');
+      throw new SettingsParseError('Parse error');
     });
 
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -499,8 +422,12 @@ describe('SettingsManager Component', () => {
             const parsedData = parseSettingsFile(result);
             mockOnImportSettings(parsedData.settings);
           } catch (error) {
-            console.error('Settings import error:', error);
-            alert(mockT('settings.importError') || 'Error importing settings file');
+            if (error instanceof SettingsParseError) {
+              alert(mockT('settings.importError') || 'Invalid settings file format');
+            } else {
+              console.error('Settings import error:', error);
+              alert(mockT('settings.importError') || 'Error importing settings file');
+            }
           }
         };
         reader.readAsText(file);
@@ -539,7 +466,7 @@ describe('SettingsManager Component', () => {
     }
 
     expect(global.alert).toHaveBeenCalledWith('settings.importError');
-    expect(consoleSpy).toHaveBeenCalledWith('Settings import error:', expect.any(Error));
+    expect(consoleSpy).not.toHaveBeenCalled();
 
     consoleSpy.mockRestore();
   });

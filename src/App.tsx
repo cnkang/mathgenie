@@ -1,3 +1,5 @@
+import LoadingButton from '@/components/LoadingButton';
+import { generatePdf } from '@/utils/pdf';
 import React, { Suspense, useEffect, useState } from 'react';
 import './App.css';
 import ErrorMessage from './components/ErrorMessage';
@@ -8,16 +10,23 @@ import QuizMode from './components/QuizMode';
 import './components/QuizMode.css';
 import SettingsPresets from './components/SettingsPresets';
 import TranslationLoader from './components/TranslationLoader';
+import { useProblemGenerator } from './hooks/useProblemGenerator';
+import { useSettings } from './hooks/useSettings';
 import { useTranslation } from './i18n';
 import './styles/components.css';
 import type { MessageValue, Operation, PaperSizeOptions, QuizResult, Settings } from './types';
 import { setupWCAGEnforcement } from './utils/wcagEnforcement';
-import { useProblemGenerator } from './hooks/useProblemGenerator';
-import { useSettings } from './hooks/useSettings';
 
 const SpeedInsights = React.lazy(() =>
   import('@vercel/speed-insights/react').then(module => ({ default: module.SpeedInsights }))
 );
+
+// Constants to avoid duplicate strings
+const FORM_INPUT_CLASS = 'form-input';
+const DECIMAL_RADIX = 10;
+const SETTINGS_FROM_KEY = 'settings.from';
+const SETTINGS_TO_KEY = 'settings.to';
+const BUTTONS_GENERATE_KEY = 'buttons.generate';
 
 function App(): React.JSX.Element {
   const { t, isLoading } = useTranslation();
@@ -38,7 +47,7 @@ function App(): React.JSX.Element {
     legal: 'legal',
   };
 
-  const downloadPdf = (): void => {
+  const downloadPdf = async (): Promise<void> => {
     if (problems.length === 0) {
       // Only show error if i18n is loaded
       if (!isLoading) {
@@ -53,57 +62,17 @@ function App(): React.JSX.Element {
     setSuccessMessage('');
 
     try {
-      import('jspdf').then(({ default: jsPDF }) => {
-        const doc = new jsPDF({
-          format: paperSizeOptions[settings.paperSize],
-        });
-
-        doc.setFontSize(settings.fontSize);
-        const pageHeight = doc.internal.pageSize.getHeight();
-        const pageWidth = doc.internal.pageSize.getWidth();
-
-        const marginLeft = 10;
-        const marginTop = 10;
-        const lineSpacing = settings.lineSpacing;
-        const colWidth = (pageWidth - 3 * marginLeft) / 2;
-
-        let currYLeft = marginTop;
-        let currYRight = marginTop;
-
-        problems.forEach((problem, index) => {
-          if (index % 2 === 0) {
-            if (currYLeft + lineSpacing > pageHeight) {
-              doc.addPage();
-              currYLeft = marginTop;
-              currYRight = marginTop;
-            }
-            doc.text(problem.text, marginLeft, currYLeft);
-            currYLeft += lineSpacing;
-          } else {
-            if (currYRight + lineSpacing > pageHeight) {
-              doc.addPage();
-              currYLeft = marginTop;
-              currYRight = marginTop;
-            }
-            doc.text(problem.text, marginLeft + colWidth + marginLeft, currYRight);
-            currYRight += lineSpacing;
-          }
-        });
-
-        doc.save('problems.pdf');
-
-        // Show success message only if i18n is loaded
-        if (!isLoading) {
-          setSuccessMessage({ key: 'messages.success.pdfGenerated' });
-          setTimeout(() => setSuccessMessage(''), 5000);
-        }
-      });
+      await generatePdf(problems, settings, paperSizeOptions);
+      if (!isLoading) {
+        setSuccessMessage({ key: 'messages.success.pdfGenerated' });
+        setTimeout(() => setSuccessMessage(''), 5000);
+      }
     } catch (err) {
       // Only show error if i18n is loaded
       if (!isLoading) {
         setError({ key: 'errors.pdfFailed' });
       }
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.DEV) {
         console.error('PDF generation error:', err);
       }
     }
@@ -130,14 +99,13 @@ function App(): React.JSX.Element {
         setHasInitialGenerated(true);
       }
     } else {
-      setError(validationError);
+      setError({ key: validationError });
     }
   }, [settings, isLoading]);
 
   // WCAG 2.2 AAA Enforcement
   useEffect(() => {
-    const cleanup = setupWCAGEnforcement();
-    return cleanup;
+    return setupWCAGEnforcement();
   }, []);
 
   const handleChange = <K extends keyof Settings>(field: K, value: Settings[K]): void => {
@@ -163,7 +131,7 @@ function App(): React.JSX.Element {
       if (validationError) {
         // Only show error if i18n is loaded
         if (!isLoading) {
-          setError(validationError);
+          setError({ key: validationError });
         }
       } else {
         // Check for restrictive settings
@@ -228,7 +196,7 @@ function App(): React.JSX.Element {
       }
       localStorage.setItem('mathgenie-quiz-results', JSON.stringify(results));
     } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.DEV) {
         console.warn('Failed to save quiz result:', error);
       }
     }
@@ -312,10 +280,12 @@ function App(): React.JSX.Element {
                     type='number'
                     id='numProblems'
                     value={settings.numProblems}
-                    onChange={e => handleChange('numProblems', parseInt(e.target.value, 10))}
+                    onChange={e =>
+                      handleChange('numProblems', parseInt(e.target.value, DECIMAL_RADIX))
+                    }
                     aria-label={t('accessibility.numProblemsInput')}
                     tabIndex={0}
-                    className='form-input'
+                    className={FORM_INPUT_CLASS}
                   />
                 </div>
                 <div className='form-row'>
@@ -327,16 +297,16 @@ function App(): React.JSX.Element {
                       value={settings.numRange[0]}
                       onChange={e =>
                         handleChange('numRange', [
-                          parseInt(e.target.value, 10),
+                          parseInt(e.target.value, DECIMAL_RADIX),
                           settings.numRange[1],
                         ])
                       }
                       aria-label={t('accessibility.minNumber')}
-                      placeholder={t('settings.from')}
+                      placeholder={t(SETTINGS_FROM_KEY)}
                       tabIndex={0}
-                      className='form-input'
+                      className={FORM_INPUT_CLASS}
                     />
-                    <span>{t('settings.to')}</span>
+                    <span>{t(SETTINGS_TO_KEY)}</span>
                     <input
                       type='number'
                       id='numRangeTo'
@@ -344,13 +314,13 @@ function App(): React.JSX.Element {
                       onChange={e =>
                         handleChange('numRange', [
                           settings.numRange[0],
-                          parseInt(e.target.value, 10),
+                          parseInt(e.target.value, DECIMAL_RADIX),
                         ])
                       }
                       aria-label={t('accessibility.maxNumber')}
-                      placeholder={t('settings.to')}
+                      placeholder={t(SETTINGS_TO_KEY)}
                       tabIndex={0}
-                      className='form-input'
+                      className={FORM_INPUT_CLASS}
                     />
                   </div>
                 </div>
@@ -363,16 +333,16 @@ function App(): React.JSX.Element {
                       value={settings.resultRange[0]}
                       onChange={e =>
                         handleChange('resultRange', [
-                          parseInt(e.target.value, 10),
+                          parseInt(e.target.value, DECIMAL_RADIX),
                           settings.resultRange[1],
                         ])
                       }
                       aria-label={t('accessibility.minResult')}
-                      placeholder={t('settings.from')}
+                      placeholder={t(SETTINGS_FROM_KEY)}
                       tabIndex={0}
-                      className='form-input'
+                      className={FORM_INPUT_CLASS}
                     />
-                    <span>{t('settings.to')}</span>
+                    <span>{t(SETTINGS_TO_KEY)}</span>
                     <input
                       type='number'
                       id='resultRangeTo'
@@ -380,13 +350,13 @@ function App(): React.JSX.Element {
                       onChange={e =>
                         handleChange('resultRange', [
                           settings.resultRange[0],
-                          parseInt(e.target.value, 10),
+                          parseInt(e.target.value, DECIMAL_RADIX),
                         ])
                       }
                       aria-label={t('accessibility.maxResult')}
-                      placeholder={t('settings.to')}
+                      placeholder={t(SETTINGS_TO_KEY)}
                       tabIndex={0}
-                      className='form-input'
+                      className={FORM_INPUT_CLASS}
                     />
                   </div>
                 </div>
@@ -399,16 +369,16 @@ function App(): React.JSX.Element {
                       value={settings.numOperandsRange[0]}
                       onChange={e =>
                         handleChange('numOperandsRange', [
-                          parseInt(e.target.value, 10),
+                          parseInt(e.target.value, DECIMAL_RADIX),
                           settings.numOperandsRange[1],
                         ])
                       }
                       aria-label={t('accessibility.minOperands')}
-                      placeholder={t('settings.from')}
+                      placeholder={t(SETTINGS_FROM_KEY)}
                       tabIndex={0}
-                      className='form-input'
+                      className={FORM_INPUT_CLASS}
                     />
-                    <span>{t('settings.to')}</span>
+                    <span>{t(SETTINGS_TO_KEY)}</span>
                     <input
                       type='number'
                       id='numOperandsRangeTo'
@@ -416,88 +386,215 @@ function App(): React.JSX.Element {
                       onChange={e =>
                         handleChange('numOperandsRange', [
                           settings.numOperandsRange[0],
-                          parseInt(e.target.value, 10),
+                          parseInt(e.target.value, DECIMAL_RADIX),
                         ])
                       }
                       aria-label={t('accessibility.maxOperands')}
-                      placeholder={t('settings.to')}
+                      placeholder={t(SETTINGS_TO_KEY)}
                       tabIndex={0}
-                      className='form-input'
+                      className={FORM_INPUT_CLASS}
                     />
                   </div>
                 </div>
-                <div className='form-row'>
-                  <label htmlFor='allowNegative'>{t('settings.allowNegative')}:</label>
-                  <input
-                    type='checkbox'
-                    id='allowNegative'
-                    checked={settings.allowNegative}
-                    onChange={e => handleChange('allowNegative', e.target.checked)}
-                    aria-label={t('accessibility.allowNegativeLabel')}
-                    tabIndex={0}
-                    className='form-checkbox'
-                  />
-                  <small className='help-text'>{t('settings.allowNegativeDesc')}</small>
-                </div>
-                <div className='form-row'>
-                  <label htmlFor='showAnswers'>{t('settings.showAnswers')}:</label>
-                  <input
-                    type='checkbox'
-                    id='showAnswers'
-                    checked={settings.showAnswers}
-                    onChange={e => handleChange('showAnswers', e.target.checked)}
-                    aria-label={t('accessibility.showAnswersLabel')}
-                    tabIndex={0}
-                    className='form-checkbox'
-                  />
-                  <small className='help-text'>{t('settings.showAnswersDesc')}</small>
-                </div>
-                <fieldset className='pdf-settings' tabIndex={0}>
-                  <legend>{t('pdf.title')}</legend>
-                  <div className='form-row'>
-                    <label htmlFor='fontSize'>{t('pdf.fontSize')}:</label>
-                    <input
-                      type='number'
-                      id='fontSize'
-                      value={settings.fontSize}
-                      onChange={e => handleChange('fontSize', parseInt(e.target.value, 10))}
-                      aria-label={t('accessibility.fontSizeInput')}
-                      tabIndex={0}
-                      className='form-input'
-                    />
-                  </div>
-                  <div className='form-row'>
-                    <label htmlFor='lineSpacing'>{t('pdf.lineSpacing')}:</label>
-                    <input
-                      type='number'
-                      id='lineSpacing'
-                      value={settings.lineSpacing}
-                      onChange={e => handleChange('lineSpacing', parseInt(e.target.value, 10))}
-                      aria-label={t('accessibility.lineSpacingInput')}
-                      tabIndex={0}
-                      className='form-input'
-                    />
-                  </div>
-                  <div className='form-row'>
-                    <label htmlFor='paperSize'>{t('pdf.paperSize')}:</label>
-                    <select
-                      id='paperSize'
-                      value={settings.paperSize}
-                      onChange={e =>
-                        handleChange('paperSize', e.target.value as Settings['paperSize'])
+
+                {/* Advanced settings - collapsible with WCAG 2.2 AAA compliance */}
+                <details
+                  className='advanced-settings'
+                  onToggle={e => {
+                    const isOpen = (e.target as HTMLDetailsElement).open;
+                    // Announce state change for screen readers
+                    const announcement = isOpen
+                      ? t('accessibility.advancedSettingsExpanded') || 'Advanced settings expanded'
+                      : t('accessibility.advancedSettingsCollapsed') ||
+                        'Advanced settings collapsed';
+
+                    // Create temporary announcement for screen readers
+                    const announcer = document.createElement('div');
+                    announcer.setAttribute('aria-live', 'polite');
+                    announcer.setAttribute('aria-atomic', 'true');
+                    announcer.className = 'sr-only';
+                    announcer.textContent = announcement;
+                    document.body.appendChild(announcer);
+                    setTimeout(() => document.body.removeChild(announcer), 1000);
+                  }}
+                >
+                  <summary
+                    className='advanced-settings-toggle'
+                    aria-controls='advanced-settings-content'
+                    aria-describedby='advanced-settings-desc'
+                    onKeyDown={e => {
+                      // Enhanced keyboard support
+                      if (
+                        e.key === 'Escape' &&
+                        (e.target as HTMLElement).closest('details')?.open
+                      ) {
+                        (e.target as HTMLElement).closest('details')?.removeAttribute('open');
+                        e.preventDefault();
                       }
-                      aria-label={t('accessibility.paperSizeSelect')}
-                      tabIndex={0}
-                      className='form-select'
-                    >
-                      {Object.keys(paperSizeOptions).map(size => (
-                        <option key={size} value={size}>
-                          {size.toUpperCase()}
-                        </option>
-                      ))}
-                    </select>
+                    }}
+                  >
+                    <span aria-hidden='true'>⚙️</span>
+                    <span>{t('settings.advanced')}</span>
+                    <span className='toggle-indicator' aria-hidden='true'>
+                      <span className='toggle-icon'>▼</span>
+                      <span className='sr-only toggle-status'>
+                        {t('accessibility.clickToExpand') || 'Click to expand'}
+                      </span>
+                    </span>
+                  </summary>
+                  <div
+                    id='advanced-settings-content'
+                    className='advanced-settings-content'
+                    role='region'
+                    aria-labelledby='advanced-settings-toggle'
+                  >
+                    <div id='advanced-settings-desc' className='sr-only'>
+                      {t('accessibility.advancedSettingsDesc') ||
+                        'Advanced settings for problem generation including negative numbers and answer display options'}
+                    </div>
+                    <div className='checkbox-item'>
+                      <input
+                        type='checkbox'
+                        id='allowNegative'
+                        checked={settings.allowNegative}
+                        onChange={e => handleChange('allowNegative', e.target.checked)}
+                        aria-label={t('accessibility.allowNegativeLabel')}
+                        tabIndex={0}
+                      />
+                      <div className='checkbox-content'>
+                        <label htmlFor='allowNegative' className='checkbox-label'>
+                          {t('settings.allowNegative')}
+                        </label>
+                        <small className='checkbox-description'>
+                          {t('settings.allowNegativeDesc')}
+                        </small>
+                      </div>
+                    </div>
+                    <div className='checkbox-item'>
+                      <input
+                        type='checkbox'
+                        id='showAnswers'
+                        checked={settings.showAnswers}
+                        onChange={e => handleChange('showAnswers', e.target.checked)}
+                        aria-label={t('accessibility.showAnswersLabel')}
+                        tabIndex={0}
+                      />
+                      <div className='checkbox-content'>
+                        <label htmlFor='showAnswers' className='checkbox-label'>
+                          {t('settings.showAnswers')}
+                        </label>
+                        <small className='checkbox-description'>
+                          {t('settings.showAnswersDesc')}
+                        </small>
+                      </div>
+                    </div>
                   </div>
-                </fieldset>
+                </details>
+                {/* PDF settings - collapsible with WCAG 2.2 AAA compliance */}
+                <details
+                  className='pdf-settings-collapsible'
+                  onToggle={e => {
+                    const isOpen = (e.target as HTMLDetailsElement).open;
+                    // Announce state change for screen readers
+                    const announcement = isOpen
+                      ? t('accessibility.pdfSettingsExpanded') || 'PDF settings expanded'
+                      : t('accessibility.pdfSettingsCollapsed') || 'PDF settings collapsed';
+
+                    // Create temporary announcement for screen readers
+                    const announcer = document.createElement('div');
+                    announcer.setAttribute('aria-live', 'polite');
+                    announcer.setAttribute('aria-atomic', 'true');
+                    announcer.className = 'sr-only';
+                    announcer.textContent = announcement;
+                    document.body.appendChild(announcer);
+                    setTimeout(() => document.body.removeChild(announcer), 1000);
+                  }}
+                >
+                  <summary
+                    className='pdf-settings-toggle'
+                    aria-controls='pdf-settings-content'
+                    aria-describedby='pdf-settings-desc'
+                    onKeyDown={e => {
+                      // Enhanced keyboard support
+                      if (
+                        e.key === 'Escape' &&
+                        (e.target as HTMLElement).closest('details')?.open
+                      ) {
+                        (e.target as HTMLElement).closest('details')?.removeAttribute('open');
+                        e.preventDefault();
+                      }
+                    }}
+                  >
+                    <span aria-hidden='true'>📄</span>
+                    <span>{t('pdf.title')}</span>
+                    <span className='toggle-indicator' aria-hidden='true'>
+                      <span className='toggle-icon'>▼</span>
+                      <span className='sr-only toggle-status'>
+                        {t('accessibility.clickToExpand') || 'Click to expand'}
+                      </span>
+                    </span>
+                  </summary>
+                  <fieldset
+                    id='pdf-settings-content'
+                    className='pdf-settings'
+                    tabIndex={0}
+                    role='region'
+                    aria-labelledby='pdf-settings-toggle'
+                  >
+                    <legend className='sr-only'>{t('pdf.title')}</legend>
+                    <div id='pdf-settings-desc' className='sr-only'>
+                      {t('accessibility.pdfSettingsDesc') ||
+                        'PDF export settings including font size, line spacing, and paper size options'}
+                    </div>
+                    <div className='form-row'>
+                      <label htmlFor='fontSize'>{t('pdf.fontSize')}:</label>
+                      <input
+                        type='number'
+                        id='fontSize'
+                        value={settings.fontSize}
+                        onChange={e =>
+                          handleChange('fontSize', parseInt(e.target.value, DECIMAL_RADIX))
+                        }
+                        aria-label={t('accessibility.fontSizeInput')}
+                        tabIndex={0}
+                        className={FORM_INPUT_CLASS}
+                      />
+                    </div>
+                    <div className='form-row'>
+                      <label htmlFor='lineSpacing'>{t('pdf.lineSpacing')}:</label>
+                      <input
+                        type='number'
+                        id='lineSpacing'
+                        value={settings.lineSpacing}
+                        onChange={e =>
+                          handleChange('lineSpacing', parseInt(e.target.value, DECIMAL_RADIX))
+                        }
+                        aria-label={t('accessibility.lineSpacingInput')}
+                        tabIndex={0}
+                        className={FORM_INPUT_CLASS}
+                      />
+                    </div>
+                    <div className='form-row'>
+                      <label htmlFor='paperSize'>{t('pdf.paperSize')}:</label>
+                      <select
+                        id='paperSize'
+                        value={settings.paperSize}
+                        onChange={e =>
+                          handleChange('paperSize', e.target.value as Settings['paperSize'])
+                        }
+                        aria-label={t('accessibility.paperSizeSelect')}
+                        tabIndex={0}
+                        className='form-select'
+                      >
+                        {Object.keys(paperSizeOptions).map(size => (
+                          <option key={size} value={size}>
+                            {size.toUpperCase()}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </fieldset>
+                </details>
               </div>
 
               <div className='results-section'>
@@ -513,13 +610,13 @@ function App(): React.JSX.Element {
                       }
                     }}
                     className='action-card generate-card'
-                    aria-label={`${t('buttons.generate')} - ${t('accessibility.generateButton')}`}
+                    aria-label={`${t(BUTTONS_GENERATE_KEY)} - ${t('accessibility.generateButton')}`}
                     tabIndex={0}
                   >
                     <div className='action-card-content'>
                       <div className='action-icon'>🎲</div>
                       <div className='action-text'>
-                        <h3>{t('buttons.generate')}</h3>
+                        <h3>{t(BUTTONS_GENERATE_KEY)}</h3>
                         <p>{t('buttons.generateDescription')}</p>
                       </div>
                       <div className='action-indicator'>
@@ -528,12 +625,24 @@ function App(): React.JSX.Element {
                     </div>
                   </button>
 
-                  <button
+                  <LoadingButton
                     onClick={downloadPdf}
                     className='action-card download-card'
                     aria-label={`${t('buttons.download')} - ${t('accessibility.downloadButton')}`}
                     disabled={problems.length === 0}
                     tabIndex={0}
+                    loadingContent={
+                      <div className='action-card-content'>
+                        <div className='action-icon'>📄</div>
+                        <div className='action-text'>
+                          <div
+                            className='loading-spinner'
+                            aria-live='polite'
+                            aria-label={t('messages.loading')}
+                          ></div>
+                        </div>
+                      </div>
+                    }
                   >
                     <div className='action-card-content'>
                       <div className='action-icon'>📄</div>
@@ -545,7 +654,7 @@ function App(): React.JSX.Element {
                         <span className='action-arrow'>→</span>
                       </div>
                     </div>
-                  </button>
+                  </LoadingButton>
 
                   <button
                     onClick={startQuizMode}
@@ -625,7 +734,7 @@ function App(): React.JSX.Element {
                         <div className='no-problems-icon'>🎯</div>
                         <div className='no-problems-text'>{t('results.noProblems')}</div>
                         <div className='no-problems-hint'>
-                          {t('results.clickToStart', { generateButton: t('buttons.generate') })}
+                          {t('results.clickToStart', { generateButton: t(BUTTONS_GENERATE_KEY) })}
                         </div>
                       </div>
                     )}
@@ -652,8 +761,8 @@ function App(): React.JSX.Element {
             </div>
           )}
 
-          {process.env.NODE_ENV === 'production' && (
-            <Suspense fallback={<div>{t('loading.insights')}</div>}>
+          {import.meta.env.PROD && (
+            <Suspense fallback={null}>
               <SpeedInsights />
             </Suspense>
           )}

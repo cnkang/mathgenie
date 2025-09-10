@@ -1,5 +1,8 @@
+import type { Settings } from '@/types';
 import { useEffect, useState } from 'react';
-import type { MessageValue, Settings } from '@/types';
+
+// Constants to avoid duplicate strings
+const SETTINGS_STORAGE_KEY = 'mathgenie-settings';
 
 const defaultSettings: Settings = {
   operations: ['+', '-'],
@@ -16,7 +19,7 @@ const defaultSettings: Settings = {
 
 const loadSettings = (): Settings => {
   try {
-    const saved = localStorage.getItem('mathgenie-settings');
+    const saved = localStorage.getItem(SETTINGS_STORAGE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
       return {
@@ -40,8 +43,8 @@ const loadSettings = (): Settings => {
       };
     }
   } catch (error) {
-    localStorage.removeItem('mathgenie-settings');
-    if (process.env.NODE_ENV === 'development') {
+    localStorage.removeItem(SETTINGS_STORAGE_KEY);
+    if (import.meta.env.DEV) {
       console.warn('Failed to load settings from localStorage:', error);
     }
   }
@@ -53,32 +56,32 @@ export const useSettings = () => {
 
   useEffect(() => {
     try {
-      localStorage.setItem('mathgenie-settings', JSON.stringify(settings));
+      localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
     } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.DEV) {
         console.warn('Failed to save settings to localStorage:', error);
       }
     }
   }, [settings]);
 
-  const validateSettings = (newSettings: Settings): MessageValue => {
+  const validateSettings = (newSettings: Settings): string => {
     if (newSettings.operations.length === 0) {
-      return { key: 'errors.noOperations' };
+      return 'errors.noOperations';
     }
     if (newSettings.numProblems <= 0 || newSettings.numProblems > 100) {
-      return { key: 'errors.invalidProblemCount' };
+      return 'errors.invalidProblemCount';
     }
     if (newSettings.numRange[0] > newSettings.numRange[1]) {
-      return { key: 'errors.invalidNumberRange' };
+      return 'errors.invalidNumberRange';
     }
     if (newSettings.resultRange[0] > newSettings.resultRange[1]) {
-      return { key: 'errors.invalidResultRange' };
+      return 'errors.invalidResultRange';
     }
     if (
       newSettings.numOperandsRange[0] > newSettings.numOperandsRange[1] ||
       newSettings.numOperandsRange[0] < 2
     ) {
-      return { key: 'errors.invalidOperandsRange' };
+      return 'errors.invalidOperandsRange';
     }
     return '';
   };

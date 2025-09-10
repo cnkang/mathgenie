@@ -1,0 +1,196 @@
+/* ===== INTERNATIONAL LAYOUT FIXES ===== */
+
+/* Handles text length variations across different languages */
+
+/* Global text handling for international content */
+.international-text {
+  line-height: 1.5;
+  hyphens: auto;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+/* Specific fixes for German and other long-text languages */
+html[lang='de'] .preset-card.clickable-card,
+html[lang='fr'] .preset-card.clickable-card {
+  min-height: 120px !important;
+}
+
+html[lang='de'] .preset-content,
+html[lang='fr'] .preset-content {
+  gap: var(--space-md) !important;
+  min-height: 100px !important;
+}
+
+html[lang='de'] .preset-info,
+html[lang='fr'] .preset-info {
+  max-width: calc(100% - 180px) !important; /* Reserve more space for German and French text */
+}
+
+html[lang='de'] .preset-card.clickable-card h4,
+html[lang='fr'] .preset-card.clickable-card h4 {
+  font-size: var(
+    --font-size-sm
+  ) !important; /* Slightly reduce font size to accommodate longer text */
+  line-height: 1.5 !important;
+}
+
+html[lang='de'] .preset-card.clickable-card p,
+html[lang='fr'] .preset-card.clickable-card p {
+  font-size: var(--font-size-xs) !important;
+  line-height: 1.6 !important;
+}
+
+/* Action cards international fixes */
+html[lang='de'] .action-card,
+html[lang='fr'] .action-card {
+  min-height: 160px !important;
+}
+
+html[lang='de'] .action-card-content,
+html[lang='fr'] .action-card-content {
+  min-height: 120px !important;
+}
+
+html[lang='de'] .action-text h3,
+html[lang='fr'] .action-text h3 {
+  font-size: var(--font-size-base) !important;
+  line-height: 1.4 !important;
+}
+
+html[lang='de'] .action-text p,
+html[lang='fr'] .action-text p {
+  font-size: var(--font-size-xs) !important;
+  line-height: 1.6 !important;
+}
+
+/* Mobile international fixes */
+@media (width <= 767px) {
+  html[lang='de'] .preset-card.clickable-card,
+  html[lang='fr'] .preset-card.clickable-card {
+    min-height: 140px !important;
+  }
+
+  html[lang='de'] .preset-content,
+  html[lang='fr'] .preset-content {
+    flex-direction: column !important;
+    gap: var(--space-lg) !important;
+    min-height: 120px !important;
+  }
+
+  html[lang='de'] .preset-info,
+  html[lang='fr'] .preset-info {
+    max-width: 100% !important;
+    margin-bottom: var(--space-md) !important;
+  }
+
+  html[lang='de'] .action-card,
+  html[lang='fr'] .action-card {
+    min-height: 180px !important;
+  }
+
+  html[lang='de'] .action-card-content,
+  html[lang='fr'] .action-card-content {
+    min-height: 140px !important;
+  }
+}
+
+@media (width <= 480px) {
+  html[lang='de'] .preset-card.clickable-card,
+  html[lang='fr'] .preset-card.clickable-card {
+    min-height: 180px !important;
+  }
+
+  html[lang='de'] .preset-content,
+  html[lang='fr'] .preset-content {
+    min-height: 160px !important;
+  }
+
+  html[lang='de'] .action-card,
+  html[lang='fr'] .action-card {
+    min-height: 200px !important;
+  }
+
+  html[lang='de'] .action-card-content,
+  html[lang='fr'] .action-card-content {
+    min-height: 160px !important;
+  }
+}
+
+/* Japanese and Chinese compact text optimizations */
+html[lang='ja'] .preset-card.clickable-card,
+html[lang='zh'] .preset-card.clickable-card {
+  min-height: 80px !important;
+}
+
+html[lang='ja'] .preset-content,
+html[lang='zh'] .preset-content {
+  min-height: 60px !important;
+}
+
+html[lang='ja'] .action-card,
+html[lang='zh'] .action-card {
+  min-height: 120px !important;
+}
+
+html[lang='ja'] .action-card-content,
+html[lang='zh'] .action-card-content {
+  min-height: 80px !important;
+}
+
+/* Spanish text handling */
+html[lang='es'] .preset-card.clickable-card {
+  min-height: 110px !important;
+}
+
+html[lang='es'] .preset-content {
+  min-height: 90px !important;
+}
+
+html[lang='es'] .action-card {
+  min-height: 150px !important;
+}
+
+html[lang='es'] .action-card-content {
+  min-height: 110px !important;
+}
+
+/* Ensure all text elements can handle long content */
+.preset-card h4,
+.preset-card p,
+.action-text h3,
+.action-text p {
+  hyphens: auto !important;
+  overflow-wrap: break-word !important;
+  white-space: normal !important;
+}
+
+/* Prevent text cutoff in all languages */
+.preset-card.clickable-card,
+.action-card {
+  overflow: visible !important;
+}
+
+.preset-content,
+.action-card-content {
+  overflow: visible !important;
+}
+
+/* Ensure proper spacing for all languages */
+.presets-grid {
+  gap: var(--space-lg) !important;
+}
+
+.action-cards-grid {
+  gap: var(--space-lg) !important;
+}
+
+/* Fix for very long words in any language */
+.preset-card h4,
+.preset-card p,
+.action-text h3,
+.action-text p {
+  max-width: 100%;
+  word-break: break-word; /* Fallback */
+  overflow-wrap: anywhere; /* Modern browsers */
+}

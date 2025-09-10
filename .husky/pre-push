@@ -4,6 +4,11 @@ export NO_COLOR=1
 
 echo "🚀 Running pre-push checks..."
 
+if git diff --cached --name-only | grep -q '^\.git/'; then
+  echo "❌ Abort: trying to commit files under .git/"
+  exit 1
+fi
+
 # 获取当前分支
 current_branch=$(git branch --show-current)
 echo "📍 Current branch: $current_branch"
@@ -18,6 +23,21 @@ fi
 echo "🔍 Running TypeScript type check..."
 if ! pnpm type-check; then
   echo "❌ TypeScript type check failed"
+  exit 1
+fi
+
+# 运行国际化检查
+echo "🌍 Running i18n checks..."
+if ! pnpm i18n:check; then
+  echo "❌ i18n checks failed"
+  exit 1
+fi
+
+# 运行CSS和HTML质量检查（不自动修复，确保代码质量）
+echo "🎨 Running CSS & HTML quality checks..."
+if ! pnpm lint:css-html; then
+  echo "❌ CSS & HTML quality checks failed"
+  echo "💡 Run 'pnpm lint:css-html:fix' to auto-fix issues"
   exit 1
 fi
 

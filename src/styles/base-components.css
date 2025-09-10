@@ -3,30 +3,31 @@
 /* Form Elements */
 label {
   display: block;
+  margin-bottom: var(--space-xs);
   font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: var(--space-xs);
   text-align: left;
 }
 
 input,
 select {
-  width: 100%;
-  padding: var(--space-md);
-  font-size: var(--font-size-base);
-  border: 2px solid var(--border-color);
-  border-radius: var(--radius-md);
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  transition: all var(--transition-fast);
-  /* WCAG 2.2 AAA: Minimum 44px touch target - force with !important to override any conflicting styles */
-  min-height: 44px !important;
-  min-width: 44px !important;
-  -webkit-appearance: none;
-  -moz-appearance: none;
   /* Ensure proper box-sizing */
   box-sizing: border-box;
+  width: 100%;
+  min-width: 44px !important;
+
+  /* WCAG 2.2 AAA: Minimum 44px touch target - force with !important to override any conflicting styles */
+  min-height: 44px !important;
+  padding: var(--space-md);
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: var(--bg-primary);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
 }
 
 /* WCAG 2.2 AAA: Comprehensive touch target enforcement for ALL interactive elements */
@@ -37,16 +38,17 @@ textarea,
 [role='button'],
 [tabindex='0'],
 a {
-  min-height: 44px !important;
-  min-width: 44px !important;
   box-sizing: border-box !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
 }
 
 /* Special handling for checkboxes and radio buttons */
 input[type='checkbox'],
 input[type='radio'] {
-  min-height: 44px !important;
   min-width: 44px !important;
+  min-height: 44px !important;
+
   /* Use padding to create the touch target while keeping visual size smaller */
   padding: 12px !important;
 }
@@ -56,15 +58,15 @@ input[type='radio'] {
 .pdf-settings:focus {
   outline: none;
   border: 2px solid var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(55, 48, 163, 0.25);
   border-radius: var(--radius-md);
+  box-shadow: 0 0 0 2px rgb(55 48 163 / 25%);
 }
 
 input:focus,
 select:focus {
   outline: none;
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgb(79 70 229 / 0.1);
+  box-shadow: 0 0 0 3px rgb(79 70 229 / 10%);
   transform: translateY(-1px);
 }
 
@@ -75,48 +77,49 @@ select:hover {
 
 /* Modern button styling - WCAG 2.2 AAA compliant */
 button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-sm);
-  padding: var(--space-md) var(--space-lg);
-  font-size: var(--font-size-base);
-  font-weight: 600;
-  border: none;
-  border-radius: var(--radius-md);
-  background: var(--primary-color);
-  color: white;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  /* WCAG 2.2 AAA: Minimum 44px touch target - force with !important to override any conflicting styles */
-  min-height: 44px !important;
-  min-width: 44px !important;
-  box-shadow: var(--shadow-sm);
-  text-decoration: none;
-  white-space: nowrap;
-  overflow: visible;
-  text-overflow: ellipsis;
-  will-change: var(--will-change);
   /* Ensure proper box-sizing */
   box-sizing: border-box;
+  display: inline-flex;
+  gap: var(--space-sm);
+  align-items: center;
+  justify-content: center;
+  min-width: 44px !important;
+
+  /* WCAG 2.2 AAA: Minimum 44px touch target - force with !important to override any conflicting styles */
+  min-height: 44px !important;
+  padding: var(--space-md) var(--space-lg);
+  overflow: visible;
+  text-overflow: ellipsis;
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: white;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  background: var(--primary-color);
+  border: none;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+  will-change: var(--will-change);
 }
 
 button:hover {
   background: var(--primary-hover);
-  transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 button:active {
-  transform: translateY(0);
   box-shadow: var(--shadow-sm);
+  transform: translateY(0);
 }
 
 button:disabled {
-  background: var(--text-muted);
   cursor: not-allowed;
-  transform: none;
+  background: var(--text-muted);
   box-shadow: none;
+  transform: none;
 }
 
 button:disabled:hover {
@@ -130,7 +133,7 @@ select:focus,
 button:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(55, 48, 163, 0.25);
+  box-shadow: 0 0 0 2px rgb(55 48 163 / 25%);
 }
 
 /* Form Layout */
@@ -138,11 +141,11 @@ button:focus {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
-  margin-bottom: var(--space-lg);
   padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
   background: var(--bg-secondary);
-  border-radius: var(--radius-lg);
   border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
   transition: all var(--transition-fast);
 }
 
@@ -152,27 +155,27 @@ button:focus {
 }
 
 .form-row label {
+  display: flex;
+  gap: var(--space-xs);
+  align-items: center;
+  margin-bottom: var(--space-xs);
   font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: var(--space-xs);
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
 }
 
 .form-row label::before {
-  content: '•';
-  color: var(--primary-color);
   font-weight: bold;
+  color: var(--primary-color);
+  content: '•';
 }
 
 /* Range inputs styling */
 .range-inputs {
   display: flex;
-  align-items: center;
-  gap: var(--space-md);
   flex-wrap: wrap;
+  gap: var(--space-md);
+  align-items: center;
 }
 
 .range-inputs input {
@@ -181,20 +184,23 @@ button:focus {
 }
 
 .range-inputs span {
+  padding: 0 var(--space-sm);
   font-weight: 600;
   color: var(--text-secondary);
   white-space: nowrap;
-  padding: 0 var(--space-sm);
 }
 
 /* Operations select styling */
 .operations-select {
-  min-height: 120px;
+  min-height: 140px;
   padding: var(--space-md);
+
+  /* Ensure all options are visible without scrolling */
+  overflow: visible;
+  font-size: var(--font-size-base);
   background: var(--bg-primary);
   border: 2px solid var(--border-color);
   border-radius: var(--radius-md);
-  font-size: var(--font-size-base);
 }
 
 .operations-select option {
@@ -204,120 +210,121 @@ button:focus {
 }
 
 .operations-select option:checked {
-  background: var(--primary-light);
-  color: var(--primary-color);
   font-weight: 600;
+  color: var(--primary-color);
+  background: var(--primary-light);
 }
 
 /* Button Group */
 .button-group {
   display: flex;
-  gap: var(--space-md);
-  margin: var(--space-xl) 0;
   flex-wrap: wrap;
+  gap: var(--space-md);
   justify-content: center;
+  margin: var(--space-xl) 0;
 }
 
 /* Specific button styles to avoid selector conflicts */
 .generate-btn,
 .download-btn,
 .quiz-mode-btn {
+  display: inline-flex;
+  gap: var(--space-sm);
+  align-items: center;
+  justify-content: center;
+  min-width: 160px;
+
   /* WCAG 2.2 AAA: Minimum 44px touch target */
   min-height: 44px;
-  min-width: 160px;
   padding: var(--space-md) var(--space-lg);
   font-size: var(--font-size-base);
   font-weight: 600;
+  cursor: pointer;
   border: none;
   border-radius: var(--radius-md);
-  cursor: pointer;
   transition: all var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-sm);
 }
 
 .generate-btn {
-  background: var(--primary-color);
   color: white;
+  background: var(--primary-color);
 }
 
 .generate-btn:hover {
   background: var(--primary-hover);
-  transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 .download-btn {
-  background: var(--success-color);
   color: white;
+  background: var(--success-color);
 }
 
 .download-btn:hover:not(:disabled) {
   background: var(--success-dark);
-  transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 .quiz-mode-btn {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
   color: white;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
 }
 
 .quiz-mode-btn:hover:not(:disabled) {
   background: linear-gradient(135deg, #d97706, #b45309);
-  transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 .button-group button {
-  flex: 0 1 auto;
-  min-width: 160px;
-  max-width: none;
-  padding: var(--space-md) var(--space-lg);
-  font-size: var(--font-size-base);
-  font-weight: 600;
-  border: none;
-  border-radius: var(--radius-md);
-  background: var(--primary-color);
-  color: white;
-  cursor: pointer;
-  transition: all 0.15s ease-in-out;
-  /* WCAG 2.2 AAA: Minimum 44px touch target */
-  min-height: 44px;
-  min-width: 160px; /* Ensure adequate width for button text */
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  text-decoration: none;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-sm);
   position: relative;
   z-index: 1;
+  display: inline-flex;
+  flex: 0 1 auto;
+  gap: var(--space-sm);
+  align-items: center;
+  justify-content: center;
+  min-width: 160px; /* Ensure adequate width for button text */
+  max-width: none;
+
+  /* WCAG 2.2 AAA: Minimum 44px touch target */
+  min-height: 44px;
+  padding: var(--space-md) var(--space-lg);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: white;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  background: var(--primary-color);
+  border: none;
+  border-radius: var(--radius-md);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 5%);
+  transition: all 0.15s ease-in-out;
 }
 
 .button-group button:hover {
   background: var(--primary-hover);
-  transform: translateY(-2px);
   box-shadow:
-    0 4px 6px -1px rgb(0 0 0 / 0.1),
-    0 2px 4px -2px rgb(0 0 0 / 0.1);
+    0 4px 6px -1px rgb(0 0 0 / 10%),
+    0 2px 4px -2px rgb(0 0 0 / 10%);
+  transform: translateY(-2px);
 }
 
 .button-group button:active {
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 5%);
   transform: translateY(0);
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
 .button-group button:disabled {
-  background: var(--text-muted);
   cursor: not-allowed;
-  transform: none;
+  background: var(--text-muted);
   box-shadow: none;
+  transform: none;
 }
 
 .button-group button:disabled:hover {
@@ -328,20 +335,20 @@ button:focus {
 /* Small helper text */
 small {
   display: block;
-  font-size: var(--font-size-xs);
-  color: var(--text-primary);
   margin-top: var(--space-xs);
+  font-size: var(--font-size-xs);
   font-style: italic;
-  line-height: 1.4;
   font-weight: 500;
+  line-height: 1.4;
+  color: var(--text-primary);
 }
 
 .help-text {
-  color: var(--text-primary) !important;
   font-weight: 500;
+  color: var(--text-primary) !important;
 }
 
-/* Checkbox styling */
+/* Enhanced Checkbox styling with better visual feedback */
 .checkbox-group {
   display: flex;
   flex-direction: column;
@@ -349,95 +356,217 @@ small {
 }
 
 .checkbox-item {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-md);
-  padding: var(--space-lg);
-  background: var(--bg-primary);
-  border-radius: var(--radius-md);
-  border: 2px solid var(--border-color);
-  transition: all var(--transition-fast);
-  cursor: pointer;
   position: relative;
+  display: flex;
+  gap: var(--space-md);
+  align-items: flex-start;
+
+  /* WCAG 2.2 AAA: Minimum touch target */
+  min-height: 44px;
+  padding: var(--space-lg);
   overflow: hidden;
+  cursor: pointer;
+  background: var(--bg-primary);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Animated background effect */
 .checkbox-item::before {
-  content: '';
   position: absolute;
   top: 0;
   left: -100%;
+  z-index: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(79, 70, 229, 0.05), transparent);
-  transition: left 0.5s ease;
+  content: '';
+  background: linear-gradient(90deg, transparent, rgb(79 70 229 / 8%), transparent);
+  transition: left 0.6s ease;
 }
 
 .checkbox-item:hover::before {
   left: 100%;
 }
 
+/* Hover state with enhanced feedback */
 .checkbox-item:hover {
+  background: rgb(79 70 229 / 2%);
   border-color: var(--primary-color);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 4px 12px rgb(79 70 229 / 15%);
   transform: translateY(-2px);
 }
 
-.checkbox-item:has(input:checked) {
-  border-color: var(--primary-color);
-  background: var(--primary-light);
-  box-shadow: var(--shadow-sm);
+/* Active/pressed state */
+.checkbox-item:active {
+  box-shadow: 0 2px 8px rgb(79 70 229 / 20%);
+  transform: translateY(0);
 }
 
-/* Modern Checkbox Design - WCAG 2.2 AAA compliant */
-.checkbox-item input[type='checkbox'] {
-  width: 20px;
-  height: 20px;
+/* Checked state with enhanced visual feedback */
+.checkbox-item:has(input:checked) {
+  background: linear-gradient(135deg, rgb(79 70 229 / 8%), rgb(79 70 229 / 4%));
+  border-color: var(--primary-color);
+  box-shadow: 0 2px 8px rgb(79 70 229 / 15%);
+}
+
+.checkbox-item:has(input:checked):hover {
+  background: linear-gradient(135deg, rgb(79 70 229 / 12%), rgb(79 70 229 / 6%));
+  box-shadow: 0 4px 16px rgb(79 70 229 / 20%);
+}
+
+/* Checkbox content layout */
+.checkbox-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.checkbox-label {
   margin: 0;
-  appearance: none;
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.checkbox-item:has(input:checked) .checkbox-label {
+  color: var(--primary-color);
+}
+
+.checkbox-description {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+  color: var(--text-secondary);
+  transition: color 0.2s ease;
+}
+
+.checkbox-item:has(input:checked) .checkbox-description {
+  color: var(--text-primary);
+}
+
+/* Modern Checkbox Design - Enhanced with better visual feedback */
+.checkbox-item input[type='checkbox'] {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  width: 24px;
+  min-width: 44px;
+  height: 24px;
+  min-height: 44px;
+
+  /* WCAG 2.2 AAA: Ensure adequate touch target with padding */
+  padding: 10px;
+  margin: 0;
   -webkit-appearance: none;
   -moz-appearance: none;
-  border: 2px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  background: var(--bg-primary);
+  appearance: none;
   cursor: pointer;
-  position: relative;
-  transition: all var(--transition-fast);
-  flex-shrink: 0;
-  /* WCAG 2.2 AAA: Ensure adequate touch target with padding */
-  padding: 12px;
-  min-width: 44px;
-  min-height: 44px;
+  background: var(--bg-primary);
+  border: 3px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Hover state for checkbox */
 .checkbox-item input[type='checkbox']:hover {
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-}
-
-.checkbox-item input[type='checkbox']:checked {
-  background: var(--primary-color);
-  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgb(79 70 229 / 10%);
   transform: scale(1.05);
 }
 
+/* Focus state for accessibility */
+.checkbox-item input[type='checkbox']:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgb(79 70 229 / 25%);
+}
+
+/* Checked state with enhanced animation */
+.checkbox-item input[type='checkbox']:checked {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgb(79 70 229 / 20%);
+  transform: scale(1.1);
+}
+
+/* Checkmark with improved animation */
 .checkbox-item input[type='checkbox']:checked::after {
-  content: '✓';
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  color: white;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 30%);
+  content: '✓';
+  transform: translate(-50%, -50%) scale(1);
+  animation: checkmarkPop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Checkmark animation */
+@keyframes checkmarkPop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(1.3);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Active/pressed state for checkbox */
+.checkbox-item input[type='checkbox']:active {
+  transform: scale(0.95);
+}
+
+.checkbox-item input[type='checkbox']:checked:active {
+  transform: scale(1.05);
+}
+
+/* Ripple effect on click */
+.checkbox-item::after {
+  position: absolute;
+  top: 50%;
+  left: 24px; /* Position over checkbox */
+  z-index: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  content: '';
+  background: rgb(79 70 229 / 30%);
+  border-radius: 50%;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.3s ease,
+    height 0.3s ease,
+    opacity 0.3s ease;
+}
+
+.checkbox-item:active::after {
+  width: 60px;
+  height: 60px;
+  opacity: 1;
 }
 
 /* Responsive form adjustments */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   .form-row {
-    margin-bottom: var(--space-md);
     padding: var(--space-lg);
+    margin-bottom: var(--space-md);
   }
 
   .range-inputs {
@@ -447,11 +576,18 @@ small {
     align-items: center;
   }
 
+  /* Ensure operations select has enough height to show all options */
+  .operations-select {
+    min-height: 160px;
+    max-height: none;
+    overflow: visible;
+  }
+
   .button-group {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--space-lg);
     justify-content: flex-start;
-    flex-wrap: wrap;
   }
 
   .button-group button {
@@ -462,19 +598,19 @@ small {
   }
 }
 
-@media (min-width: 992px) and (max-width: 1199px) {
+@media (width >= 992px) and (width <= 1199px) {
   .form-row {
     display: grid;
     grid-template-columns: 200px 1fr;
     gap: var(--space-lg);
     align-items: start;
-    margin-bottom: var(--space-lg);
     padding: var(--space-lg);
+    margin-bottom: var(--space-lg);
   }
 
   .form-row label {
-    margin-bottom: 0;
     padding-top: var(--space-sm);
+    margin-bottom: 0;
   }
 
   .range-inputs {
@@ -491,14 +627,14 @@ small {
   }
 }
 
-@media (min-width: 768px) and (max-width: 991px) {
+@media (width >= 768px) and (width <= 991px) {
   .form-row {
     display: flex;
     flex-direction: row;
-    align-items: center;
     gap: var(--space-lg);
-    margin-bottom: var(--space-lg);
+    align-items: center;
     padding: var(--space-lg);
+    margin-bottom: var(--space-lg);
   }
 
   .form-row label {
@@ -524,20 +660,20 @@ small {
   }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .form-row {
     padding: var(--space-md);
   }
 
   .range-inputs {
     flex-direction: column;
-    align-items: stretch;
     gap: var(--space-sm);
+    align-items: stretch;
   }
 
   .range-inputs span {
-    text-align: center;
     padding: var(--space-xs) 0;
+    text-align: center;
   }
 
   .button-group {
@@ -553,7 +689,7 @@ small {
   }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .form-row {
     padding: var(--space-sm);
     margin-bottom: var(--space-md);
@@ -561,19 +697,21 @@ small {
 
   input,
   select {
-    font-size: 16px; /* Prevent zoom on iOS */
-    padding: var(--space-sm);
+    min-width: 44px;
+
     /* WCAG 2.2 AAA: Maintain minimum 44px touch target on mobile */
     min-height: 44px;
-    min-width: 44px;
+    padding: var(--space-sm);
+    font-size: 16px; /* Prevent zoom on iOS */
   }
 
   button {
-    padding: var(--space-sm) var(--space-md);
-    font-size: var(--font-size-sm);
+    min-width: 44px;
+
     /* WCAG 2.2 AAA: Maintain minimum 44px touch target on mobile */
     min-height: 44px;
-    min-width: 44px;
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--font-size-sm);
   }
 
   .operations-select {
@@ -582,7 +720,7 @@ small {
   }
 }
 
-@media (max-width: 320px) {
+@media (width <= 320px) {
   .form-row {
     padding: var(--space-xs);
   }
@@ -590,9 +728,10 @@ small {
   input,
   select,
   button {
-    font-size: 14px;
+    min-width: 44px;
+
     /* WCAG 2.2 AAA: Maintain minimum 44px touch target even on very small screens */
     min-height: 44px;
-    min-width: 44px;
+    font-size: 14px;
   }
 }

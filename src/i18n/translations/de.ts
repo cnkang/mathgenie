@@ -22,6 +22,7 @@ export default {
     allowNegativeDesc: 'Erlaube, dass Berechnungsergebnisse negative Zahlen sind',
     showAnswers: 'Antworten anzeigen',
     showAnswersDesc: 'Antworten direkt neben den Aufgaben anzeigen',
+    advanced: 'Erweiterte Einstellungen',
     from: 'Von',
     to: 'bis',
     manager: {
@@ -46,7 +47,7 @@ export default {
     download: 'PDF herunterladen',
     downloadDescription: 'Ihre Aufgaben als druckbare PDF-Datei speichern',
     quizDescription: 'Testen Sie Ihre Fähigkeiten mit einem interaktiven Quiz',
-    downloadEmpty: 'PDF herunterladen',
+    downloadEmpty: 'Leere PDF herunterladen',
   },
   results: {
     title: 'Generierte Aufgaben ({{count}})',
@@ -88,6 +89,7 @@ export default {
       'Die aktuellen Einstellungen sind ziemlich restriktiv. Sie könnten weniger Aufgaben erhalten als angefordert.',
   },
   messages: {
+    loading: 'Wird geladen...',
     success: {
       problemsGenerated: '{{count}} Aufgaben erfolgreich generiert!',
       settingsImported: 'Einstellungen erfolgreich importiert!',
@@ -121,6 +123,15 @@ export default {
     errorMessage: 'Fehlermeldung',
     warningMessage: 'Warnmeldung',
     infoMessage: 'Informationsmeldung',
+    clickToExpand: 'Zum Erweitern klicken',
+    advancedSettingsExpanded: 'Erweiterte Einstellungen erweitert',
+    advancedSettingsCollapsed: 'Erweiterte Einstellungen eingeklappt',
+    advancedSettingsDesc:
+      'Erweiterte Einstellungen für die Problemgenerierung einschließlich negativer Zahlen und Antwortanzeigeoptionen',
+    pdfSettingsExpanded: 'PDF-Einstellungen erweitert',
+    pdfSettingsCollapsed: 'PDF-Einstellungen eingeklappt',
+    pdfSettingsDesc:
+      'PDF-Exporteinstellungen einschließlich Schriftgröße, Zeilenabstand und Papiergrößenoptionen',
     dismissMessage: 'Meldung schließen',
     problemsList: 'Liste der generierten Mathematikaufgaben',
   },
@@ -135,7 +146,7 @@ export default {
   presets: {
     title: 'Schnellvorlagen',
     apply: 'Anwenden',
-    clickToApply: 'Klicken zum Anwenden',
+    clickToApply: 'Anwenden',
     beginner: {
       name: 'Anfänger (1-10)',
       description: 'Einfache Addition und Subtraktion',

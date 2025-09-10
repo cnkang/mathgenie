@@ -5,24 +5,102 @@
 
 import { debounce } from './debounce';
 
-export const enforceWCAGTouchTargets = (): void => {
-  // WCAG 2.2 AAA Success Criterion 2.5.5: Target Size (Enhanced)
+const isElementHidden = (element: HTMLElement, computedStyle: CSSStyleDeclaration): boolean => {
+  return (
+    element.hidden ||
+    computedStyle.display === 'none' ||
+    computedStyle.visibility === 'hidden' ||
+    computedStyle.opacity === '0'
+  );
+};
+
+const getMinimumSizeForDevice = (): number => {
   const MIN_TOUCH_TARGET_SIZE = 44;
   const MOBILE_BREAKPOINT = 768;
   const SMALL_MOBILE_BREAKPOINT = 480;
 
-  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
   const isSmallMobile = window.innerWidth <= SMALL_MOBILE_BREAKPOINT;
+  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
 
-  // Determine minimum size based on screen size
-  let minSize = MIN_TOUCH_TARGET_SIZE;
-  if (isSmallMobile) {
-    minSize = 50; // Extra large for very small screens
-  } else if (isMobile) {
-    minSize = 48; // Enhanced for mobile
+  if (isSmallMobile) return 50; // Extra large for very small screens
+  if (isMobile) return 48; // Enhanced for mobile
+  return MIN_TOUCH_TARGET_SIZE;
+};
+
+const getPaddingForDevice = (): string => {
+  const MOBILE_BREAKPOINT = 768;
+  const SMALL_MOBILE_BREAKPOINT = 480;
+
+  const isSmallMobile = window.innerWidth <= SMALL_MOBILE_BREAKPOINT;
+  const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
+
+  if (isSmallMobile) return '16px';
+  if (isMobile) return '14px';
+  return '12px';
+};
+
+const applyMinimumDimensions = (element: HTMLElement, minSize: number): void => {
+  element.style.setProperty('min-height', `${minSize}px`, 'important');
+  element.style.setProperty('min-width', `${minSize}px`, 'important');
+  element.style.setProperty('box-sizing', 'border-box', 'important');
+};
+
+const applyButtonStyles = (element: HTMLElement): void => {
+  element.style.setProperty('display', 'inline-flex', 'important');
+  element.style.setProperty('align-items', 'center', 'important');
+  element.style.setProperty('justify-content', 'center', 'important');
+};
+
+const handleInputElement = (element: HTMLElement, minSize: number): void => {
+  const inputType = element.getAttribute('type');
+  const isCheckboxOrRadio = inputType === 'checkbox' || inputType === 'radio';
+
+  if (!isCheckboxOrRadio) return;
+
+  const wrapper = element.parentElement;
+  if (wrapper) {
+    wrapper.style.setProperty('min-height', `${minSize}px`, 'important');
+    wrapper.style.setProperty('min-width', `${minSize}px`, 'important');
+    wrapper.style.setProperty('display', 'flex', 'important');
+    wrapper.style.setProperty('align-items', 'center', 'important');
+    wrapper.style.setProperty('cursor', 'pointer', 'important');
+  }
+};
+
+const processElement = (element: HTMLElement, minSize: number): void => {
+  const computedStyle = window.getComputedStyle(element);
+
+  if (isElementHidden(element, computedStyle)) {
+    return;
   }
 
-  // Select all interactive elements
+  const currentHeight = parseFloat(computedStyle.height) || 0;
+  const currentWidth = parseFloat(computedStyle.width) || 0;
+
+  if (currentHeight < minSize || currentWidth < minSize) {
+    applyMinimumDimensions(element, minSize);
+
+    const currentPadding =
+      parseFloat(computedStyle.paddingTop) + parseFloat(computedStyle.paddingBottom);
+
+    if (currentPadding < 12) {
+      const padding = getPaddingForDevice();
+      element.style.setProperty('padding', padding, 'important');
+    }
+
+    if (element.tagName === 'BUTTON') {
+      applyButtonStyles(element);
+    }
+  }
+
+  if (element.tagName === 'INPUT') {
+    handleInputElement(element, minSize);
+  }
+};
+
+export const enforceWCAGTouchTargets = (): void => {
+  const minSize = getMinimumSizeForDevice();
+
   const interactiveSelectors = [
     'button',
     'input',
@@ -40,66 +118,10 @@ export const enforceWCAGTouchTargets = (): void => {
   const elements = document.querySelectorAll(selector);
 
   elements.forEach(element => {
-    const htmlElement = element as HTMLElement;
-
-    const computedStyle = window.getComputedStyle(htmlElement);
-
-    // Skip hidden elements
-    if (
-      htmlElement.hidden ||
-      computedStyle.display === 'none' ||
-      computedStyle.visibility === 'hidden' ||
-      computedStyle.opacity === '0'
-    ) {
-      return;
-    }
-
-    const currentHeight = parseFloat(computedStyle.height) || 0;
-    const currentWidth = parseFloat(computedStyle.width) || 0;
-
-    // Force minimum dimensions if they're too small
-    if (currentHeight < minSize || currentWidth < minSize) {
-      // Use inline styles with !important to override any CSS
-      htmlElement.style.setProperty('min-height', `${minSize}px`, 'important');
-      htmlElement.style.setProperty('min-width', `${minSize}px`, 'important');
-      htmlElement.style.setProperty('box-sizing', 'border-box', 'important');
-
-      // Ensure proper padding for touch targets
-      const currentPadding =
-        parseFloat(computedStyle.paddingTop) + parseFloat(computedStyle.paddingBottom);
-      if (currentPadding < 12) {
-        const padding = isSmallMobile ? '16px' : isMobile ? '14px' : '12px';
-        htmlElement.style.setProperty('padding', padding, 'important');
-      }
-
-      // Ensure buttons are properly displayed
-      if (htmlElement.tagName === 'BUTTON') {
-        htmlElement.style.setProperty('display', 'inline-flex', 'important');
-        htmlElement.style.setProperty('align-items', 'center', 'important');
-        htmlElement.style.setProperty('justify-content', 'center', 'important');
-      }
-    }
-
-    // Special handling for checkboxes and radio buttons
-    if (
-      htmlElement.tagName === 'INPUT' &&
-      (htmlElement.getAttribute('type') === 'checkbox' ||
-        htmlElement.getAttribute('type') === 'radio')
-    ) {
-      // Create a larger clickable area around the input
-      const wrapper = htmlElement.parentElement;
-      if (wrapper) {
-        wrapper.style.setProperty('min-height', `${minSize}px`, 'important');
-        wrapper.style.setProperty('min-width', `${minSize}px`, 'important');
-        wrapper.style.setProperty('display', 'flex', 'important');
-        wrapper.style.setProperty('align-items', 'center', 'important');
-        wrapper.style.setProperty('cursor', 'pointer', 'important');
-      }
-    }
+    processElement(element as HTMLElement, minSize);
   });
 
-  // Add debug information in development
-  if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
     console.log(
       `WCAG Enforcement: Applied ${minSize}px minimum touch targets to ${elements.length} elements`
     );

@@ -7,7 +7,7 @@ import {
   generateFilename,
   parseSettingsFile,
   serializeSettings,
-  validateSettingsData,
+  SettingsParseError,
 } from '../utils/settingsManager';
 
 interface SettingsManagerProps {
@@ -50,15 +50,15 @@ const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onImportSet
         const result = e.target?.result;
         if (typeof result === 'string') {
           const importedData = parseSettingsFile(result);
-          if (validateSettingsData(importedData)) {
-            onImportSettings(importedData.settings);
-          } else {
-            alert(t('settings.importError') || 'Invalid settings file format');
-          }
+          onImportSettings(importedData.settings);
         }
       } catch (error) {
-        alert(t('settings.importError') || 'Error reading settings file');
-        console.error('Settings import error:', error);
+        if (error instanceof SettingsParseError) {
+          alert(t('settings.importError') || 'Invalid settings file format');
+        } else {
+          alert(t('settings.importError') || 'Error importing settings file');
+          console.error('Settings import error:', error);
+        }
       }
     };
     reader.readAsText(file);

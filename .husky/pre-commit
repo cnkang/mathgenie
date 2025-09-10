@@ -1,6 +1,11 @@
 #!/bin/sh
 echo "🔍 Running pre-commit checks..."
 
+if git diff --cached --name-only | grep -q '^\.git/'; then
+  echo "❌ Abort: trying to commit files under .git/"
+  exit 1
+fi
+
 # 检查Node.js版本
 if command -v node >/dev/null 2>&1; then
   NODE_VERSION=$(node --version)
@@ -21,8 +26,16 @@ pnpm format
 
 echo "🧹 Running lint-staged..."
 # Ensure consistent color output in CI environments
+unset FORCE_COLOR
 export NO_COLOR=1
 npx lint-staged
+
+echo "🎨 Running CSS & HTML quality checks..."
+if ! pnpm lint:css-html:fix; then
+  echo "❌ CSS & HTML quality checks failed"
+  echo "💡 Some issues may have been auto-fixed. Please review and commit the changes."
+  exit 1
+fi
 
 # 检查是否有未解决的merge conflicts
 echo "🔍 Checking for merge conflicts..."

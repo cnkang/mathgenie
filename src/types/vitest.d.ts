@@ -1,13 +1,11 @@
 /// <reference types="vitest/globals" />
 
 // Custom matchers for happy-dom testing environment
-declare global {
-  namespace Vi {
-    interface Assertion<T = any> {
-      toBeInTheDocument(): T;
-      toHaveTextContent(text: string): T;
-      toHaveValue(value: any): T;
-    }
+declare module 'vitest' {
+  interface Assertion<T = unknown> {
+    toBeInTheDocument(): T;
+    toHaveTextContent(text: string): T;
+    toHaveValue(value: string | number | boolean): T;
   }
 }
 

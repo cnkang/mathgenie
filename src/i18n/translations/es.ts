@@ -22,6 +22,7 @@ export default {
     allowNegativeDesc: 'Permitir que los resultados de cálculos sean números negativos',
     showAnswers: 'Mostrar Respuestas',
     showAnswersDesc: 'Mostrar respuestas directamente junto a los problemas',
+    advanced: 'Configuración Avanzada',
     from: 'Desde',
     to: 'hasta',
     manager: {
@@ -46,7 +47,7 @@ export default {
     download: 'Descargar PDF',
     downloadDescription: 'Guardar tus problemas como un archivo PDF imprimible',
     quizDescription: 'Pon a prueba tus habilidades con un quiz interactivo',
-    downloadEmpty: 'Descargar PDF',
+    downloadEmpty: 'Descargar PDF vacío',
   },
   results: {
     title: 'Problemas Generados ({{count}})',
@@ -87,6 +88,7 @@ export default {
       'La configuración actual es bastante restrictiva. Podrías obtener menos problemas de los solicitados.',
   },
   messages: {
+    loading: 'Cargando...',
     success: {
       problemsGenerated: '¡Se generaron {{count}} problemas exitosamente!',
       settingsImported: '¡Configuración importada exitosamente!',
@@ -121,6 +123,15 @@ export default {
     errorMessage: 'Mensaje de error',
     warningMessage: 'Mensaje de advertencia',
     infoMessage: 'Mensaje de información',
+    clickToExpand: 'Hacer clic para expandir',
+    advancedSettingsExpanded: 'Configuración avanzada expandida',
+    advancedSettingsCollapsed: 'Configuración avanzada contraída',
+    advancedSettingsDesc:
+      'Configuración avanzada para la generación de problemas incluyendo números negativos y opciones de visualización de respuestas',
+    pdfSettingsExpanded: 'Configuración PDF expandida',
+    pdfSettingsCollapsed: 'Configuración PDF contraída',
+    pdfSettingsDesc:
+      'Configuración de exportación PDF incluyendo tamaño de fuente, espaciado de líneas y opciones de tamaño de papel',
     dismissMessage: 'Descartar mensaje',
     problemsList: 'Lista de problemas matemáticos generados',
   },
@@ -135,7 +146,7 @@ export default {
   presets: {
     title: 'Presets Rápidos',
     apply: 'Aplicar',
-    clickToApply: 'Haz clic para aplicar',
+    clickToApply: 'Aplicar',
     beginner: {
       name: 'Principiante (1-10)',
       description: 'Suma y resta simples',

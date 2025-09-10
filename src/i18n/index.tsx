@@ -52,6 +52,25 @@ export const useTranslation = (): I18nContextType => {
   return context;
 };
 
+// Safe translation function that can be used during initial render
+const safeT = (key: string, params: Record<string, string | number> = {}): string => {
+  const fallbackText = getFallbackText(key);
+  if (fallbackText) {
+    if (Object.keys(params).length > 0) {
+      let result = fallbackText;
+      Object.entries(params).forEach(([paramKey, paramValue]) => {
+        const placeholder = '{{' + paramKey + '}}';
+        while (result.includes(placeholder)) {
+          result = result.replace(placeholder, String(paramValue));
+        }
+      });
+      return result;
+    }
+    return fallbackText;
+  }
+  return key;
+};
+
 const getBrowserLanguage = (): string => {
   if (typeof navigator === 'undefined') {
     return 'en';
@@ -100,11 +119,9 @@ const getFallbackText = (key: string): string | null => {
     'presets.multiplication.name': 'Multiplication Focus',
     'presets.multiplication.description': 'Focus on multiplication tables',
     'settings.manager.title': 'Settings Manager',
-    'settings.export': 'Export Settings',
-    'settings.import': 'Import Settings',
-    'settings.importError': 'Error importing settings file',
     'settings.manager.export': 'Export Settings',
     'settings.manager.import': 'Import Settings',
+    'settings.importError': 'Error importing settings file',
     'language.select': 'Language',
     'errors.noOperations': 'Please select at least one operation.',
     'errors.invalidProblemCount': 'Number of problems must be between 1 and 100.',
@@ -126,6 +143,27 @@ const getFallbackText = (key: string): string | null => {
   return fallbacks[key] || null;
 };
 
+const loadTranslationFile = async (language: string): Promise<Translations> => {
+  const translations = await import(`./translations/${language}.ts`);
+  return translations.default;
+};
+
+const waitForRetry = async (attempt: number): Promise<void> => {
+  await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 100));
+};
+
+const loadFallbackTranslations = async (): Promise<Translations> => {
+  try {
+    const fallback = await import('./translations/en');
+    return fallback.default;
+  } catch (fallbackError) {
+    if (__DEV__) {
+      console.error('🌐 Failed to load fallback English translations:', fallbackError);
+    }
+    return {};
+  }
+};
+
 const loadTranslations = async (language: string): Promise<Translations> => {
   const maxRetries = 3;
   let lastError: Error | null = null;
@@ -136,13 +174,13 @@ const loadTranslations = async (language: string): Promise<Translations> => {
         console.log(`🌐 Loading translations for "${language}" (attempt ${attempt})`);
       }
 
-      const translations = await import(`./translations/${language}.ts`);
+      const translations = await loadTranslationFile(language);
 
       if (__DEV__) {
         console.log(`🌐 Successfully loaded translations for "${language}"`);
       }
 
-      return translations.default;
+      return translations;
     } catch (error) {
       lastError = error as Error;
 
@@ -150,14 +188,12 @@ const loadTranslations = async (language: string): Promise<Translations> => {
         console.warn(`🌐 Attempt ${attempt} failed to load translations for "${language}":`, error);
       }
 
-      // Wait before retry (exponential backoff)
       if (attempt < maxRetries) {
-        await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 100));
+        await waitForRetry(attempt);
       }
     }
   }
 
-  // All retries failed, fall back to English
   if (__DEV__) {
     console.error(
       `🌐 All attempts failed to load translations for "${language}", falling back to English. Last error:`,
@@ -165,16 +201,7 @@ const loadTranslations = async (language: string): Promise<Translations> => {
     );
   }
 
-  try {
-    const fallback = await import('./translations/en');
-    return fallback.default;
-  } catch (fallbackError) {
-    if (__DEV__) {
-      console.error('🌐 Failed to load fallback English translations:', fallbackError);
-    }
-    // Return empty translations as last resort
-    return {};
-  }
+  return loadFallbackTranslations();
 };
 
 interface I18nProviderProps {
@@ -193,6 +220,10 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   const [translations, setTranslations] = useState<Translations>({});
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isPending, startTransition] = useTransition();
+  const [hasInitialLoad, setHasInitialLoad] = useState<boolean>(false);
+
+  // Initialize with fallback translations to prevent warnings
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -206,6 +237,8 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
         if (!isMounted) return;
 
         setTranslations(newTranslations);
+        setHasInitialLoad(true);
+        setIsInitialized(true);
 
         // Safe localStorage access
         if (typeof window !== 'undefined' && window.localStorage) {
@@ -235,25 +268,25 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   }, [currentLanguage]);
 
   const t = (key: string, params: Record<string, string | number> = {}): string => {
+    // Always try fallback first if translations are not loaded or empty
+    if (!isInitialized || isLoading || Object.keys(translations).length === 0) {
+      return safeT(key, params);
+    }
+
     const keys = key.split('.');
-    let value: any = translations;
+    let value: unknown = translations;
 
     for (const k of keys) {
-      value = value?.[k];
-      if (value === undefined) {
+      if (value && typeof value === 'object' && k in value) {
+        value = (value as Record<string, unknown>)[k];
+      } else {
+        value = undefined;
         break;
       }
     }
 
     if (value === undefined) {
-      // Only show warning in development mode
-      if (__DEV__) {
-        console.warn(`🌐 Translation missing for key: ${key}`);
-      }
-
-      // Return a more user-friendly fallback
-      const fallbackText = getFallbackText(key);
-      value = fallbackText || key;
+      return safeT(key, params);
     }
 
     // Apply parameter substitution to both translations and fallback text
@@ -288,7 +321,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
       t,
       changeLanguage,
     }),
-    [currentLanguage, translations, isLoading, isPending]
+    [currentLanguage, translations, isLoading, isPending, hasInitialLoad]
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;

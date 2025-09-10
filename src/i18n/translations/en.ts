@@ -22,6 +22,7 @@ export default {
     allowNegativeDesc: 'Allow calculation results to be negative numbers',
     showAnswers: 'Show Answers',
     showAnswersDesc: 'Display answers directly next to problems',
+    advanced: 'Advanced Settings',
     from: 'From',
     to: 'to',
     manager: {
@@ -46,7 +47,7 @@ export default {
     download: 'Download PDF',
     downloadDescription: 'Save your problems as a printable PDF file',
     quizDescription: 'Test your skills with an interactive quiz',
-    downloadEmpty: 'Download PDF',
+    downloadEmpty: 'Generate & Download PDF',
   },
   results: {
     title: 'Generated Problems ({{count}})',
@@ -83,6 +84,7 @@ export default {
       'Current settings are quite restrictive. You might get fewer problems than requested.',
   },
   messages: {
+    loading: 'Loading...',
     success: {
       problemsGenerated: 'Successfully generated {{count}} problems!',
       settingsImported: 'Settings imported successfully!',
@@ -116,6 +118,15 @@ export default {
     errorMessage: 'Error message',
     warningMessage: 'Warning message',
     infoMessage: 'Information message',
+    clickToExpand: 'Click to expand',
+    advancedSettingsExpanded: 'Advanced settings expanded',
+    advancedSettingsCollapsed: 'Advanced settings collapsed',
+    advancedSettingsDesc:
+      'Advanced settings for problem generation including negative numbers and answer display options',
+    pdfSettingsExpanded: 'PDF settings expanded',
+    pdfSettingsCollapsed: 'PDF settings collapsed',
+    pdfSettingsDesc:
+      'PDF export settings including font size, line spacing, and paper size options',
     dismissMessage: 'Dismiss message',
     problemsList: 'List of generated math problems',
   },
@@ -130,7 +141,7 @@ export default {
   presets: {
     title: 'Quick Presets',
     apply: 'Apply',
-    clickToApply: 'Click to apply',
+    clickToApply: 'Apply',
     beginner: {
       name: 'Beginner (1-10)',
       description: 'Simple addition and subtraction',

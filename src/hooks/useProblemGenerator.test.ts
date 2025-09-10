@@ -1,7 +1,7 @@
+import type { Settings } from '@/types';
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { calculateExpression, generateProblem, useProblemGenerator } from './useProblemGenerator';
-import type { Settings } from '@/types';
 
 // Mock crypto for deterministic results
 const mockCrypto = {
@@ -76,7 +76,7 @@ describe('useProblemGenerator hook', () => {
   });
 
   it('handles validation errors', () => {
-    const validate = () => ({ key: 'errors.noOperations' });
+    const validate = () => 'errors.noOperations';
     const { result } = renderHook(() => useProblemGenerator(baseSettings, false, validate));
     let messages: ReturnType<typeof result.current.generateProblems> = {
       error: '',
