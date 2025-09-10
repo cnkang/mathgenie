@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable", "WebWorker"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -32,6 +32,7 @@
   "include": [
     "src/**/*",
     "tests/**/*",
+    "public/**/*",
     "vite.config.ts",
     "playwright.config.ts",
     "playwright.e2e.config.ts",

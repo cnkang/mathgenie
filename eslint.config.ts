@@ -15,7 +15,7 @@ const reactHooksPlugin: ESLint.Plugin = reactHooks as unknown as ESLint.Plugin;
 const config = [
   js.configs.recommended,
   {
-    files: ['**/*.{js,jsx,ts,tsx}'],
+    files: ['**/*.{ts,tsx}'],
     ignores: ['**/*.test.{js,jsx,ts,tsx}', '**/*.spec.{js,jsx,ts,tsx}', '**/setupTests.ts'],
     languageOptions: {
       parser: typescriptParser,
@@ -102,7 +102,7 @@ const config = [
         ecmaFeatures: {
           jsx: true,
         },
-        project: './tsconfig.json',
+        project: './tsconfig.eslint.json',
       },
     },
     plugins: {
@@ -133,6 +133,6 @@ const config = [
     },
   },
 // Enforce flat config typing without loosening plugin types
-] satisfies Linter.FlatConfig[];
+] satisfies Linter.Config[];
 
 export default config;
