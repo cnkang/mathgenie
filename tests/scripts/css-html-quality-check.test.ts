@@ -1,9 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import {
-  buildSafeEnv,
-  validateFilePatterns,
-  resolveBin,
-} from '../../scripts/css-html-quality-check';
+import { buildSafeEnv, resolveBin } from '../../scripts/exec-utils';
+import { validateFilePatterns } from '../../scripts/css-html-quality-check';
 import { existsSync } from 'node:fs';
 
 describe('css-html-quality-check helpers', () => {
