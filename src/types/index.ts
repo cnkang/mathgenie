@@ -45,10 +45,6 @@ export interface NumberInputProps {
   'data-testid'?: string;
 }
 
-export interface PerformanceMonitorProps {
-  children: ReactNode;
-}
-
 export interface ProblemPreviewProps {
   settings: Settings;
   generateSampleProblem?: () => string;
