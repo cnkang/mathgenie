@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react';
-import type { PerformanceMonitorProps } from '../types';
+import { useEffect, type FC, type PropsWithChildren } from 'react';
 
 // Extend Window interface for gtag
 declare global {
@@ -24,7 +23,7 @@ interface ExtendedPerformance extends Performance {
  * Performance Monitor Component with TypeScript support
  * Tracks and reports performance metrics for optimization
  */
-const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({ children }) => {
+const PerformanceMonitor: FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     // Monitor Core Web Vitals
     const observer = new PerformanceObserver(list => {
