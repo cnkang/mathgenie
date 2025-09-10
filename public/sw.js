@@ -18,7 +18,8 @@ self.addEventListener('install', event => {
         return cache.addAll(STATIC_CACHE_URLS);
       })
       .then(() => {
-        return self.skipWaiting();
+        // Ensure the new SW activates immediately without returning a value
+        self.skipWaiting();
       })
   );
 });
@@ -34,11 +35,13 @@ self.addEventListener('activate', event => {
             if (cacheName !== CACHE_NAME) {
               return caches.delete(cacheName);
             }
+            return undefined;
           })
         );
       })
       .then(() => {
-        return self.clients.claim();
+        // Take control immediately without returning from the handler
+        self.clients.claim();
       })
   );
 });
