@@ -155,14 +155,16 @@ html[lang='es'] .action-card-content {
   min-height: 110px !important;
 }
 
-/* Ensure all text elements can handle long content */
+/* Ensure all text elements can handle long content (merged duplicate selectors) */
 .preset-card h4,
 .preset-card p,
 .action-text h3,
 .action-text p {
   hyphens: auto !important;
-  overflow-wrap: break-word !important;
   white-space: normal !important;
+  max-width: 100%;
+  word-break: break-word; /* Fallback */
+  overflow-wrap: anywhere;
 }
 
 /* Prevent text cutoff in all languages */
@@ -185,12 +187,4 @@ html[lang='es'] .action-card-content {
   gap: var(--space-lg) !important;
 }
 
-/* Fix for very long words in any language */
-.preset-card h4,
-.preset-card p,
-.action-text h3,
-.action-text p {
-  max-width: 100%;
-  word-break: break-word; /* Fallback */
-  overflow-wrap: anywhere; /* Modern browsers */
-}
+/* (removed duplicate selector block; properties merged above) */

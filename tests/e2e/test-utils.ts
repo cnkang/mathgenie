@@ -267,7 +267,13 @@ export async function fillLocalStorageQuota(page: Page): Promise<void> {
         localStorage.setItem(`large-data-${i}`, largeData);
       }
     } catch (e) {
-      // Expected to fail at some point
+      // Expected to fail at some point (simulate quota exceeded); log at debug level
+      try {
+        // Browsers may drop this log; safe in test context
+        console.debug('Simulated quota exceed error while filling localStorage');
+      } catch (_ignore) {
+        // no-op
+      }
     }
   });
 }

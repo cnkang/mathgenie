@@ -264,7 +264,6 @@ function App(): React.JSX.Element {
                     }
                     aria-label={t('accessibility.selectOperations')}
                     title={t('operations.help')}
-                    tabIndex={0}
                     className='operations-select'
                   >
                     <option value='+'>{t('operations.addition')}</option>
@@ -284,7 +283,6 @@ function App(): React.JSX.Element {
                       handleChange('numProblems', parseInt(e.target.value, DECIMAL_RADIX))
                     }
                     aria-label={t('accessibility.numProblemsInput')}
-                    tabIndex={0}
                     className={FORM_INPUT_CLASS}
                   />
                 </div>
@@ -303,7 +301,6 @@ function App(): React.JSX.Element {
                       }
                       aria-label={t('accessibility.minNumber')}
                       placeholder={t(SETTINGS_FROM_KEY)}
-                      tabIndex={0}
                       className={FORM_INPUT_CLASS}
                     />
                     <span>{t(SETTINGS_TO_KEY)}</span>
@@ -319,7 +316,6 @@ function App(): React.JSX.Element {
                       }
                       aria-label={t('accessibility.maxNumber')}
                       placeholder={t(SETTINGS_TO_KEY)}
-                      tabIndex={0}
                       className={FORM_INPUT_CLASS}
                     />
                   </div>
@@ -339,7 +335,6 @@ function App(): React.JSX.Element {
                       }
                       aria-label={t('accessibility.minResult')}
                       placeholder={t(SETTINGS_FROM_KEY)}
-                      tabIndex={0}
                       className={FORM_INPUT_CLASS}
                     />
                     <span>{t(SETTINGS_TO_KEY)}</span>
@@ -355,7 +350,6 @@ function App(): React.JSX.Element {
                       }
                       aria-label={t('accessibility.maxResult')}
                       placeholder={t(SETTINGS_TO_KEY)}
-                      tabIndex={0}
                       className={FORM_INPUT_CLASS}
                     />
                   </div>
@@ -375,7 +369,6 @@ function App(): React.JSX.Element {
                       }
                       aria-label={t('accessibility.minOperands')}
                       placeholder={t(SETTINGS_FROM_KEY)}
-                      tabIndex={0}
                       className={FORM_INPUT_CLASS}
                     />
                     <span>{t(SETTINGS_TO_KEY)}</span>
@@ -391,7 +384,6 @@ function App(): React.JSX.Element {
                       }
                       aria-label={t('accessibility.maxOperands')}
                       placeholder={t(SETTINGS_TO_KEY)}
-                      tabIndex={0}
                       className={FORM_INPUT_CLASS}
                     />
                   </div>
@@ -442,10 +434,9 @@ function App(): React.JSX.Element {
                       </span>
                     </span>
                   </summary>
-                  <div
+                  <section
                     id='advanced-settings-content'
                     className='advanced-settings-content'
-                    role='region'
                     aria-labelledby='advanced-settings-toggle'
                   >
                     <div id='advanced-settings-desc' className='sr-only'>
@@ -459,7 +450,6 @@ function App(): React.JSX.Element {
                         checked={settings.allowNegative}
                         onChange={e => handleChange('allowNegative', e.target.checked)}
                         aria-label={t('accessibility.allowNegativeLabel')}
-                        tabIndex={0}
                       />
                       <div className='checkbox-content'>
                         <label htmlFor='allowNegative' className='checkbox-label'>
@@ -477,7 +467,6 @@ function App(): React.JSX.Element {
                         checked={settings.showAnswers}
                         onChange={e => handleChange('showAnswers', e.target.checked)}
                         aria-label={t('accessibility.showAnswersLabel')}
-                        tabIndex={0}
                       />
                       <div className='checkbox-content'>
                         <label htmlFor='showAnswers' className='checkbox-label'>
@@ -488,7 +477,7 @@ function App(): React.JSX.Element {
                         </small>
                       </div>
                     </div>
-                  </div>
+                  </section>
                 </details>
                 {/* PDF settings - collapsible with WCAG 2.2 AAA compliance */}
                 <details
@@ -537,8 +526,6 @@ function App(): React.JSX.Element {
                   <fieldset
                     id='pdf-settings-content'
                     className='pdf-settings'
-                    tabIndex={0}
-                    role='region'
                     aria-labelledby='pdf-settings-toggle'
                   >
                     <legend className='sr-only'>{t('pdf.title')}</legend>
@@ -556,7 +543,6 @@ function App(): React.JSX.Element {
                           handleChange('fontSize', parseInt(e.target.value, DECIMAL_RADIX))
                         }
                         aria-label={t('accessibility.fontSizeInput')}
-                        tabIndex={0}
                         className={FORM_INPUT_CLASS}
                       />
                     </div>
@@ -570,7 +556,6 @@ function App(): React.JSX.Element {
                           handleChange('lineSpacing', parseInt(e.target.value, DECIMAL_RADIX))
                         }
                         aria-label={t('accessibility.lineSpacingInput')}
-                        tabIndex={0}
                         className={FORM_INPUT_CLASS}
                       />
                     </div>
@@ -583,7 +568,6 @@ function App(): React.JSX.Element {
                           handleChange('paperSize', e.target.value as Settings['paperSize'])
                         }
                         aria-label={t('accessibility.paperSizeSelect')}
-                        tabIndex={0}
                         className='form-select'
                       >
                         {Object.keys(paperSizeOptions).map(size => (
@@ -611,7 +595,6 @@ function App(): React.JSX.Element {
                     }}
                     className='action-card generate-card'
                     aria-label={`${t(BUTTONS_GENERATE_KEY)} - ${t('accessibility.generateButton')}`}
-                    tabIndex={0}
                   >
                     <div className='action-card-content'>
                       <div className='action-icon'>🎲</div>
@@ -630,7 +613,6 @@ function App(): React.JSX.Element {
                     className='action-card download-card'
                     aria-label={`${t('buttons.download')} - ${t('accessibility.downloadButton')}`}
                     disabled={problems.length === 0}
-                    tabIndex={0}
                     loadingContent={
                       <div className='action-card-content'>
                         <div className='action-icon'>📄</div>
@@ -661,7 +643,6 @@ function App(): React.JSX.Element {
                     disabled={problems.length === 0}
                     className='action-card quiz-card'
                     aria-label={t('infoPanel.quickActions.startQuiz')}
-                    tabIndex={0}
                   >
                     <div className='action-card-content'>
                       <div className='action-icon'>🎯</div>
@@ -687,8 +668,6 @@ function App(): React.JSX.Element {
                       <div className='problems-stats'>
                         <div
                           className='problems-stat'
-                          tabIndex={0}
-                          role='button'
                           aria-label={`${problems.length} problems generated`}
                         >
                           <span>📊</span>
@@ -696,8 +675,6 @@ function App(): React.JSX.Element {
                         </div>
                         <div
                           className='problems-stat'
-                          tabIndex={0}
-                          role='button'
                           aria-label={`Operations: ${settings.operations.join(', ')}`}
                         >
                           <span>⚙️</span>
@@ -705,8 +682,6 @@ function App(): React.JSX.Element {
                         </div>
                         <div
                           className='problems-stat success-indicator'
-                          tabIndex={0}
-                          role='button'
                           aria-label={t('messages.success.generated')}
                         >
                           <span>✅</span>
@@ -715,11 +690,15 @@ function App(): React.JSX.Element {
                       </div>
                     )}
                   </div>
-                  <div
+                  <section
                     className='problems-content'
-                    tabIndex={0}
-                    role='region'
                     aria-label={t('accessibility.problemsList')}
+                    tabIndex={0} // @deviation
+                    // Rule: S6845 (tabIndex should only be on interactive elements)
+                    // Reason: This scrollable region must be focusable for keyboard users to pass WCAG (axe: scrollable-region-focusable)
+                    // Risk: Minimal; allows focus to a non-interactive scrolling container
+                    // Refactor Plan: Keep as-is; accessibility requires focusability for scrollable content
+                    // Owner: a11y; Target: 2025-12-31
                   >
                     {problems.length > 0 ? (
                       <div className='problems-grid'>
@@ -738,7 +717,7 @@ function App(): React.JSX.Element {
                         </div>
                       </div>
                     )}
-                  </div>
+                  </section>
                 </div>
 
                 <InfoPanel

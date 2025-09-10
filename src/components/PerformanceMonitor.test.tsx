@@ -11,8 +11,12 @@ class MockPerformanceObserver {
     this.callback = callback;
   }
 
-  observe() {}
-  disconnect() {}
+  observe(): void {
+    // no-op: test stub implementation for PerformanceObserver.observe
+  }
+  disconnect(): void {
+    // no-op: test stub implementation for PerformanceObserver.disconnect
+  }
 }
 
 describe('PerformanceMonitor', () => {
@@ -67,10 +71,12 @@ describe('PerformanceMonitor', () => {
   it('handles performance observer errors gracefully', () => {
     const ErrorObserver = class {
       constructor() {}
-      observe() {
+      observe(): void {
         throw new Error('Observer not supported');
       }
-      disconnect() {}
+      disconnect(): void {
+        // no-op: simulated unsupported environment
+      }
     };
 
     global.PerformanceObserver = ErrorObserver as any;
@@ -240,8 +246,12 @@ describe('PerformanceMonitor', () => {
       constructor(callback: PerformanceObserverCallback) {
         observerCallback = callback;
       }
-      observe() {}
-      disconnect() {}
+      observe(): void {
+        // no-op
+      }
+      disconnect(): void {
+        // no-op
+      }
     }
 
     global.PerformanceObserver = TestObserver as any;
@@ -284,8 +294,12 @@ describe('PerformanceMonitor', () => {
       constructor(callback: PerformanceObserverCallback) {
         observerCallback = callback;
       }
-      observe() {}
-      disconnect() {}
+      observe(): void {
+        // no-op
+      }
+      disconnect(): void {
+        // no-op
+      }
     }
 
     global.PerformanceObserver = TestObserver as any;
@@ -328,8 +342,12 @@ describe('PerformanceMonitor', () => {
       constructor(callback: PerformanceObserverCallback) {
         observerCallback = callback;
       }
-      observe() {}
-      disconnect() {}
+      observe(): void {
+        // no-op
+      }
+      disconnect(): void {
+        // no-op
+      }
     }
 
     global.PerformanceObserver = TestObserver as any;

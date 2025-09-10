@@ -32,12 +32,15 @@ describe('ErrorMessage', () => {
     ['error', 'Test error message', '⚠️'],
     ['warning', 'Test warning message', '⚡'],
     ['info', 'Test info message', 'ℹ️'],
-  ])('renders %s message correctly', (type, message, expectedIcon) => {
-    render(<ErrorMessage error={message} type={type as any} />);
+  ] as Array<['error' | 'warning' | 'info', string, string]>)(
+    'renders %s message correctly',
+    (type, message, expectedIcon) => {
+      render(<ErrorMessage error={message} type={type} />);
 
-    expect(screen.getByText(message)).toBeDefined();
-    expect(screen.getByText(expectedIcon)).toBeDefined();
-  });
+      expect(screen.getByText(message)).toBeDefined();
+      expect(screen.getByText(expectedIcon)).toBeDefined();
+    }
+  );
 
   test('renders MessageState with translation and parameters', () => {
     const messageState: MessageValue = {
@@ -53,10 +56,13 @@ describe('ErrorMessage', () => {
     ['', null],
     [null, null],
     [undefined, null],
-  ])('does not render when error is %s', (error, expected) => {
-    const { container } = render(<ErrorMessage error={error as any} />);
-    expect(container.firstChild).toBe(expected);
-  });
+  ] as Array<[MessageValue | null | undefined, null]>)(
+    'does not render when error is %s',
+    (error, expected) => {
+      const { container } = render(<ErrorMessage error={error as unknown as MessageValue} />);
+      expect(container.firstChild).toBe(expected);
+    }
+  );
 
   test('has proper accessibility attributes', () => {
     render(<ErrorMessage error='Test error' type='error' />);

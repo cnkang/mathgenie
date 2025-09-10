@@ -58,9 +58,9 @@ export default defineConfig(({ mode }) => ({
         manualChunks(id: string) {
           // Keep translation files as separate chunks for dynamic loading
           if (id.includes('src/i18n/translations/')) {
-            const match = id.match(/translations\/([a-z]{2})\.ts$/);
-            if (match) {
-              return `i18n-${match[1]}`; // Use prefixed chunk name to avoid conflicts
+            const langMatch = /translations\/([a-z]{2})\.ts$/.exec(id);
+            if (langMatch) {
+              return `i18n-${langMatch[1]}`; // Use prefixed chunk name to avoid conflicts
             }
           }
           // Bundle React-related libraries separately

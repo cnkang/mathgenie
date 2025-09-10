@@ -26,7 +26,8 @@ const config: Linter.FlatConfig[] = [
         ecmaFeatures: {
           jsx: true,
         },
-        project: './tsconfig.json',
+        // Use dedicated ESLint tsconfig to include e2e/spec files
+        project: './tsconfig.eslint.json',
       },
     },
     plugins: {
