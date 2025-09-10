@@ -1,13 +1,13 @@
 /* ===== INTERNATIONAL LAYOUT FIXES ===== */
+
 /* Handles text length variations across different languages */
 
 /* Global text handling for international content */
 .international-text {
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  hyphens: auto;
-  white-space: normal;
   line-height: 1.5;
+  hyphens: auto;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 /* Specific fixes for German and other long-text languages */
@@ -18,8 +18,8 @@ html[lang='fr'] .preset-card.clickable-card {
 
 html[lang='de'] .preset-content,
 html[lang='fr'] .preset-content {
-  min-height: 100px !important;
   gap: var(--space-md) !important;
+  min-height: 100px !important;
 }
 
 html[lang='de'] .preset-info,
@@ -65,7 +65,7 @@ html[lang='fr'] .action-text p {
 }
 
 /* Mobile international fixes */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   html[lang='de'] .preset-card.clickable-card,
   html[lang='fr'] .preset-card.clickable-card {
     min-height: 140px !important;
@@ -73,9 +73,9 @@ html[lang='fr'] .action-text p {
 
   html[lang='de'] .preset-content,
   html[lang='fr'] .preset-content {
-    min-height: 120px !important;
     flex-direction: column !important;
     gap: var(--space-lg) !important;
+    min-height: 120px !important;
   }
 
   html[lang='de'] .preset-info,
@@ -95,7 +95,7 @@ html[lang='fr'] .action-text p {
   }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   html[lang='de'] .preset-card.clickable-card,
   html[lang='fr'] .preset-card.clickable-card {
     min-height: 180px !important;
@@ -160,9 +160,8 @@ html[lang='es'] .action-card-content {
 .preset-card p,
 .action-text h3,
 .action-text p {
-  word-wrap: break-word !important;
-  overflow-wrap: break-word !important;
   hyphens: auto !important;
+  overflow-wrap: break-word !important;
   white-space: normal !important;
 }
 
@@ -192,6 +191,6 @@ html[lang='es'] .action-card-content {
 .action-text h3,
 .action-text p {
   max-width: 100%;
-  overflow-wrap: anywhere; /* Modern browsers */
   word-break: break-word; /* Fallback */
+  overflow-wrap: anywhere; /* Modern browsers */
 }

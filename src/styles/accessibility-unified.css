@@ -1,5 +1,7 @@
 /* ===== UNIFIED WCAG 2.2 AAA ACCESSIBILITY COMPLIANCE ===== */
+
 /* This file consolidates all accessibility fixes for maximum compliance */
+
 /* WCAG 2.2 AAA requires minimum 44x44px touch targets for Level AAA compliance */
 
 /* Screen reader only content */
@@ -10,9 +12,9 @@
   padding: 0;
   margin: -1px;
   overflow: hidden;
-  clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+  clip: rect(0, 0, 0, 0);
 }
 
 /* CRITICAL: Universal touch target enforcement - covers ALL interactive elements */
@@ -61,39 +63,40 @@ label,
 .form-select,
 .form-checkbox,
 .operations-select {
+  box-sizing: border-box !important;
+  min-width: 44px !important;
+
   /* WCAG 2.2 AAA: Minimum 44x44px touch targets */
   min-height: 44px !important;
-  min-width: 44px !important;
-  box-sizing: border-box !important;
-  /* Ensure adequate spacing between touch targets */
-  margin: 2px !important;
+
   /* Ensure touch targets are properly padded */
   padding: 12px 16px !important;
+
+  /* Ensure adequate spacing between touch targets */
+  margin: 2px !important;
 }
 
 /* Special handling for checkboxes and radio buttons */
 input[type='checkbox'],
 input[type='radio'],
 .form-checkbox {
+  position: relative;
+  min-width: 44px !important;
+  min-height: 44px !important;
+
   /* Use padding to create the touch target while keeping visual size appropriate */
   padding: 12px !important;
-  min-height: 44px !important;
-  min-width: 44px !important;
-  position: relative;
 }
 
 input[type='checkbox']::before,
 input[type='radio']::before,
 .form-checkbox::before {
-  content: '';
   position: absolute;
-  top: -12px;
-  left: -12px;
-  right: -12px;
-  bottom: -12px;
-  min-height: 44px;
-  min-width: 44px;
+  inset: -12px;
   z-index: -1;
+  min-width: 44px;
+  min-height: 44px;
+  content: '';
 }
 
 /* Form elements specific adjustments */
@@ -109,25 +112,25 @@ textarea,
 
 /* Special handling for quick-action-btn */
 .quick-action-btn {
-  min-height: 60px !important;
-  min-width: 120px !important;
-  padding: 12px 16px !important;
+  box-sizing: border-box !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  box-sizing: border-box !important;
+  min-width: 120px !important;
+  min-height: 60px !important;
+  padding: 12px 16px !important;
   line-height: 1.2 !important;
 }
 
 /* Special handling for problem items */
 .problem-item {
-  min-height: 44px !important;
-  min-width: 44px !important;
-  padding: 12px 16px !important;
   box-sizing: border-box !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+  padding: 12px 16px !important;
   text-align: center !important;
   word-break: break-word !important;
   overflow-wrap: break-word !important;
@@ -143,7 +146,7 @@ textarea,
 }
 
 /* WCAG 2.2 AAA Mobile-specific overrides */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   /* Enhanced mobile touch targets */
   *[onclick],
   *[onmousedown],
@@ -190,9 +193,10 @@ textarea,
   .form-select,
   .form-checkbox,
   .operations-select {
+    min-width: 48px !important;
+
     /* WCAG 2.2 AAA: Enhanced mobile touch targets (48px recommended) */
     min-height: 48px !important;
-    min-width: 48px !important;
     padding: 14px 18px !important;
     margin: 4px !important;
   }
@@ -210,14 +214,14 @@ textarea,
   input[type='checkbox'],
   input[type='radio'],
   .form-checkbox {
-    padding: 14px !important;
-    min-height: 48px !important;
     min-width: 48px !important;
+    min-height: 48px !important;
+    padding: 14px !important;
   }
 
   .quick-action-btn {
-    min-height: 64px !important;
     min-width: 140px !important;
+    min-height: 64px !important;
     padding: 14px 18px !important;
   }
 
@@ -233,7 +237,7 @@ textarea,
 }
 
 /* Extra small screens - maximum accessibility */
-@media (max-width: 480px) {
+@media (width <= 480px) {
   /* Ultra-aggressive touch target enforcement */
   *[onclick],
   *[onmousedown],
@@ -280,9 +284,10 @@ textarea,
   .form-select,
   .form-checkbox,
   .operations-select {
+    min-width: 50px !important;
+
     /* WCAG 2.2 AAA: Extra large touch targets for very small screens */
     min-height: 50px !important;
-    min-width: 50px !important;
     padding: 16px 20px !important;
     margin: 6px !important;
   }
@@ -301,14 +306,14 @@ textarea,
   input[type='checkbox'],
   input[type='radio'],
   .form-checkbox {
-    padding: 16px !important;
-    min-height: 50px !important;
     min-width: 50px !important;
+    min-height: 50px !important;
+    padding: 16px !important;
   }
 
   .quick-action-btn {
-    min-height: 68px !important;
     min-width: 160px !important;
+    min-height: 68px !important;
     padding: 16px 20px !important;
   }
 
@@ -330,39 +335,39 @@ button.quiz-mode-btn,
 .button-group button.generate-btn,
 .button-group button.download-btn,
 .button-group button.quiz-mode-btn {
-  min-height: 44px !important;
-  min-width: 160px !important;
-  padding: 12px 16px !important;
   box-sizing: border-box !important;
   display: inline-flex !important;
+  gap: 8px !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 8px !important;
+  min-width: 160px !important;
+  min-height: 44px !important;
+  padding: 12px 16px !important;
 }
 
 /* Mobile specific button overrides */
-@media (max-width: 768px) {
+@media (width <= 768px) {
   button.generate-btn,
   button.download-btn,
   button.quiz-mode-btn,
   .button-group button.generate-btn,
   .button-group button.download-btn,
   .button-group button.quiz-mode-btn {
-    min-height: 48px !important;
     min-width: 140px !important;
+    min-height: 48px !important;
     padding: 14px 18px !important;
   }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   button.generate-btn,
   button.download-btn,
   button.quiz-mode-btn,
   .button-group button.generate-btn,
   .button-group button.download-btn,
   .button-group button.quiz-mode-btn {
-    min-height: 50px !important;
     min-width: 160px !important;
+    min-height: 50px !important;
     padding: 16px 20px !important;
   }
 }
@@ -372,13 +377,15 @@ button.quiz-mode-btn,
 *:focus-visible {
   outline: 3px solid #4f46e5 !important;
   outline-offset: 2px !important;
-  /* High contrast focus ring for all backgrounds */
-  box-shadow:
-    0 0 0 2px #ffffff,
-    0 0 0 5px #4f46e5,
-    0 0 8px rgba(79, 70, 229, 0.3) !important;
+
   /* Ensure focus is visible on mobile */
   border-radius: 4px !important;
+
+  /* High contrast focus ring for all backgrounds */
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 0 5px #4f46e5,
+    0 0 8px rgb(79 70 229 / 30%) !important;
 }
 
 /* WCAG 2.2 AAA: Ensure all interactive elements are keyboard accessible */
@@ -390,8 +397,7 @@ textarea:not([tabindex='-1']),
 [onclick]:not([tabindex='-1']),
 a[href]:not([tabindex='-1']) {
   /* Ensure all interactive elements are focusable */
-  -webkit-tap-highlight-color: rgba(79, 70, 229, 0.2);
-  tap-highlight-color: rgba(79, 70, 229, 0.2);
+  -webkit-tap-highlight-color: rgb(79 70 229 / 20%);
 }
 
 /* WCAG 2.2 AAA: Reduced motion support */
@@ -399,9 +405,9 @@ a[href]:not([tabindex='-1']) {
   *,
   *::before,
   *::after {
+    transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
 }
@@ -413,9 +419,9 @@ a[href]:not([tabindex='-1']) {
   select,
   textarea,
   [role='button'] {
-    border: 2px solid currentColor !important;
-    background-color: ButtonFace !important;
     color: ButtonText !important;
+    background-color: ButtonFace !important;
+    border: 2px solid currentcolor !important;
   }
 
   *:focus,
@@ -431,9 +437,9 @@ a[href]:not([tabindex='-1']) {
   *:focus,
   *:focus-visible {
     box-shadow:
-      0 0 0 2px #000000,
+      0 0 0 2px #000,
       0 0 0 5px #6366f1,
-      0 0 8px rgba(99, 102, 241, 0.3) !important;
+      0 0 8px rgb(99 102 241 / 30%) !important;
   }
 }
 
@@ -441,8 +447,8 @@ a[href]:not([tabindex='-1']) {
 .generate-btn,
 .download-btn,
 .quiz-mode-btn {
-  visibility: visible !important;
   display: inline-flex !important;
-  opacity: 1 !important;
+  visibility: visible !important;
   pointer-events: auto !important;
+  opacity: 1 !important;
 }

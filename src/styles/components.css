@@ -6,10 +6,10 @@
 }
 
 .progress-container .progress-text {
+  margin-top: var(--space-xs);
   font-size: var(--font-size-xs);
   color: var(--text-secondary);
   text-align: center;
-  margin-top: var(--space-xs);
 }
 
 /* Number Input Component */
@@ -21,24 +21,25 @@
 }
 
 .number-input-label {
+  font-size: var(--font-size-sm);
   font-weight: 500;
   color: var(--text-primary);
-  font-size: var(--font-size-sm);
 }
 
 .required-indicator {
-  color: var(--error-color);
   margin-left: 2px;
+  color: var(--error-color);
 }
 
 .input-pending-indicator {
   position: absolute;
   top: 50%;
   right: 8px;
-  transform: translateY(-50%);
   display: flex;
   align-items: center;
+  transform: translateY(-50%);
 }
 
 /* Note: Settings Manager styles moved to src/components/SettingsManager.css */
+
 /* Note: Other component-specific styles moved to their respective component CSS files */

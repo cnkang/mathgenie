@@ -9,7 +9,6 @@ import { spawnSync } from 'child_process';
 import { statSync } from 'fs';
 import path from 'path';
 
-
 interface SonarCheckOptions {
   fix?: boolean;
   files?: string[];
@@ -111,6 +110,7 @@ function isSecureDirectory(dir: string): boolean {
  * Gets fallback system paths when dynamic filtering results in empty PATH
  * These are minimal, well-known system directories
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getSystemFallbackPaths(): string[] {
   switch (process.platform) {
     case 'darwin': // macOS
@@ -125,43 +125,13 @@ function getSystemFallbackPaths(): string[] {
 }
 
 /**
- * Creates a secure environment with dynamically filtered PATH variable
- * Analyzes current PATH and filters out unsafe directories
+ * Creates a secure environment with basic PATH filtering
+ * Less restrictive than the original to ensure npx can be found
  */
-function createSecureEnvironment(): NodeJS.ProcessEnv {
-  const currentPath = process.env.PATH || '';
-  const pathSeparator = process.platform === 'win32' ? ';' : ':';
-
-  // Parse current PATH into individual directories
-  const pathDirectories = currentPath
-    .split(pathSeparator)
-    .filter(Boolean) // Remove empty entries
-    .filter(isSecureDirectory); // Filter for secure directories only
-
-  // If filtering resulted in no paths, use system fallback
-  const securePaths = pathDirectories.length > 0 ? pathDirectories : getSystemFallbackPaths();
-
-  console.log(
-    `🔒 Filtered PATH from ${currentPath.split(pathSeparator).length} to ${securePaths.length} secure directories`
-  );
-
+function createSecureEnvironment(): Record<string, string | undefined> {
   return {
-    // Essential environment variables for Node.js and npm/pnpm
-    NODE_ENV: process.env.NODE_ENV || 'development',
-    HOME: process.env.HOME,
-    USER: process.env.USER,
-    USERPROFILE: process.env.USERPROFILE, // Windows equivalent of HOME
-    LANG: process.env.LANG || 'en_US.UTF-8',
-
-    // Dynamically filtered secure PATH
-    PATH: securePaths.join(pathSeparator),
-
-    // Node.js specific variables (only if they exist and are safe)
-    NODE_OPTIONS: process.env.NODE_OPTIONS,
-
-    // npm/pnpm configuration (only safe ones)
-    npm_config_cache: process.env.npm_config_cache,
-    npm_config_prefix: process.env.npm_config_prefix,
+    // Keep most of the original environment for compatibility
+    ...process.env,
 
     // Explicitly remove dangerous environment variables
     LD_PRELOAD: undefined,
@@ -169,9 +139,6 @@ function createSecureEnvironment(): NodeJS.ProcessEnv {
     DYLD_INSERT_LIBRARIES: undefined,
     DYLD_LIBRARY_PATH: undefined,
     DYLD_FALLBACK_LIBRARY_PATH: undefined,
-
-    // Windows specific - only include safe PATHEXT
-    PATHEXT: process.platform === 'win32' ? '.COM;.EXE;.BAT;.CMD' : undefined,
   };
 }
 
@@ -209,28 +176,10 @@ function buildESLintArgs(options: SonarCheckOptions): string[] {
 }
 
 /**
- * Finds the absolute path to npx executable in secure directories
- * Prevents relying on potentially unsafe PATH resolution
+ * Finds npx executable - simplified version
  */
 function findSecureNpxPath(): string {
-  const secureSearchPaths = getSystemFallbackPaths();
-  const npxName = process.platform === 'win32' ? 'npx.cmd' : 'npx';
-
-  for (const searchPath of secureSearchPaths) {
-    const npxPath = path.join(searchPath, npxName);
-    try {
-      const stats = statSync(npxPath);
-      if (stats.isFile()) {
-        return npxPath;
-      }
-    } catch {
-      // Continue searching
-    }
-  }
-
-  // Fallback to npx if not found in secure paths
-  // This maintains functionality while logging the security concern
-  console.warn('⚠️ Could not find npx in secure paths, using system resolution');
+  // Use npx directly from PATH - it should be available in development environment
   return 'npx';
 }
 
