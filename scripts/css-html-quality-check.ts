@@ -6,13 +6,11 @@
  * Usage: tsx scripts/css-html-quality-check.ts [--fix]
  */
 
-import { spawnSync, SpawnSyncReturns } from 'child_process';
-import { existsSync, readFileSync } from 'fs';
+import { SpawnSyncReturns } from 'child_process';
+import { existsSync } from 'fs';
 import path from 'path';
-import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
-
-const require = createRequire(import.meta.url);
+import { spawnNodeCli } from './exec-utils';
 
 // Parse command line arguments
 const args = process.argv.slice(2);
@@ -25,83 +23,19 @@ const INVALID_CSS_PATTERNS = 'Invalid CSS file patterns' as const;
 const INVALID_HTML_PATTERNS = 'Invalid HTML file patterns' as const;
 const STYLELINT_TOOL = 'stylelint' as const;
 const HTML_VALIDATE_TOOL = 'html-validate' as const;
-const SPAWN_OPTIONS = {
-  encoding: 'utf8' as const,
-  stdio: 'pipe' as const,
-  shell: false,
-  timeout: 60000,
-  windowsHide: true,
-} as const;
+// spawn options are provided per-call in spawnNodeCli
 
 /**
  * Build a sanitized environment for child processes
  * - Removes dangerous variables to prevent library injection
  * - Sets a fixed PATH containing only system directories (no writable dirs)
  */
-export function buildSafeEnv(): Record<string, string> {
-  const dangerousVars = [
-    'LD_PRELOAD',
-    'LD_LIBRARY_PATH',
-    'DYLD_INSERT_LIBRARIES',
-    'DYLD_LIBRARY_PATH',
-  ];
-
-  const baseEnv: Record<string, string> = {};
-
-  // Copy only non-dangerous env vars
-  for (const [key, value] of Object.entries(process.env)) {
-    if (dangerousVars.includes(key)) continue;
-    if (typeof value === 'string') baseEnv[key] = value;
-  }
-
-  // Remove PATH entirely to avoid any PATH-based command resolution
-  // and ensure we only execute absolute binaries.
-  delete baseEnv.PATH;
-  delete (baseEnv as Record<string, string | undefined>)['Path'];
-
-  return baseEnv;
-}
+export { buildSafeEnv } from './exec-utils';
 
 /**
  * Resolve the absolute path to a package's bin script to avoid PATH lookups.
  */
-export function resolveBin(pkgName: string, binName?: string): string {
-  const pkgJsonPath = require.resolve(`${pkgName}/package.json`);
-  const pkgDir = path.dirname(pkgJsonPath);
-  const raw = readFileSync(pkgJsonPath, 'utf8');
-  const pkg = JSON.parse(raw) as { name?: string; bin?: string | Record<string, string> };
-  const binField = pkg.bin;
-
-  if (typeof binField === 'string') {
-    return path.resolve(pkgDir, binField);
-  }
-
-  if (binField && typeof binField === 'object') {
-    if (binName && typeof binField[binName] === 'string') {
-      return path.resolve(pkgDir, binField[binName]);
-    }
-    if (pkg.name && typeof binField[pkg.name] === 'string') {
-      return path.resolve(pkgDir, binField[pkg.name]);
-    }
-    const values = Object.values(binField).filter((v): v is string => typeof v === 'string');
-    if (values.length === 1) {
-      return path.resolve(pkgDir, values[0]);
-    }
-  }
-
-  const suffix = binName ? ` (bin: ${binName})` : '';
-  throw new Error(`Cannot resolve bin for package: ${pkgName}${suffix}`);
-}
-
-/**
- * Build spawn options including sanitized environment.
- */
-function buildSpawnOptions() {
-  return {
-    ...SPAWN_OPTIONS,
-    env: buildSafeEnv(),
-  } as const;
-}
+export { resolveBin } from './exec-utils';
 
 /**
  * Creates a failed result object
@@ -204,18 +138,19 @@ function runStylelint(): QualityCheckResult {
 
   try {
     // Execute stylelint via the Node binary with an absolute bin script path
-    const nodeBin = process.execPath; // absolute path to the current Node.js executable
-    const stylelintBin = resolveBin(STYLELINT_TOOL, STYLELINT_TOOL);
-
     const stylelintArgs = [
-      stylelintBin,
       ...cssPatterns,
       '--formatter',
       'string',
       ...(shouldFix ? ['--fix'] : []),
     ];
 
-    const result = spawnSync(nodeBin, stylelintArgs, buildSpawnOptions());
+    const result = spawnNodeCli(STYLELINT_TOOL, STYLELINT_TOOL, stylelintArgs, {
+      encoding: 'utf8',
+      stdio: 'pipe',
+      removePath: true,
+      timeout: 60000,
+    });
 
     return isStylelintSuccess(result)
       ? handleStylelintSuccess(result)
@@ -241,11 +176,13 @@ function runHTMLValidate(): QualityCheckResult {
   }
 
   try {
-    const nodeBin = process.execPath;
-    const htmlValidateBin = resolveBin(HTML_VALIDATE_TOOL, HTML_VALIDATE_TOOL);
-    const args = [htmlValidateBin, ...htmlPatterns];
-
-    const result = spawnSync(nodeBin, args, buildSpawnOptions());
+    const args = [...htmlPatterns];
+    const result = spawnNodeCli(HTML_VALIDATE_TOOL, HTML_VALIDATE_TOOL, args, {
+      encoding: 'utf8',
+      stdio: 'pipe',
+      removePath: true,
+      timeout: 60000,
+    });
 
     // Handle successful execution (status 0 or null with no error/signal)
     if (
