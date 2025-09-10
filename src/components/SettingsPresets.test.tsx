@@ -134,35 +134,34 @@ describe('SettingsPresets', () => {
   });
 
   test('renders with fallback text when translations return undefined', () => {
-    const FallbackPresets = ({ onApply }: { onApply: (s: any) => void }) => {
-      const mockT = (key: string) => key;
-      const presets = [
-        {
-          name: mockT('presets.beginner.name') ?? 'Beginner (1-10)',
-          description: mockT('presets.beginner.description') ?? 'Simple addition and subtraction',
-          settings: { operations: ['+', '-'] as Operation[], numProblems: 15 },
-        },
-      ];
+    const handleApply = (settings: any) => mockOnApplyPreset(settings);
+    const mockT = (key: string) => key;
+    const presets = [
+      {
+        name: mockT('presets.beginner.name') ?? 'Beginner (1-10)',
+        description: mockT('presets.beginner.description') ?? 'Simple addition and subtraction',
+        settings: { operations: ['+', '-'] as Operation[], numProblems: 15 },
+      },
+    ];
 
-      return (
-        <div className='settings-presets'>
-          <h3>{mockT('presets.title') ?? 'Quick Presets'}</h3>
-          <div className='presets-grid'>
-            {presets.map(preset => (
-              <div key={preset.name} className='preset-card'>
-                <h4>{preset.name}</h4>
-                <p>{preset.description}</p>
-                <button onClick={() => onApply(preset.settings)}>
-                  {mockT('presets.apply') ?? 'Apply'}
-                </button>
-              </div>
-            ))}
-          </div>
+    const FallbackPresets = ({ onApply }: { onApply: (s: any) => void }) => (
+      <div className='settings-presets'>
+        <h3>{mockT('presets.title') ?? 'Quick Presets'}</h3>
+        <div className='presets-grid'>
+          {presets.map(preset => (
+            <div key={preset.name} className='preset-card'>
+              <h4>{preset.name}</h4>
+              <p>{preset.description}</p>
+              <button onClick={() => onApply(preset.settings)}>
+                {mockT('presets.apply') ?? 'Apply'}
+              </button>
+            </div>
+          ))}
         </div>
-      );
-    };
+      </div>
+    );
 
-    render(<FallbackPresets onApply={mockOnApplyPreset} />);
+    render(<FallbackPresets onApply={handleApply} />);
 
     // Verify fallback values are used
     expect(screen.getByText('presets.title')).toBeDefined();
@@ -257,103 +256,102 @@ describe('SettingsPresets', () => {
   });
 
   test('renders with mock translation provider that returns undefined', () => {
-    // Create a custom component that directly tests the fallback logic
-    const TestSettingsPresetsWithFallbacks = ({ onApply }: { onApply: (s: Settings) => void }) => {
-      // Simulate the exact same logic as SettingsPresets but with undefined translations
-      const mockT = (key: string) => key;
+    const mockT = (key: string) => key;
+    const handleApplyPreset = (settings: Settings) => mockOnApplyPreset(settings);
 
-      const presets = [
-        {
-          name: mockT('presets.beginner.name') ?? 'Beginner (1-10)',
-          description: mockT('presets.beginner.description') ?? 'Simple addition and subtraction',
-          settings: {
-            operations: ['+', '-'] as Operation[],
-            numProblems: 15,
-            numRange: [1, 10] as [number, number],
-            resultRange: [0, 20] as [number, number],
-            numOperandsRange: [2, 2] as [number, number],
-            allowNegative: false,
-            showAnswers: false,
-            fontSize: 18,
-            lineSpacing: 16,
-            paperSize: 'a4' as const,
-          },
+    const presets = [
+      {
+        name: mockT('presets.beginner.name') ?? 'Beginner (1-10)',
+        description: mockT('presets.beginner.description') ?? 'Simple addition and subtraction',
+        settings: {
+          operations: ['+', '-'] as Operation[],
+          numProblems: 15,
+          numRange: [1, 10] as [number, number],
+          resultRange: [0, 20] as [number, number],
+          numOperandsRange: [2, 2] as [number, number],
+          allowNegative: false,
+          showAnswers: false,
+          fontSize: 18,
+          lineSpacing: 16,
+          paperSize: 'a4' as const,
         },
-        {
-          name: mockT('presets.intermediate.name') ?? 'Intermediate (1-50)',
-          description:
-            mockT('presets.intermediate.description') ?? 'All operations with medium numbers',
-          settings: {
-            operations: ['+', '-', '*'] as Operation[],
-            numProblems: 20,
-            numRange: [1, 50] as [number, number],
-            resultRange: [0, 100] as [number, number],
-            numOperandsRange: [2, 3] as [number, number],
-            allowNegative: false,
-            showAnswers: false,
-            fontSize: 18,
-            lineSpacing: 16,
-            paperSize: 'a4' as const,
-          },
+      },
+      {
+        name: mockT('presets.intermediate.name') ?? 'Intermediate (1-50)',
+        description:
+          mockT('presets.intermediate.description') ?? 'All operations with medium numbers',
+        settings: {
+          operations: ['+', '-', '*'] as Operation[],
+          numProblems: 20,
+          numRange: [1, 50] as [number, number],
+          resultRange: [0, 100] as [number, number],
+          numOperandsRange: [2, 3] as [number, number],
+          allowNegative: false,
+          showAnswers: false,
+          fontSize: 18,
+          lineSpacing: 16,
+          paperSize: 'a4' as const,
         },
-        {
-          name: mockT('presets.advanced.name') ?? 'Advanced (1-100)',
-          description: mockT('presets.advanced.description') ?? 'All operations including division',
-          settings: {
-            operations: ['+', '-', '*', '/'] as Operation[],
-            numProblems: 25,
-            numRange: [1, 100] as [number, number],
-            resultRange: [0, 200] as [number, number],
-            numOperandsRange: [2, 4] as [number, number],
-            allowNegative: true,
-            showAnswers: false,
-            fontSize: 18,
-            lineSpacing: 16,
-            paperSize: 'a4' as const,
-          },
+      },
+      {
+        name: mockT('presets.advanced.name') ?? 'Advanced (1-100)',
+        description: mockT('presets.advanced.description') ?? 'All operations including division',
+        settings: {
+          operations: ['+', '-', '*', '/'] as Operation[],
+          numProblems: 25,
+          numRange: [1, 100] as [number, number],
+          resultRange: [0, 200] as [number, number],
+          numOperandsRange: [2, 4] as [number, number],
+          allowNegative: true,
+          showAnswers: false,
+          fontSize: 18,
+          lineSpacing: 16,
+          paperSize: 'a4' as const,
         },
-        {
-          name: mockT('presets.multiplication.name') ?? 'Multiplication Tables',
-          description:
-            mockT('presets.multiplication.description') ?? 'Focus on multiplication practice',
-          settings: {
-            operations: ['*'] as Operation[],
-            numProblems: 30,
-            numRange: [1, 12] as [number, number],
-            resultRange: [1, 144] as [number, number],
-            numOperandsRange: [2, 2] as [number, number],
-            allowNegative: false,
-            showAnswers: false,
-            fontSize: 18,
-            lineSpacing: 16,
-            paperSize: 'a4' as const,
-          },
+      },
+      {
+        name: mockT('presets.multiplication.name') ?? 'Multiplication Tables',
+        description:
+          mockT('presets.multiplication.description') ?? 'Focus on multiplication practice',
+        settings: {
+          operations: ['*'] as Operation[],
+          numProblems: 30,
+          numRange: [1, 12] as [number, number],
+          resultRange: [1, 144] as [number, number],
+          numOperandsRange: [2, 2] as [number, number],
+          allowNegative: false,
+          showAnswers: false,
+          fontSize: 18,
+          lineSpacing: 16,
+          paperSize: 'a4' as const,
         },
-      ];
+      },
+    ];
 
-      const handleApplyPreset = (settings: Settings) => onApply(settings);
-
-      return (
-        <div className='settings-presets'>
-          <h3>{mockT('presets.title') || 'Quick Presets'}</h3>
-          <div className='presets-grid'>
-            {presets.map(preset => (
-              <div key={preset.name} className='preset-card'>
-                <h4>{preset.name}</h4>
-                <p>{preset.description}</p>
-                <button
-                  onClick={() => handleApplyPreset(preset.settings)}
-                  className='preset-button'
-                  aria-label={`Apply ${preset.name} preset`}
-                >
-                  {mockT('presets.apply') ?? 'Apply'}
-                </button>
-              </div>
-            ))}
-          </div>
+    const TestSettingsPresetsWithFallbacks = ({
+      onApply: _onApply,
+    }: {
+      onApply: (s: Settings) => void;
+    }) => (
+      <div className='settings-presets'>
+        <h3>{mockT('presets.title') || 'Quick Presets'}</h3>
+        <div className='presets-grid'>
+          {presets.map(preset => (
+            <div key={preset.name} className='preset-card'>
+              <h4>{preset.name}</h4>
+              <p>{preset.description}</p>
+              <button
+                onClick={() => handleApplyPreset(preset.settings)}
+                className='preset-button'
+                aria-label={`Apply ${preset.name} preset`}
+              >
+                {mockT('presets.apply') ?? 'Apply'}
+              </button>
+            </div>
+          ))}
         </div>
-      );
-    };
+      </div>
+    );
 
     render(<TestSettingsPresetsWithFallbacks onApply={mockOnApplyPreset} />);
 

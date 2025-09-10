@@ -415,11 +415,12 @@ describe('SettingsManager Component', () => {
 
   it('renders with fallback text when translations return undefined', () => {
     // Mock useTranslation to return undefined
-    vi.doMock('../i18n', () => ({
+    const mockTranslation = () => ({
       useTranslation: () => ({
         t: () => undefined,
       }),
-    }));
+    });
+    vi.doMock('../i18n', mockTranslation);
 
     render(<FallbackComponent />);
 
