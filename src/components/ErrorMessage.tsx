@@ -26,7 +26,7 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
   const isMessageState = (
     value: MessageValue
   ): value is { key: string; params?: Record<string, string | number> } => {
-    return typeof value === 'object' && value !== null && 'key' in value;
+    return typeof value === 'object' && 'key' in value;
   };
 
   // Get the display text - either translate MessageState or use string directly

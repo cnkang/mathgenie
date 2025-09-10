@@ -116,7 +116,7 @@ const evaluateGeneratedProblems = (
 export const useProblemGenerator = (
   settings: Settings,
   isLoading: boolean,
-  validateSettings: (settings: Settings) => MessageValue
+  validateSettings: (settings: Settings) => string
 ) => {
   const [problems, setProblems] = useState<Problem[]>([]);
 
@@ -133,7 +133,11 @@ export const useProblemGenerator = (
 
     const validationError = validateSettings(settings);
     if (validationError) {
-      return { error: validationError, warning: '', successMessage: '' };
+      return {
+        error: typeof validationError === 'string' ? { key: validationError } : validationError,
+        warning: '',
+        successMessage: '',
+      };
     }
 
     const warning: MessageValue =
@@ -160,7 +164,7 @@ export const useProblemGenerator = (
 
       return { ...messages, warning: messages.warning || warning };
     } catch (err) {
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.DEV) {
         console.error('Problem generation error:', err);
       }
       return {

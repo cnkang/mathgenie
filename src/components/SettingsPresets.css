@@ -1,88 +1,137 @@
 /* ===== SETTINGS PRESETS COMPONENT - WCAG 2.2 AAA OPTIMIZED ===== */
 
 .settings-presets {
-  margin-bottom: var(--space-xl);
-  padding: var(--space-lg);
-  background: var(--bg-secondary);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-md);
   position: relative;
-  overflow: hidden;
+
+  /* Fix stacking and prevent overlap - lower than action cards */
+  z-index: 5;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+
+  /* Ensure proper sizing */
+  width: 100%;
+
+  /* Remove fixed height to allow content to expand */
+  min-height: auto;
+
+  /* Increase padding to ensure content is not cut off */
+  padding: var(--space-lg) var(--space-lg) var(--space-xl);
+  margin-bottom: var(--space-xl);
+
+  /* Prevent layout issues */
+  contain: layout style;
+  overflow: visible;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+
+  /* Create new stacking context */
+  isolation: isolate;
 }
 
 .settings-presets::before {
-  content: '';
   position: absolute;
   top: 0;
-  left: 0;
   right: 0;
+  left: 0;
   height: 4px;
+  content: '';
   background: linear-gradient(90deg, var(--primary-color), var(--success-color));
 }
 
 .settings-presets h3 {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
   margin: 0 0 var(--space-lg) 0;
-  color: var(--text-primary);
   font-size: var(--font-size-lg);
   font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
+  color: var(--text-primary);
 }
 
 .settings-presets h3::before {
-  content: '🎯';
+  margin-right: var(--space-sm);
   font-size: var(--font-size-lg);
+  content: '⚡';
 }
 
 .presets-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+
+  /* Increase gap between preset cards */
   gap: var(--space-md);
+  width: 100%;
+
+  /* Remove fixed height to allow all presets to show */
+  min-height: auto;
+
+  /* Add bottom padding to prevent cut-off */
+  padding-bottom: var(--space-md);
+
+  /* Ensure all content is visible */
+  overflow: visible;
 }
 
 /* WCAG 2.2 AAA: Large clickable card design */
 .preset-card.clickable-card {
-  padding: 0;
-  background: var(--bg-primary);
-  border-radius: var(--radius-md);
-  border: 2px solid var(--border-color);
-  transition: all var(--transition-fast);
-  position: relative;
-  overflow: hidden;
-  cursor: pointer;
+  position: relative !important;
+
+  /* Ensure proper z-index for clickability - lower than action cards */
+  z-index: 6 !important;
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  width: 100% !important;
+  max-width: none !important;
+
   /* WCAG 2.2 AAA: Large touch target - entire card is clickable */
-  min-height: 120px;
-  min-width: 240px;
-  display: flex;
-  align-items: stretch;
-  text-align: left;
-  font-family: inherit;
-  font-size: inherit;
+  min-height: 100px !important; /* Increase minimum height to accommodate longer text */
+  padding: 0 !important;
+  overflow: visible !important; /* Allow content to display naturally */
+  font-family: inherit !important;
+  font-size: inherit !important;
+  text-align: left !important;
+
+  /* Ensure entire card is clickable */
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  background: var(--bg-primary) !important;
+  border: 2px solid var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  transition: all var(--transition-fast) !important;
 }
 
 /* Clickable card content container */
 .preset-content {
-  padding: var(--space-lg);
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  position: relative;
+  position: relative !important;
+  display: flex !important;
+  flex-direction: row !important;
+  gap: var(--space-lg) !important; /* Increase spacing to prevent overlap */
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  min-height: 80px !important; /* Increase minimum height to accommodate longer text */
+  padding: var(--space-md) !important;
+
+  /* Allow content to wrap naturally instead of hiding */
+  overflow: visible !important;
 }
 
 /* Hover and focus effects for the entire card */
 .preset-card.clickable-card::before {
-  content: '';
   position: absolute;
   top: 0;
   left: -100%;
+  z-index: 1;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(79, 70, 229, 0.08), transparent);
+  content: '';
+  background: linear-gradient(90deg, transparent, rgb(79 70 229 / 8%), transparent);
   transition: left 0.6s ease;
-  z-index: 1;
 }
 
 .preset-card.clickable-card:hover::before {
@@ -90,15 +139,15 @@
 }
 
 .preset-card.clickable-card:hover {
+  background: linear-gradient(135deg, var(--bg-primary), rgb(79 70 229 / 2%));
   border-color: var(--primary-color);
   box-shadow: var(--shadow-lg);
   transform: translateY(-3px);
-  background: linear-gradient(135deg, var(--bg-primary), rgba(79, 70, 229, 0.02));
 }
 
 .preset-card.clickable-card:active {
-  transform: translateY(-1px);
   box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
 /* WCAG 2.2 AAA: Enhanced focus indicator */
@@ -106,40 +155,83 @@
   outline: none;
   border-color: var(--primary-color);
   box-shadow:
-    0 0 0 3px rgba(79, 70, 229, 0.3),
+    0 0 0 3px rgb(79 70 229 / 30%),
     var(--shadow-lg);
   transform: translateY(-2px);
 }
 
+/* Left content area for title and description */
+.preset-info {
+  display: flex !important;
+  flex: 1 !important;
+  flex-direction: column !important;
+  gap: var(--space-xs) !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  min-width: 0 !important; /* Allow text to wrap */
+
+  /* Reserve more space for right-side button to accommodate different languages */
+  max-width: calc(100% - 160px) !important; /* Increase reserved space */
+  overflow: visible !important; /* Allow text to display naturally */
+  hyphens: auto !important;
+
+  /* Ensure text can wrap normally */
+  overflow-wrap: break-word !important;
+}
+
 .preset-card.clickable-card h4 {
-  margin: 0 0 var(--space-sm) 0;
-  color: var(--text-primary);
-  font-size: var(--font-size-base);
-  font-weight: 600;
   position: relative;
   z-index: 2;
+  max-width: 100%;
+  margin: 0;
+  font-size: var(--font-size-base); /* Adjust font size to accommodate longer text */
+  font-weight: 600; /* Moderate font weight */
+  line-height: 1.4; /* Increase line height to improve readability */
+  color: var(--text-primary);
+  text-align: left;
+  overflow-wrap: break-word;
+
+  /* Ensure long text can display normally */
+  white-space: normal;
 }
 
 .preset-card.clickable-card p {
-  margin: 0 0 var(--space-md) 0;
-  color: var(--text-secondary);
-  font-size: var(--font-size-sm);
-  line-height: 1.4;
-  flex-grow: 1;
   position: relative;
   z-index: 2;
+  max-width: 100%;
+  margin: 0;
+  font-size: var(--font-size-sm); /* Adjust description text size */
+  line-height: 1.5; /* Increase line height to improve readability */
+  color: var(--text-secondary);
+  text-align: left;
+  overflow-wrap: break-word;
+
+  /* Ensure long text can display normally */
+  white-space: normal;
 }
 
 /* Visual indicator for clickable action */
 .preset-indicator {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  margin-top: auto;
-  padding-top: var(--space-sm);
-  border-top: 1px solid var(--border-color);
   position: relative;
   z-index: 2;
+  display: flex;
+  flex-shrink: 0; /* Prevent shrinking */
+  gap: var(--space-xs);
+  align-items: center;
+  justify-content: center !important;
+
+  /* Adjust button width to accommodate different languages */
+  min-width: 100px !important;
+  max-width: 140px !important;
+  padding: var(--space-xs) var(--space-sm);
+
+  /* Ensure button text doesn't overflow */
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important; /* Prevent text wrapping */
+  background: rgb(79 70 229 / 10%);
+  border: 1px solid rgb(79 70 229 / 20%);
+  border-radius: var(--radius-sm);
 }
 
 .preset-icon {
@@ -149,9 +241,9 @@
 }
 
 .preset-action {
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm); /* Increase font size */
+  font-weight: 700; /* Increase font weight */
   color: var(--primary-color);
-  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   transition: all var(--transition-fast);
@@ -169,19 +261,41 @@
 /* Remove old preset-button styles - now using clickable cards */
 
 /* WCAG 2.2 AAA: Responsive design with enhanced touch targets */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
+  .settings-presets {
+    /* Remove fixed height to allow natural expansion */
+    min-height: auto;
+
+    /* Ensure extra bottom padding */
+    padding-bottom: var(--space-xl);
+  }
+
   .presets-grid {
-    grid-template-columns: repeat(2, 1fr);
     gap: var(--space-lg);
+
+    /* Remove fixed height to allow all presets to show naturally */
+    min-height: auto;
+
+    /* Add extra bottom padding */
+    padding-bottom: var(--space-md);
   }
 
   .preset-card.clickable-card {
-    min-height: 140px;
-    min-width: 280px;
+    /* Ensure consistent sizing */
+    flex: 0 0 auto;
+    min-height: 90px;
+
+    /* Add margin bottom for extra spacing */
+    margin-bottom: var(--space-sm);
+  }
+
+  /* Ensure the last preset card has extra bottom space */
+  .preset-card.clickable-card:last-child {
+    margin-bottom: var(--space-xl);
   }
 
   .preset-content {
-    padding: var(--space-xl);
+    padding: var(--space-lg);
   }
 
   .preset-card.clickable-card h4 {
@@ -193,43 +307,53 @@
   }
 }
 
-@media (min-width: 768px) and (max-width: 1199px) {
-  .presets-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
+@media (width >= 768px) and (width <= 1199px) {
   .preset-card.clickable-card {
-    min-height: 130px;
-    min-width: 260px;
+    min-height: 85px;
   }
 }
 
-@media (max-width: 767px) {
+@media (width <= 767px) {
   .settings-presets {
     padding: var(--space-md);
   }
 
-  .presets-grid {
-    grid-template-columns: 1fr;
-    gap: var(--space-sm);
-  }
-
   .preset-card.clickable-card {
+    width: 100%;
+
     /* WCAG 2.2 AAA: Enhanced mobile touch targets */
-    min-height: 120px;
-    min-width: 100%;
+    min-height: 120px; /* Increase minimum height for mobile */
   }
 
   .preset-content {
+    flex-direction: column;
+    gap: var(--space-md); /* Increase spacing */
+    align-items: flex-start;
+    min-height: 100px; /* Ensure sufficient height */
     padding: var(--space-md);
   }
 
+  .preset-info {
+    width: 100%;
+    max-width: 100% !important; /* Allow full width on mobile */
+    margin-bottom: var(--space-sm); /* Add bottom margin */
+  }
+
+  .preset-indicator {
+    align-self: flex-end;
+    min-width: 80px !important; /* Reduce width for mobile */
+    max-width: 120px !important;
+  }
+
   .preset-card.clickable-card h4 {
+    margin-bottom: var(--space-xs);
     font-size: var(--font-size-base);
+    line-height: 1.4;
   }
 
   .preset-card.clickable-card p {
     font-size: var(--font-size-sm);
+    line-height: 1.5;
   }
 
   .preset-action {
@@ -237,14 +361,138 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .preset-card.clickable-card {
-    /* WCAG 2.2 AAA: Extra large touch targets for small screens */
-    min-height: 140px;
     min-width: 100%;
+
+    /* WCAG 2.2 AAA: Extra large touch targets for small screens */
+    min-height: 160px; /* Further increase minimum height for small screens */
   }
 
   .preset-content {
+    gap: var(--space-lg); /* Increase spacing */
+    min-height: 140px; /* Ensure sufficient content height */
     padding: var(--space-lg);
+  }
+
+  .preset-info {
+    margin-bottom: var(--space-md); /* Increase bottom margin */
+  }
+
+  .preset-card.clickable-card h4 {
+    font-size: var(--font-size-lg); /* Slightly increase title size on small screens */
+    line-height: 1.3;
+  }
+
+  .preset-card.clickable-card p {
+    font-size: var(--font-size-base); /* Slightly increase description text size on small screens */
+    line-height: 1.6;
+  }
+}
+
+/* Dark mode optimizations - WCAG 2.2 AAA compliant */
+@media (prefers-color-scheme: dark) {
+  .settings-presets {
+    background: var(--bg-primary);
+    border-color: var(--border-color);
+    box-shadow:
+      0 4px 6px -1px rgb(0 0 0 / 40%),
+      0 2px 4px -1px rgb(0 0 0 / 30%);
+  }
+
+  .preset-card.clickable-card {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+    box-shadow:
+      0 1px 3px 0 rgb(0 0 0 / 30%),
+      0 1px 2px 0 rgb(0 0 0 / 20%);
+  }
+
+  .preset-card.clickable-card:hover {
+    background: linear-gradient(135deg, var(--bg-secondary), rgb(99 102 241 / 6%));
+    border-color: var(--primary-color);
+    box-shadow:
+      0 10px 15px -3px rgb(0 0 0 / 50%),
+      0 4px 6px -2px rgb(0 0 0 / 40%);
+  }
+
+  .preset-card.clickable-card:focus {
+    border-color: var(--primary-color);
+    box-shadow:
+      0 0 0 3px rgb(99 102 241 / 35%),
+      0 10px 15px -3px rgb(0 0 0 / 50%);
+  }
+
+  .preset-indicator {
+    background: rgb(165 180 252 / 15%); /* Lighter background for better text contrast */
+    border-color: rgb(165 180 252 / 30%);
+  }
+
+  .preset-card.clickable-card:hover .preset-indicator {
+    background: rgb(165 180 252 / 25%); /* More visible on hover */
+    border-color: rgb(165 180 252 / 45%);
+  }
+
+  /* Enhanced text contrast for dark mode - WCAG AAA compliant */
+  .preset-card.clickable-card h4 {
+    color: var(--text-primary); /* Already high contrast */
+  }
+
+  .preset-card.clickable-card p {
+    color: var(--text-secondary); /* Already high contrast */
+  }
+
+  /* High contrast colors for action text - WCAG AAA compliant */
+  .preset-action {
+    color: #a5b4fc; /* Light indigo for high contrast on dark background */
+  }
+
+  .preset-card.clickable-card:hover .preset-action {
+    color: #c7d2fe; /* Even lighter on hover for better visibility */
+  }
+
+  /* Enhanced icon visibility */
+  .preset-icon {
+    color: #a5b4fc;
+    opacity: 0.9; /* Increased opacity for better visibility */
+  }
+
+  .preset-card.clickable-card:hover .preset-icon {
+    color: #c7d2fe;
+    opacity: 1;
+  }
+}
+
+/* Enhanced dark mode color harmony - softer visual hierarchy */
+@media (prefers-color-scheme: dark) {
+  /* Softer gradient for the top accent line */
+  .settings-presets::before {
+    background: linear-gradient(90deg, rgb(99 102 241 / 60%), rgb(16 185 129 / 60%));
+    opacity: 0.8;
+  }
+
+  /* More subtle hover animation gradient */
+  .preset-card.clickable-card::before {
+    background: linear-gradient(90deg, transparent, rgb(99 102 241 / 6%), transparent);
+  }
+
+  /* High contrast colors for action text - better visibility */
+  .preset-action {
+    color: #c7d2fe !important; /* High contrast light indigo */
+    text-shadow: 0 1px 2px rgb(0 0 0 / 30%); /* Add text shadow to enhance readability */
+  }
+
+  .preset-card.clickable-card:hover .preset-action {
+    color: #e0e7ff !important; /* Even lighter on hover */
+    text-shadow: 0 1px 3px rgb(0 0 0 / 40%);
+  }
+
+  /* Enhanced visual hierarchy with subtle background variations */
+  .settings-presets {
+    background: linear-gradient(135deg, var(--bg-primary), rgb(30 41 59 / 80%));
+  }
+
+  .preset-card.clickable-card {
+    background: linear-gradient(135deg, var(--bg-secondary), rgb(51 65 85 / 60%));
   }
 }

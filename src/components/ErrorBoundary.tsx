@@ -34,7 +34,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       this.props.onError(error, errorInfo);
     }
 
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.error('ErrorBoundary caught an error:', error, errorInfo);
     }
   }
@@ -43,41 +43,36 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     this.setState({ hasError: false, error: undefined, errorInfo: undefined });
   };
 
+  // eslint-disable-next-line sonarjs/function-return-type
   render(): ReactNode {
-    if (this.state.hasError) {
-      if (this.props.fallback) {
-        return this.props.fallback;
-      }
+    return this.state.hasError
+      ? this.props.fallback || (
+          <div className='error-boundary'>
+            <div className='error-content'>
+              <h2>🚨 Something went wrong</h2>
+              <p>We&apos;re sorry, but something unexpected happened.</p>
 
-      return (
-        <div className='error-boundary'>
-          <div className='error-content'>
-            <h2>🚨 Something went wrong</h2>
-            <p>We&apos;re sorry, but something unexpected happened.</p>
+              {import.meta.env.DEV && this.state.error && (
+                <details className='error-details'>
+                  <summary>Error Details (Development)</summary>
+                  <pre>{this.state.error.toString()}</pre>
+                  {this.state.errorInfo && <pre>{this.state.errorInfo.componentStack}</pre>}
+                </details>
+              )}
 
-            {process.env.NODE_ENV === 'development' && this.state.error && (
-              <details className='error-details'>
-                <summary>Error Details (Development)</summary>
-                <pre>{this.state.error.toString()}</pre>
-                {this.state.errorInfo && <pre>{this.state.errorInfo.componentStack}</pre>}
-              </details>
-            )}
+              <div className='error-actions'>
+                <button onClick={this.handleRetry} className='retry-button'>
+                  🔄 Try Again
+                </button>
 
-            <div className='error-actions'>
-              <button onClick={this.handleRetry} className='retry-button'>
-                🔄 Try Again
-              </button>
-
-              <button onClick={() => window.location.reload()} className='reload-button'>
-                🔃 Reload Page
-              </button>
+                <button onClick={() => window.location.reload()} className='reload-button'>
+                  🔃 Reload Page
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      );
-    }
-
-    return this.props.children;
+        )
+      : this.props.children;
   }
 }
 
@@ -87,11 +82,13 @@ export default ErrorBoundary;
  * React 19 Function Component Error Boundary Hook with TypeScript
  * For use with function components
  */
-export const useErrorHandler = (): {
+interface ErrorHandlerReturn {
   handleError: (error: Error) => void;
   resetError: () => void;
   error: Error | null;
-} => {
+}
+
+export const useErrorHandler = (): ErrorHandlerReturn => {
   const [error, setError] = React.useState<Error | null>(null);
 
   const resetError = React.useCallback((): void => {
@@ -101,7 +98,7 @@ export const useErrorHandler = (): {
   const handleError = React.useCallback((error: Error): void => {
     setError(error);
 
-    if (process.env.NODE_ENV === 'production') {
+    if (import.meta.env.PROD) {
       console.error('Application error:', error);
     }
   }, []);

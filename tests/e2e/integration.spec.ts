@@ -1,6 +1,7 @@
 // Integration tests for error handling, localStorage, and presets
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
+import { ensureElementVisible, expandAdvancedSettings, expandPdfSettings } from './test-utils';
 
 test.describe('Integration Tests', () => {
   test.beforeEach(async ({ page }: { page: Page }) => {
@@ -57,7 +58,8 @@ test.describe('Integration Tests', () => {
     await page.waitForSelector('.settings-presets', { timeout: 10000 });
 
     // Apply beginner preset
-    await page.locator('.preset-card').first().click();
+    const beginnerPreset = page.locator('.settings-section .preset-card').first();
+    await beginnerPreset.click();
     await page.waitForTimeout(1000);
 
     // Verify preset is applied and saved
@@ -79,7 +81,9 @@ test.describe('Integration Tests', () => {
     await expect(page.locator('.error-message')).toBeVisible({ timeout: 5000 });
 
     // Apply another preset to fix the error
-    await page.locator('.preset-card').nth(1).click();
+    const intermediatePreset = page.locator('.settings-section .preset-card').nth(1);
+    await intermediatePreset.scrollIntoViewIfNeeded();
+    await intermediatePreset.click();
     await page.waitForTimeout(1000);
 
     // Error should clear and new preset should be applied
@@ -147,7 +151,9 @@ test.describe('Integration Tests', () => {
     await expect(page.locator('.error-message')).toBeVisible({ timeout: 5000 });
 
     // Apply a preset - this should fix the error
-    await page.locator('.preset-card').first().click();
+    const beginnerPreset = page.locator('.settings-section .preset-card').first();
+    await beginnerPreset.scrollIntoViewIfNeeded();
+    await beginnerPreset.click();
     await page.waitForTimeout(1000);
 
     // Error should be cleared by preset application
@@ -172,7 +178,9 @@ test.describe('Integration Tests', () => {
     await page.waitForSelector('.settings-presets', { timeout: 10000 });
 
     // Step 1: Apply intermediate preset
-    await page.locator('.preset-card').nth(1).click();
+    const intermediatePreset = page.locator('.settings-section .preset-card').nth(1);
+    await intermediatePreset.scrollIntoViewIfNeeded();
+    await intermediatePreset.click();
     await page.waitForTimeout(1000);
 
     // Verify preset is applied
@@ -180,6 +188,7 @@ test.describe('Integration Tests', () => {
 
     // Step 2: Make custom changes
     await page.fill('#numProblems', '35');
+    await expandAdvancedSettings(page);
     await page.check('#allowNegative');
     await page.waitForTimeout(500);
 
@@ -214,6 +223,7 @@ test.describe('Integration Tests', () => {
     await page.waitForSelector('#numProblems', { timeout: 10000 });
 
     await expect(page.locator('#numProblems')).toHaveValue('35');
+    await ensureElementVisible(page, '#allowNegative');
     await expect(page.locator('#allowNegative')).toBeChecked();
     await expect(page.locator('#resultRangeFrom')).toHaveValue('100');
     await expect(page.locator('#resultRangeTo')).toHaveValue('150');
@@ -249,7 +259,9 @@ test.describe('Integration Tests', () => {
     await page.waitForSelector('.settings-presets', { timeout: 10000 });
 
     // Apply preset to fix all errors at once
-    await page.locator('.preset-card').nth(2).click(); // Advanced preset
+    const advancedPreset = page.locator('.settings-section .preset-card').nth(2); // Advanced preset
+    await advancedPreset.scrollIntoViewIfNeeded();
+    await advancedPreset.click();
     await page.waitForTimeout(1000);
 
     // All errors should be cleared
@@ -291,7 +303,9 @@ test.describe('Integration Tests', () => {
 
     // Fix error and apply preset in first tab
     await page1.waitForSelector('.settings-presets', { timeout: 10000 });
-    await page1.locator('.preset-card').first().click();
+    const beginnerPreset1 = page1.locator('.settings-section .preset-card').first();
+    await beginnerPreset1.scrollIntoViewIfNeeded();
+    await beginnerPreset1.click();
     await page1.waitForTimeout(1000);
 
     // Reload second tab
@@ -317,10 +331,16 @@ test.describe('Integration Tests', () => {
 
     // Rapid sequence of actions
     await page.fill('#numProblems', '0'); // Create error
-    await page.locator('.preset-card').first().click(); // Apply preset
+    const beginnerPreset = page.locator('.settings-section .preset-card').first();
+    await beginnerPreset.scrollIntoViewIfNeeded();
+    await beginnerPreset.click(); // Apply preset
     await page.fill('#numProblems', '999'); // Create another error
-    await page.locator('.preset-card').nth(1).click(); // Apply different preset
+    const intermediatePreset = page.locator('.settings-section .preset-card').nth(1);
+    await intermediatePreset.scrollIntoViewIfNeeded();
+    await intermediatePreset.click(); // Apply different preset
+    await expandAdvancedSettings(page);
     await page.check('#allowNegative'); // Custom change
+    await expandPdfSettings(page);
     await page.fill('#fontSize', '24'); // Another custom change
 
     // Wait for all changes to settle
@@ -328,7 +348,9 @@ test.describe('Integration Tests', () => {
 
     // Final state should be consistent
     await expect(page.locator('#numProblems')).toHaveValue('20'); // Intermediate preset value
+    await ensureElementVisible(page, '#allowNegative');
     await expect(page.locator('#allowNegative')).toBeChecked(); // Custom change preserved
+    await ensureElementVisible(page, '#fontSize');
     await expect(page.locator('#fontSize')).toHaveValue('24'); // Custom change preserved
 
     // No errors should be present

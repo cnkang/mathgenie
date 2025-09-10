@@ -83,7 +83,7 @@ const SettingsPresets: React.FC<SettingsPresetsProps> = ({ onApplyPreset }) => {
 
   return (
     <div className='settings-presets'>
-      <h3>{t('presets.title') || 'Quick Presets'}</h3>
+      <h2>{t('presets.title') || 'Quick Presets'}</h2>
       <div className='presets-grid'>
         {presets.map((preset, index) => (
           <button
@@ -93,8 +93,10 @@ const SettingsPresets: React.FC<SettingsPresetsProps> = ({ onApplyPreset }) => {
             aria-label={`${t('presets.apply') || 'Apply'} ${preset.name} preset: ${preset.description}`}
           >
             <div className='preset-content'>
-              <h4>{preset.name}</h4>
-              <p>{preset.description}</p>
+              <div className='preset-info'>
+                <h3>{preset.name}</h3>
+                <p>{preset.description}</p>
+              </div>
               <div className='preset-indicator'>
                 <span className='preset-icon'>✨</span>
                 <span className='preset-action'>

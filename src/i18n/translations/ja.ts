@@ -22,6 +22,7 @@ export default {
     allowNegativeDesc: '計算結果が負の数になることを許可',
     showAnswers: '答えを表示',
     showAnswersDesc: '問題の横に答えを直接表示',
+    advanced: '詳細設定',
     from: 'から',
     to: 'まで',
     manager: {
@@ -82,6 +83,7 @@ export default {
       '現在の設定は非常に制限的です。要求された数より少ない問題が生成される可能性があります。',
   },
   messages: {
+    loading: '読み込み中...',
     success: {
       problemsGenerated: '{{count}}問の問題を正常に生成しました！',
       settingsImported: '設定が正常にインポートされました！',
@@ -117,6 +119,13 @@ export default {
     infoMessage: '情報メッセージ',
     dismissMessage: 'メッセージを閉じる',
     problemsList: '生成された数学問題のリスト',
+    clickToExpand: 'クリックして展開',
+    advancedSettingsExpanded: '詳細設定が展開されました',
+    advancedSettingsCollapsed: '詳細設定が折りたたまれました',
+    advancedSettingsDesc: '負の数と答えの表示オプションを含む問題生成の詳細設定',
+    pdfSettingsExpanded: 'PDF設定が展開されました',
+    pdfSettingsCollapsed: 'PDF設定が折りたたまれました',
+    pdfSettingsDesc: 'フォントサイズ、行間、用紙サイズオプションを含むPDFエクスポート設定',
   },
   language: {
     select: '言語',
@@ -129,7 +138,7 @@ export default {
   presets: {
     title: 'クイックプリセット',
     apply: '適用',
-    clickToApply: 'クリックして適用',
+    clickToApply: '適用',
     beginner: {
       name: '初級 (1-10)',
       description: '簡単な足し算と引き算',

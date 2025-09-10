@@ -22,20 +22,18 @@ interface Settings {
 
 declare global {
   interface Window {
-    gtag?: (...args: any[]) => void;
+    gtag?: (command: string, action: string, parameters?: Record<string, unknown>) => void;
   }
 }
 
 export const trackEvent = (eventName: string, properties: EventProperties = {}): void => {
+  let optOut = false;
   try {
-    // Only track in production and if user hasn't opted out
-    if (process.env.NODE_ENV !== 'production' || localStorage.getItem('analytics-opt-out')) {
-      return;
-    }
+    optOut = Boolean(localStorage.getItem('analytics-opt-out'));
   } catch (error) {
     // Handle localStorage errors gracefully
     console.warn('Analytics: localStorage access failed', error);
-    return;
+    optOut = true;
   }
 
   // Simple event tracking without personal data
@@ -51,9 +49,14 @@ export const trackEvent = (eventName: string, properties: EventProperties = {}):
     },
   };
 
-  // Log to console in development
-  if (process.env.NODE_ENV !== 'production') {
+  // Always log to console in development for easier debugging
+  if (!import.meta.env.PROD) {
     console.log('Analytics Event:', event);
+  }
+
+  // Skip sending analytics if user opted out or we're not in production
+  if (optOut || !import.meta.env.PROD) {
+    return;
   }
 
   // Send to analytics service (if configured)

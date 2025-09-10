@@ -2,70 +2,71 @@
 
 /* Problems display area */
 .problems {
-  margin-top: var(--space-xl);
+  position: relative;
+  max-height: 500px;
   padding: var(--space-xl);
+  margin-top: var(--space-xl);
+  overflow-y: auto;
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
-  max-height: 500px;
-  overflow-y: auto;
-  position: relative;
 }
 
 .problems::before {
-  content: '';
   position: absolute;
   top: 0;
-  left: 0;
   right: 0;
+  left: 0;
   height: 3px;
+  content: '';
   background: linear-gradient(90deg, var(--success-color), var(--primary-color));
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
 .problems h3 {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
   margin-top: 0;
   margin-bottom: var(--space-lg);
   color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
 }
 
 .problems h3::before {
-  content: '📝';
-  font-size: var(--font-size-lg);
   width: auto;
   height: auto;
+  font-size: var(--font-size-lg);
+  content: '📝';
   background: none;
   border-radius: 0;
 }
 
 .problem-item {
+  display: flex;
+  align-items: center;
+
+  /* WCAG 2.2 AAA: Large touch targets for clickable problem items */
+  min-height: 44px;
   padding: var(--space-md);
   margin-bottom: var(--space-sm);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  contain: layout style;
+  font-family: 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', monospace;
   font-size: var(--font-size-lg);
   font-weight: 500;
   color: var(--text-primary);
-  transition: all var(--transition-fast);
-  border-left: 4px solid var(--primary-color);
-  contain: layout style;
-  /* WCAG 2.2 AAA: Large touch targets for clickable problem items */
-  min-height: 44px;
-  display: flex;
-  align-items: center;
   cursor: pointer;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--primary-color);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
 }
 
 .problem-item:hover {
   background: var(--bg-accent);
-  transform: translateX(4px);
   box-shadow: var(--shadow-sm);
+  transform: translateX(4px);
 }
 
 .problem-item:last-child {
@@ -74,7 +75,7 @@
 
 /* Problem display styles moved to ProblemsDisplay.css for better organization */
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .problems {
     max-height: 350px;
   }
@@ -84,47 +85,47 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .problems {
-    padding: var(--space-md);
     max-height: 300px;
+    padding: var(--space-md);
   }
 
   .problem-item {
-    padding: var(--space-sm);
-    font-size: var(--font-size-sm);
     /* WCAG 2.2 AAA: Maintain minimum touch targets on mobile */
     min-height: 48px;
+    padding: var(--space-sm);
+    font-size: var(--font-size-sm);
   }
 }
 
-@media (max-width: 320px) {
+@media (width <= 320px) {
   .problems {
-    padding: var(--space-sm);
     max-height: 250px;
+    padding: var(--space-sm);
   }
 
   .problem-item {
-    font-size: var(--font-size-xs);
-    padding: var(--space-xs);
     /* WCAG 2.2 AAA: Maintain minimum touch targets even on very small screens */
     min-height: 44px;
+    padding: var(--space-xs);
+    font-size: var(--font-size-xs);
   }
 }
 
 /* List styles for problems */
 ul {
-  list-style-type: none;
   padding: 0;
+  list-style-type: none;
 }
 
 ul li {
-  margin: 10px 0;
   padding: 10px;
+  margin: 10px 0;
+  line-height: 1.5;
+  color: var(--text-primary);
   background-color: var(--bg-primary);
   border: 1px solid var(--border-color);
   border-radius: 5px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  line-height: 1.5;
-  color: var(--text-primary);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
 }

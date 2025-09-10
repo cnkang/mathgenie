@@ -22,6 +22,7 @@ export default {
     allowNegativeDesc: '允许题目的计算结果为负数',
     showAnswers: '显示答案',
     showAnswersDesc: '在题目旁边直接显示答案',
+    advanced: '高级设置',
     from: '从',
     to: '到',
     manager: {
@@ -80,6 +81,7 @@ export default {
     restrictiveSettings: '当前设置比较严格，可能生成的题目数量少于请求数量。',
   },
   messages: {
+    loading: '加载中...',
     success: {
       problemsGenerated: '成功生成了 {{count}} 道题目！',
       settingsImported: '设置导入成功！',
@@ -115,6 +117,13 @@ export default {
     infoMessage: '信息消息',
     dismissMessage: '关闭消息',
     problemsList: '生成的数学题目列表',
+    clickToExpand: '点击展开',
+    advancedSettingsExpanded: '高级设置已展开',
+    advancedSettingsCollapsed: '高级设置已折叠',
+    advancedSettingsDesc: '题目生成的高级设置，包括负数和答案显示选项',
+    pdfSettingsExpanded: 'PDF设置已展开',
+    pdfSettingsCollapsed: 'PDF设置已折叠',
+    pdfSettingsDesc: 'PDF导出设置，包括字体大小、行间距和纸张大小选项',
   },
   language: {
     select: '语言',

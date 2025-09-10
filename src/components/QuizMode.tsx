@@ -15,16 +15,18 @@ const safeEvaluateExpression = (expression: string): number => {
 
   // Parse and evaluate the expression safely
   try {
-    // Split into tokens
-    const tokens = cleanExpression.match(/(\d+\.?\d*|[+\-*/()])/g);
-    if (!tokens) throw new Error('Invalid expression format');
+    // Split into tokens using a linear-time regex
+    const tokens = cleanExpression.match(/\d+(?:\.\d+)?|[+\-*/()]/g);
+    if (!tokens) {
+      throw new Error('Invalid expression format');
+    }
 
     // Simple recursive descent parser for basic arithmetic
     let index = 0;
 
     const parseNumber = (): number => {
       const token = tokens[index++];
-      if (!token || !/^\d+\.?\d*$/.test(token)) {
+      if (!token || !/^\d+(?:\.\d+)?$/.test(token)) {
         throw new Error('Expected number');
       }
       return parseFloat(token);

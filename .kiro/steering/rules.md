@@ -190,6 +190,58 @@ Before creating a new file, ask:
 - Prettier: Consistent formatting
 - Git hooks: Pre-commit linting, pre-push validation
 
+#### Quality Tools Integration & Optimization
+
+- **CSS & HTML Quality Workflow**: Integrated quality checks with auto-fixing capabilities
+  - `pnpm lint:css-html:fix` - Auto-fix CSS issues and validate HTML
+  - `pnpm lint:css-html` - Validation-only quality checks
+  - `pnpm lint:css:fix` - CSS-specific auto-fixing
+  - `pnpm lint:html` - HTML-specific validation
+
+- **Tool Consolidation**: Modern, actively maintained tools only
+  - **HTML Validation**: html-validate (replaces HTMLHint due to compatibility issues)
+  - **CSS Linting**: stylelint without deprecated stylelint-config-prettier
+  - **Dependency Cleanup**: Removed redundant and incompatible dependencies
+
+- **Pre-commit Integration**: Quality checks are mandatory and cannot be bypassed
+  - CSS issues are automatically fixed during commit process
+  - HTML validation prevents commits with invalid markup
+  - Failed quality checks must be resolved before code can be committed
+
+#### Quality Rule Enforcement (Critical)
+
+- **NEVER disable quality rules for the sake of committing code**
+- **ALWAYS fix the underlying quality issue first**
+- **ONLY disable rules after thorough analysis confirms they are incorrectly configured**
+- **REQUIRE team review and documentation for any rule modifications**
+
+#### Quality Gate Integrity
+
+- Pre-commit hooks cannot be bypassed with `--no-verify` or similar flags
+- Quality failures provide clear guidance on resolution steps
+- Auto-fixing is preferred over manual intervention where possible
+- All quality tools execute with security isolation and timeout protection
+
+#### CSS Quality Standards (Critical)
+
+- **No Duplicate Properties**: Never declare the same CSS property multiple times in a single rule
+- **Valid Properties Only**: Use only standard CSS properties; avoid non-standard properties
+  - ❌ `tap-highlight-color` (non-standard)
+  - ✅ `-webkit-tap-highlight-color` (standard vendor prefix)
+- **Property Consolidation**: Remove redundant declarations and combine related properties efficiently
+- **Vendor Prefix Compatibility**: Include standard properties alongside vendor-prefixed ones
+- **CSS Validation**: Run CSS through linters to catch syntax errors and invalid properties
+
+#### JavaScript Logic Quality Standards (Critical)
+
+- **Avoid Always-Same-Return Functions**: Functions must have meaningful conditional logic
+- **Clear Conditional Branches**: Use explicit if/else statements for different code paths
+- **Meaningful Error Handling**: Implement proper error handling with different responses for different conditions
+- **Service Worker Best Practices**: Use proper cache strategies with explicit conditional logic
+  - ✅ Check cache first, then network with different return paths
+  - ❌ Functions that always return the same value regardless of conditions
+- **Promise Chain Clarity**: Structure promise chains with clear conditional logic and proper error propagation
+
 ## MathGenie Patterns
 
 ### Problem Generation
@@ -231,12 +283,32 @@ Before creating a new file, ask:
 - Placeholder text and accessibility labels MUST use translation keys
 - Dynamic content with interpolation MUST use proper i18n formatting
 
+#### Layout Compatibility Requirements (Critical)
+
+- **Text Length Variation Management**: Different languages have significantly different text lengths that can cause layout issues:
+  - English to German: Text can expand by 30-50%
+  - English to Chinese/Japanese: Text typically contracts by 20-30%
+  - English to French/Spanish: Text can expand by 15-25%
+- **UI Layout Guidelines**:
+  - Use flexible CSS layouts (flexbox, grid) that adapt to content length
+  - Avoid fixed-width containers for text elements
+  - Test UI with longest expected translations in all supported languages
+  - Ensure adequate spacing between UI elements to prevent overlap
+  - Use `min-width` and `max-width` constraints appropriately
+- **Translation Text Guidelines**:
+  - Prefer concise, clear translations over verbose ones
+  - Standardize action button text across languages (e.g., "Apply" vs "Click to Apply")
+  - Consider text length impact during translation key design
+  - Provide context to translators about UI space constraints
+
 #### Code Review Requirements
 
 - Reject any PR with hardcoded user-facing strings
 - Verify all new translation keys exist in all language files
 - Test language switching functionality for new features
 - Ensure proper fallback behavior for missing translations
+- **Visual Layout Testing**: Test UI layouts with all supported languages to prevent text overlap or layout breaking
+- **Responsive Design Validation**: Ensure layouts work across different viewport sizes with international content
 
 ### Settings
 
@@ -474,6 +546,102 @@ select,
 - **ALWAYS** validate and sanitize user inputs
 - **ALWAYS** use secure parsers for math expressions
 
+### 🔒 Command Injection Prevention
+
+#### Secure Command Execution (Mandatory)
+
+- **NEVER** use `execSync`, `exec`, or `spawn` with `shell: true`
+- **ALWAYS** use `spawnSync` or `spawn` with `shell: false`
+- **ALWAYS** pass commands and arguments separately (no string concatenation)
+- **ALWAYS** validate command arguments against strict whitelists
+
+#### Implementation Pattern
+
+```typescript
+// ❌ NEVER DO THIS - Vulnerable to injection
+const result = execSync(`command ${userInput}`);
+
+// ✅ ALWAYS DO THIS - Secure execution
+const result = spawnSync('command', [validatedArg], {
+  shell: false,
+  timeout: 60000,
+  env: { ...process.env, LD_PRELOAD: undefined },
+});
+```
+
+#### Input Validation Requirements
+
+- Use regex patterns: `/^[a-zA-Z0-9_\-./]+$/` for file paths
+- Block shell metacharacters: `[;&|`$(){}[]<>\*?~]`
+- Enforce length limits (e.g., 200 chars for paths)
+- Provide clear error messages for invalid inputs
+
+### 🔒 Library Injection Prevention
+
+#### Environment Variable Security
+
+- **ALWAYS** remove dangerous environment variables from child processes:
+  - `LD_PRELOAD` (Linux library preloading)
+  - `LD_LIBRARY_PATH` (Linux library path)
+  - `DYLD_INSERT_LIBRARIES` (macOS library injection)
+  - `DYLD_LIBRARY_PATH` (macOS library path)
+
+#### Safe Environment Pattern
+
+```typescript
+// ✅ Safe environment handling
+const safeEnv = {
+  ...process.env,
+  // Explicitly remove dangerous variables
+  LD_PRELOAD: undefined,
+  LD_LIBRARY_PATH: undefined,
+  DYLD_INSERT_LIBRARIES: undefined,
+  DYLD_LIBRARY_PATH: undefined,
+};
+```
+
+### 🔒 Input Validation & Sanitization
+
+#### Validation Strategy
+
+- **Validate at boundaries**: API endpoints, file inputs, CLI arguments
+- **Fail-fast principle**: Reject invalid inputs immediately
+- **Type safety**: Use TypeScript interfaces + runtime validation
+- **Whitelist approach**: Allow only known-safe patterns
+
+#### Validation Functions
+
+```typescript
+// ✅ Example validation function
+function validateFilePattern(input: string): boolean {
+  const allowedPattern = /^[a-zA-Z0-9_\-./]+$/;
+  const dangerousPattern = /[;&|`$(){}[\]<>*?~]/;
+
+  return allowedPattern.test(input) && !dangerousPattern.test(input) && input.length <= 200;
+}
+```
+
+### 🔒 Secure Process Execution
+
+#### Process Security Requirements
+
+- **Timeout protection**: Set reasonable timeouts (e.g., 60 seconds)
+- **Resource limits**: Prevent resource exhaustion
+- **Error handling**: Don't expose sensitive information in errors
+- **Audit logging**: Log security-relevant operations
+
+#### Security Checklist
+
+Before executing any external command:
+
+- [ ] Command is in approved whitelist
+- [ ] All arguments are validated
+- [ ] No shell metacharacters present
+- [ ] Environment variables cleaned
+- [ ] Timeout configured
+- [ ] Error handling implemented
+- [ ] Logging configured
+
 ### Dependencies
 
 - Run `pnpm audit` before releases
@@ -493,6 +661,10 @@ select,
 - Use npm/yarn (pnpm only)
 - Bypass commit hooks with `--no-verify`
 - Disable tests instead of fixing
+- **Disable quality rules for the sake of committing code**
+- **Use `--no-verify`, `--skip-hooks`, or similar flags to bypass quality checks**
+- **Comment out or remove quality rules to force commits through**
+- **Ignore quality tool warnings without proper analysis and resolution**
 - **Break WCAG 2.2 AAA accessibility standards**
 - **Create interactive elements smaller than 44px**
 - **Use color alone to convey information**
@@ -515,6 +687,10 @@ select,
 - **Commit code changes without updating corresponding documentation**
 - **Create new documentation files without evaluating existing alternatives**
 - **Leave outdated examples or instructions in documentation**
+- **Use duplicate CSS property declarations in the same rule**
+- **Use non-standard CSS properties without proper vendor prefixes**
+- **Write JavaScript functions that always return the same value regardless of conditions**
+- **Create Service Worker logic that doesn't properly differentiate between cache and network responses**
 
 ### ALWAYS
 
@@ -530,6 +706,12 @@ select,
 - **Create intuitive, single-step interaction patterns**
 - **Follow modern card-based design principles**
 - Run `pnpm validate` before committing
+- **Run quality checks before every commit using `pnpm lint:css-html:fix`**
+- **Fix quality issues at their root cause rather than disabling rules**
+- **Analyze and understand why quality rules are triggering before taking action**
+- **Seek team review before modifying or disabling any quality rules**
+- **Document any necessary rule modifications with clear justification**
+- **Use auto-fixing capabilities when available to maintain code quality**
 - Follow existing component patterns
 - Include comprehensive tests (including accessibility tests)
 - Maintain TypeScript strict compliance
@@ -550,6 +732,112 @@ select,
 - **Verify documentation accuracy after any modifications**
 - **Consider extending existing documentation before creating new files**
 - **Maintain documentation synchronization with code changes**
+- **Validate CSS for duplicate properties and invalid property names**
+- **Use standard CSS properties with vendor prefixes as fallbacks**
+- **Write JavaScript functions with clear conditional logic and different return paths**
+- **Implement proper Service Worker cache strategies with explicit conditional branches**
+- **Run CSS and JavaScript through appropriate linters and validators**
+
+## Quality Tools Optimization & Integration
+
+### CSS & HTML Quality Workflow
+
+#### Integrated Quality Pipeline
+
+- **Pre-commit Auto-fixing**: CSS issues are automatically fixed during commit using `pnpm lint:css-html:fix`
+- **HTML Validation**: All HTML files must pass html-validate checks before commit
+- **Pre-push Validation**: Comprehensive quality checks run before push using `pnpm lint:css-html`
+- **CI/CD Integration**: Quality gates enforced in continuous integration pipeline
+
+#### Tool Modernization
+
+- **HTML Validation**: Migrated from HTMLHint to html-validate
+  - **Reason**: HTMLHint has Node.js compatibility issues and is less actively maintained
+  - **Benefit**: html-validate is modern, actively maintained, and provides better error reporting
+- **CSS Linting**: Removed stylelint-config-prettier dependency
+  - **Reason**: Stylelint v15+ deprecated all style-related rules, making this package unnecessary
+  - **Benefit**: Cleaner dependency tree and elimination of peer dependency warnings
+
+#### Quality Commands Reference
+
+```bash
+# CSS and HTML quality check with auto-fix (use in pre-commit)
+pnpm lint:css-html:fix
+
+# CSS and HTML quality check (validation only, use in pre-push)
+pnpm lint:css-html
+
+# Individual tool commands
+pnpm lint:css:fix    # CSS auto-fix only
+pnpm lint:html       # HTML validation only
+```
+
+#### Security-First Quality Execution
+
+- **Command Injection Prevention**: All quality tools execute with validated arguments and secure environments
+- **Environment Isolation**: Dangerous environment variables removed from child processes
+- **Timeout Protection**: All quality checks have reasonable timeout limits
+- **Resource Management**: Quality tools run with appropriate resource constraints
+
+### Quality Rule Enforcement Philosophy
+
+#### Core Principles
+
+1. **Quality Rules Exist for Good Reasons**: Every quality rule addresses real code quality, security, or maintainability concerns
+2. **Fix Issues, Don't Disable Rules**: The correct response to quality violations is to fix the underlying issue
+3. **Thorough Analysis Required**: Before modifying any quality rule, conduct thorough analysis of why it's triggering
+4. **Team Review Mandatory**: Any quality rule modifications require team review and documentation
+
+#### Decision Framework for Quality Rule Issues
+
+When a quality rule triggers, follow this decision framework:
+
+1. **First Response**: Fix the underlying code quality issue
+   - This is the preferred and most common solution
+   - Addresses the root cause rather than symptoms
+   - Maintains code quality standards
+
+2. **Second Response**: Analyze rule configuration
+   - Determine if the rule is correctly configured for the project context
+   - Check if the rule conflicts with other established patterns
+   - Verify the rule is appropriate for the specific technology stack
+
+3. **Last Resort**: Rule modification with justification
+   - Only after thorough analysis and team review
+   - Must be documented with clear reasoning
+   - Should include plan for future re-evaluation
+   - Requires explicit approval from team leads
+
+#### Prohibited Practices
+
+- **NEVER** use `--no-verify` to bypass pre-commit hooks
+- **NEVER** comment out or delete quality rules to force commits
+- **NEVER** ignore quality warnings without investigation
+- **NEVER** disable rules temporarily without a clear re-enablement plan
+- **NEVER** modify quality configurations without team review
+
+#### Quality Gate Integrity
+
+- **Mandatory Execution**: Quality checks cannot be bypassed or skipped
+- **Clear Feedback**: Quality failures provide actionable guidance for resolution
+- **Auto-fixing Priority**: Use automated fixes when available to reduce manual work
+- **Consistent Standards**: Quality rules apply uniformly across the entire codebase
+
+### Quality Metrics & Monitoring
+
+#### Key Quality Indicators
+
+- **CSS Quality**: Zero duplicate properties, valid CSS properties only, proper vendor prefixes
+- **HTML Quality**: Valid markup, semantic structure, accessibility compliance
+- **JavaScript Quality**: Clear conditional logic, proper error handling, no always-same-return functions
+- **Security**: No command injection vulnerabilities, secure environment handling
+
+#### Continuous Improvement
+
+- **Regular Tool Updates**: Keep quality tools updated to latest stable versions
+- **Rule Review Cycles**: Periodically review and optimize quality rule configurations
+- **Metrics Tracking**: Monitor quality trends and improvement over time
+- **Team Training**: Ensure all team members understand quality standards and tools
 
 ## Engineering Principles
 
@@ -684,6 +972,158 @@ Before implementing any solution, **ALWAYS** ask these questions:
 - Removing error handling or edge case management
 - Eliminating accessibility features for "cleaner" code
 
+## CSS & JavaScript Code Quality Standards (Critical)
+
+### CSS Quality Requirements
+
+#### Duplicate Property Prevention
+
+- **Problem**: Multiple declarations of the same CSS property in a single rule
+- **Solution**: Remove duplicate properties, keep only one declaration per property
+- **Example**:
+
+  ```css
+  /* ❌ WRONG - Duplicate min-width */
+  .button {
+    min-width: 160px;
+    padding: 12px;
+    min-width: 160px; /* Duplicate! */
+  }
+
+  /* ✅ CORRECT - Single declaration */
+  .button {
+    min-width: 160px;
+    padding: 12px;
+  }
+  ```
+
+#### Invalid CSS Property Prevention
+
+- **Problem**: Using non-standard or invalid CSS properties
+- **Solution**: Use only standard CSS properties with proper vendor prefixes
+- **Example**:
+
+  ```css
+  /* ❌ WRONG - Non-standard property */
+  .element {
+    tap-highlight-color: rgba(79, 70, 229, 0.2);
+  }
+
+  /* ✅ CORRECT - Standard vendor prefix */
+  .element {
+    -webkit-tap-highlight-color: rgba(79, 70, 229, 0.2);
+  }
+  ```
+
+### JavaScript Logic Quality Requirements
+
+#### Function Return Value Variation
+
+- **Problem**: Functions that always return the same value regardless of conditions
+- **Solution**: Implement clear conditional logic with different return paths
+- **Example**:
+
+  ```javascript
+  // ❌ WRONG - Always returns the same pattern
+  function handleRequest(cached, network) {
+    return (
+      cached ||
+      network.then(response => {
+        // Always does the same thing regardless of response
+        return response;
+      })
+    );
+  }
+
+  // ✅ CORRECT - Clear conditional branches
+  function handleRequest(cached, network) {
+    if (cached) {
+      return cached; // Different return path
+    }
+
+    return network.then(response => {
+      if (!response || response.status !== 200) {
+        return response; // Different handling
+      }
+
+      // Cache and return - different logic path
+      cacheResponse(response.clone());
+      return response;
+    });
+  }
+  ```
+
+#### Service Worker Cache Strategy
+
+- **Problem**: Service Worker logic that doesn't properly differentiate between cache and network
+- **Solution**: Implement explicit cache-first or network-first strategies with proper fallbacks
+- **Example**:
+
+  ```javascript
+  // ❌ WRONG - Unclear logic flow
+  event.respondWith(
+    caches.match(event.request).then(response => {
+      return (
+        response ||
+        fetch(event.request).then(fetchResponse => {
+          // Always does the same thing
+          return fetchResponse;
+        })
+      );
+    })
+  );
+
+  // ✅ CORRECT - Clear conditional branches
+  event.respondWith(
+    caches.match(event.request).then(cachedResponse => {
+      if (cachedResponse) {
+        return cachedResponse; // Cache hit - return immediately
+      }
+
+      // Cache miss - fetch from network
+      return fetch(event.request).then(networkResponse => {
+        if (!networkResponse || networkResponse.status !== 200) {
+          return networkResponse; // Error response
+        }
+
+        // Success - cache and return
+        const responseToCache = networkResponse.clone();
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(event.request, responseToCache);
+        });
+
+        return networkResponse;
+      });
+    })
+  );
+  ```
+
+### Code Quality Validation Process
+
+#### Pre-Commit Checks
+
+1. **CSS Validation**:
+   - Run CSS linters to detect duplicate properties
+   - Validate CSS property names against standard specifications
+   - Check for proper vendor prefix usage
+
+2. **JavaScript Logic Validation**:
+   - Review functions for meaningful conditional logic
+   - Ensure Service Workers have proper cache strategies
+   - Validate promise chains for clear error handling
+
+3. **Automated Tools**:
+   - Use ESLint rules to detect logic issues
+   - Configure CSS linters to catch property problems
+   - Set up pre-commit hooks to prevent quality issues
+
+#### Quality Metrics
+
+- **CSS**: Zero duplicate properties, zero invalid properties
+- **JavaScript**: All functions must have meaningful conditional branches
+- **Service Workers**: Must implement proper cache strategies with fallbacks
+- **Error Handling**: All promise chains must have proper error handling
+
 ## Test Coverage Standards (Critical)
 
 ### Coverage Requirements
@@ -794,12 +1234,34 @@ Before writing tests, evaluate:
 
 ## Decision Priority
 
-1. **Test Coverage** - Does this meet 80% coverage with meaningful tests?
-2. **Internationalization** - Are all user-facing strings properly translated?
-3. **Accessibility (WCAG 2.2 AAA)** - Meets highest accessibility standards for all users?
-4. **User Experience** - Follows mobile-first, card-based interaction principles?
-5. **Security** - Safe and secure implementation?
+1. **🔒 Security** - Safe and secure implementation with no injection vulnerabilities?
+   - Command injection prevention ✅
+   - Library injection prevention ✅
+   - Input validation & sanitization ✅
+   - Secure process execution ✅
+2. **Test Coverage** - Does this meet 80% coverage with meaningful tests?
+3. **Internationalization** - Are all user-facing strings properly translated?
+4. **Accessibility (WCAG 2.2 AAA)** - Meets highest accessibility standards for all users?
+5. **User Experience** - Follows mobile-first, card-based interaction principles?
 6. **Simplicity** - Is this the simplest effective solution with intuitive interactions?
 7. **Performance** - Optimized for use case without compromising accessibility or UX?
 8. **Testability** - Easily testable with accessibility validation?
 9. **Consistency** - Matches existing accessible and modern design patterns?
+
+### Security-First Development
+
+**Security is the top priority** - No feature or optimization should compromise security:
+
+- 🔒 **Command Injection**: All external command execution must be secure
+- 🔒 **Library Injection**: Environment variables must be cleaned
+- 🔒 **Input Validation**: All inputs must be validated and sanitized
+- 🔒 **Process Security**: All child processes must have proper isolation
+
+**Security Review Checklist** (mandatory before commit):
+
+- [ ] No `execSync`, `exec`, or `spawn` with `shell: true`
+- [ ] All command arguments validated against whitelists
+- [ ] Dangerous environment variables removed
+- [ ] Input validation functions implemented
+- [ ] Timeout and error handling configured
+- [ ] Security logging implemented
