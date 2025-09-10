@@ -134,27 +134,26 @@ describe('SettingsPresets', () => {
   });
 
   test('renders with fallback text when translations return undefined', () => {
-    // Create a test component that directly uses fallback values
-    const TestComponent = () => {
+    const FallbackPresets = ({ onApply }: { onApply: (s: any) => void }) => {
       const mockT = (key: string) => key;
       const presets = [
         {
-          name: mockT('presets.beginner.name') || 'Beginner (1-10)',
-          description: mockT('presets.beginner.description') || 'Simple addition and subtraction',
+          name: mockT('presets.beginner.name') ?? 'Beginner (1-10)',
+          description: mockT('presets.beginner.description') ?? 'Simple addition and subtraction',
           settings: { operations: ['+', '-'] as Operation[], numProblems: 15 },
         },
       ];
 
       return (
         <div className='settings-presets'>
-          <h3>{mockT('presets.title') || 'Quick Presets'}</h3>
+          <h3>{mockT('presets.title') ?? 'Quick Presets'}</h3>
           <div className='presets-grid'>
-            {presets.map((preset, index) => (
-              <div key={index} className='preset-card'>
+            {presets.map(preset => (
+              <div key={preset.name} className='preset-card'>
                 <h4>{preset.name}</h4>
                 <p>{preset.description}</p>
-                <button onClick={() => mockOnApplyPreset(preset.settings)}>
-                  {mockT('presets.apply') || 'Apply'}
+                <button onClick={() => onApply(preset.settings)}>
+                  {mockT('presets.apply') ?? 'Apply'}
                 </button>
               </div>
             ))}
@@ -163,7 +162,7 @@ describe('SettingsPresets', () => {
       );
     };
 
-    render(<TestComponent />);
+    render(<FallbackPresets onApply={mockOnApplyPreset} />);
 
     // Verify fallback values are used
     expect(screen.getByText('presets.title')).toBeDefined();
@@ -179,32 +178,32 @@ describe('SettingsPresets', () => {
 
       return (
         <div>
-          <div data-testid='title'>{mockT('presets.title') || 'Quick Presets'}</div>
+          <div data-testid='title'>{mockT('presets.title') ?? 'Quick Presets'}</div>
           <div data-testid='beginner-name'>
-            {mockT('presets.beginner.name') || 'Beginner (1-10)'}
+            {mockT('presets.beginner.name') ?? 'Beginner (1-10)'}
           </div>
           <div data-testid='beginner-desc'>
-            {mockT('presets.beginner.description') || 'Simple addition and subtraction'}
+            {mockT('presets.beginner.description') ?? 'Simple addition and subtraction'}
           </div>
           <div data-testid='intermediate-name'>
-            {mockT('presets.intermediate.name') || 'Intermediate (1-50)'}
+            {mockT('presets.intermediate.name') ?? 'Intermediate (1-50)'}
           </div>
           <div data-testid='intermediate-desc'>
-            {mockT('presets.intermediate.description') || 'All operations with medium numbers'}
+            {mockT('presets.intermediate.description') ?? 'All operations with medium numbers'}
           </div>
           <div data-testid='advanced-name'>
-            {mockT('presets.advanced.name') || 'Advanced (1-100)'}
+            {mockT('presets.advanced.name') ?? 'Advanced (1-100)'}
           </div>
           <div data-testid='advanced-desc'>
-            {mockT('presets.advanced.description') || 'All operations including division'}
+            {mockT('presets.advanced.description') ?? 'All operations including division'}
           </div>
           <div data-testid='multiplication-name'>
-            {mockT('presets.multiplication.name') || 'Multiplication Tables'}
+            {mockT('presets.multiplication.name') ?? 'Multiplication Tables'}
           </div>
           <div data-testid='multiplication-desc'>
-            {mockT('presets.multiplication.description') || 'Focus on multiplication practice'}
+            {mockT('presets.multiplication.description') ?? 'Focus on multiplication practice'}
           </div>
-          <div data-testid='apply'>{mockT('presets.apply') || 'Apply'}</div>
+          <div data-testid='apply'>{mockT('presets.apply') ?? 'Apply'}</div>
         </div>
       );
     };
@@ -259,14 +258,14 @@ describe('SettingsPresets', () => {
 
   test('renders with mock translation provider that returns undefined', () => {
     // Create a custom component that directly tests the fallback logic
-    const TestSettingsPresetsWithFallbacks = () => {
+    const TestSettingsPresetsWithFallbacks = ({ onApply }: { onApply: (s: Settings) => void }) => {
       // Simulate the exact same logic as SettingsPresets but with undefined translations
       const mockT = (key: string) => key;
 
       const presets = [
         {
-          name: mockT('presets.beginner.name') || 'Beginner (1-10)',
-          description: mockT('presets.beginner.description') || 'Simple addition and subtraction',
+          name: mockT('presets.beginner.name') ?? 'Beginner (1-10)',
+          description: mockT('presets.beginner.description') ?? 'Simple addition and subtraction',
           settings: {
             operations: ['+', '-'] as Operation[],
             numProblems: 15,
@@ -281,9 +280,9 @@ describe('SettingsPresets', () => {
           },
         },
         {
-          name: mockT('presets.intermediate.name') || 'Intermediate (1-50)',
+          name: mockT('presets.intermediate.name') ?? 'Intermediate (1-50)',
           description:
-            mockT('presets.intermediate.description') || 'All operations with medium numbers',
+            mockT('presets.intermediate.description') ?? 'All operations with medium numbers',
           settings: {
             operations: ['+', '-', '*'] as Operation[],
             numProblems: 20,
@@ -298,8 +297,8 @@ describe('SettingsPresets', () => {
           },
         },
         {
-          name: mockT('presets.advanced.name') || 'Advanced (1-100)',
-          description: mockT('presets.advanced.description') || 'All operations including division',
+          name: mockT('presets.advanced.name') ?? 'Advanced (1-100)',
+          description: mockT('presets.advanced.description') ?? 'All operations including division',
           settings: {
             operations: ['+', '-', '*', '/'] as Operation[],
             numProblems: 25,
@@ -314,9 +313,9 @@ describe('SettingsPresets', () => {
           },
         },
         {
-          name: mockT('presets.multiplication.name') || 'Multiplication Tables',
+          name: mockT('presets.multiplication.name') ?? 'Multiplication Tables',
           description:
-            mockT('presets.multiplication.description') || 'Focus on multiplication practice',
+            mockT('presets.multiplication.description') ?? 'Focus on multiplication practice',
           settings: {
             operations: ['*'] as Operation[],
             numProblems: 30,
@@ -332,16 +331,14 @@ describe('SettingsPresets', () => {
         },
       ];
 
-      const handleApplyPreset = (settings: Settings) => {
-        mockOnApplyPreset(settings);
-      };
+      const handleApplyPreset = (settings: Settings) => onApply(settings);
 
       return (
         <div className='settings-presets'>
           <h3>{mockT('presets.title') || 'Quick Presets'}</h3>
           <div className='presets-grid'>
-            {presets.map((preset, index) => (
-              <div key={index} className='preset-card'>
+            {presets.map(preset => (
+              <div key={preset.name} className='preset-card'>
                 <h4>{preset.name}</h4>
                 <p>{preset.description}</p>
                 <button
@@ -349,7 +346,7 @@ describe('SettingsPresets', () => {
                   className='preset-button'
                   aria-label={`Apply ${preset.name} preset`}
                 >
-                  {mockT('presets.apply') || 'Apply'}
+                  {mockT('presets.apply') ?? 'Apply'}
                 </button>
               </div>
             ))}
@@ -358,7 +355,7 @@ describe('SettingsPresets', () => {
       );
     };
 
-    render(<TestSettingsPresetsWithFallbacks />);
+    render(<TestSettingsPresetsWithFallbacks onApply={mockOnApplyPreset} />);
 
     // Verify all fallback values are rendered
     expect(screen.getByText('presets.title')).toBeDefined();
@@ -383,7 +380,7 @@ describe('SettingsPresets', () => {
     const buttons = screen.getAllByRole('button');
 
     // Check that aria-label includes preset name (this tests the template literal)
-    buttons.forEach((button, _index) => {
+    buttons.forEach(button => {
       const ariaLabel = button.getAttribute('aria-label');
       expect(ariaLabel).toContain('Apply');
       expect(ariaLabel).toContain('preset');

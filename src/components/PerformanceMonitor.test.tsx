@@ -6,16 +6,20 @@ import PerformanceMonitor from './PerformanceMonitor';
 // Mock PerformanceObserver
 class MockPerformanceObserver {
   callback: PerformanceObserverCallback;
+  private isObserving = false;
 
   constructor(callback: PerformanceObserverCallback) {
     this.callback = callback;
   }
 
   observe(): void {
-    // no-op: test stub implementation for PerformanceObserver.observe
+    this.isObserving = true;
+    // Trigger callback with empty list to simulate start
+    const list = { getEntries: () => [] } as unknown as PerformanceObserverEntryList;
+    this.callback(list, this as unknown as PerformanceObserver);
   }
   disconnect(): void {
-    // no-op: test stub implementation for PerformanceObserver.disconnect
+    this.isObserving = false;
   }
 }
 
@@ -69,15 +73,14 @@ describe('PerformanceMonitor', () => {
   });
 
   it('handles performance observer errors gracefully', () => {
-    const ErrorObserver = class {
-      constructor() {}
+    class ErrorObserver {
       observe(): void {
         throw new Error('Observer not supported');
       }
       disconnect(): void {
-        // no-op: simulated unsupported environment
+        /* simulated unsupported environment */
       }
-    };
+    }
 
     global.PerformanceObserver = ErrorObserver as any;
 
@@ -243,14 +246,15 @@ describe('PerformanceMonitor', () => {
     let observerCallback: PerformanceObserverCallback;
 
     class TestObserver {
+      private active = false;
       constructor(callback: PerformanceObserverCallback) {
         observerCallback = callback;
       }
       observe(): void {
-        // no-op
+        this.active = true;
       }
       disconnect(): void {
-        // no-op
+        this.active = false;
       }
     }
 
@@ -291,14 +295,15 @@ describe('PerformanceMonitor', () => {
     let observerCallback: PerformanceObserverCallback;
 
     class TestObserver {
+      private active = false;
       constructor(callback: PerformanceObserverCallback) {
         observerCallback = callback;
       }
       observe(): void {
-        // no-op
+        this.active = true;
       }
       disconnect(): void {
-        // no-op
+        this.active = false;
       }
     }
 
@@ -339,14 +344,15 @@ describe('PerformanceMonitor', () => {
     let observerCallback: PerformanceObserverCallback;
 
     class TestObserver {
+      private active = false;
       constructor(callback: PerformanceObserverCallback) {
         observerCallback = callback;
       }
       observe(): void {
-        // no-op
+        this.active = true;
       }
       disconnect(): void {
-        // no-op
+        this.active = false;
       }
     }
 
@@ -383,11 +389,16 @@ describe('PerformanceMonitor', () => {
     let observerCallback: PerformanceObserverCallback;
 
     class TestObserver {
+      private active = false;
       constructor(callback: PerformanceObserverCallback) {
         observerCallback = callback;
       }
-      observe() {}
-      disconnect() {}
+      observe(): void {
+        this.active = true;
+      }
+      disconnect(): void {
+        this.active = false;
+      }
     }
 
     global.PerformanceObserver = TestObserver as any;

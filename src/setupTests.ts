@@ -30,14 +30,14 @@ expect.extend({
     };
   },
   toHaveTextContent(received, expected) {
-    const pass = received && received.textContent && received.textContent.includes(expected);
+    const pass = received?.textContent?.includes(expected) ?? false;
     return {
       message: () => `expected element ${pass ? 'not ' : ''}to have text content "${expected}"`,
       pass,
     };
   },
   toHaveValue(received, expected) {
-    const pass = received && received.value === expected;
+    const pass = (received?.value ?? undefined) === expected;
     return {
       message: () => `expected element ${pass ? 'not ' : ''}to have value "${expected}"`,
       pass,

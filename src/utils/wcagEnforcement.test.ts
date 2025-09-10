@@ -11,7 +11,7 @@ describe('WCAG Enforcement', () => {
 
     const cleanup = setupWCAGEnforcement();
 
-    const resizeCall = addSpy.mock.calls.find(call => call[0] === 'resize');
+    const resizeCall = addSpy.mock.calls.find(call => String(call[0]) === 'resize');
     const handler = resizeCall?.[1] as EventListener;
 
     enforceSpy.mockClear();

@@ -124,7 +124,7 @@ describe('I18n System', () => {
 
   it('handles fallback behavior', () => {
     const getFallbackValue = (value: any, fallback: any) => {
-      return value !== undefined && value !== null ? value : fallback;
+      return value ?? fallback;
     };
 
     expect(getFallbackValue('value', 'fallback')).toBe('value');
