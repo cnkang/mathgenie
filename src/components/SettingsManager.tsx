@@ -93,7 +93,6 @@ const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onImportSet
           accept='.json'
           onChange={importSettings}
           className='visually-hidden'
-          aria-hidden='true'
         />
       </div>
     </div>

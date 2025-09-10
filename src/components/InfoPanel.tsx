@@ -245,8 +245,8 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
       <div className='tips-section'>
         <h3>💡 {t('infoPanel.tips.title')}</h3>
         <ul className='tips-list'>
-          {tips.slice(0, 3).map((tip, index) => (
-            <li key={index}>{tip}</li>
+          {tips.slice(0, 3).map(tip => (
+            <li key={tip}>{tip}</li>
           ))}
         </ul>
       </div>
