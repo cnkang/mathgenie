@@ -17,6 +17,11 @@
 
   <!-- Critical CSS inline to prevent render blocking -->
   <style>
+    .no-js {
+      text-align: center;
+      padding: 2rem;
+      font-family: system-ui, sans-serif;
+    }
     :root {
       --primary-color: #4f46e5;
       --bg-secondary: #f8fafc;
@@ -164,7 +169,7 @@
 
 <body>
   <noscript>
-    <div style="text-align: center; padding: 2rem; font-family: system-ui, sans-serif;">
+    <div class="no-js">
       <h1>JavaScript Required</h1>
       <p>You need to enable JavaScript to run this application.</p>
       <p>MathGenie requires JavaScript to generate math problems and create PDF worksheets.</p>
