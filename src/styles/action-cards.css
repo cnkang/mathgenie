@@ -1,68 +1,78 @@
 /* ===== ACTION CARDS - WCAG 2.2 AAA OPTIMIZED ===== */
+
 /* Large, card-based action buttons following modern design principles */
 
 .action-cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: var(--space-lg);
-  margin: var(--space-xl) 0;
   /* Fix positioning and prevent overlap - higher than preset cards */
   position: relative;
   z-index: 10;
-  /* Create new stacking context */
-  isolation: isolate;
-  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+
   /* Ensure proper grid behavior */
   grid-auto-rows: min-content;
+  gap: var(--space-lg);
+  width: 100%;
+  margin: var(--space-xl) 0;
+
   /* Prevent button overlap on mobile */
   contain: layout style;
+
+  /* Create new stacking context */
+  isolation: isolate;
 }
 
 /* WCAG 2.2 AAA: Large clickable action cards */
 .action-card {
+  position: relative;
+
+  /* Fix stacking and prevent overlap - higher than preset cards */
+  z-index: 11;
+  box-sizing: border-box;
+  display: flex;
+  align-items: stretch;
+
+  /* Ensure proper sizing */
+  width: 100%;
+  min-width: 320px;
+
+  /* WCAG 2.2 AAA: Large touch targets */
+  min-height: 140px; /* Increase minimum height to accommodate longer text */
+  padding: 0;
+
+  /* Ensure buttons don't overlap */
+  margin-bottom: var(--space-sm);
+
+  /* Prevent content overflow and button overlap */
+  contain: layout style;
+  overflow: visible; /* Allow content to display naturally */
+  font-family: inherit;
+  font-size: inherit;
+  text-align: left;
+  cursor: pointer;
   background: var(--bg-primary);
   border: 2px solid var(--border-color);
   border-radius: var(--radius-lg);
-  padding: 0;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  position: relative;
-  overflow: visible; /* Allow content to display naturally */
-  /* WCAG 2.2 AAA: Large touch targets */
-  min-height: 140px; /* Increase minimum height to accommodate longer text */
-  min-width: 320px;
-  display: flex;
-  align-items: stretch;
-  text-align: left;
-  font-family: inherit;
-  font-size: inherit;
   box-shadow: var(--shadow-sm);
-  /* Fix stacking and prevent overlap - higher than preset cards */
-  z-index: 11;
-  /* Ensure proper sizing */
-  width: 100%;
-  box-sizing: border-box;
-  /* Prevent content overflow and button overlap */
-  contain: layout style;
-  /* Ensure buttons don't overlap */
-  margin-bottom: var(--space-sm);
+  transition: all var(--transition-fast);
 }
 
 .action-card-content {
-  padding: var(--space-lg);
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
   position: relative;
   z-index: 2;
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+  width: 100%;
+
   /* 确保内容有足够的空间 */
   min-height: 100px;
+  padding: var(--space-lg);
 }
 
 .action-icon {
-  font-size: 2.5rem;
   flex-shrink: 0;
+  font-size: 2.5rem;
   opacity: 0.8;
   transition: all var(--transition-fast);
 }
@@ -71,67 +81,67 @@
   flex-grow: 1;
   min-width: 0; /* Allow text to shrink */
   overflow: visible; /* 允许文本自然显示 */
+
   /* 确保文本可以正常换行 */
-  word-wrap: break-word;
   overflow-wrap: break-word;
 }
 
 .action-text h3 {
+  max-width: 100%;
   margin: 0 0 var(--space-xs) 0;
-  color: var(--text-primary);
   font-size: var(--font-size-lg);
   font-weight: 600;
   line-height: 1.3; /* 增加行高以提高可读性 */
-  word-wrap: break-word;
+  color: var(--text-primary);
   overflow-wrap: break-word;
+
   /* 确保长文本可以正常显示 */
   white-space: normal;
-  max-width: 100%;
 }
 
 .action-text p {
+  max-width: 100%;
   margin: 0;
-  color: var(--text-secondary);
   font-size: var(--font-size-sm);
   line-height: 1.5; /* 增加行高以提高可读性 */
-  opacity: 0.8;
-  word-wrap: break-word;
+  color: var(--text-secondary);
   overflow-wrap: break-word;
+
   /* 确保长文本可以正常显示 */
   white-space: normal;
-  max-width: 100%;
+  opacity: 0.8;
 }
 
 .action-indicator {
-  flex-shrink: 0;
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
   width: 40px;
   height: 40px;
+  background: rgb(79 70 229 / 10%);
   border-radius: 50%;
-  background: rgba(79, 70, 229, 0.1);
   transition: all var(--transition-fast);
 }
 
 .action-arrow {
   font-size: var(--font-size-lg);
-  color: var(--primary-color);
   font-weight: bold;
+  color: var(--primary-color);
   transition: all var(--transition-fast);
 }
 
 /* Hover and focus effects */
 .action-card::before {
-  content: '';
   position: absolute;
   top: 0;
   left: -100%;
+  z-index: 1;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(79, 70, 229, 0.05), transparent);
+  content: '';
+  background: linear-gradient(90deg, transparent, rgb(79 70 229 / 5%), transparent);
   transition: left 0.6s ease;
-  z-index: 1;
 }
 
 .action-card:hover::before {
@@ -139,10 +149,10 @@
 }
 
 .action-card:hover {
+  background: linear-gradient(135deg, var(--bg-primary), rgb(79 70 229 / 2%));
   border-color: var(--primary-color);
   box-shadow: var(--shadow-lg);
   transform: translateY(-4px);
-  background: linear-gradient(135deg, var(--bg-primary), rgba(79, 70, 229, 0.02));
 }
 
 .action-card:hover .action-icon {
@@ -155,7 +165,7 @@
 }
 
 .action-card:hover .action-indicator {
-  background: rgba(79, 70, 229, 0.2);
+  background: rgb(79 70 229 / 20%);
   transform: scale(1.1);
 }
 
@@ -164,8 +174,8 @@
 }
 
 .action-card:active {
-  transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 /* WCAG 2.2 AAA: Enhanced focus indicator */
@@ -173,30 +183,31 @@
   outline: none;
   border-color: var(--primary-color);
   box-shadow:
-    0 0 0 3px rgba(79, 70, 229, 0.3),
+    0 0 0 3px rgb(79 70 229 / 30%),
     var(--shadow-lg);
   transform: translateY(-2px);
 }
 
 /* Disabled state */
 .action-card:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-  border-color: var(--border-color);
-  background: var(--bg-secondary);
-  /* Prevent disabled buttons from intercepting clicks */
-  pointer-events: none !important;
   /* Ensure disabled buttons are positioned correctly */
   position: relative;
   z-index: 1;
+
+  /* Prevent disabled buttons from intercepting clicks */
+  pointer-events: none !important;
+  cursor: not-allowed;
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+  opacity: 0.6;
+  transform: none;
 }
 
 .action-card:disabled:hover {
-  transform: none;
-  box-shadow: var(--shadow-sm);
-  border-color: var(--border-color);
   background: var(--bg-secondary);
+  border-color: var(--border-color);
+  box-shadow: var(--shadow-sm);
+  transform: none;
 }
 
 .action-card:disabled .action-icon,
@@ -206,7 +217,7 @@
 }
 
 .action-card:disabled .action-indicator {
-  background: rgba(128, 128, 128, 0.1);
+  background: rgb(128 128 128 / 10%);
 }
 
 .action-card:disabled .action-arrow {
@@ -215,9 +226,9 @@
 
 /* Specific fix for download button overlap issue */
 .download-card:disabled {
-  pointer-events: none !important;
   position: relative;
   z-index: 1 !important;
+  pointer-events: none !important;
 }
 
 /* Ensure generate button is always clickable */
@@ -227,7 +238,7 @@
 }
 
 /* Desktop layout optimizations */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   .desktop-action-grid {
     grid-template-columns: 1fr;
     gap: var(--space-sm);
@@ -235,14 +246,14 @@
   }
 
   .desktop-action-grid .action-card {
-    min-height: 80px;
     min-width: 100%;
     max-width: none;
+    min-height: 80px;
   }
 
   .desktop-action-grid .action-card-content {
-    padding: var(--space-md);
     gap: var(--space-sm);
+    padding: var(--space-md);
   }
 
   .desktop-action-grid .action-icon {
@@ -250,8 +261,8 @@
   }
 
   .desktop-action-grid .action-text h3 {
-    font-size: var(--font-size-base);
     margin-bottom: var(--space-xs);
+    font-size: var(--font-size-base);
   }
 
   .desktop-action-grid .action-text p {
@@ -261,7 +272,7 @@
 }
 
 /* WCAG 2.2 AAA: Responsive design */
-@media (max-width: 1199px) {
+@media (width <= 1199px) {
   .action-cards-grid {
     grid-template-columns: 1fr;
     gap: var(--space-lg);
@@ -274,28 +285,29 @@
   }
 }
 
-@media (max-width: 767px) {
+@media (width <= 767px) {
   .action-cards-grid {
-    gap: var(--space-xl);
     /* Ensure proper grid layout on mobile */
     grid-template-columns: 1fr;
     grid-auto-rows: minmax(140px, auto);
+    gap: var(--space-xl);
   }
 
   .action-card {
-    /* WCAG 2.2 AAA: Enhanced mobile touch targets */
-    min-height: 140px; /* 增加移动端最小高度 */
-    min-width: 100%;
-    margin-bottom: var(--space-lg);
     /* Ensure buttons don't overlap */
     position: relative;
     clear: both;
+    min-width: 100%;
+
+    /* WCAG 2.2 AAA: Enhanced mobile touch targets */
+    min-height: 140px; /* 增加移动端最小高度 */
+    margin-bottom: var(--space-lg);
   }
 
   .action-card-content {
-    padding: var(--space-md);
     gap: var(--space-sm);
     min-height: 120px; /* 确保足够的内容高度 */
+    padding: var(--space-md);
   }
 
   .action-icon {
@@ -322,30 +334,32 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
   .action-cards-grid {
-    gap: var(--space-xl);
-    margin: var(--space-xl) 0 var(--space-2xl) 0;
     /* Force single column layout */
     grid-template-columns: 1fr;
     grid-auto-rows: minmax(160px, auto);
+    gap: var(--space-xl);
+    margin: var(--space-xl) 0 var(--space-2xl) 0;
   }
 
   .action-card {
-    /* WCAG 2.2 AAA: Extra large touch targets for small screens */
-    min-height: 160px; /* 进一步增加小屏幕的最小高度 */
-    min-width: 100%;
-    margin-bottom: var(--space-xl);
     /* Ensure buttons don't overlap */
     position: relative;
     clear: both;
+
     /* Add explicit positioning to prevent overlap */
     display: block;
+    min-width: 100%;
+
+    /* WCAG 2.2 AAA: Extra large touch targets for small screens */
+    min-height: 160px; /* 进一步增加小屏幕的最小高度 */
+    margin-bottom: var(--space-xl);
   }
 
   .action-card-content {
-    padding: var(--space-lg);
     min-height: 140px; /* 确保足够的内容高度 */
+    padding: var(--space-lg);
   }
 
   .action-icon {
@@ -362,29 +376,30 @@
     line-height: 1.6; /* 增加行高以提高可读性 */
   }
 }
+
 /* Dark mode optimizations - WCAG 2.2 AAA compliant */
 @media (prefers-color-scheme: dark) {
   .action-card {
     background: var(--bg-secondary);
     border-color: var(--border-color);
     box-shadow:
-      0 1px 3px 0 rgba(0, 0, 0, 0.3),
-      0 1px 2px 0 rgba(0, 0, 0, 0.2);
+      0 1px 3px 0 rgb(0 0 0 / 30%),
+      0 1px 2px 0 rgb(0 0 0 / 20%);
   }
 
   .action-card:hover {
-    background: linear-gradient(135deg, var(--bg-secondary), rgba(139, 92, 246, 0.08));
+    background: linear-gradient(135deg, var(--bg-secondary), rgb(139 92 246 / 8%));
     border-color: var(--primary-color);
     box-shadow:
-      0 10px 15px -3px rgba(0, 0, 0, 0.5),
-      0 4px 6px -2px rgba(0, 0, 0, 0.4);
+      0 10px 15px -3px rgb(0 0 0 / 50%),
+      0 4px 6px -2px rgb(0 0 0 / 40%);
   }
 
   .action-card:focus {
     border-color: var(--primary-color);
     box-shadow:
-      0 0 0 3px rgba(139, 92, 246, 0.4),
-      0 10px 15px -3px rgba(0, 0, 0, 0.5);
+      0 0 0 3px rgb(139 92 246 / 40%),
+      0 10px 15px -3px rgb(0 0 0 / 50%);
   }
 
   .action-text h3 {
@@ -396,11 +411,11 @@
   }
 
   .action-indicator {
-    background: rgba(139, 92, 246, 0.15);
+    background: rgb(139 92 246 / 15%);
   }
 
   .action-card:hover .action-indicator {
-    background: rgba(139, 92, 246, 0.25);
+    background: rgb(139 92 246 / 25%);
   }
 
   .action-arrow {
@@ -413,7 +428,7 @@
   }
 
   .action-card:disabled .action-indicator {
-    background: rgba(148, 163, 184, 0.15);
+    background: rgb(148 163 184 / 15%);
   }
 
   .action-card:disabled .action-arrow {

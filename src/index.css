@@ -1,13 +1,15 @@
 /* Import modular CSS architecture */
-@import './styles/globals.css';
-@import './styles/layout.css';
-@import './styles/base-components.css';
-@import './styles/utilities.css';
-@import './styles/action-cards.css';
+@import url('./styles/globals.css');
+@import url('./styles/layout.css');
+@import url('./styles/base-components.css');
+@import url('./styles/utilities.css');
+@import url('./styles/action-cards.css');
+
 /* CRITICAL: Load international layout fixes for text length variations */
-@import './styles/international-layout.css';
+@import url('./styles/international-layout.css');
+
 /* CRITICAL: Load unified accessibility fixes last to ensure they take precedence */
-@import './styles/accessibility-unified.css';
+@import url('./styles/accessibility-unified.css');
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;

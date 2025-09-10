@@ -29,6 +29,13 @@ echo "🧹 Running lint-staged..."
 export NO_COLOR=1
 npx lint-staged
 
+echo "🎨 Running CSS & HTML quality checks..."
+if ! pnpm lint:css-html:fix; then
+  echo "❌ CSS & HTML quality checks failed"
+  echo "💡 Some issues may have been auto-fixed. Please review and commit the changes."
+  exit 1
+fi
+
 # 检查是否有未解决的merge conflicts
 echo "🔍 Checking for merge conflicts..."
 if git diff --check --cached; then

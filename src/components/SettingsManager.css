@@ -1,7 +1,7 @@
 /* Settings Manager Component Styles */
 .settings-manager {
-  margin: var(--space-lg) 0;
   padding: var(--space-lg);
+  margin: var(--space-lg) 0;
   background: var(--bg-accent);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
@@ -9,30 +9,31 @@
 
 .settings-actions {
   display: flex;
-  gap: var(--space-md);
   flex-wrap: wrap;
+  gap: var(--space-md);
 }
 
 .export-button,
 .import-button {
-  padding: var(--space-md) var(--space-lg);
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: var(--font-size-sm);
-  cursor: pointer;
-  transition: all var(--transition-fast);
   display: flex;
-  align-items: center;
   gap: var(--space-xs);
-  font-weight: 600;
+  align-items: center;
+  min-width: 44px;
+
   /* WCAG 2.2 AAA: Minimum 44px touch target */
   min-height: 44px;
-  min-width: 44px;
+  padding: var(--space-md) var(--space-lg);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
 }
 
 .export-button {
-  background: var(--success-color);
   color: white;
+  background: var(--success-color);
 }
 
 .export-button:hover {
@@ -41,8 +42,8 @@
 }
 
 .import-button {
-  background: #0891b2;
   color: white;
+  background: #0891b2;
 }
 
 .import-button:hover {
@@ -51,18 +52,19 @@
 }
 
 .preset-button {
-  padding: var(--space-md) var(--space-lg);
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  border: 2px solid var(--border-color);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  font-weight: 500;
-  font-size: var(--font-size-sm);
+  min-width: 44px;
+
   /* WCAG 2.2 AAA: Minimum 44px touch target */
   min-height: 44px;
-  min-width: 44px;
+  padding: var(--space-md) var(--space-lg);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
 }
 
 .preset-button:hover {
@@ -72,8 +74,8 @@
 }
 
 .preset-button.active {
-  background: var(--primary-color);
   color: white;
+  background: var(--primary-color);
   border-color: var(--primary-color);
 }
 
@@ -91,7 +93,7 @@
 }
 
 /* Responsive adjustments */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
   .pdf-settings-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -105,7 +107,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .pdf-settings-grid {
     grid-template-columns: 1fr;
     gap: var(--space-md);
@@ -118,7 +120,7 @@
   .export-button,
   .import-button,
   .preset-button {
-    width: 100%;
     justify-content: center;
+    width: 100%;
   }
 }

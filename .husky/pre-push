@@ -26,6 +26,21 @@ if ! pnpm type-check; then
   exit 1
 fi
 
+# 运行国际化检查
+echo "🌍 Running i18n checks..."
+if ! pnpm i18n:check; then
+  echo "❌ i18n checks failed"
+  exit 1
+fi
+
+# 运行CSS和HTML质量检查（不自动修复，确保代码质量）
+echo "🎨 Running CSS & HTML quality checks..."
+if ! pnpm lint:css-html; then
+  echo "❌ CSS & HTML quality checks failed"
+  echo "💡 Run 'pnpm lint:css-html:fix' to auto-fix issues"
+  exit 1
+fi
+
 # 运行测试
 echo "🧪 Running tests..."
 if ! pnpm test:unit; then
