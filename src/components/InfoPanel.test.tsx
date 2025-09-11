@@ -5,53 +5,39 @@ import type { Settings } from '../types';
 import InfoPanel from './InfoPanel';
 
 // Mock the translation system
-vi.mock('../i18n', () => ({
-  useTranslation: vi.fn(() => ({
-    t: (key: string, params?: Record<string, string | number>) => {
-      const translations: Record<string, string> = {
-        'infoPanel.title': 'Problem Statistics',
-        'infoPanel.difficulty.beginner': 'Beginner',
-        'infoPanel.difficulty.intermediate': 'Intermediate',
-        'infoPanel.difficulty.advanced': 'Advanced',
-        'infoPanel.difficulty.expert': 'Expert',
-        'infoPanel.stats.currentProblems': 'Current Problems',
-        'infoPanel.stats.totalGenerated': 'Total Generated',
-        'infoPanel.stats.operationTypes': 'Operation Types',
-        'infoPanel.stats.difficultyLevel': 'Difficulty Level',
-        'infoPanel.progress.title': 'Learning Progress',
-        'infoPanel.progress.completed': '{{percent}}% completed (Goal: 100 problems)',
-        'infoPanel.quickActions.title': 'Quick Actions',
-        'infoPanel.quickActions.regenerate': 'Regenerate Problems',
-        'infoPanel.quickActions.downloadPdf': 'Download PDF',
-        'infoPanel.quickActions.startQuiz': 'Start Quiz',
-        'infoPanel.quickActions.jumpToProblems': 'Jump to Problems',
-        'infoPanel.tips.title': 'Usage Tips',
-        'infoPanel.tips.items.0': 'Use quick presets for common settings',
-        'infoPanel.tips.items.1': 'More operands increase difficulty',
-        'infoPanel.tips.items.2': 'Limiting result range controls answer complexity',
-        'infoPanel.tips.items.3': 'Show answers helps with learning verification',
-        'infoPanel.tips.items.4': 'PDF export supports various paper formats',
-        'infoPanel.currentConfig.title': 'Current Configuration',
-        'infoPanel.currentConfig.operations': 'Operations: {{operations}}',
-        'infoPanel.currentConfig.numbers': 'Numbers: {{min}}-{{max}}',
-        'infoPanel.currentConfig.results': 'Results: {{min}}-{{max}}',
-        'infoPanel.currentConfig.operands': 'Operands: {{min}}-{{max}}',
-        'messages.loading': 'Loading...',
-      };
-      let result = translations[key] || key;
-
-      // Handle parameter substitution
-      if (params && typeof result === 'string') {
-        Object.entries(params).forEach(([paramKey, paramValue]) => {
-          const placeholder = '{{' + paramKey + '}}';
-          result = result.replace(new RegExp(placeholder, 'g'), String(paramValue));
-        });
-      }
-
-      return result;
-    },
-  })),
-}));
+vi.mock('../i18n', async () => {
+  const { mockUseTranslation } = await import('../../tests/helpers/mockTranslations');
+  return mockUseTranslation({
+    'infoPanel.title': 'Problem Statistics',
+    'infoPanel.difficulty.beginner': 'Beginner',
+    'infoPanel.difficulty.intermediate': 'Intermediate',
+    'infoPanel.difficulty.advanced': 'Advanced',
+    'infoPanel.difficulty.expert': 'Expert',
+    'infoPanel.stats.currentProblems': 'Current Problems',
+    'infoPanel.stats.totalGenerated': 'Total Generated',
+    'infoPanel.stats.operationTypes': 'Operation Types',
+    'infoPanel.stats.difficultyLevel': 'Difficulty Level',
+    'infoPanel.progress.title': 'Learning Progress',
+    'infoPanel.progress.completed': '{{percent}}% completed (Goal: 100 problems)',
+    'infoPanel.quickActions.title': 'Quick Actions',
+    'infoPanel.quickActions.regenerate': 'Regenerate Problems',
+    'infoPanel.quickActions.downloadPdf': 'Download PDF',
+    'infoPanel.quickActions.startQuiz': 'Start Quiz',
+    'infoPanel.quickActions.jumpToProblems': 'Jump to Problems',
+    'infoPanel.tips.title': 'Usage Tips',
+    'infoPanel.tips.items.0': 'Use quick presets for common settings',
+    'infoPanel.tips.items.1': 'More operands increase difficulty',
+    'infoPanel.tips.items.2': 'Limiting result range controls answer complexity',
+    'infoPanel.tips.items.3': 'Show answers helps with learning verification',
+    'infoPanel.tips.items.4': 'PDF export supports various paper formats',
+    'infoPanel.currentConfig.title': 'Current Configuration',
+    'infoPanel.currentConfig.operations': 'Operations: {{operations}}',
+    'infoPanel.currentConfig.numbers': 'Numbers: {{min}}-{{max}}',
+    'infoPanel.currentConfig.results': 'Results: {{min}}-{{max}}',
+    'infoPanel.currentConfig.operands': 'Operands: {{min}}-{{max}}',
+    'messages.loading': 'Loading...',
+  });
+});
 
 // Mock the progress bar hook
 vi.mock('../hooks/useProgressBar', () => ({

@@ -5,47 +5,31 @@ import type { Problem } from '../types';
 import QuizMode from './QuizMode';
 
 // Mock useTranslation hook
-vi.mock('../i18n', () => ({
-  useTranslation: () => ({
-    t: (key: string, params: Record<string, string | number> = {}): string => {
-      const mockTranslations = {
-        'quiz.loading': 'Preparing quiz...',
-        'quiz.exit': 'Exit',
-        'quiz.previousProblem': '← Previous',
-        'quiz.nextProblem': 'Next →',
-        'quiz.problemNumber': 'Problem {{number}}',
-        'quiz.progress': '{{current}} / {{total}}',
-        'quiz.completed': '🎉 Quiz Completed!',
-        'quiz.retry': 'Retry Quiz',
-        'quiz.backToPractice': 'Back to Practice',
-        'quiz.detailedResults': 'Detailed Results',
-        'quiz.grades.excellent': 'Excellent',
-        'quiz.grades.good': 'Good',
-        'quiz.grades.average': 'Average',
-        'quiz.grades.passing': 'Passing',
-        'quiz.grades.needsImprovement': 'Needs Improvement',
-        'quiz.feedback.excellent': 'Amazing! You have strong math skills!',
-        'quiz.feedback.good': 'Well done! Keep it up!',
-        'quiz.feedback.average': "Nice work! There's room for improvement!",
-        'quiz.feedback.passing': 'Good foundation! Practice more!',
-        'quiz.feedback.needsImprovement': 'Keep trying and practice more!',
-      };
-
-      let value = mockTranslations[key as keyof typeof mockTranslations] || key;
-
-      if (typeof value === 'string' && Object.keys(params).length > 0) {
-        Object.entries(params).forEach(([paramKey, paramValue]) => {
-          const placeholder = '{{' + paramKey + '}}';
-          while (value.includes(placeholder)) {
-            value = value.replace(placeholder, String(paramValue));
-          }
-        });
-      }
-
-      return value;
-    },
-  }),
-}));
+vi.mock('../i18n', async () => {
+  const { mockUseTranslation } = await import('../../tests/helpers/mockTranslations');
+  return mockUseTranslation({
+    'quiz.loading': 'Preparing quiz...',
+    'quiz.exit': 'Exit',
+    'quiz.previousProblem': '← Previous',
+    'quiz.nextProblem': 'Next →',
+    'quiz.problemNumber': 'Problem {{number}}',
+    'quiz.progress': '{{current}} / {{total}}',
+    'quiz.completed': '🎉 Quiz Completed!',
+    'quiz.retry': 'Retry Quiz',
+    'quiz.backToPractice': 'Back to Practice',
+    'quiz.detailedResults': 'Detailed Results',
+    'quiz.grades.excellent': 'Excellent',
+    'quiz.grades.good': 'Good',
+    'quiz.grades.average': 'Average',
+    'quiz.grades.passing': 'Passing',
+    'quiz.grades.needsImprovement': 'Needs Improvement',
+    'quiz.feedback.excellent': 'Amazing! You have strong math skills!',
+    'quiz.feedback.good': 'Well done! Keep it up!',
+    'quiz.feedback.average': "Nice work! There's room for improvement!",
+    'quiz.feedback.passing': 'Good foundation! Practice more!',
+    'quiz.feedback.needsImprovement': 'Keep trying and practice more!',
+  });
+});
 
 // Mock InteractiveProblem component
 vi.mock('./InteractiveProblem', () => {
