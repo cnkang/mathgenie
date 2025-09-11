@@ -5,32 +5,17 @@ import type { Problem } from '../types';
 import InteractiveProblem from './InteractiveProblem';
 
 // Mock the translation system for unit tests
-vi.mock('../i18n', () => ({
-  useTranslation: vi.fn(() => ({
-    t: (key: string, params?: Record<string, string | number>) => {
-      const translations: Record<string, string> = {
-        'quiz.enterAnswer': 'Enter answer',
-        'quiz.submit': 'Submit',
-        'quiz.submitted': 'Submitted',
-        'quiz.correct': 'Correct!',
-        'quiz.incorrect': 'Incorrect.',
-        'quiz.correctAnswer': 'The correct answer is {{answer}}',
-      };
-
-      let result = translations[key] || key;
-
-      // Handle parameter interpolation
-      if (params && typeof result === 'string') {
-        Object.entries(params).forEach(([paramKey, paramValue]) => {
-          const placeholder = '{{' + paramKey + '}}';
-          result = result.replace(placeholder, String(paramValue));
-        });
-      }
-
-      return result;
-    },
-  })),
-}));
+vi.mock('../i18n', async () => {
+  const { mockUseTranslation } = await import('../../tests/helpers/mockTranslations');
+  return mockUseTranslation({
+    'quiz.enterAnswer': 'Enter answer',
+    'quiz.submit': 'Submit',
+    'quiz.submitted': 'Submitted',
+    'quiz.correct': 'Correct!',
+    'quiz.incorrect': 'Incorrect.',
+    'quiz.correctAnswer': 'The correct answer is {{answer}}',
+  });
+});
 
 describe('InteractiveProblem', () => {
   const mockOnAnswerSubmit = vi.fn();

@@ -4,24 +4,13 @@ import type { MessageValue } from '../types';
 import ErrorMessage from './ErrorMessage';
 
 // Mock the translation hook
-vi.mock('../i18n', () => ({
-  useTranslation: vi.fn(() => ({
-    t: (key: string, params?: Record<string, string | number>) => {
-      const translations: Record<string, string> = {
-        'messages.success.problemsGenerated': 'Successfully generated {{count}} problems!',
-        'errors.generationFailed': 'Failed to generate problems. Please try again.',
-      };
-
-      let result = translations[key] || key;
-      if (params && typeof result === 'string') {
-        Object.entries(params).forEach(([paramKey, paramValue]) => {
-          result = result.replace(`{{${paramKey}}}`, String(paramValue));
-        });
-      }
-      return result;
-    },
-  })),
-}));
+vi.mock('../i18n', async () => {
+  const { mockUseTranslation } = await import('../../tests/helpers/mockTranslations');
+  return mockUseTranslation({
+    'messages.success.problemsGenerated': 'Successfully generated {{count}} problems!',
+    'errors.generationFailed': 'Failed to generate problems. Please try again.',
+  });
+});
 
 describe('ErrorMessage', () => {
   beforeEach(() => {

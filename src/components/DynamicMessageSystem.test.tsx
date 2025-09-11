@@ -1,41 +1,32 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import React, { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { I18nProvider } from '../i18n';
 import type { MessageValue } from '../types';
 import ErrorMessage from './ErrorMessage';
 
+const MockI18nProvider = vi.hoisted(
+  () =>
+    function MockI18nProvider({ children }: { children: React.ReactNode }) {
+      return <div>{children}</div>;
+    }
+);
+
 // Mock the i18n system
-vi.mock('../i18n', () => ({
-  useTranslation: () => ({
-    t: (key: string, params: Record<string, string | number> = {}) => {
-      const translations: Record<string, string> = {
-        'messages.success.problemsGenerated': 'Successfully generated {{count}} problems!',
-        'errors.noProblemsGenerated': 'No problems could be generated with current settings.',
-        'warnings.largeNumberOfProblems': 'Generating {{count}} problems may take some time.',
-        'accessibility.errorMessage': 'Error message',
-        'accessibility.warningMessage': 'Warning message',
-        'accessibility.infoMessage': 'Information message',
-        'accessibility.dismissMessage': 'Dismiss message',
-      };
-
-      let result = translations[key] || key;
-
-      // Handle parameter substitution
-      if (params && typeof result === 'string') {
-        Object.entries(params).forEach(([paramKey, paramValue]) => {
-          const placeholder = '{{' + paramKey + '}}';
-          result = result.replace(new RegExp(placeholder, 'g'), String(paramValue));
-        });
-      }
-
-      return result;
-    },
-    changeLanguage: vi.fn(),
-    isLoading: false,
-  }),
-  I18nProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-}));
+vi.mock('../i18n', async () => {
+  const { mockUseTranslation } = await import('../../tests/helpers/mockTranslations');
+  return {
+    ...mockUseTranslation({
+      'messages.success.problemsGenerated': 'Successfully generated {{count}} problems!',
+      'errors.noProblemsGenerated': 'No problems could be generated with current settings.',
+      'warnings.largeNumberOfProblems': 'Generating {{count}} problems may take some time.',
+      'accessibility.errorMessage': 'Error message',
+      'accessibility.warningMessage': 'Warning message',
+      'accessibility.infoMessage': 'Information message',
+      'accessibility.dismissMessage': 'Dismiss message',
+    }),
+    I18nProvider: MockI18nProvider,
+  };
+});
 
 describe('Dynamic Message System', () => {
   it('should handle MessageState messages with proper translation', () => {
@@ -60,9 +51,9 @@ describe('Dynamic Message System', () => {
     };
 
     render(
-      <I18nProvider>
+      <MockI18nProvider>
         <TestComponent />
-      </I18nProvider>
+      </MockI18nProvider>
     );
 
     fireEvent.click(screen.getByText('Show Success'));
@@ -80,9 +71,9 @@ describe('Dynamic Message System', () => {
     };
 
     render(
-      <I18nProvider>
+      <MockI18nProvider>
         <TestComponent />
-      </I18nProvider>
+      </MockI18nProvider>
     );
 
     expect(screen.getByText('Generating 75 problems may take some time.')).toBeInTheDocument();
@@ -96,9 +87,9 @@ describe('Dynamic Message System', () => {
     };
 
     render(
-      <I18nProvider>
+      <MockI18nProvider>
         <TestComponent />
-      </I18nProvider>
+      </MockI18nProvider>
     );
 
     expect(screen.getByText('This is a legacy string message')).toBeInTheDocument();
@@ -116,9 +107,9 @@ describe('Dynamic Message System', () => {
     };
 
     const { container } = render(
-      <I18nProvider>
+      <MockI18nProvider>
         <TestComponent />
-      </I18nProvider>
+      </MockI18nProvider>
     );
 
     // No messages should be rendered
@@ -136,9 +127,9 @@ describe('Dynamic Message System', () => {
     };
 
     render(
-      <I18nProvider>
+      <MockI18nProvider>
         <TestComponent />
-      </I18nProvider>
+      </MockI18nProvider>
     );
 
     // Should display the key itself when translation is missing
@@ -155,9 +146,9 @@ describe('Dynamic Message System', () => {
     };
 
     render(
-      <I18nProvider>
+      <MockI18nProvider>
         <TestComponent />
-      </I18nProvider>
+      </MockI18nProvider>
     );
 
     expect(
