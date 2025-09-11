@@ -41,12 +41,17 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@2270f39ef63c3edf50be34da68c039eca5e15c15
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
       - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📦 Enable pnpm via Corepack
+        run: |
+          corepack enable
+          corepack install
+
+      - name: 📦 Setup pnpm cache
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -86,12 +91,17 @@ jobs:
         with:
           fetch-depth: 0 # Full history for better analysis
 
-      - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@2270f39ef63c3edf50be34da68c039eca5e15c15
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
       - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📦 Enable pnpm via Corepack
+        run: |
+          corepack enable
+          corepack install
+
+      - name: 📦 Setup pnpm cache
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -140,12 +150,17 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@2270f39ef63c3edf50be34da68c039eca5e15c15
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
       - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📦 Enable pnpm via Corepack
+        run: |
+          corepack enable
+          corepack install
+
+      - name: 📦 Setup pnpm cache
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -172,7 +187,7 @@ jobs:
       - name: 📊 Upload coverage to Codecov
         uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
         with:
-          file: ./coverage/lcov.info
+          files: ./coverage/lcov.info
           flags: unit-tests
           name: codecov-unit
           fail_ci_if_error: false
@@ -195,12 +210,17 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@2270f39ef63c3edf50be34da68c039eca5e15c15
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
       - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📦 Enable pnpm via Corepack
+        run: |
+          corepack enable
+          corepack install
+
+      - name: 📦 Setup pnpm cache
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -225,12 +245,17 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@2270f39ef63c3edf50be34da68c039eca5e15c15
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
       - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📦 Enable pnpm via Corepack
+        run: |
+          corepack enable
+          corepack install
+
+      - name: 📦 Setup pnpm cache
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -287,12 +312,17 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@2270f39ef63c3edf50be34da68c039eca5e15c15
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
       - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📦 Enable pnpm via Corepack
+        run: |
+          corepack enable
+          corepack install
+
+      - name: 📦 Setup pnpm cache
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -432,12 +462,17 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@2270f39ef63c3edf50be34da68c039eca5e15c15
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
       - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📦 Enable pnpm via Corepack
+        run: |
+          corepack enable
+          corepack install
+
+      - name: 📦 Setup pnpm cache
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -552,12 +587,17 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@2270f39ef63c3edf50be34da68c039eca5e15c15
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
       - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📦 Enable pnpm via Corepack
+        run: |
+          corepack enable
+          corepack install
+
+      - name: 📦 Setup pnpm cache
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -597,12 +637,17 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@2270f39ef63c3edf50be34da68c039eca5e15c15
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
       - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📦 Enable pnpm via Corepack
+        run: |
+          corepack enable
+          corepack install
+
+      - name: 📦 Setup pnpm cache
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -648,12 +693,17 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@2270f39ef63c3edf50be34da68c039eca5e15c15
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
       - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📦 Enable pnpm via Corepack
+        run: |
+          corepack enable
+          corepack install
+
+      - name: 📦 Setup pnpm cache
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
