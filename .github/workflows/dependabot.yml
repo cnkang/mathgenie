@@ -47,9 +47,6 @@ jobs:
             const autoMerge = updateType === 'patch' || 
                              (updateType === 'minor' && !title.includes('breaking'));
 
-            core.exportVariable('update_type', updateType);
-            core.exportVariable('auto_merge', autoMerge.toString());
-            
             // Use environment file for outputs (GitHub Actions new method)
             const fs = require('fs');
             fs.appendFileSync(process.env.GITHUB_OUTPUT, `update_type=${updateType}\n`);
@@ -97,12 +94,17 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 📦 Setup pnpm
-        uses: pnpm/action-setup@2270f39ef63c3edf50be34da68c039eca5e15c15
-        with:
-          version: '10.15.1'
-
       - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: 📦 Enable pnpm via Corepack
+        run: |
+          corepack enable
+          corepack install
+
+      - name: 📦 Setup pnpm cache
         uses: actions/setup-node@v4
         with:
           node-version: '22'
