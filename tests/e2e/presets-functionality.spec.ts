@@ -99,10 +99,10 @@ test.describe('Presets Functionality', () => {
     await expect(page.locator('#numProblems')).toHaveValue('15');
     await expect(page.locator('#numRangeFrom')).toHaveValue('1');
     await expect(page.locator('#numRangeTo')).toHaveValue('10');
-    await expect(page.locator('#resultRangeFrom')).toHaveValue('0');
-    await expect(page.locator('#resultRangeTo')).toHaveValue('20');
-    await expect(page.locator('#numOperandsRangeFrom')).toHaveValue('2');
-    await expect(page.locator('#numOperandsRangeTo')).toHaveValue('2');
+    await expect(page.locator('#result-range-from')).toHaveValue('0');
+    await expect(page.locator('#result-range-to')).toHaveValue('20');
+    await expect(page.locator('#operands-range-from')).toHaveValue('2');
+    await expect(page.locator('#operands-range-to')).toHaveValue('2');
     await ensureElementVisible(page, '#allowNegative');
     await expect(page.locator('#allowNegative')).not.toBeChecked();
     await expect(page.locator('#showAnswers')).not.toBeChecked();
@@ -134,10 +134,10 @@ test.describe('Presets Functionality', () => {
     await expect(page.locator('#numProblems')).toHaveValue('20');
     await expect(page.locator('#numRangeFrom')).toHaveValue('1');
     await expect(page.locator('#numRangeTo')).toHaveValue('50');
-    await expect(page.locator('#resultRangeFrom')).toHaveValue('0');
-    await expect(page.locator('#resultRangeTo')).toHaveValue('100');
-    await expect(page.locator('#numOperandsRangeFrom')).toHaveValue('2');
-    await expect(page.locator('#numOperandsRangeTo')).toHaveValue('3');
+    await expect(page.locator('#result-range-from')).toHaveValue('0');
+    await expect(page.locator('#result-range-to')).toHaveValue('100');
+    await expect(page.locator('#operands-range-from')).toHaveValue('2');
+    await expect(page.locator('#operands-range-to')).toHaveValue('3');
 
     // Check operations selection (should include +, -, *)
     const selectedOperations = await page.locator('#operations option:checked').allTextContents();
@@ -163,10 +163,10 @@ test.describe('Presets Functionality', () => {
     await expect(page.locator('#numProblems')).toHaveValue('25');
     await expect(page.locator('#numRangeFrom')).toHaveValue('1');
     await expect(page.locator('#numRangeTo')).toHaveValue('100');
-    await expect(page.locator('#resultRangeFrom')).toHaveValue('-50');
-    await expect(page.locator('#resultRangeTo')).toHaveValue('200');
-    await expect(page.locator('#numOperandsRangeFrom')).toHaveValue('2');
-    await expect(page.locator('#numOperandsRangeTo')).toHaveValue('4');
+    await expect(page.locator('#result-range-from')).toHaveValue('-50');
+    await expect(page.locator('#result-range-to')).toHaveValue('200');
+    await expect(page.locator('#operands-range-from')).toHaveValue('2');
+    await expect(page.locator('#operands-range-to')).toHaveValue('4');
     await ensureElementVisible(page, '#allowNegative');
     await expect(page.locator('#allowNegative')).toBeChecked();
 
@@ -195,10 +195,10 @@ test.describe('Presets Functionality', () => {
     await expect(page.locator('#numProblems')).toHaveValue('30');
     await expect(page.locator('#numRangeFrom')).toHaveValue('1');
     await expect(page.locator('#numRangeTo')).toHaveValue('12');
-    await expect(page.locator('#resultRangeFrom')).toHaveValue('1');
-    await expect(page.locator('#resultRangeTo')).toHaveValue('144');
-    await expect(page.locator('#numOperandsRangeFrom')).toHaveValue('2');
-    await expect(page.locator('#numOperandsRangeTo')).toHaveValue('2');
+    await expect(page.locator('#result-range-from')).toHaveValue('1');
+    await expect(page.locator('#result-range-to')).toHaveValue('144');
+    await expect(page.locator('#operands-range-from')).toHaveValue('2');
+    await expect(page.locator('#operands-range-to')).toHaveValue('2');
     await ensureElementVisible(page, '#allowNegative');
     await expect(page.locator('#allowNegative')).not.toBeChecked();
 
