@@ -45,13 +45,17 @@ describe('css-html-quality-check helpers', () => {
   });
 
   it('validateFilePatterns should reject patterns with dangerous characters', () => {
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     expect(validateFilePatterns(['src/**/*.css; rm -rf /'])).toBe(false);
     expect(validateFilePatterns(['src/**/..|..'])).toBe(false);
+    errSpy.mockRestore();
   });
 
   it('validateFilePatterns should reject overly long patterns', () => {
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const long = 'a'.repeat(201);
     expect(validateFilePatterns([long])).toBe(false);
+    errSpy.mockRestore();
   });
 
   it('resolveBin should resolve stylelint CLI from package.json bin', () => {

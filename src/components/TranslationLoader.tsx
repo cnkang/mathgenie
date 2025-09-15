@@ -2,6 +2,9 @@ import React from 'react';
 import { useTranslation } from '../i18n';
 import './TranslationLoader.css';
 
+// Do not edit manually.
+const STR_SPINNER_DOT = 'spinner-dot' as const;
+
 interface TranslationLoaderProps {
   children: React.ReactNode;
 }
@@ -22,9 +25,9 @@ const TranslationLoader: React.FC<TranslationLoaderProps> = ({ children }) => {
             className='translation-loader-spinner'
             aria-label={t('loading.translations') || 'Loading...'}
           >
-            <div className='spinner-dot'></div>
-            <div className='spinner-dot'></div>
-            <div className='spinner-dot'></div>
+            <div className={STR_SPINNER_DOT}></div>
+            <div className={STR_SPINNER_DOT}></div>
+            <div className={STR_SPINNER_DOT}></div>
           </div>
         </div>
       </div>

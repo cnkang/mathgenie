@@ -189,6 +189,7 @@ Before creating a new file, ask:
 - ESLint: Single quotes, semicolons required
 - Prettier: Consistent formatting
 - Git hooks: Pre-commit linting, pre-push validation
+- **Block Braces Required**: Always use block braces for if statements, while loops, for loops, and other control structures, even for single-line statements
 
 #### Quality Tools Integration & Optimization
 
@@ -236,6 +237,7 @@ Before creating a new file, ask:
 
 - **Avoid Always-Same-Return Functions**: Functions must have meaningful conditional logic
 - **Clear Conditional Branches**: Use explicit if/else statements for different code paths
+- **Block Braces Required**: Always use block braces `{}` for if statements, while loops, for loops, and other control structures, even for single-line statements
 - **Meaningful Error Handling**: Implement proper error handling with different responses for different conditions
 - **Service Worker Best Practices**: Use proper cache strategies with explicit conditional logic
   - ✅ Check cache first, then network with different return paths
@@ -691,6 +693,7 @@ Before executing any external command:
 - **Use non-standard CSS properties without proper vendor prefixes**
 - **Write JavaScript functions that always return the same value regardless of conditions**
 - **Create Service Worker logic that doesn't properly differentiate between cache and network responses**
+- **Omit block braces for if statements, while loops, for loops, or other control structures**
 
 ### ALWAYS
 
@@ -736,6 +739,7 @@ Before executing any external command:
 - **Use standard CSS properties with vendor prefixes as fallbacks**
 - **Write JavaScript functions with clear conditional logic and different return paths**
 - **Implement proper Service Worker cache strategies with explicit conditional branches**
+- **Use block braces for all control structures (if, while, for, etc.) even for single-line statements**
 - **Run CSS and JavaScript through appropriate linters and validators**
 
 ## Quality Tools Optimization & Integration

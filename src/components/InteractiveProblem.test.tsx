@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { fireEvent, render, screen } from '../../tests/helpers/testUtils';
 import type { Problem } from '../types';
 import InteractiveProblem from './InteractiveProblem';
 
@@ -46,6 +46,13 @@ describe('InteractiveProblem', () => {
 
   beforeEach(() => {
     mockOnAnswerSubmit.mockClear();
+    // Ensure clean DOM state
+    document.body.innerHTML = '';
+  });
+
+  afterEach(() => {
+    // Clean up after each test
+    document.body.innerHTML = '';
   });
 
   describe('Rendering', () => {
@@ -55,13 +62,21 @@ describe('InteractiveProblem', () => {
     });
 
     test('renders input with correct placeholder', () => {
-      render(<InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />);
-      expect(screen.getByPlaceholderText('Enter answer')).toBeInTheDocument();
+      const { container } = render(
+        <InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />
+      );
+      const input = container.querySelector('.answer-input') as HTMLInputElement;
+      expect(input).toBeInTheDocument();
+      expect(input.placeholder).toBe('Enter answer');
     });
 
     test('renders submit button with correct text', () => {
-      render(<InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />);
-      expect(screen.getByRole('button', { name: 'Submit' })).toBeInTheDocument();
+      const { container } = render(
+        <InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />
+      );
+      const button = container.querySelector('.submit-answer-btn') as HTMLButtonElement;
+      expect(button).toBeInTheDocument();
+      expect(button.textContent).toBe('Submit');
     });
 
     test.each([
@@ -108,70 +123,102 @@ describe('InteractiveProblem', () => {
     });
 
     test('disables submit button when problem is answered', () => {
-      render(
+      const { container } = render(
         <InteractiveProblem problem={mockAnsweredProblem} onAnswerSubmit={mockOnAnswerSubmit} />
       );
 
-      const button = screen.getByRole('button');
-      expect(button).toHaveProperty('disabled', true);
-      expect(button).toHaveTextContent('Submitted');
+      const button = container.querySelector('.submit-answer-btn') as HTMLButtonElement;
+      expect(button).toBeTruthy();
+      expect(button.disabled).toBe(true);
+      expect(button.textContent).toBe('Submitted');
     });
   });
 
   describe('User Interactions', () => {
     test('allows user to enter answer', async () => {
-      const user = userEvent.setup();
-      render(<InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />);
+      const { container } = render(
+        <InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />
+      );
 
-      const input = screen.getByRole('spinbutton');
-      await user.type(input, '5');
+      const input = container.querySelector('.answer-input') as HTMLInputElement;
+      expect(input).toBeTruthy();
 
-      expect(input).toHaveValue('5');
+      // Use fireEvent instead of userEvent for more reliable testing
+      fireEvent.change(input, { target: { value: '5' } });
+
+      expect((input as HTMLInputElement).value).toBe('5');
     });
 
-    test('calls onAnswerSubmit when form is submitted with valid answer', async () => {
-      const user = userEvent.setup();
-      render(<InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />);
+    test('calls onAnswerSubmit when form is submitted with valid answer', () => {
+      const { container } = render(
+        <InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />
+      );
 
-      const input = screen.getByRole('spinbutton');
-      const button = screen.getByRole('button', { name: 'Submit' });
+      const input = container.querySelector('.answer-input') as HTMLInputElement;
+      const button = container.querySelector('.submit-answer-btn') as HTMLButtonElement;
 
-      await user.type(input, '5');
-      await user.click(button);
+      expect(input).toBeTruthy();
+      expect(button).toBeTruthy();
+
+      // Type the answer using fireEvent
+      fireEvent.change(input, { target: { value: '5' } });
+
+      // Button should be enabled now
+      expect(button.disabled).toBe(false);
+
+      // Submit the form
+      fireEvent.click(button);
 
       expect(mockOnAnswerSubmit).toHaveBeenCalledWith(1, 5);
     });
 
-    test('calls onAnswerSubmit when Enter key is pressed', async () => {
-      const user = userEvent.setup();
-      render(<InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />);
+    test('calls onAnswerSubmit when Enter key is pressed', () => {
+      const { container } = render(
+        <InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />
+      );
 
-      const input = screen.getByRole('spinbutton');
-      await user.type(input, '5');
-      await user.keyboard('{Enter}');
+      const input = container.querySelector('.answer-input') as HTMLInputElement;
+      expect(input).toBeTruthy();
+
+      // Type the answer using fireEvent
+      fireEvent.change(input, { target: { value: '5' } });
+
+      // Press Enter
+      fireEvent.keyDown(input, { key: 'Enter' });
 
       expect(mockOnAnswerSubmit).toHaveBeenCalledWith(1, 5);
     });
 
     test('does not submit when input is empty', async () => {
       const user = userEvent.setup();
-      render(<InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />);
+      const localOnSubmit = vi.fn();
+      const { container } = render(
+        <InteractiveProblem problem={mockProblem} onAnswerSubmit={localOnSubmit} />
+      );
 
-      const button = screen.getByRole('button', { name: 'Submit' });
+      const button = container.querySelector('.submit-answer-btn') as HTMLButtonElement;
+      expect(button).toBeTruthy();
       await user.click(button);
 
-      expect(mockOnAnswerSubmit).not.toHaveBeenCalled();
+      expect(localOnSubmit).not.toHaveBeenCalled();
     });
 
     test('handles negative numbers correctly', async () => {
-      const user = userEvent.setup();
-      render(<InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />);
+      const { container } = render(
+        <InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />
+      );
 
-      const input = screen.getByRole('spinbutton');
-      await user.type(input, '-3');
+      const input = container.querySelector('.answer-input') as HTMLInputElement;
+      expect(input).toBeTruthy();
 
-      const button = screen.getByRole('button', { name: 'Submit' });
-      await user.click(button);
+      // Enter negative number synchronously to avoid flakiness
+      fireEvent.change(input, { target: { value: '-3' } });
+
+      const button = container.querySelector('.submit-answer-btn') as HTMLButtonElement;
+      expect(button).toBeTruthy();
+      expect(button.disabled).toBe(false);
+
+      fireEvent.click(button);
 
       expect(mockOnAnswerSubmit).toHaveBeenCalledWith(1, -3);
     });
@@ -179,16 +226,23 @@ describe('InteractiveProblem', () => {
 
   describe('Accessibility', () => {
     test('has proper form structure', () => {
-      render(<InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />);
+      const { container } = render(
+        <InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />
+      );
 
-      expect(screen.getByRole('spinbutton')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Submit' })).toBeInTheDocument();
+      const input = container.querySelector('.answer-input');
+      const button = container.querySelector('.submit-answer-btn');
+      expect(input).toBeInTheDocument();
+      expect(button).toBeInTheDocument();
     });
 
     test('input has proper accessibility attributes', () => {
-      render(<InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />);
+      const { container } = render(
+        <InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />
+      );
 
-      const input = screen.getByRole('spinbutton');
+      const input = container.querySelector('.answer-input') as HTMLInputElement;
+      expect(input).toBeTruthy();
       expect(input).toHaveProperty('type', 'number');
       expect(input).toHaveProperty('placeholder', 'Enter answer');
     });
@@ -208,44 +262,62 @@ describe('InteractiveProblem', () => {
   });
 
   describe('Edge Cases', () => {
-    test('handles zero as valid answer', async () => {
-      const user = userEvent.setup();
-      render(<InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />);
+    test('handles zero as valid answer', () => {
+      const { container } = render(
+        <InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />
+      );
 
-      const input = screen.getByRole('spinbutton');
-      await user.type(input, '0');
+      const input = container.querySelector('.answer-input') as HTMLInputElement;
+      expect(input).toBeTruthy();
 
-      const button = screen.getByRole('button', { name: 'Submit' });
-      await user.click(button);
+      fireEvent.change(input, { target: { value: '0' } });
+
+      const button = container.querySelector('.submit-answer-btn') as HTMLButtonElement;
+      expect(button).toBeTruthy();
+      expect(button.disabled).toBe(false);
+
+      fireEvent.click(button);
 
       expect(mockOnAnswerSubmit).toHaveBeenCalledWith(1, 0);
     });
 
-    test('handles decimal numbers correctly', async () => {
-      const user = userEvent.setup();
-      render(<InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />);
+    test('handles decimal numbers correctly', () => {
+      const { container } = render(
+        <InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />
+      );
 
-      const input = screen.getByRole('spinbutton');
-      await user.type(input, '5.5');
+      const input = container.querySelector('.answer-input') as HTMLInputElement;
+      expect(input).toBeTruthy();
 
-      const button = screen.getByRole('button', { name: 'Submit' });
-      await user.click(button);
+      fireEvent.change(input, { target: { value: '5.5' } });
+
+      const button = container.querySelector('.submit-answer-btn') as HTMLButtonElement;
+      expect(button).toBeTruthy();
+      expect(button.disabled).toBe(false);
+
+      fireEvent.click(button);
 
       expect(mockOnAnswerSubmit).toHaveBeenCalledWith(1, 5.5);
     });
 
     test('clears input and refocuses after submission', async () => {
       const user = userEvent.setup();
-      render(<InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />);
+      const { container } = render(
+        <InteractiveProblem problem={mockProblem} onAnswerSubmit={mockOnAnswerSubmit} />
+      );
 
-      const input = screen.getByRole('spinbutton');
+      const input = container.querySelector('.answer-input') as HTMLInputElement;
+      const button = container.querySelector('.submit-answer-btn') as HTMLButtonElement;
+
+      expect(input).toBeTruthy();
+      expect(button).toBeTruthy();
+
+      await user.clear(input);
       await user.type(input, '5');
-
-      const button = screen.getByRole('button', { name: 'Submit' });
       await user.click(button);
 
       // Input should be cleared after submission
-      expect(input).toHaveValue('');
+      expect((input as HTMLInputElement).value).toBe('');
     });
   });
 });

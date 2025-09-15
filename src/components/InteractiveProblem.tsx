@@ -35,7 +35,7 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
     }
   }, [problem.id, problem.userAnswer]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SyntheticEvent): void => {
     e.preventDefault();
     if (userInput.trim() === '' || isSubmitted || disabled) {
       return;
@@ -49,28 +49,27 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
     if (e.key === 'Enter') {
       handleSubmit(e);
     }
   };
 
-  const getResultIcon = () => {
-    if (!showResult || !problem.isAnswered) {
-      return null;
+  const canShowResult = showResult && problem.isAnswered;
+  let resultClass = '';
+  let resultIcon: string | null = null;
+  if (canShowResult) {
+    if (problem.isCorrect) {
+      resultClass = 'correct';
+      resultIcon = '✅';
+    } else {
+      resultClass = 'incorrect';
+      resultIcon = '❌';
     }
-    return problem.isCorrect ? '✅' : '❌';
-  };
-
-  const getResultClass = () => {
-    if (!showResult || !problem.isAnswered) {
-      return '';
-    }
-    return problem.isCorrect ? 'correct' : 'incorrect';
-  };
+  }
 
   return (
-    <div className={`interactive-problem ${getResultClass()}`}>
+    <div className={`interactive-problem ${resultClass}`}>
       <div className='problem-expression'>{problem.text}</div>
 
       <form onSubmit={handleSubmit} className='answer-form'>
@@ -95,9 +94,9 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
         </div>
       </form>
 
-      {showResult && problem.isAnswered && (
+      {canShowResult && (
         <div className='answer-result'>
-          <span className='result-icon'>{getResultIcon()}</span>
+          <span className='result-icon'>{resultIcon}</span>
           <span className='result-text'>
             {problem.isCorrect ? (
               t('quiz.correct') || 'Correct!'

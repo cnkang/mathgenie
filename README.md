@@ -127,6 +127,12 @@ pnpm validate
 - **ESLint + Prettier**: Consistent code style
 - **Pre-commit hooks**: Automatic formatting and linting
 - **Comprehensive testing**: Unit and E2E tests
+- **Sonar checks**: `pnpm lint:sonar` and auto-fix duplicate strings with `pnpm lint:sonar:fix`
+
+Auto-fix details:
+- AST-based extraction of repeated string literals into file-local constants (sonarjs/no-duplicate-string)
+- Safe for TS/TSX, including JSX attributes (proper `{CONST}` wrapping)
+- i18n dictionaries under `src/i18n/translations/` are excluded from duplicate-string checks
 
 ## 🔧 TypeScript Configuration
 
@@ -202,11 +208,21 @@ MathGenie features a comprehensive, optimized test suite:
 ### Unit & Integration Tests
 
 ```bash
-# Unit tests with coverage
+# Unit tests with coverage (enables coverage explicitly)
 pnpm test
+
+# Fast (no coverage) – memory-tuned
+pnpm test:unit:fast
+
+# If Node 22 triggers worker OOM, temporarily ignore unhandled errors
+pnpm test:unit:fast:ignore-errors
 
 # Watch mode for development
 pnpm test:watch
+
+Note: On Node 22.x, Vitest’s worker pool may report “ERR_WORKER_OUT_OF_MEMORY”
+intermittently due to upstream limits. Use the memory‑tuned commands above or
+run with Node 20.x for fully stable execution.
 ```
 
 ### E2E Tests

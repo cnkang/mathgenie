@@ -1,5 +1,4 @@
-import { act, renderHook } from '@testing-library/react';
-import { vi } from 'vitest';
+import { act, renderHook } from '../../tests/helpers/testUtils';
 import { useOptimisticState } from './useOptimisticState';
 
 describe('useOptimisticState', () => {
@@ -54,7 +53,7 @@ describe('useOptimisticState', () => {
   test('should handle async operations', async () => {
     const { result } = renderHook(() => useOptimisticState('initial'));
 
-    const asyncOperation = vi.fn().mockResolvedValue('async-result');
+    const asyncOperation = () => Promise.resolve('async-result');
 
     await act(async () => {
       await result.current.performOptimistic('optimistic', asyncOperation);
@@ -62,13 +61,12 @@ describe('useOptimisticState', () => {
 
     expect(result.current.state).toBe('async-result');
     expect(result.current.isPending).toBe(false);
-    expect(asyncOperation).toHaveBeenCalled();
   });
 
   test('should rollback on async operation failure', async () => {
     const { result } = renderHook(() => useOptimisticState('initial'));
 
-    const asyncOperation = vi.fn().mockRejectedValue(new Error('Failed'));
+    const asyncOperation = () => Promise.reject(new Error('Failed'));
 
     await act(async () => {
       try {

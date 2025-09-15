@@ -13,7 +13,8 @@ const isLocalhost = Boolean(
 );
 
 export function register(config?: ServiceWorkerConfig): void {
-  if ('serviceWorker' in navigator) {
+  const HAS_SW = 'serviceWorker' in navigator;
+  if (HAS_SW) {
     const publicUrl = new URL(import.meta.env.VITE_PUBLIC_URL || '', window.location.href);
     if (publicUrl.origin !== window.location.origin) {
       return;
@@ -38,12 +39,12 @@ function registerValidSW(swUrl: string, config?: ServiceWorkerConfig): void {
   navigator.serviceWorker
     .register(swUrl)
     .then(registration => {
-      registration.onupdatefound = () => {
+      registration.onupdatefound = (): void => {
         const installingWorker = registration.installing;
-        if (installingWorker == null) {
+        if (installingWorker === null) {
           return;
         }
-        installingWorker.onstatechange = () => {
+        installingWorker.onstatechange = (): void => {
           if (installingWorker.state === 'installed') {
             if (navigator.serviceWorker.controller) {
               console.log('New content is available and will be used when all tabs are closed.');
@@ -56,7 +57,7 @@ function registerValidSW(swUrl: string, config?: ServiceWorkerConfig): void {
         };
       };
     })
-    .catch(error => {
+    .catch((error: Error) => {
       console.error('Error during service worker registration:', error);
     });
 }
@@ -65,14 +66,14 @@ function checkValidServiceWorker(swUrl: string, config?: ServiceWorkerConfig): v
   fetch(swUrl, {
     headers: { 'Service-Worker': 'script' },
   })
-    .then(response => {
+    .then((response: Response) => {
       const contentType = response.headers.get('content-type');
-      if (
-        response.status === 404 ||
-        (contentType != null && contentType.indexOf('javascript') === -1)
-      ) {
-        navigator.serviceWorker.ready.then(registration => {
-          registration.unregister().then(() => {
+      const isNotFound = response.status === 404;
+      const isNotJavaScript = contentType !== null && !contentType.includes('javascript');
+
+      if (isNotFound || isNotJavaScript) {
+        navigator.serviceWorker.ready.then((registration: ServiceWorkerRegistration) => {
+          registration.unregister().then((): void => {
             window.location.reload();
           });
         });
@@ -80,19 +81,20 @@ function checkValidServiceWorker(swUrl: string, config?: ServiceWorkerConfig): v
         registerValidSW(swUrl, config);
       }
     })
-    .catch(() => {
+    .catch((): void => {
       console.log('No internet connection found. App is running in offline mode.');
     });
 }
 
 export function unregister(): void {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.ready
-      .then(registration => {
-        registration.unregister();
-      })
-      .catch(error => {
-        console.error(error.message);
-      });
+  if (!('serviceWorker' in navigator)) {
+    return;
   }
+  navigator.serviceWorker.ready
+    .then(registration => {
+      registration.unregister();
+    })
+    .catch(error => {
+      console.error(error.message);
+    });
 }

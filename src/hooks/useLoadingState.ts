@@ -6,16 +6,29 @@ interface LoadingStateConfig {
   className?: string;
 }
 
+interface UseLoadingStateResult {
+  loadingProps: {
+    className: string;
+    'aria-busy': boolean;
+    'data-loading': boolean;
+    'data-pending': boolean;
+  };
+}
+
 export const useLoadingState = ({
   isLoading = false,
   isPending = false,
   className = '',
-}: LoadingStateConfig) => {
+}: LoadingStateConfig): UseLoadingStateResult => {
   const loadingProps = useMemo(() => {
     const classes = [className];
 
-    if (isLoading) classes.push('loading-state');
-    if (isPending) classes.push('pending-state');
+    if (isLoading) {
+      classes.push('loading-state');
+    }
+    if (isPending) {
+      classes.push('pending-state');
+    }
 
     return {
       className: classes.filter(Boolean).join(' '),

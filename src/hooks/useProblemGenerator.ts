@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { buildExpression, randomInt } from '@/utils/problemUtils';
 import type { MessageValue, Problem, Settings } from '@/types';
 
@@ -23,7 +23,7 @@ export const calculateExpression = (operands: number[], operators: string[]): nu
         if (operand === 0 || result % operand !== 0) {
           return null;
         }
-        result = result / operand;
+        result /= operand;
         break;
       default:
         return null;
@@ -37,6 +37,17 @@ export const generateProblem = (settings: Settings): string => {
   const numOperands = randomInt(settings.numOperandsRange[0], settings.numOperandsRange[1]);
   if (numOperands < 2) {
     return '';
+  }
+
+  // Quick feasibility check for addition-only to avoid expensive retries
+  // If only '+' is allowed, the result must be within [min*count, max*count]
+  // Otherwise, bail out early to prevent hot loops in impossible scenarios.
+  if (settings.operations.length > 0 && settings.operations.every(op => op === '+')) {
+    const minSum = settings.numRange[0] * numOperands;
+    const maxSum = settings.numRange[1] * numOperands;
+    if (settings.resultRange[0] > maxSum || settings.resultRange[1] < minSum) {
+      return '';
+    }
   }
 
   const MAX_ATTEMPTS = 10000;
@@ -177,6 +188,14 @@ export const useProblemGenerator = (
     },
     [isLoading, settings, validateSettings]
   );
+  // Auto-regenerate problems when settings change (no success toast)
+  useEffect(() => {
+    if (!isLoading) {
+      generateProblems(false);
+    }
+    // We intentionally exclude generateProblems from deps to avoid recreation loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings, isLoading, validateSettings]);
 
   return {
     problems,

@@ -1,5 +1,5 @@
 import type { Settings } from '@/types';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from 'react';
 
 // Constants to avoid duplicate strings
 const SETTINGS_STORAGE_KEY = 'mathgenie-settings';
@@ -44,23 +44,31 @@ const loadSettings = (): Settings => {
     }
   } catch (error) {
     localStorage.removeItem(SETTINGS_STORAGE_KEY);
-    if (import.meta.env.DEV) {
-      console.warn('Failed to load settings from localStorage:', error);
-    }
+    devWarn('Failed to load settings from localStorage:', error);
   }
   return defaultSettings;
 };
 
-export const useSettings = () => {
+const devWarn = (...args: unknown[]): void => {
+  if (import.meta.env.DEV) {
+    console.warn(...args);
+  }
+};
+
+interface UseSettingsResult {
+  settings: Settings;
+  setSettings: Dispatch<SetStateAction<Settings>>;
+  validateSettings: (newSettings: Settings) => string;
+}
+
+export const useSettings = (): UseSettingsResult => {
   const [settings, setSettings] = useState<Settings>(() => loadSettings());
 
   useEffect(() => {
     try {
       localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
     } catch (error) {
-      if (import.meta.env.DEV) {
-        console.warn('Failed to save settings to localStorage:', error);
-      }
+      devWarn('Failed to save settings to localStorage:', error);
     }
   }, [settings]);
 
