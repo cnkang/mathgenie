@@ -1,6 +1,6 @@
-import { act, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { act, render, screen, waitFor } from '../../tests/helpers/testUtils';
 import { I18nProvider, useTranslation } from './index';
 
 // Mock dynamic imports
@@ -48,7 +48,7 @@ const TestComponent: React.FC = () => {
   );
 };
 
-describe('I18n System', () => {
+describe.sequential('I18n System', () => {
   beforeEach(() => {
     localStorage.clear();
     vi.clearAllMocks();
@@ -171,41 +171,76 @@ describe('I18n System', () => {
   });
 
   it('provides I18n context and translations', async () => {
-    await act(async () => {
-      render(
-        <I18nProvider>
-          <TestComponent />
-        </I18nProvider>
+    const TestComponentWrapper = () => {
+      const { t, currentLanguage, languages } = useTranslation();
+      return (
+        <div>
+          <div data-testid='current-language'>{currentLanguage}</div>
+          <div data-testid='app-title'>{t('app.title')}</div>
+          <div data-testid='languages-count'>{Object.keys(languages).length}</div>
+        </div>
       );
-    });
+    };
 
-    expect(screen.getByTestId('current-language')).toHaveTextContent('en');
-    expect(screen.getByTestId('app-title')).toHaveTextContent('MathGenie');
-    expect(screen.getByTestId('languages-count')).toHaveTextContent('6');
+    const { container } = render(
+      <I18nProvider>
+        <TestComponentWrapper />
+      </I18nProvider>
+    );
+
+    await waitFor(() => {
+      const currentLang = container.querySelector('[data-testid="current-language"]');
+      const appTitle = container.querySelector('[data-testid="app-title"]');
+      const langCount = container.querySelector('[data-testid="languages-count"]');
+      expect(currentLang?.textContent).toBe('en');
+      expect(appTitle?.textContent).toBe('MathGenie');
+      expect(langCount?.textContent).toBe('6');
+    });
   });
 
   it('handles missing translation keys with fallback', async () => {
-    await act(async () => {
-      render(
-        <I18nProvider>
-          <TestComponent />
-        </I18nProvider>
+    const TestMissingComponent = () => {
+      const { t } = useTranslation();
+      return (
+        <div>
+          <div data-testid='missing-key'>{t('missing.key')}</div>
+        </div>
+      );
+    };
+
+    const { container } = render(
+      <I18nProvider>
+        <TestMissingComponent />
+      </I18nProvider>
+    );
+
+    await waitFor(() => {
+      expect(container.querySelector('[data-testid="missing-key"]')?.textContent).toBe(
+        'missing.key'
       );
     });
-
-    expect(screen.getByTestId('missing-key')).toHaveTextContent('missing.key');
   });
 
   it('handles string interpolation in translations', async () => {
-    await act(async () => {
-      render(
-        <I18nProvider>
-          <TestComponent />
-        </I18nProvider>
+    const TestInterpolationComponent = () => {
+      const { t } = useTranslation();
+      return (
+        <div>
+          <div data-testid='interpolation'>{t('test.interpolation', { name: 'World' })}</div>
+        </div>
       );
-    });
+    };
 
-    expect(screen.getByTestId('interpolation')).toHaveTextContent('Hello World!');
+    const { container } = render(
+      <I18nProvider>
+        <TestInterpolationComponent />
+      </I18nProvider>
+    );
+
+    await waitFor(() => {
+      const interpolationEl = container.querySelector('[data-testid="interpolation"]');
+      expect(interpolationEl?.textContent).toBe('Hello World!');
+    });
   });
 
   it('throws error when useTranslation is used outside provider', () => {
@@ -214,27 +249,41 @@ describe('I18n System', () => {
       return <div>{t('test')}</div>;
     };
 
+    // Suppress console.error for this test
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
     expect(() => {
       render(<TestComponentWithoutProvider />);
     }).toThrow('useTranslation must be used within an I18nProvider');
+
+    consoleSpy.mockRestore();
   });
 
   it('uses browser language as default', async () => {
+    // Clear localStorage first
+    localStorage.clear();
+
     // Set browser language to Chinese
     Object.defineProperty(navigator, 'language', {
       writable: true,
       value: 'zh-CN',
     });
 
-    await act(async () => {
-      render(
-        <I18nProvider>
-          <TestComponent />
-        </I18nProvider>
-      );
-    });
+    const TestLanguageComponent = () => {
+      const { currentLanguage } = useTranslation();
+      return <div data-testid='current-language'>{currentLanguage}</div>;
+    };
 
-    expect(screen.getByTestId('current-language')).toHaveTextContent('zh');
+    const { container } = render(
+      <I18nProvider>
+        <TestLanguageComponent />
+      </I18nProvider>
+    );
+
+    await waitFor(() => {
+      const langEl = container.querySelector('[data-testid="current-language"]');
+      expect(langEl?.textContent).toBe('zh');
+    });
   });
 
   it('falls back to English for unsupported browser language', async () => {
@@ -244,51 +293,82 @@ describe('I18n System', () => {
       value: 'ko-KR',
     });
 
+    let unmount: () => void;
     await act(async () => {
-      render(
+      const result = render(
         <I18nProvider>
           <TestComponent />
         </I18nProvider>
       );
+      unmount = result.unmount;
     });
 
-    expect(screen.getByTestId('current-language')).toHaveTextContent('en');
+    const container = document.body;
+    expect(container.querySelector('[data-testid="current-language"]')?.textContent).toBe('en');
+    unmount!();
   });
 
   it('uses localStorage language preference', async () => {
     localStorage.setItem('mathgenie-language', 'zh');
 
-    await act(async () => {
-      render(
-        <I18nProvider>
-          <TestComponent />
-        </I18nProvider>
-      );
-    });
+    const TestStorageComponent = () => {
+      const { currentLanguage } = useTranslation();
+      return <div data-testid='current-language'>{currentLanguage}</div>;
+    };
 
-    expect(screen.getByTestId('current-language')).toHaveTextContent('zh');
+    const { container } = render(
+      <I18nProvider>
+        <TestStorageComponent />
+      </I18nProvider>
+    );
+
+    await waitFor(() => {
+      const langEl = container.querySelector('[data-testid="current-language"]');
+      expect(langEl?.textContent).toBe('zh');
+    });
   });
 
   it('ignores invalid language change requests', async () => {
-    await act(async () => {
-      render(
-        <I18nProvider>
-          <TestComponent />
-        </I18nProvider>
+    // Clear localStorage to ensure we start with browser language
+    localStorage.clear();
+
+    const TestInvalidComponent = () => {
+      const { currentLanguage, changeLanguage } = useTranslation();
+      return (
+        <div>
+          <div data-testid='current-language'>{currentLanguage}</div>
+          <button onClick={() => changeLanguage('invalid')}>Change to Invalid</button>
+        </div>
       );
+    };
+
+    const { container } = render(
+      <I18nProvider>
+        <TestInvalidComponent />
+      </I18nProvider>
+    );
+
+    await waitFor(() => {
+      const langEl = container.querySelector('[data-testid="current-language"]');
+      expect(langEl?.textContent).toBe('en');
     });
 
-    const invalidButton = screen.getByText('Change to Invalid');
-
-    await act(async () => {
+    const invalidButton = container.querySelector('button');
+    if (invalidButton) {
       invalidButton.click();
-    });
+    }
 
     // Should remain English
-    expect(screen.getByTestId('current-language')).toHaveTextContent('en');
+    await waitFor(() => {
+      const langEl = container.querySelector('[data-testid="current-language"]');
+      expect(langEl?.textContent).toBe('en');
+    });
   });
 
   it('handles missing navigator.languages gracefully', async () => {
+    // Clear localStorage to ensure we test navigator fallback
+    localStorage.clear();
+
     // Mock missing navigator.languages
     Object.defineProperty(navigator, 'languages', {
       writable: true,
@@ -300,15 +380,21 @@ describe('I18n System', () => {
       value: undefined,
     });
 
-    await act(async () => {
-      render(
-        <I18nProvider>
-          <TestComponent />
-        </I18nProvider>
-      );
-    });
+    const TestNavigatorComponent = () => {
+      const { currentLanguage } = useTranslation();
+      return <div data-testid='current-language'>{currentLanguage}</div>;
+    };
 
-    // Should default to English
-    expect(screen.getByTestId('current-language')).toHaveTextContent('en');
+    const { container } = render(
+      <I18nProvider>
+        <TestNavigatorComponent />
+      </I18nProvider>
+    );
+
+    await waitFor(() => {
+      // Should default to English
+      const langEl = container.querySelector('[data-testid="current-language"]');
+      expect(langEl?.textContent).toBe('en');
+    });
   });
 });
