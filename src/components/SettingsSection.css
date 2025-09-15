@@ -1,0 +1,41 @@
+/* Settings section layout and inputs with AAA touch targets */
+.settings-section {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg, 1.5rem);
+}
+
+.field {
+  display: grid;
+  gap: var(--space-xs, 0.5rem);
+}
+
+.field-label {
+  font-size: var(--font-size-sm, 0.875rem);
+  font-weight: 600;
+  color: var(--text-primary, #1e293b);
+}
+
+input[type='number'],
+select {
+  min-height: 44px; /* WCAG 2.2 AAA */
+  padding: 8px 12px;
+  font: inherit;
+  color: var(--text-primary, #1e293b);
+  background: var(--bg-primary, #fff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: var(--radius-md, 8px);
+}
+
+input[type='number']:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary-color, #4f46e5);
+  box-shadow: 0 0 0 2px rgb(79 70 229 / 25%);
+}
+
+@media (min-width: 768px) {
+  .settings-section {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
