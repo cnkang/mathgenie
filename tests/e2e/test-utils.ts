@@ -3,6 +3,15 @@ import type { Page } from '@playwright/test';
 import { expect } from '@playwright/test';
 
 /**
+ * Check if the current browser is WebKit (Safari)
+ */
+export async function isWebKit(page: Page): Promise<boolean> {
+  return await page.evaluate(() => {
+    return /WebKit/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+  });
+}
+
+/**
  * Wait for the app to fully load with all necessary elements
  */
 export async function waitForAppLoad(page: Page): Promise<void> {
@@ -18,6 +27,23 @@ export async function waitForAppLoad(page: Page): Promise<void> {
     },
     { timeout: 10000 }
   );
+
+  // Additional wait for WebKit to ensure DOM is fully ready
+  if (await isWebKit(page)) {
+    await page.waitForTimeout(500);
+
+    // Ensure all critical elements are interactive
+    await page.waitForFunction(
+      () => {
+        const operations = document.querySelector('#operations');
+        const numProblems = document.querySelector('#numProblems');
+        return (
+          operations && numProblems && operations.offsetHeight > 0 && numProblems.offsetHeight > 0
+        );
+      },
+      { timeout: 5000 }
+    );
+  }
 }
 
 /**
@@ -27,8 +53,21 @@ export async function waitForPresetsLoad(page: Page): Promise<void> {
   await page.waitForSelector('.settings-presets', { timeout: 10000 });
   await page.waitForSelector('.preset-card', { timeout: 10000 });
 
-  // Ensure at least one preset button is visible
+  // Ensure all 4 preset buttons are visible and clickable
+  await expect(page.locator('.preset-card')).toHaveCount(4);
   await expect(page.locator('.preset-card').first()).toBeVisible();
+
+  // Wait for preset cards to be fully interactive
+  await page.waitForFunction(
+    () => {
+      const presetCards = document.querySelectorAll('.preset-card');
+      return (
+        presetCards.length === 4 &&
+        Array.from(presetCards).every(card => card.offsetHeight > 0 && card.offsetWidth > 0)
+      );
+    },
+    { timeout: 10000 }
+  );
 }
 
 /**
@@ -51,10 +90,96 @@ export async function applyPreset(page: Page, presetIndex: number): Promise<void
 
   const presetButton = page.locator('.preset-card').nth(presetIndex);
   await expect(presetButton).toBeVisible();
-  await presetButton.click();
 
-  // Wait for settings to be applied
-  await page.waitForTimeout(1000);
+  // Use reliable click with retry logic
+  await presetButton.click({ timeout: 5000 });
+
+  // Wait for settings to be applied by checking for actual state change
+  // Different presets have different numProblems values
+  const expectedValues = ['15', '20', '25', '30'];
+  if (presetIndex < expectedValues.length) {
+    await expect(page.locator('#numProblems')).toHaveValue(expectedValues[presetIndex], {
+      timeout: 5000,
+    });
+  }
+}
+
+/**
+ * Wait for preset settings to be fully applied
+ */
+export async function waitForPresetApplied(page: Page, expectedNumProblems: string): Promise<void> {
+  // Wait for the main setting to change
+  await expect(page.locator('#numProblems')).toHaveValue(expectedNumProblems, { timeout: 5000 });
+
+  // Wait for problems to be regenerated if they exist
+  const problemsExist = (await page.locator('.problem-item').count()) > 0;
+  if (problemsExist) {
+    await page.waitForFunction(
+      expected => {
+        const numProblemsInput = document.querySelector('#numProblems') as HTMLInputElement;
+        const problemItems = document.querySelectorAll('.problem-item');
+        return numProblemsInput?.value === expected && problemItems.length > 0;
+      },
+      expectedNumProblems,
+      { timeout: 5000 }
+    );
+  }
+}
+
+/**
+ * WebKit-safe click function that handles Safari's specific behavior
+ */
+export async function webkitSafeClick(page: Page, selector: string): Promise<void> {
+  const element = page.locator(selector);
+
+  // Ensure element is visible and ready
+  await expect(element).toBeVisible();
+
+  if (await isWebKit(page)) {
+    // WebKit sometimes needs extra time for elements to be interactive
+    await page.waitForTimeout(100);
+
+    // Scroll element into view for WebKit
+    await element.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(50);
+
+    // Try normal click first
+    try {
+      await element.click({ timeout: 3000 });
+    } catch (error) {
+      // Fallback: Use JavaScript click for WebKit if normal click fails
+      await element.evaluate(el => {
+        if (el instanceof HTMLElement) {
+          el.focus();
+          el.click();
+        }
+      });
+    }
+  } else {
+    // For other browsers, use normal click
+    await element.click({ timeout: 5000 });
+  }
+}
+
+/**
+ * WebKit-safe preset application with enhanced reliability
+ */
+export async function applyPresetWebkitSafe(page: Page, presetIndex: number): Promise<void> {
+  await waitForPresetsLoad(page);
+
+  const presetButton = page.locator('.preset-card').nth(presetIndex);
+  await expect(presetButton).toBeVisible();
+
+  // Use WebKit-safe click
+  await webkitSafeClick(page, `.preset-card:nth-child(${presetIndex + 1})`);
+
+  // Wait for settings to be applied by checking for actual state change
+  const expectedValues = ['15', '20', '25', '30'];
+  if (presetIndex < expectedValues.length) {
+    await expect(page.locator('#numProblems')).toHaveValue(expectedValues[presetIndex], {
+      timeout: 8000, // Longer timeout for WebKit
+    });
+  }
 }
 
 /**
@@ -113,8 +238,16 @@ export async function waitForProblemsGenerated(page: Page, expectedCount?: numbe
 export async function changeLanguage(page: Page, languageCode: string): Promise<void> {
   await page.selectOption('#language-select', languageCode);
 
-  // Wait for translations to load
-  await page.waitForTimeout(3000);
+  // Wait for translations to load by checking for actual content change
+  await page.waitForFunction(
+    lang => {
+      const title = document.querySelector('h1')?.textContent;
+      const languageSelect = document.querySelector('#language-select') as HTMLSelectElement;
+      return languageSelect?.value === lang && title && title !== 'Loading...' && title.length > 0;
+    },
+    languageCode,
+    { timeout: 10000 }
+  );
 
   // Verify language selector shows the new language
   await expect(page.locator('#language-select')).toHaveValue(languageCode);
@@ -125,7 +258,8 @@ export async function changeLanguage(page: Page, languageCode: string): Promise<
  */
 export async function fillAndSave(page: Page, selector: string, value: string): Promise<void> {
   await page.fill(selector, value);
-  await page.waitForTimeout(500); // Wait for debounced save
+  // Wait for the value to be actually set and saved
+  await expect(page.locator(selector)).toHaveValue(value, { timeout: 3000 });
 }
 
 /**
