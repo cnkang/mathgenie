@@ -15,6 +15,49 @@ interface SettingsManagerProps {
   onImportSettings: (settings: Settings) => void;
 }
 
+type TFunc = (key: string, params?: Record<string, string | number>) => string;
+
+const exportSettingsToFile = (settings: Settings): void => {
+  const settingsData = createSettingsData(settings);
+  const dataStr = serializeSettings(settingsData);
+  const dataBlob = createDownloadBlob(dataStr);
+
+  const url = URL.createObjectURL(dataBlob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = generateFilename();
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};
+
+const importSettingsFromFile = (
+  file: File,
+  t: TFunc,
+  onImportSettings: (settings: Settings) => void
+): void => {
+  const reader = new FileReader();
+  reader.onload = (e: ProgressEvent<FileReader>) => {
+    const result = e.target?.result;
+    if (typeof result !== 'string') {
+      alert(t('settings.importError') || 'Invalid settings file format');
+      return;
+    }
+    try {
+      const importedData = parseSettingsFile(result);
+      onImportSettings(importedData.settings);
+    } catch (error) {
+      const message = t('settings.importError') || 'Error importing settings file';
+      alert(message);
+      if (!(error instanceof SettingsParseError)) {
+        console.error('Settings import error:', error);
+      }
+    }
+  };
+  reader.readAsText(file);
+};
+
 /**
  * Settings Manager Component
  * Allows users to export and import their settings
@@ -23,45 +66,15 @@ const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onImportSet
   const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const exportSettings = (): void => {
-    const settingsData = createSettingsData(settings);
-    const dataStr = serializeSettings(settingsData);
-    const dataBlob = createDownloadBlob(dataStr);
-
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = generateFilename();
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
+  const exportSettings = (): void => exportSettingsToFile(settings);
 
   const importSettings = (event: ChangeEvent<HTMLInputElement>): void => {
     const file = event.target.files?.[0];
     if (!file) {
+      event.target.value = '';
       return;
     }
-
-    const reader = new FileReader();
-    reader.onload = (e: ProgressEvent<FileReader>) => {
-      try {
-        const result = e.target?.result;
-        if (typeof result === 'string') {
-          const importedData = parseSettingsFile(result);
-          onImportSettings(importedData.settings);
-        }
-      } catch (error) {
-        if (error instanceof SettingsParseError) {
-          alert(t('settings.importError') || 'Invalid settings file format');
-        } else {
-          alert(t('settings.importError') || 'Error importing settings file');
-          console.error('Settings import error:', error);
-        }
-      }
-    };
-    reader.readAsText(file);
+    importSettingsFromFile(file, t, onImportSettings);
 
     // Reset file input
     event.target.value = '';

@@ -1,6 +1,6 @@
-import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { vi } from 'vitest';
+import { render, screen, waitFor } from '../../tests/helpers/testUtils';
 import type { I18nContextType } from '../types';
 import TranslationLoader from './TranslationLoader';
 
@@ -67,16 +67,19 @@ describe('TranslationLoader', () => {
     });
     mockUseTranslation.mockReturnValue(createMockI18nContextWithT(true, mockT));
 
-    render(
+    const { container } = render(
       <TranslationLoader>
         <div data-testid='child-content'>Test Content</div>
       </TranslationLoader>
     );
 
-    expect(screen.queryByTestId('child-content')).toBeNull();
-    expect(screen.getByText('🌐')).toBeDefined();
-    expect(screen.getByText('MathGenie')).toBeDefined();
-    expect(screen.getByText('Loading translations...')).toBeDefined();
+    // Child content should not be rendered when loading
+    expect(container.querySelector('[data-testid="child-content"]')).toBeNull();
+    expect(container.querySelector('.translation-loader')).toBeInTheDocument();
+    expect(container.querySelector('.translation-loader-title')?.textContent).toBe('MathGenie');
+    expect(container.querySelector('.translation-loader-message')?.textContent).toBe(
+      'Loading translations...'
+    );
   });
 
   test('displays loading spinner when loading', () => {
@@ -87,17 +90,17 @@ describe('TranslationLoader', () => {
     });
     mockUseTranslation.mockReturnValue(createMockI18nContextWithT(true, mockT));
 
-    render(
+    const { container } = render(
       <TranslationLoader>
         <div>Test Content</div>
       </TranslationLoader>
     );
 
-    const spinner = screen.getByLabelText('Loading translations...');
-    expect(spinner).toBeDefined();
-    expect(spinner.classList.contains('translation-loader-spinner')).toBe(true);
+    const spinner = container.querySelector('.translation-loader-spinner');
+    expect(spinner).toBeInTheDocument();
+    expect(spinner?.getAttribute('aria-label')).toBe('Loading translations...');
 
-    const spinnerDots = document.querySelectorAll('.spinner-dot');
+    const spinnerDots = container.querySelectorAll('.spinner-dot');
     expect(spinnerDots).toHaveLength(3);
   });
 
@@ -130,7 +133,15 @@ describe('TranslationLoader', () => {
       </TranslationLoader>
     );
 
-    expect(screen.getByText('Loading translations...')).toBeDefined();
+    const { container } = render(
+      <TranslationLoader>
+        <div>Test Content</div>
+      </TranslationLoader>
+    );
+
+    expect(container.querySelector('.translation-loader-message')?.textContent).toBe(
+      'Loading translations...'
+    );
   });
 
   test('falls back to default text when translation returns undefined', () => {
@@ -140,13 +151,15 @@ describe('TranslationLoader', () => {
       isLoading: true,
     } as unknown as I18nContextType);
 
-    render(
+    const { container } = render(
       <TranslationLoader>
         <div>Test Content</div>
       </TranslationLoader>
     );
 
-    expect(screen.getByText('Loading translations...')).toBeDefined();
+    expect(container.querySelector('.translation-loader-message')?.textContent).toBe(
+      'Loading translations...'
+    );
   });
 
   test('applies correct CSS classes to loading elements', () => {
@@ -167,10 +180,10 @@ describe('TranslationLoader', () => {
     );
 
     expect((container.firstChild as Element)?.classList.contains('translation-loader')).toBe(true);
-    expect(screen.getByText('MathGenie').classList.contains('translation-loader-title')).toBe(true);
-    expect(
-      screen.getByText('Loading translations...').classList.contains('translation-loader-message')
-    ).toBe(true);
+    expect(container.querySelector('.translation-loader-title')?.textContent).toBe('MathGenie');
+    expect(container.querySelector('.translation-loader-message')?.textContent).toBe(
+      'Loading translations...'
+    );
 
     const content = container.querySelector('.translation-loader-content');
     expect(content).toBeDefined();
@@ -245,15 +258,15 @@ describe('TranslationLoader', () => {
       isLoading: true,
     } as unknown as I18nContextType);
 
-    const { rerender } = render(
+    const { rerender, container } = render(
       <TranslationLoader>
         <div data-testid='child-content'>Test Content</div>
       </TranslationLoader>
     );
 
-    // Verify loading state
-    expect(screen.getAllByText('Loading translations...')).toHaveLength(2); // title and message
-    expect(screen.queryByTestId('child-content')).toBeNull();
+    // Verify loading state - should have exactly 1 loading message
+    expect(container.querySelectorAll('.translation-loader-message')).toHaveLength(1);
+    expect(container.querySelector('[data-testid="child-content"]')).toBeNull();
 
     // Change to loaded state
     mockUseTranslation.mockReturnValue({
@@ -269,8 +282,8 @@ describe('TranslationLoader', () => {
 
     // Verify loaded state
     await waitFor(() => {
-      expect(screen.queryByText('Loading translations...')).toBeNull();
-      expect(screen.getByTestId('child-content')).toBeDefined();
+      expect(container.querySelector('.translation-loader-message')).toBeNull();
+      expect(container.querySelector('[data-testid="child-content"]')).toBeDefined();
     });
   });
 

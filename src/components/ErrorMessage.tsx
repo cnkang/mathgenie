@@ -37,7 +37,7 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
     return error;
   };
 
-  const getIcon = () => {
+  const getIcon = (): string => {
     switch (type) {
       case 'error':
         return '⚠️';
@@ -50,7 +50,7 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
     }
   };
 
-  const getAriaLabel = () => {
+  const getAriaLabel = (): string => {
     switch (type) {
       case 'error':
         return t('accessibility.errorMessage') || 'Error message';

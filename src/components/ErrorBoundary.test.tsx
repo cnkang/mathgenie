@@ -1,6 +1,6 @@
-import { fireEvent, render, renderHook, screen } from '@testing-library/react';
 import React, { act } from 'react';
 import { afterAll, beforeAll, describe, expect, vi } from 'vitest';
+import { fireEvent, render, renderHook, screen } from '../../tests/helpers/testUtils';
 import { setViteEnv, useViteEnv } from '../../tests/helpers/viteEnv';
 import ErrorBoundary, { useErrorHandler } from './ErrorBoundary';
 
@@ -36,15 +36,15 @@ describe('ErrorBoundary', () => {
   });
 
   test('renders error fallback when there is an error', () => {
-    render(
+    const { container } = render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
       </ErrorBoundary>
     );
 
-    expect(screen.getByText(/Something went wrong/)).toBeDefined();
-    expect(screen.getByText(/Try Again/)).toBeDefined();
-    expect(screen.getByText(/Reload Page/)).toBeDefined();
+    expect(container.querySelector('h2')?.textContent).toBe('🚨 Something went wrong');
+    expect(container.querySelector('.retry-button')?.textContent).toBe('🔄 Try Again');
+    expect(container.querySelector('.reload-button')?.textContent).toBe('🔃 Reload Page');
 
     // In development environment, error details should exist
     if (import.meta.env.DEV) {
@@ -88,35 +88,35 @@ describe('ErrorBoundary', () => {
       writable: true,
     });
 
-    render(
+    const { container } = render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
       </ErrorBoundary>
     );
 
-    const reloadButton = screen.getByText(/Reload Page/);
-    fireEvent.click(reloadButton);
+    const reloadButton = container.querySelector('.reload-button');
+    fireEvent.click(reloadButton!);
 
     expect(mockReload).toHaveBeenCalled();
   });
 
   test('handles retry button click', () => {
-    render(
+    const { container } = render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
       </ErrorBoundary>
     );
 
-    expect(screen.getByText(/Something went wrong/)).toBeDefined();
+    expect(container.querySelector('h2')?.textContent).toBe('🚨 Something went wrong');
 
-    const retryButton = screen.getByText(/Try Again/);
+    const retryButton = container.querySelector('.retry-button');
     expect(retryButton).toBeDefined();
 
     // Just test that the button exists and can be clicked
-    fireEvent.click(retryButton);
+    fireEvent.click(retryButton!);
 
     // The error boundary should still show error state after retry click
-    expect(screen.getByText(/Something went wrong/)).toBeDefined();
+    expect(container.querySelector('h2')?.textContent).toBe('🚨 Something went wrong');
   });
 
   test('shows error details in development mode', () => {
@@ -135,13 +135,13 @@ describe('ErrorBoundary', () => {
   test('hides error details in production mode', () => {
     setViteEnv('production');
 
-    render(
+    const { container } = render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
       </ErrorBoundary>
     );
 
-    expect(screen.queryByText(/Error Details/)).toBeNull();
+    expect(container.querySelector('summary')).toBeNull();
   });
 
   test('handles error with custom error info', () => {
@@ -167,13 +167,13 @@ describe('ErrorBoundary', () => {
   });
 
   test('maintains error state consistently', () => {
-    const { rerender } = render(
+    const { rerender, container } = render(
       <ErrorBoundary>
         <ThrowError shouldThrow={true} />
       </ErrorBoundary>
     );
 
-    expect(screen.getByText(/Something went wrong/)).toBeDefined();
+    expect(container.querySelector('h2')?.textContent).toBe('🚨 Something went wrong');
 
     // Rerender with same error component
     rerender(
@@ -183,19 +183,19 @@ describe('ErrorBoundary', () => {
     );
 
     // Should still show error state
-    expect(screen.getByText(/Something went wrong/)).toBeDefined();
+    expect(container.querySelector('h2')?.textContent).toBe('🚨 Something went wrong');
   });
 
   test('handles multiple error scenarios', () => {
     const onError = vi.fn();
 
-    const { rerender } = render(
+    const { rerender, container } = render(
       <ErrorBoundary onError={onError}>
         <ThrowError shouldThrow={false} />
       </ErrorBoundary>
     );
 
-    expect(screen.getByText('No error')).toBeDefined();
+    expect(container.textContent).toContain('No error');
 
     // Trigger error
     rerender(
@@ -204,7 +204,7 @@ describe('ErrorBoundary', () => {
       </ErrorBoundary>
     );
 
-    expect(screen.getByText(/Something went wrong/)).toBeDefined();
+    expect(container.querySelector('h2')?.textContent).toBe('🚨 Something went wrong');
     expect(onError).toHaveBeenCalledTimes(1);
   });
 });

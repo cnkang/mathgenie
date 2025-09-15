@@ -1,6 +1,6 @@
-import { fireEvent, render, screen } from '@testing-library/react';
 import React, { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
+import { fireEvent, render, screen } from '../../tests/helpers/testUtils';
 import type { MessageValue } from '../types';
 import ErrorMessage from './ErrorMessage';
 
