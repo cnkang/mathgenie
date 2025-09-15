@@ -1,21 +1,14 @@
-import { act, renderHook } from '@testing-library/react';
+import { act, renderHook } from '../../tests/helpers/testUtils';
 import { useLocalStorage } from './useLocalStorage';
 
-// Mock localStorage
-const localStorageMock = {
-  getItem: vi.fn(),
-  setItem: vi.fn(),
-  removeItem: vi.fn(),
-  clear: vi.fn(),
-};
-
-Object.defineProperty(window, 'localStorage', {
-  value: localStorageMock,
-});
+// 使用全局 setupTests.ts 中的 localStorage mock
 
 describe('useLocalStorage', () => {
+  const localStorageMock = window.localStorage as any;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorageMock.clear();
   });
 
   test('should return initial value when localStorage is empty', () => {
@@ -49,6 +42,7 @@ describe('useLocalStorage', () => {
   });
 
   test('should handle localStorage errors gracefully', () => {
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     localStorageMock.getItem.mockImplementation(() => {
       throw new Error('localStorage error');
     });
@@ -56,17 +50,21 @@ describe('useLocalStorage', () => {
     const { result } = renderHook(() => useLocalStorage('test-key', 'default'));
 
     expect(result.current[0]).toBe('default');
+    errSpy.mockRestore();
   });
 
   test('should handle JSON parse errors gracefully', () => {
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     localStorageMock.getItem.mockReturnValue('invalid-json');
 
     const { result } = renderHook(() => useLocalStorage('test-key', 'default'));
 
     expect(result.current[0]).toBe('default');
+    errSpy.mockRestore();
   });
 
   test('should handle setItem errors gracefully', () => {
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     localStorageMock.getItem.mockReturnValue(null);
     localStorageMock.setItem.mockImplementation(() => {
       throw new Error('setItem error');
@@ -80,6 +78,7 @@ describe('useLocalStorage', () => {
 
     // Should still update the state even if localStorage fails
     expect(result.current[0]).toBe('new-value');
+    errSpy.mockRestore();
   });
 
   test('should handle function updates', () => {
@@ -277,7 +276,6 @@ describe('useLocalStorage', () => {
     unmount();
 
     expect(removeEventListenerSpy).toHaveBeenCalledWith('storage', expect.any(Function));
-
     removeEventListenerSpy.mockRestore();
   });
 });
