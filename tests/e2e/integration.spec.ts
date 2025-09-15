@@ -193,15 +193,15 @@ test.describe('Integration Tests', () => {
     await page.waitForTimeout(500);
 
     // Step 3: Create an error
-    await page.fill('#resultRangeFrom', '100');
-    await page.fill('#resultRangeTo', '50'); // Invalid range
-    await page.locator('#resultRangeTo').blur();
+    await page.fill('#result-range-from', '100');
+    await page.fill('#result-range-to', '50'); // Invalid range
+    await page.locator('#result-range-to').blur();
 
     // Error should appear
     await expect(page.locator('.error-message')).toBeVisible({ timeout: 5000 });
 
     // Step 4: Fix the error
-    await page.fill('#resultRangeTo', '150');
+    await page.fill('#result-range-to', '150');
     await page.waitForTimeout(500);
 
     // Error should clear
@@ -225,8 +225,8 @@ test.describe('Integration Tests', () => {
     await expect(page.locator('#numProblems')).toHaveValue('35');
     await ensureElementVisible(page, '#allowNegative');
     await expect(page.locator('#allowNegative')).toBeChecked();
-    await expect(page.locator('#resultRangeFrom')).toHaveValue('100');
-    await expect(page.locator('#resultRangeTo')).toHaveValue('150');
+    await expect(page.locator('#result-range-from')).toHaveValue('100');
+    await expect(page.locator('#result-range-to')).toHaveValue('150');
 
     // Step 7: Verify problems can be generated
     await page.waitForSelector('.problem-item', { timeout: 10000 });
