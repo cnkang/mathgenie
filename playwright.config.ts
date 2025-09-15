@@ -16,7 +16,8 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  // 动态调整worker数量基于CPU核心数
+  workers: process.env.CI ? 2 : 6, // CI环境保守使用，本地环境更积极使用
   timeout: 30000,
   expect: {
     timeout: 10000,
