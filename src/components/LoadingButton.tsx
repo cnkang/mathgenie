@@ -14,7 +14,7 @@ const LoadingButton: React.FC<LoadingButtonProps> = ({
 }) => {
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const handleClick = async () => {
+  const handleClick = async (): Promise<void> => {
     setIsLoading(true);
     try {
       await onClick();

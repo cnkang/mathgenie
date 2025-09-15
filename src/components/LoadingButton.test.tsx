@@ -1,6 +1,6 @@
-import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, test, vi } from 'vitest';
+import { render, screen, waitFor } from '../../tests/helpers/testUtils';
 import LoadingButton from './LoadingButton';
 
 describe('LoadingButton', () => {

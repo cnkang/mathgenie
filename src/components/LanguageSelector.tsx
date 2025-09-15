@@ -2,6 +2,9 @@ import React from 'react';
 import { useTranslation } from '../i18n';
 import './LanguageSelector.css';
 
+// Do not edit manually.
+const STR_LANGUAGE_SELECT = 'language-select' as const;
+
 const LanguageSelector: React.FC = () => {
   const { currentLanguage, languages, changeLanguage, t, isLoading } = useTranslation();
 
@@ -11,14 +14,14 @@ const LanguageSelector: React.FC = () => {
 
   return (
     <div className='language-selector'>
-      <label htmlFor='language-select' className='language-label'>
+      <label htmlFor={STR_LANGUAGE_SELECT} className='language-label'>
         {t('language.select')}:
       </label>
       <select
-        id='language-select'
+        id={STR_LANGUAGE_SELECT}
         value={currentLanguage}
         onChange={e => changeLanguage(e.target.value)}
-        className='language-select'
+        className={STR_LANGUAGE_SELECT}
         aria-label={t('accessibility.languageSelect')}
       >
         {Object.values(languages).map(language => (
