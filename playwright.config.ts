@@ -90,6 +90,9 @@ export default defineConfig({
       name: 'webkit',
       use: {
         ...devices['Desktop Safari'],
+        // WebKit-specific settings for better stability
+        actionTimeout: 10000, // Longer timeout for WebKit actions
+        navigationTimeout: 15000, // Longer navigation timeout
         // WebKit doesn't support --no-sandbox, explicitly set empty launchOptions
         ...(process.env.CI && {
           launchOptions: {
@@ -106,6 +109,9 @@ export default defineConfig({
         viewport: { width: 393, height: 852 }, // iPhone 16 Pro dimensions
         userAgent:
           'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
+        // WebKit-specific settings for mobile
+        actionTimeout: 12000, // Longer timeout for mobile WebKit
+        navigationTimeout: 18000,
         // Explicitly ensure WebKit engine is used for iOS devices
         ...(process.env.CI && {
           launchOptions: {
@@ -130,6 +136,9 @@ export default defineConfig({
         viewport: { width: 1366, height: 1024 }, // Large iPad Landscape (custom viewport)
         userAgent:
           'Mozilla/5.0 (iPad; CPU OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
+        // WebKit-specific settings for iPad
+        actionTimeout: 12000, // Longer timeout for iPad WebKit
+        navigationTimeout: 18000,
         // Explicitly ensure WebKit engine is used for iOS devices
         ...(process.env.CI && {
           launchOptions: {
