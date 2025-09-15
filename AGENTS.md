@@ -130,15 +130,17 @@
 32. **⚡ JavaScript Logic Quality Requirements**:
     32.1. **Avoid Always-Same-Return Functions**: Functions must have meaningful conditional logic that can return different values based on input or state.
     32.2. **Clear Conditional Branches**: Use explicit if/else statements instead of complex ternary chains or logical operators that obscure logic flow.
-    32.3. **Meaningful Error Handling**: Implement proper error handling with different responses for different error conditions.
-    32.4. **Service Worker Best Practices**: Use cache-first or network-first strategies with proper fallbacks; avoid functions that always return the same response regardless of cache state.
-    32.5. **Promise Chain Clarity**: Structure promise chains with clear conditional logic and proper error propagation.
+    32.3. **Block Braces Required**: Always use block braces `{}` for if statements, while loops, for loops, and other control structures, even for single-line statements.
+    32.4. **Meaningful Error Handling**: Implement proper error handling with different responses for different error conditions.
+    32.5. **Service Worker Best Practices**: Use cache-first or network-first strategies with proper fallbacks; avoid functions that always return the same response regardless of cache state.
+    32.6. **Promise Chain Clarity**: Structure promise chains with clear conditional logic and proper error propagation.
 
 33. **🔧 Code Quality Patterns**:
     33.1. **CSS Pattern**: Remove duplicate properties, use standard properties with vendor prefixes as fallbacks.
     33.2. **JavaScript Pattern**: Separate cache checks from network requests with explicit conditional returns.
-    33.3. **Error Handling Pattern**: Provide meaningful error responses and fallbacks for different failure scenarios.
-    33.4. **Validation Pattern**: Always validate CSS and JavaScript through appropriate linters and static analysis tools.
+    33.3. **Block Braces Pattern**: Always use `{}` braces for control structures: `if (condition) { statement; }` instead of `if (condition) statement;`.
+    33.4. **Error Handling Pattern**: Provide meaningful error responses and fallbacks for different failure scenarios.
+    33.5. **Validation Pattern**: Always validate CSS and JavaScript through appropriate linters and static analysis tools.
 
 ### Dependencies & Boundaries
 
