@@ -1,0 +1,34 @@
+.range-input {
+  display: grid;
+  gap: var(--space-xs, 0.5rem);
+}
+
+.range-label {
+  font-size: var(--font-size-sm, 0.875rem);
+  font-weight: 600;
+  color: var(--text-primary, #1e293b);
+}
+
+.range-fields {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: var(--space-sm, 0.5rem);
+}
+
+.range-from,
+.range-to {
+  min-height: 44px; /* WCAG 2.2 AAA */
+  padding: 8px 12px;
+  font: inherit;
+  color: var(--text-primary, #1e293b);
+  background: var(--bg-primary, #fff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: var(--radius-md, 8px);
+}
+
+.range-sep {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+}

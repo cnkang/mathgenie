@@ -40,8 +40,8 @@ test.describe('localStorage Persistence', () => {
     await page.fill('#numRangeTo', '15');
     await page.waitForTimeout(500);
 
-    await page.fill('#resultRangeFrom', '0');
-    await page.fill('#resultRangeTo', '30');
+    await page.fill('#result-range-from', '0');
+    await page.fill('#result-range-to', '30');
     await page.waitForTimeout(500);
 
     // Verify range settings are saved

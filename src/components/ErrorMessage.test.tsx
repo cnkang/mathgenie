@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { render, screen } from '../../tests/helpers/testUtils';
 import type { MessageValue } from '../types';
 import ErrorMessage from './ErrorMessage';
 
@@ -15,6 +15,8 @@ vi.mock('../i18n', async () => {
 describe('ErrorMessage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Clear DOM content to prevent test interference
+    document.body.innerHTML = '';
   });
 
   test.each([
@@ -54,11 +56,11 @@ describe('ErrorMessage', () => {
   );
 
   test('has proper accessibility attributes', () => {
-    render(<ErrorMessage error='Test error' type='error' />);
+    const { container } = render(<ErrorMessage error='Test error' type='error' />);
 
-    const alert = screen.getByRole('alert');
+    const alert = container.querySelector('[role="alert"]');
     expect(alert).toBeDefined();
-    expect(alert.getAttribute('aria-live')).toBe('polite');
-    expect(alert.getAttribute('aria-atomic')).toBe('true');
+    expect(alert?.getAttribute('aria-live')).toBe('polite');
+    expect(alert?.getAttribute('aria-atomic')).toBe('true');
   });
 });

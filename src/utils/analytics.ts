@@ -49,13 +49,14 @@ export const trackEvent = (eventName: string, properties: EventProperties = {}):
     },
   };
 
-  // Always log to console in development for easier debugging
-  if (!import.meta.env.PROD) {
-    console.log('Analytics Event:', event);
+  // Skip sending analytics if user opted out
+  if (optOut) {
+    return;
   }
 
-  // Skip sending analytics if user opted out or we're not in production
-  if (optOut || !import.meta.env.PROD) {
+  // In development: log to console and skip external services
+  if (!import.meta.env.PROD) {
+    console.log('Analytics Event:', event);
     return;
   }
 

@@ -20,23 +20,23 @@ print_status() {
 }
 
 # Function to check if a browser is installed
+# Uses shared logic from debug script for consistency
 check_browser() {
     local browser=$1
     print_status $BLUE "🔍 Checking $browser installation..."
     
-    # Try multiple methods to check browser installation
+    # Use the same comprehensive logic as debug script
     local dry_run_output=$(pnpm exec playwright install --dry-run $browser 2>&1)
+    local is_installed=false
     
     # Method 1: Check for "is already installed" message
     if echo "$dry_run_output" | grep -q "is already installed"; then
-        print_status $GREEN "✅ $browser is already installed"
-        return 0
+        is_installed=true
     fi
     
     # Method 2: Check if dry-run shows no download URLs (means already installed)
     if ! echo "$dry_run_output" | grep -q "Download url:"; then
-        print_status $GREEN "✅ $browser is already installed (no download needed)"
-        return 0
+        is_installed=true
     fi
     
     # Method 3: Check cache directory for browser files
@@ -48,12 +48,16 @@ check_browser() {
     fi
     
     if [ -d "$cache_dir" ] && find "$cache_dir" -name "*$browser*" -type d | grep -q "$browser"; then
-        print_status $GREEN "✅ $browser found in cache directory"
-        return 0
+        is_installed=true
     fi
     
-    print_status $YELLOW "❌ $browser is not installed"
-    return 1
+    if [ "$is_installed" = true ]; then
+        print_status $GREEN "✅ $browser is installed and available"
+        return 0
+    else
+        print_status $YELLOW "❌ $browser is not installed"
+        return 1
+    fi
 }
 
 # Function to install a browser

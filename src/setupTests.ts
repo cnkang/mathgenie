@@ -22,57 +22,109 @@ declare global {
 
 // Custom matchers for happy-dom
 expect.extend({
-  toBeInTheDocument(received) {
-    const pass = received && document.body.contains(received);
+  toBeInTheDocument(received: unknown): { pass: boolean; message: () => string } {
+    const node = received as Node | null | undefined;
+    const pass = !!(node && document.body.contains(node));
     return {
       message: () => `expected element ${pass ? 'not ' : ''}to be in the document`,
       pass,
     };
   },
-  toHaveTextContent(received, expected) {
+  toHaveTextContent(
+    received: { textContent?: string | null } | null | undefined,
+    expected: string
+  ): { pass: boolean; message: () => string } {
     const pass = received?.textContent?.includes(expected) ?? false;
     return {
       message: () => `expected element ${pass ? 'not ' : ''}to have text content "${expected}"`,
       pass,
     };
   },
-  toHaveValue(received, expected) {
-    const pass = (received?.value ?? undefined) === expected;
+  toHaveValue(
+    received: { value?: string | number } | null | undefined,
+    expected: string | number
+  ): { pass: boolean; message: () => string } {
+    const pass =
+      (received?.value ?? undefined) === expected ||
+      (received?.value ?? undefined) === String(expected);
     return {
       message: () => `expected element ${pass ? 'not ' : ''}to have value "${expected}"`,
       pass,
     };
   },
+  toHaveClass(
+    received: { className?: string } | null | undefined,
+    expected: string
+  ): { pass: boolean; message: () => string } {
+    const className = received?.className ?? '';
+    const pass = className.split(' ').includes(expected);
+    return {
+      message: () => `expected element ${pass ? 'not ' : ''}to have class "${expected}"`,
+      pass,
+    };
+  },
+  toHaveAttribute(
+    received: Element | null | undefined,
+    attribute: string,
+    expectedValue?: string
+  ): { pass: boolean; message: () => string } {
+    const element = received as Element;
+    if (!element || !element.hasAttribute) {
+      return {
+        message: () => 'expected element to be a valid DOM element',
+        pass: false,
+      };
+    }
+
+    const hasAttribute = element.hasAttribute(attribute);
+    if (expectedValue === undefined) {
+      return {
+        message: () =>
+          `expected element ${hasAttribute ? 'not ' : ''}to have attribute "${attribute}"`,
+        pass: hasAttribute,
+      };
+    }
+
+    const actualValue = element.getAttribute(attribute);
+    const pass = hasAttribute && actualValue === expectedValue;
+    return {
+      message: () =>
+        `expected element ${pass ? 'not ' : ''}to have attribute "${attribute}" with value "${expectedValue}"`,
+      pass,
+    };
+  },
 });
 
-// Mock canvas for jsPDF
+// 轻量级 Canvas mock
+const createMockContext = () => ({
+  fillRect: vi.fn(),
+  clearRect: vi.fn(),
+  getImageData: vi.fn(() => ({ data: [0, 0, 0, 0] })),
+  putImageData: vi.fn(),
+  createImageData: vi.fn(() => ({ data: [0, 0, 0, 0] })),
+  setTransform: vi.fn(),
+  drawImage: vi.fn(),
+  save: vi.fn(),
+  fillText: vi.fn(),
+  restore: vi.fn(),
+  beginPath: vi.fn(),
+  moveTo: vi.fn(),
+  lineTo: vi.fn(),
+  closePath: vi.fn(),
+  stroke: vi.fn(),
+  translate: vi.fn(),
+  scale: vi.fn(),
+  rotate: vi.fn(),
+  arc: vi.fn(),
+  fill: vi.fn(),
+  measureText: vi.fn(() => ({ width: 0 })),
+  transform: vi.fn(),
+  rect: vi.fn(),
+  clip: vi.fn(),
+});
+
 const mockCanvas = {
-  getContext: vi.fn(() => ({
-    fillRect: vi.fn(),
-    clearRect: vi.fn(),
-    getImageData: vi.fn(() => ({ data: new Array(4) })),
-    putImageData: vi.fn(),
-    createImageData: vi.fn(() => ({ data: new Array(4) })),
-    setTransform: vi.fn(),
-    drawImage: vi.fn(),
-    save: vi.fn(),
-    fillText: vi.fn(),
-    restore: vi.fn(),
-    beginPath: vi.fn(),
-    moveTo: vi.fn(),
-    lineTo: vi.fn(),
-    closePath: vi.fn(),
-    stroke: vi.fn(),
-    translate: vi.fn(),
-    scale: vi.fn(),
-    rotate: vi.fn(),
-    arc: vi.fn(),
-    fill: vi.fn(),
-    measureText: vi.fn(() => ({ width: 0 })),
-    transform: vi.fn(),
-    rect: vi.fn(),
-    clip: vi.fn(),
-  })),
+  getContext: vi.fn(createMockContext),
   toDataURL: vi.fn(() => ''),
   addEventListener: vi.fn(),
   removeEventListener: vi.fn(),
@@ -83,43 +135,101 @@ Object.defineProperty(window, 'HTMLCanvasElement', {
   value: vi.fn().mockImplementation(() => mockCanvas),
 });
 
-// Mock crypto with secure random generation for testing
+// 简化的 crypto mock
 Object.defineProperty(window, 'crypto', {
   writable: true,
   value: {
     getRandomValues: vi.fn((arr: Uint32Array) => {
-      // Use a deterministic but secure approach for testing
-      // In production, this would use the actual crypto.getRandomValues
       for (let i = 0; i < arr.length; i++) {
-        // Use a combination of timestamp and counter for better entropy in tests
-        const timestamp = Date.now();
-        const counter = i;
-        arr[i] = (timestamp * 0x9e3779b9 + counter) >>> 0; // Ensure 32-bit unsigned
+        arr[i] = Math.floor(Math.random() * 0xffffffff);
       }
       return arr;
     }),
   },
 });
 
-// Mock localStorage
-const localStorageMock = (() => {
-  let store: Record<string, string> = {};
+// 简化的 localStorage mock
+let mockStore: Record<string, string> = {};
 
-  return {
-    getItem: vi.fn((key: string) => store[key] || null),
-    setItem: vi.fn((key: string, value: string) => {
-      store[key] = value;
-    }),
-    removeItem: vi.fn((key: string) => {
-      delete store[key];
-    }),
-    clear: vi.fn(() => {
-      store = {};
-    }),
-  };
-})();
+const localStorageMock = {
+  getItem: vi.fn((key: string): string | null => mockStore[key] || null),
+  setItem: vi.fn((key: string, value: string): void => {
+    mockStore[key] = value;
+  }),
+  removeItem: vi.fn((key: string): void => {
+    delete mockStore[key];
+  }),
+  clear: vi.fn((): void => {
+    mockStore = {};
+  }),
+};
 
 Object.defineProperty(window, 'localStorage', {
   writable: true,
   value: localStorageMock,
 });
+
+// Global test cleanup
+import { cleanup } from '@testing-library/react';
+import { afterEach, beforeEach } from 'vitest';
+
+// Store original console methods (for potential future use)
+// const originalConsole = {
+//   error: console.error,
+//   warn: console.warn,
+//   log: console.log,
+// };
+
+// Mock window APIs once at startup
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+});
+
+global.IntersectionObserver = vi.fn().mockImplementation(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
+}));
+
+global.ResizeObserver = vi.fn().mockImplementation(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
+}));
+
+// 简化清理逻辑
+beforeEach(() => {
+  mockStore = {};
+});
+
+afterEach(() => {
+  cleanup();
+  mockStore = {};
+});
+
+// jsdom polyfills for missing browser APIs used in tests
+// URL.createObjectURL and revokeObjectURL are not implemented in jsdom
+try {
+  // Safely attach mocks without throwing in environments that already provide them
+  if (typeof URL !== 'undefined') {
+    const g: any = globalThis as any;
+    if (!('createObjectURL' in URL)) {
+      g.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
+    }
+    if (!('revokeObjectURL' in URL)) {
+      g.URL.revokeObjectURL = vi.fn();
+    }
+  }
+} catch {
+  // Ignore polyfill errors in non-jsdom environments
+}

@@ -20,19 +20,17 @@ root.render(
   </React.StrictMode>
 );
 
+const devLog = (...args: unknown[]): void => {
+  if (import.meta.env.DEV) {
+    console.log(...args);
+  }
+};
+
 // Register service worker for offline functionality
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   serviceWorker.register({
-    onSuccess: () => {
-      if (import.meta.env.DEV) {
-        console.log('MathGenie is now available offline!');
-      }
-    },
-    onUpdate: () => {
-      if (import.meta.env.DEV) {
-        console.log('New version available! Please refresh the page.');
-      }
-    },
+    onSuccess: () => devLog('MathGenie is now available offline!'),
+    onUpdate: () => devLog('New version available! Please refresh the page.'),
   });
 }
 

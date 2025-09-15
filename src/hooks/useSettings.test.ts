@@ -1,6 +1,6 @@
 import type { Settings } from '@/types';
-import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { act, renderHook } from '../../tests/helpers/testUtils';
 import { useSettings } from './useSettings';
 
 const localStorageMock = {

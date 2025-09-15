@@ -1,47 +1,70 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { I18nProvider } from '../i18n';
+import { vi } from 'vitest';
+import { fireEvent, render, waitFor } from '../../tests/helpers/testUtils';
 import LanguageSelector from './LanguageSelector';
 
-describe('LanguageSelector', () => {
-  test('renders language selector', async () => {
-    render(
-      <I18nProvider>
-        <LanguageSelector />
-      </I18nProvider>
-    );
+// Mock the i18n system
+const mockChangeLanguage = vi.fn();
 
-    // Wait for loading to complete
+vi.mock('../i18n', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        'language.select': 'Language',
+        'accessibility.languageSelect': 'Select language',
+        'loading.translations': 'Loading...',
+      };
+      return translations[key] || key;
+    },
+    currentLanguage: 'en',
+    changeLanguage: mockChangeLanguage,
+    isLoading: false,
+    languages: {
+      en: { code: 'en', name: 'English', flag: '🇺🇸' },
+      zh: { code: 'zh', name: '中文', flag: '🇨🇳' },
+      es: { code: 'es', name: 'Español', flag: '🇪🇸' },
+      fr: { code: 'fr', name: 'Français', flag: '🇫🇷' },
+      de: { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+      ja: { code: 'ja', name: '日本語', flag: '🇯🇵' },
+    },
+  }),
+}));
+
+describe('LanguageSelector', () => {
+  beforeEach(() => {
+    mockChangeLanguage.mockClear();
+  });
+
+  test('renders language selector', async () => {
+    const { container } = render(<LanguageSelector />);
+
     await waitFor(() => {
-      expect(screen.getByRole('combobox')).toBeInTheDocument();
+      expect(container.querySelector('select')).toBeInTheDocument();
+      expect(container.textContent).toContain('Language:');
     });
   });
 
   test('changes language when option is selected', async () => {
-    render(
-      <I18nProvider>
-        <LanguageSelector />
-      </I18nProvider>
-    );
+    const { container } = render(<LanguageSelector />);
 
-    // Wait for loading to complete
     await waitFor(() => {
-      const select = screen.getByRole('combobox');
-      fireEvent.change(select, { target: { value: 'zh' } });
-      expect(select).toHaveValue('zh');
+      const select = container.querySelector('select');
+      expect((select as HTMLSelectElement).value).toBe('en');
+
+      fireEvent.change(select!, { target: { value: 'zh' } });
+      expect(mockChangeLanguage).toHaveBeenCalledWith('zh');
     });
   });
 
   test('displays all language options', async () => {
-    render(
-      <I18nProvider>
-        <LanguageSelector />
-      </I18nProvider>
-    );
+    const { container } = render(<LanguageSelector />);
 
-    // Wait for loading to complete
     await waitFor(() => {
-      const options = screen.getAllByRole('option');
+      const options = container.querySelectorAll('option');
       expect(options).toHaveLength(6); // en, zh, es, fr, de, ja
+
+      // Check specific options
+      expect(container.textContent).toContain('English');
+      expect(container.textContent).toContain('中文');
     });
   });
 });

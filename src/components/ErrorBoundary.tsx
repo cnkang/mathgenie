@@ -43,36 +43,35 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     this.setState({ hasError: false, error: undefined, errorInfo: undefined });
   };
 
-  // eslint-disable-next-line sonarjs/function-return-type
-  render(): ReactNode {
-    return this.state.hasError
-      ? this.props.fallback || (
-          <div className='error-boundary'>
-            <div className='error-content'>
-              <h2>🚨 Something went wrong</h2>
-              <p>We&apos;re sorry, but something unexpected happened.</p>
+  render(): React.ReactElement {
+    const fallbackContent: ReactNode = this.props.fallback ?? (
+      <div className='error-boundary'>
+        <div className='error-content'>
+          <h2>🚨 Something went wrong</h2>
+          <p>We&apos;re sorry, but something unexpected happened.</p>
 
-              {import.meta.env.DEV && this.state.error && (
-                <details className='error-details'>
-                  <summary>Error Details (Development)</summary>
-                  <pre>{this.state.error.toString()}</pre>
-                  {this.state.errorInfo && <pre>{this.state.errorInfo.componentStack}</pre>}
-                </details>
-              )}
+          {import.meta.env.DEV && this.state.error && (
+            <details className='error-details'>
+              <summary>Error Details (Development)</summary>
+              <pre>{this.state.error.toString()}</pre>
+              {this.state.errorInfo && <pre>{this.state.errorInfo.componentStack}</pre>}
+            </details>
+          )}
 
-              <div className='error-actions'>
-                <button onClick={this.handleRetry} className='retry-button'>
-                  🔄 Try Again
-                </button>
+          <div className='error-actions'>
+            <button onClick={this.handleRetry} className='retry-button'>
+              🔄 Try Again
+            </button>
 
-                <button onClick={() => window.location.reload()} className='reload-button'>
-                  🔃 Reload Page
-                </button>
-              </div>
-            </div>
+            <button onClick={() => window.location.reload()} className='reload-button'>
+              🔃 Reload Page
+            </button>
           </div>
-        )
-      : this.props.children;
+        </div>
+      </div>
+    );
+    const content: ReactNode = this.state.hasError ? fallbackContent : this.props.children;
+    return <>{content}</>;
   }
 }
 
