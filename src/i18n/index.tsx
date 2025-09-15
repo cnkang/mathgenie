@@ -10,6 +10,9 @@ import React, {
 } from 'react';
 import type { I18nContextType, Language, Translations } from '../types';
 
+// Do not edit manually.
+const STR_UNDEFINED = 'undefined' as const;
+
 const languages: Record<string, Language> = {
   en: {
     code: 'en',
@@ -54,26 +57,48 @@ export const useTranslation = (): I18nContextType => {
 };
 
 // Safe translation function that can be used during initial render
+const { DEV } = import.meta.env;
+const devLog: (...args: unknown[]) => void = DEV ? (...args) => console.log(...args) : () => {};
+const devWarn: (...args: unknown[]) => void = DEV ? (...args) => console.warn(...args) : () => {};
+const devError: (...args: unknown[]) => void = DEV ? (...args) => console.error(...args) : () => {};
+
 const safeT = (key: string, params: Record<string, string | number> = {}): string => {
   const fallbackText = getFallbackText(key);
   if (fallbackText) {
-    if (Object.keys(params).length > 0) {
-      let result = fallbackText;
-      Object.entries(params).forEach(([paramKey, paramValue]) => {
-        const placeholder = '{{' + paramKey + '}}';
-        while (result.includes(placeholder)) {
-          result = result.replace(placeholder, String(paramValue));
-        }
-      });
-      return result;
-    }
-    return fallbackText;
+    return interpolate(fallbackText, params);
   }
   return key;
 };
 
+const getValueByKeyPath = (translations: Translations, key: string): unknown => {
+  const keys = key.split('.');
+  let value: unknown = translations;
+  for (const k of keys) {
+    if (value && typeof value === 'object' && k in (value as Record<string, unknown>)) {
+      value = (value as Record<string, unknown>)[k];
+    } else {
+      return undefined;
+    }
+  }
+  return value;
+};
+
+const interpolate = (template: string, params: Record<string, string | number>): string => {
+  if (Object.keys(params).length === 0) {
+    return template;
+  }
+  let result = template;
+  for (const [paramKey, paramValue] of Object.entries(params)) {
+    const placeholder = '{{' + paramKey + '}}';
+    while (result.includes(placeholder)) {
+      result = result.replace(placeholder, String(paramValue));
+    }
+  }
+  return result;
+};
+
 const getBrowserLanguage = (): string => {
-  if (typeof navigator === 'undefined') {
+  if (typeof navigator === STR_UNDEFINED) {
     return 'en';
   }
 
@@ -158,51 +183,89 @@ const loadFallbackTranslations = async (): Promise<Translations> => {
     const fallback = await import('./translations/en');
     return fallback.default;
   } catch (fallbackError) {
-    if (__DEV__) {
-      console.error('🌐 Failed to load fallback English translations:', fallbackError);
-    }
+    devError('🌐 Failed to load fallback English translations:', fallbackError);
     return {};
   }
 };
 
-const loadTranslations = async (language: string): Promise<Translations> => {
-  const maxRetries = 3;
+const loadWithRetry = async (
+  action: () => Promise<Translations>,
+  describe: (attempt: number) => void,
+  onSuccess: () => void,
+  onAttemptFail: (attempt: number, error: unknown) => void,
+  maxRetries = 3
+): Promise<Translations> => {
   let lastError: Error | null = null;
-
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      if (__DEV__) {
-        console.log(`🌐 Loading translations for "${language}" (attempt ${attempt})`);
-      }
-
-      const translations = await loadTranslationFile(language);
-
-      if (__DEV__) {
-        console.log(`🌐 Successfully loaded translations for "${language}"`);
-      }
-
-      return translations;
+      describe(attempt);
+      const result = await action();
+      onSuccess();
+      return result;
     } catch (error) {
       lastError = error as Error;
-
-      if (__DEV__) {
-        console.warn(`🌐 Attempt ${attempt} failed to load translations for "${language}":`, error);
-      }
-
+      onAttemptFail(attempt, error);
       if (attempt < maxRetries) {
         await waitForRetry(attempt);
       }
     }
   }
-
-  if (__DEV__) {
-    console.error(
-      `🌐 All attempts failed to load translations for "${language}", falling back to English. Last error:`,
-      lastError
-    );
-  }
-
+  devError('🌐 All attempts failed. Last error:', lastError);
   return loadFallbackTranslations();
+};
+
+const loadTranslations = async (language: string): Promise<Translations> =>
+  loadWithRetry(
+    () => loadTranslationFile(language),
+    attempt => devLog(`🌐 Loading translations for "${language}" (attempt ${attempt})`),
+    () => devLog(`🌐 Successfully loaded translations for "${language}"`),
+    (attempt, error) =>
+      devWarn(`🌐 Attempt ${attempt} failed to load translations for "${language}":`, error)
+  );
+
+const useLanguageState = (
+  currentLanguage: string
+): { translations: Translations; isLoading: boolean; isInitialized: boolean } => {
+  const [translations, setTranslations] = useState<Translations>({});
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    const runIfMounted = (fn: () => void): void => {
+      if (isMounted) {
+        fn();
+      }
+    };
+    const loadLanguage = async (): Promise<void> => {
+      setIsLoading(true);
+      try {
+        const newTranslations = await loadTranslations(currentLanguage);
+        const apply = (): void => {
+          setTranslations(newTranslations);
+          setIsInitialized(true);
+          const HAS_STORAGE = typeof window !== STR_UNDEFINED && !!window.localStorage;
+          if (HAS_STORAGE) {
+            localStorage.setItem('mathgenie-language', currentLanguage);
+          }
+          if (typeof document !== STR_UNDEFINED && document.documentElement) {
+            document.documentElement.lang = currentLanguage;
+          }
+        };
+        runIfMounted(apply);
+      } catch (error) {
+        devError('🌐 Failed to load translations:', error);
+      } finally {
+        runIfMounted(() => setIsLoading(false));
+      }
+    };
+    loadLanguage();
+    return () => {
+      isMounted = false;
+    };
+  }, [currentLanguage]);
+
+  return { translations, isLoading, isInitialized };
 };
 
 interface I18nProviderProps {
@@ -212,104 +275,23 @@ interface I18nProviderProps {
 export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   const [currentLanguage, setCurrentLanguage] = useState<string>(() => {
     // 优先使用用户保存的语言设置，只有在没有保存设置时才使用浏览器语言
-    if (typeof window !== 'undefined' && window.localStorage) {
+    if (typeof window !== STR_UNDEFINED && window.localStorage) {
       const savedLanguage = localStorage.getItem('mathgenie-language');
       return savedLanguage || getBrowserLanguage();
     }
     return getBrowserLanguage();
   });
-  const [translations, setTranslations] = useState<Translations>({});
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { translations, isLoading, isInitialized } = useLanguageState(currentLanguage);
   const [isPending, startTransition] = useTransition();
-  // Removed hasInitialLoad: not used; avoided dead store and unused warnings
-
-  // Initialize with fallback translations to prevent warnings
-  const [isInitialized, setIsInitialized] = useState<boolean>(false);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadLanguage = async (): Promise<void> => {
-      if (!isMounted) {
-        return;
-      }
-
-      setIsLoading(true);
-      try {
-        const newTranslations = await loadTranslations(currentLanguage);
-        if (!isMounted) {
-          return;
-        }
-
-        setTranslations(newTranslations);
-        // initial load completed
-        setIsInitialized(true);
-
-        // Safe localStorage access
-        if (typeof window !== 'undefined' && window.localStorage) {
-          localStorage.setItem('mathgenie-language', currentLanguage);
-        }
-
-        // Safe document access
-        if (typeof document !== 'undefined' && document.documentElement) {
-          document.documentElement.lang = currentLanguage;
-        }
-      } catch (error) {
-        if (__DEV__) {
-          console.error('🌐 Failed to load translations:', error);
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    loadLanguage();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [currentLanguage]);
 
   const t = useCallback(
     (key: string, params: Record<string, string | number> = {}): string => {
-      // Always try fallback first if translations are not loaded or empty
       if (!isInitialized || isLoading || Object.keys(translations).length === 0) {
         return safeT(key, params);
       }
-
-      const keys = key.split('.');
-      let value: unknown = translations;
-
-      for (const k of keys) {
-        if (value && typeof value === 'object' && k in value) {
-          value = (value as Record<string, unknown>)[k];
-        } else {
-          value = undefined;
-          break;
-        }
-      }
-
-      if (value === undefined) {
-        return safeT(key, params);
-      }
-
-      // Apply parameter substitution to both translations and fallback text
-      if (typeof value === 'string' && Object.keys(params).length > 0) {
-        let result = value;
-        Object.entries(params).forEach(([paramKey, paramValue]) => {
-          const placeholder = '{{' + paramKey + '}}';
-          while (result.includes(placeholder)) {
-            result = result.replace(placeholder, String(paramValue));
-          }
-        });
-        return result;
-      }
-
-      // Ensure we never return "[object Object]"
+      const value = getValueByKeyPath(translations, key);
       if (typeof value === 'string') {
-        return value;
+        return interpolate(value, params);
       }
       return safeT(key, params);
     },

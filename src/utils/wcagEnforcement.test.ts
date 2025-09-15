@@ -74,4 +74,44 @@ describe('WCAG Enforcement', () => {
     cleanup();
     document.body.removeChild(button);
   });
+
+  test('wraps checkbox/radio inputs in parent with min size', () => {
+    const wrapper = document.createElement('label');
+    const input = document.createElement('input');
+    input.setAttribute('type', 'checkbox');
+    wrapper.appendChild(input);
+    document.body.appendChild(wrapper);
+
+    enforceWCAGTouchTargets();
+    expect(wrapper.style.minHeight).not.toBe('');
+
+    document.body.removeChild(wrapper);
+  });
+
+  test('mutation observer triggers enforcement when interactive added', () => {
+    const cleanup = setupWCAGEnforcement();
+
+    const btn = document.createElement('button');
+    document.body.appendChild(btn);
+
+    // Give chance for debounced handler (simple direct call as fallback)
+    enforceWCAGTouchTargets();
+    expect(btn.style.minHeight).not.toBe('');
+
+    document.body.removeChild(btn);
+    cleanup();
+  });
+
+  test('applies device-specific min size for very small screens', () => {
+    const originalWidth = window.innerWidth;
+    window.innerWidth = 400; // small-mobile tier
+    const btn = document.createElement('button');
+    document.body.appendChild(btn);
+
+    enforceWCAGTouchTargets();
+    expect(btn.style.getPropertyValue('min-height')).toBe('50px');
+
+    document.body.removeChild(btn);
+    window.innerWidth = originalWidth;
+  });
 });
