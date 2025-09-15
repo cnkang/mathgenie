@@ -616,16 +616,49 @@ jobs:
         run: |
           # Create directory if it doesn't exist
           mkdir -p .lighthouseci
-          pnpm lighthouse:ci || true
+
+          echo "🚀 Running Lighthouse CI performance tests..."
+
+          # Run Lighthouse CI and capture results
+          set +e
+          pnpm lighthouse:ci
+          LIGHTHOUSE_EXIT_CODE=$?
+          set -e
+
+          # Create a summary report regardless of success/failure
+          echo "## ⚡ Lighthouse CI Performance Results" >> $GITHUB_STEP_SUMMARY
+
+          if [ $LIGHTHOUSE_EXIT_CODE -eq 0 ]; then
+            echo "✅ Lighthouse CI completed successfully" >> $GITHUB_STEP_SUMMARY
+            echo "📊 Performance metrics meet the configured thresholds" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Lighthouse CI found performance issues" >> $GITHUB_STEP_SUMMARY
+            echo "📊 Some performance metrics did not meet the configured thresholds" >> $GITHUB_STEP_SUMMARY
+            echo "💡 Check the detailed Lighthouse report for specific recommendations" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # List generated files for debugging
+          echo "📁 Generated Lighthouse files:" >> $GITHUB_STEP_SUMMARY
+          if [ -d ".lighthouseci" ] && [ "$(ls -A .lighthouseci 2>/dev/null)" ]; then
+            ls -la .lighthouseci/ >> $GITHUB_STEP_SUMMARY 2>/dev/null || echo "No files in .lighthouseci directory" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No .lighthouseci directory or files found" >> $GITHUB_STEP_SUMMARY
+            # Create a placeholder file to ensure artifact upload works
+            echo "Lighthouse CI run completed at $(date)" > .lighthouseci/lighthouse-summary.txt
+          fi
+
+          # Don't fail the job for performance issues, just report them
+          exit 0
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
 
       - name: 📊 Upload Lighthouse results
         uses: actions/upload-artifact@v4
-        if: always() && hashFiles('.lighthouseci/**/*') != ''
+        if: always()
         with:
           name: lighthouse-results
           path: .lighthouseci/
+          if-no-files-found: warn
 
   # Job 8: i18n Translation Check (runs in parallel)
   i18n-check:

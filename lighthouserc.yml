@@ -84,3 +84,5 @@ ci:
 
   upload:
     target: "temporary-public-storage"
+    outputDir: ".lighthouseci"
+    reportFilenamePattern: "%%PATHNAME%%-%%DATETIME%%-report.%%EXTENSION%%"
