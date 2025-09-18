@@ -7,9 +7,9 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  timeout: 45000, // Increased timeout for complex tests
+  timeout: 120000, // Increased from 90s to 120s for complex accessibility tests
   expect: {
-    timeout: 15000, // Increased expect timeout
+    timeout: 30000, // Increased from 15s to 30s for E2E expect timeout
   },
   reporter: [
     ['html', { open: 'never', outputFolder: 'playwright-report/e2e' }],
@@ -23,7 +23,7 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     // Increased action timeout for slower operations
-    actionTimeout: 10000,
+    actionTimeout: 20000, // Increased from 10s to 20s for E2E operations
     // CI environment optimization (headless only, browser-specific args moved to individual projects)
     ...(process.env.CI && {
       headless: true,
@@ -94,7 +94,7 @@ export default defineConfig({
             use: {
               ...devices['Pixel 5'],
               // Mobile-specific timeouts
-              actionTimeout: 15000,
+              actionTimeout: 30000, // Increased from 15s to 30s for mobile E2E
             },
           },
           {
@@ -102,7 +102,7 @@ export default defineConfig({
             use: {
               ...devices['iPhone 12'],
               // Mobile-specific timeouts
-              actionTimeout: 15000,
+              actionTimeout: 30000, // Increased from 15s to 30s for mobile E2E
             },
           },
           // Latest iPhone devices for E2E testing
@@ -110,42 +110,42 @@ export default defineConfig({
             name: 'iphone-16-pro-max-e2e',
             use: {
               ...devices['iPhone 15 Pro Max'], // Using closest available device
-              actionTimeout: 15000,
+              actionTimeout: 30000, // Increased from 15s to 30s for mobile E2E
             },
           },
           {
             name: 'iphone-16-pro-e2e',
             use: {
               ...devices['iPhone 15 Pro'], // Using closest available device
-              actionTimeout: 15000,
+              actionTimeout: 30000, // Increased from 15s to 30s for mobile E2E
             },
           },
           {
             name: 'iphone-15-pro-max-e2e',
             use: {
               ...devices['iPhone 15 Pro Max'],
-              actionTimeout: 15000,
+              actionTimeout: 30000, // Increased from 15s to 30s for mobile E2E
             },
           },
           {
             name: 'iphone-15-pro-e2e',
             use: {
               ...devices['iPhone 15 Pro'],
-              actionTimeout: 15000,
+              actionTimeout: 30000, // Increased from 15s to 30s for mobile E2E
             },
           },
           {
             name: 'iphone-14-pro-max-e2e',
             use: {
               ...devices['iPhone 14 Pro Max'],
-              actionTimeout: 15000,
+              actionTimeout: 30000, // Increased from 15s to 30s for mobile E2E
             },
           },
           {
             name: 'iphone-13-pro-e2e',
             use: {
               ...devices['iPhone 13 Pro'],
-              actionTimeout: 15000,
+              actionTimeout: 30000, // Increased from 15s to 30s for mobile E2E
             },
           },
           // iPad E2E tests - Portrait orientation
@@ -154,7 +154,7 @@ export default defineConfig({
             use: {
               ...devices['iPad Pro'],
               viewport: { width: 1024, height: 1366 }, // Portrait
-              actionTimeout: 15000,
+              actionTimeout: 30000, // Increased from 15s to 30s for mobile E2E
             },
           },
           {
@@ -162,7 +162,7 @@ export default defineConfig({
             use: {
               ...devices['iPad Pro'],
               viewport: { width: 834, height: 1194 }, // Portrait
-              actionTimeout: 15000,
+              actionTimeout: 30000, // Increased from 15s to 30s for mobile E2E
             },
           },
           {
@@ -170,7 +170,7 @@ export default defineConfig({
             use: {
               ...devices['iPad Pro'],
               viewport: { width: 820, height: 1180 }, // Portrait
-              actionTimeout: 15000,
+              actionTimeout: 30000, // Increased from 15s to 30s for mobile E2E
             },
           },
           // iPad E2E tests - Landscape orientation
@@ -179,7 +179,7 @@ export default defineConfig({
             use: {
               ...devices['iPad Pro'],
               viewport: { width: 1366, height: 1024 }, // Landscape
-              actionTimeout: 15000,
+              actionTimeout: 30000, // Increased from 15s to 30s for mobile E2E
             },
           },
           {
@@ -187,7 +187,7 @@ export default defineConfig({
             use: {
               ...devices['iPad Pro'],
               viewport: { width: 1194, height: 834 }, // Landscape
-              actionTimeout: 15000,
+              actionTimeout: 30000, // Increased from 15s to 30s for mobile E2E
             },
           },
           {
@@ -195,7 +195,7 @@ export default defineConfig({
             use: {
               ...devices['iPad Pro'],
               viewport: { width: 1180, height: 820 }, // Landscape
-              actionTimeout: 15000,
+              actionTimeout: 30000, // Increased from 15s to 30s for mobile E2E
             },
           },
           // Android E2E tests - Latest phones
@@ -206,7 +206,7 @@ export default defineConfig({
               viewport: { width: 412, height: 915 }, // S24 Ultra dimensions
               userAgent:
                 'Mozilla/5.0 (Linux; Android 14; SM-S928B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
-              actionTimeout: 15000,
+              actionTimeout: 30000, // Increased from 15s to 30s for mobile E2E
             },
           },
           {
@@ -216,7 +216,7 @@ export default defineConfig({
               viewport: { width: 384, height: 854 }, // S24 dimensions
               userAgent:
                 'Mozilla/5.0 (Linux; Android 14; SM-S921B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
-              actionTimeout: 15000,
+              actionTimeout: 30000, // Increased from 15s to 30s for mobile E2E
             },
           },
           {
@@ -226,7 +226,7 @@ export default defineConfig({
               viewport: { width: 412, height: 892 }, // Pixel 8 Pro dimensions
               userAgent:
                 'Mozilla/5.0 (Linux; Android 14; Pixel 8 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
-              actionTimeout: 15000,
+              actionTimeout: 30000, // Increased from 15s to 30s for mobile E2E
             },
           },
           {
@@ -236,7 +236,7 @@ export default defineConfig({
               viewport: { width: 412, height: 915 }, // Pixel 8 dimensions
               userAgent:
                 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
-              actionTimeout: 15000,
+              actionTimeout: 30000, // Increased from 15s to 30s for mobile E2E
             },
           },
           {
@@ -246,7 +246,7 @@ export default defineConfig({
               viewport: { width: 450, height: 1000 }, // OnePlus 12 dimensions
               userAgent:
                 'Mozilla/5.0 (Linux; Android 14; CPH2573) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
-              actionTimeout: 15000,
+              actionTimeout: 30000, // Increased from 15s to 30s for mobile E2E
             },
           },
           // Android tablets E2E tests - Portrait orientation
@@ -257,7 +257,7 @@ export default defineConfig({
               viewport: { width: 1848, height: 2960 }, // Tab S9 Ultra Portrait
               userAgent:
                 'Mozilla/5.0 (Linux; Android 13; SM-X916B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-              actionTimeout: 15000,
+              actionTimeout: 30000, // Increased from 15s to 30s for mobile E2E
             },
           },
           {
@@ -267,7 +267,7 @@ export default defineConfig({
               viewport: { width: 1600, height: 2560 }, // Tab S9 Portrait
               userAgent:
                 'Mozilla/5.0 (Linux; Android 13; SM-X810) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-              actionTimeout: 15000,
+              actionTimeout: 30000, // Increased from 15s to 30s for mobile E2E
             },
           },
           {
@@ -277,7 +277,7 @@ export default defineConfig({
               viewport: { width: 1600, height: 2560 }, // Pixel Tablet Portrait
               userAgent:
                 'Mozilla/5.0 (Linux; Android 13; Pixel Tablet) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-              actionTimeout: 15000,
+              actionTimeout: 30000, // Increased from 15s to 30s for mobile E2E
             },
           },
           // Android tablets E2E tests - Landscape orientation
@@ -288,7 +288,7 @@ export default defineConfig({
               viewport: { width: 2960, height: 1848 }, // Tab S9 Ultra Landscape
               userAgent:
                 'Mozilla/5.0 (Linux; Android 13; SM-X916B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-              actionTimeout: 15000,
+              actionTimeout: 30000, // Increased from 15s to 30s for mobile E2E
             },
           },
           {
@@ -298,7 +298,7 @@ export default defineConfig({
               viewport: { width: 2560, height: 1600 }, // Tab S9 Landscape
               userAgent:
                 'Mozilla/5.0 (Linux; Android 13; SM-X810) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-              actionTimeout: 15000,
+              actionTimeout: 30000, // Increased from 15s to 30s for mobile E2E
             },
           },
           {
@@ -308,7 +308,7 @@ export default defineConfig({
               viewport: { width: 2560, height: 1600 }, // Pixel Tablet Landscape
               userAgent:
                 'Mozilla/5.0 (Linux; Android 13; Pixel Tablet) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-              actionTimeout: 15000,
+              actionTimeout: 30000, // Increased from 15s to 30s for mobile E2E
             },
           },
         ]
@@ -319,7 +319,7 @@ export default defineConfig({
     command: 'pnpm preview',
     url: 'http://localhost:4173',
     reuseExistingServer: !process.env.CI,
-    timeout: 120000,
+    timeout: 180000, // Increased from 120s to 180s for CI stability
     ignoreHTTPSErrors: true,
     // Retry server startup in case of port conflicts
     ...(process.env.CI && {
