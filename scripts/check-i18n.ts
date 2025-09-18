@@ -6,7 +6,7 @@
  * and reports any missing translations across supported languages.
  */
 
-import { readFileSync, readdirSync } from 'fs';
+import { readdirSync } from 'fs';
 import { join } from 'path';
 
 interface TranslationObject {
@@ -56,12 +56,12 @@ async function loadTranslationFile(language: string): Promise<Record<string, str
       throw new Error(`Invalid language code: ${language}`);
     }
     const filePath = join(TRANSLATIONS_DIR, `${language}.ts`);
-    
+
     // Additional path traversal protection
     if (!filePath.startsWith(TRANSLATIONS_DIR)) {
       throw new Error(`Invalid file path: ${filePath}`);
     }
-    
+
     const module = await import(filePath);
     const translations = module.default as TranslationObject;
 
@@ -126,10 +126,13 @@ function checkParameterConsistency(
 /**
  * Load translation files and return translations with available languages
  */
-async function loadTranslations(): Promise<{ translations: Record<string, Record<string, string>>; availableLanguages: string[] }> {
+async function loadTranslations(): Promise<{
+  translations: Record<string, Record<string, string>>;
+  availableLanguages: string[];
+}> {
   const files = readdirSync(TRANSLATIONS_DIR);
   const translationFiles = files.filter(file => file.endsWith('.ts'));
-  
+
   if (translationFiles.length === 0) {
     throw new Error('No translation files found');
   }
@@ -137,7 +140,7 @@ async function loadTranslations(): Promise<{ translations: Record<string, Record
   const translations: Record<string, Record<string, string>> = {};
   const availableLanguages: string[] = [];
 
-  const loadPromises = translationFiles.map(async (file) => {
+  const loadPromises = translationFiles.map(async file => {
     const lang = file.replace('.ts', '');
     availableLanguages.push(lang);
     translations[lang] = await loadTranslationFile(lang);
@@ -146,7 +149,7 @@ async function loadTranslations(): Promise<{ translations: Record<string, Record
   await Promise.all(loadPromises);
 
   // Sort availableLanguages to have a consistent order
-  availableLanguages.sort();
+  availableLanguages.sort((a, b) => a.localeCompare(b));
 
   return { translations, availableLanguages };
 }
@@ -194,7 +197,7 @@ function checkTranslationKeys(
  */
 function checkEmptyTranslations(translations: Record<string, Record<string, string>>): string[] {
   const warnings: string[] = [];
-  
+
   for (const [lang, langTranslations] of Object.entries(translations)) {
     for (const [key, value] of Object.entries(langTranslations)) {
       if (!value || (typeof value === 'string' && value.trim() === '')) {
@@ -202,7 +205,7 @@ function checkEmptyTranslations(translations: Record<string, Record<string, stri
       }
     }
   }
-  
+
   return warnings;
 }
 
@@ -287,24 +290,24 @@ function generateMissingTranslations(missingTranslations: Record<string, string[
   if (Object.keys(missingTranslations).length === 0) {
     return [];
   }
-  
+
   const lines = ['## ❌ Missing Translations\n'];
-  
+
   for (const [lang, keys] of Object.entries(missingTranslations)) {
     lines.push(`### ${lang.toUpperCase()}`);
     lines.push(`Missing ${keys.length} translations:\n`);
-    
+
     for (const key of keys.slice(0, 10)) {
       lines.push(`- \`${key}\``);
     }
-    
+
     if (keys.length > 10) {
       lines.push(`- ... and ${keys.length - 10} more\n`);
     } else {
       lines.push('');
     }
   }
-  
+
   return lines;
 }
 
@@ -374,4 +377,10 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch(console.error);
 }
 
-export { generateReport, validateTranslations, loadTranslations, checkTranslationKeys, checkEmptyTranslations };
+export {
+  checkEmptyTranslations,
+  checkTranslationKeys,
+  generateReport,
+  loadTranslations,
+  validateTranslations,
+};

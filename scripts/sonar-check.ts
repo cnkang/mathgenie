@@ -110,7 +110,7 @@ class SonarChecker {
       { pattern: spawnPattern, name: 'spawn' },
     ];
 
-    patterns.forEach(({ pattern, name }) => {
+    patterns.forEach(({ pattern, name: _name }) => {
       let match;
       while ((match = pattern.exec(content)) !== null) {
         const lineNumber = content.substring(0, match.index).split('\n').length;
@@ -200,36 +200,36 @@ class SonarChecker {
   }
 
   // ... rest of the methods remain the same as original sonar-check.ts
-  private extractFunctions(content: string): FunctionMetrics[] {
+  private extractFunctions(_content: string): FunctionMetrics[] {
     // Implementation remains the same
     return [];
   }
 
-  private checkCognitiveComplexity(filePath: string, func: FunctionMetrics): void {
+  private checkCognitiveComplexity(_filePath: string, _func: FunctionMetrics): void {
     // Implementation remains the same
   }
 
-  private checkFunctionLength(filePath: string, func: FunctionMetrics): void {
+  private checkFunctionLength(_filePath: string, _func: FunctionMetrics): void {
     // Implementation remains the same
   }
 
-  private checkParameterCount(filePath: string, func: FunctionMetrics): void {
+  private checkParameterCount(_filePath: string, _func: FunctionMetrics): void {
     // Implementation remains the same
   }
 
-  private checkReturnStatements(filePath: string, func: FunctionMetrics): void {
+  private checkReturnStatements(_filePath: string, _func: FunctionMetrics): void {
     // Implementation remains the same
   }
 
-  private checkNestingLevel(filePath: string, func: FunctionMetrics): void {
+  private checkNestingLevel(_filePath: string, _func: FunctionMetrics): void {
     // Implementation remains the same
   }
 
-  private checkExpressionComplexity(filePath: string, func: FunctionMetrics): void {
+  private checkExpressionComplexity(_filePath: string, _func: FunctionMetrics): void {
     // Implementation remains the same
   }
 
-  private checkIdenticalExpressions(filePath: string, content: string): void {
+  private checkIdenticalExpressions(_filePath: string, _content: string): void {
     // Implementation remains the same
   }
 
@@ -298,8 +298,12 @@ class SonarChecker {
       console.log(`\n📁 ${file}`);
       for (const issue of issues) {
         const icon = issue.severity === 'error' ? '🔴' : '🟡';
-        const priorityIcon =
-          issue.priority === 'HIGH' ? '🚨' : issue.priority === 'MEDIUM' ? '⚠️' : 'ℹ️';
+        let priorityIcon = 'ℹ️';
+        if (issue.priority === 'HIGH') {
+          priorityIcon = '🚨';
+        } else if (issue.priority === 'MEDIUM') {
+          priorityIcon = '⚠️';
+        }
         console.log(`  ${icon} ${priorityIcon} Line ${issue.line}: ${issue.message}`);
         console.log(`     Rule: ${issue.rule}`);
       }
