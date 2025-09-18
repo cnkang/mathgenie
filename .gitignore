@@ -235,3 +235,4 @@ yarn-error.log
 ehthumbs.db
 Thumbs.db
 desktop.ini
+test-results-e2e.xml
