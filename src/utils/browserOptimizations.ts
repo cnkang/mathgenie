@@ -78,72 +78,104 @@ export const getBrowserOptimizations = () => {
   return getChromeOptimizations();
 };
 
+// Helper function to log performance warnings
+const logPerformanceWarning = (
+  isFirefox: boolean,
+  duration: number,
+  operationName: string
+): void => {
+  if (isFirefox && duration > 10) {
+    console.warn(`Firefox: Slow DOM operation "${operationName}" took ${duration.toFixed(2)}ms`);
+  }
+};
+
+// Helper function to measure operation performance
+const measureOperation = <T>(operation: () => T, operationName: string, isFirefox: boolean): T => {
+  const start = performance.now();
+  const result = operation();
+  const end = performance.now();
+  const duration = end - start;
+
+  logPerformanceWarning(isFirefox, duration, operationName);
+  return result;
+};
+
+// Helper function to handle DOM operation measurement
+const handleDOMOperationMeasurement = <T>(
+  operation: () => T,
+  operationName: string,
+  isFirefox: boolean,
+  shouldMeasure: boolean
+): T => {
+  if (!shouldMeasure) {
+    return operation();
+  }
+  return measureOperation(operation, operationName, isFirefox);
+};
+
+// Helper function to handle browser info logging
+const handleBrowserInfoLogging = (shouldLog: boolean): void => {
+  if (!shouldLog) {
+    return;
+  }
+  const browserInfo = getBrowserInfo();
+  console.log('Browser optimizations applied:', browserInfo);
+};
+
 // Performance monitoring for different browsers
 export const createPerformanceMonitor = () => {
   const { isFirefox } = getBrowserInfo();
+  const isDevelopment = import.meta.env.DEV;
 
   return {
     measureDOMOperation: <T>(operation: () => T, operationName: string): T => {
-      if (!import.meta.env.DEV) {
-        return operation();
-      }
-
-      const start = performance.now();
-      const result = operation();
-      const end = performance.now();
-      const duration = end - start;
-
-      // Log performance warnings for Firefox if operations are slow
-      if (isFirefox && duration > 10) {
-        console.warn(
-          `Firefox: Slow DOM operation "${operationName}" took ${duration.toFixed(2)}ms`
-        );
-      }
-
-      return result;
+      return handleDOMOperationMeasurement(operation, operationName, isFirefox, isDevelopment);
     },
 
     logBrowserInfo: () => {
-      if (import.meta.env.DEV) {
-        const browserInfo = getBrowserInfo();
-        console.log('Browser optimizations applied:', browserInfo);
-      }
+      handleBrowserInfoLogging(isDevelopment);
     },
   };
+};
+
+// Helper function to create Firefox-specific styles
+const createFirefoxStyles = (): HTMLStyleElement => {
+  const style = document.createElement('style');
+  style.textContent = `
+    /* Firefox-specific performance optimizations */
+    * {
+      /* Reduce Firefox's aggressive anti-aliasing */
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* Optimize Firefox scrolling performance */
+    * {
+      scroll-behavior: auto !important;
+    }
+    
+    /* Reduce Firefox reflow triggers */
+    button, input, select, textarea {
+      will-change: auto;
+    }
+    
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+      }
+    }
+  `;
+  return style;
 };
 
 // Utility to apply browser-specific CSS optimizations
 export const applyBrowserSpecificStyles = () => {
   const { isFirefox } = getBrowserInfo();
+  const isDocumentAvailable = typeof document !== 'undefined';
 
-  if (isFirefox && typeof document !== 'undefined') {
+  if (isFirefox && isDocumentAvailable) {
     // Add Firefox-specific CSS optimizations
-    const style = document.createElement('style');
-    style.textContent = `
-      /* Firefox-specific performance optimizations */
-      * {
-        /* Reduce Firefox's aggressive anti-aliasing */
-        -moz-osx-font-smoothing: grayscale;
-      }
-      
-      /* Optimize Firefox scrolling performance */
-      * {
-        scroll-behavior: auto !important;
-      }
-      
-      /* Reduce Firefox reflow triggers */
-      button, input, select, textarea {
-        will-change: auto;
-      }
-      
-      @media (prefers-reduced-motion: reduce) {
-        * {
-          transition-duration: 0.01ms !important;
-          animation-duration: 0.01ms !important;
-        }
-      }
-    `;
-
+    const style = createFirefoxStyles();
     document.head.appendChild(style);
 
     if (import.meta.env.DEV) {

@@ -128,6 +128,49 @@ const handleInputElement = (element: HTMLElement, minSize: number): void => {
   }
 };
 
+// Helper function to apply Firefox-specific padding
+const applyFirefoxPadding = (element: HTMLElement): void => {
+  const padding = getPaddingForDevice();
+  element.style.setProperty('padding', padding, STR_IMPORTANT);
+};
+
+// Helper function to apply standard padding
+const applyStandardPadding = (element: HTMLElement, style: CSSStyleDeclaration): void => {
+  const currentPadding = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+  if (currentPadding < 12) {
+    const padding = getPaddingForDevice();
+    element.style.setProperty('padding', padding, STR_IMPORTANT);
+  }
+};
+
+// Helper function to apply padding based on browser
+const applyPaddingOptimization = (
+  element: HTMLElement,
+  style: CSSStyleDeclaration,
+  useFirefoxOptimization: boolean
+): void => {
+  if (useFirefoxOptimization) {
+    applyFirefoxPadding(element);
+  } else {
+    applyStandardPadding(element, style);
+  }
+};
+
+// Helper function to handle size adjustments
+const handleSizeAdjustments = (
+  element: HTMLElement,
+  minSize: number,
+  style: CSSStyleDeclaration,
+  useFirefoxOptimization: boolean
+): void => {
+  applyMinimumDimensions(element, minSize);
+  applyPaddingOptimization(element, style, useFirefoxOptimization);
+
+  if (element.tagName === 'BUTTON') {
+    applyButtonStyles(element);
+  }
+};
+
 // Firefox-optimized element processing with reduced style calculations
 const processElement = (element: HTMLElement, minSize: number): void => {
   // Firefox optimization: Cache computed style and reduce calculations
@@ -150,28 +193,10 @@ const processElement = (element: HTMLElement, minSize: number): void => {
   const rect = element.getBoundingClientRect();
   const currentHeight = rect.height;
   const currentWidth = rect.width;
+  const useFirefoxOptimization = isFirefox();
 
   if (currentHeight < minSize || currentWidth < minSize) {
-    applyMinimumDimensions(element, minSize);
-
-    // Firefox optimization: Reduce padding calculations
-    if (isFirefox()) {
-      // Simplified padding logic for Firefox
-      const padding = getPaddingForDevice();
-      element.style.setProperty('padding', padding, STR_IMPORTANT);
-    } else {
-      // Full padding calculation for other browsers
-      const currentPadding = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
-
-      if (currentPadding < 12) {
-        const padding = getPaddingForDevice();
-        element.style.setProperty('padding', padding, STR_IMPORTANT);
-      }
-    }
-
-    if (element.tagName === 'BUTTON') {
-      applyButtonStyles(element);
-    }
+    handleSizeAdjustments(element, minSize, style, useFirefoxOptimization);
   }
 
   if (element.tagName === 'INPUT') {
@@ -187,30 +212,48 @@ const isFirefox = (): boolean => {
   return typeof navigator !== 'undefined' && navigator.userAgent.includes('Firefox');
 };
 
+// Helper function to schedule next batch processing
+const scheduleNextBatch = (processBatch: () => void, firefoxBrowser: boolean): void => {
+  if (firefoxBrowser) {
+    requestAnimationFrame(processBatch);
+  } else {
+    setTimeout(processBatch, 0);
+  }
+};
+
+// Helper function to process a single batch of elements
+// Helper function to safely process an element if it's an HTMLElement
+const processElementSafely = (element: Element, minSize: number): void => {
+  if (element instanceof HTMLElement) {
+    processElement(element, minSize);
+  }
+};
+
+const processSingleBatch = (
+  elements: NodeListOf<Element>,
+  startIndex: number,
+  endIndex: number,
+  minSize: number
+): void => {
+  for (let i = startIndex; i < endIndex; i++) {
+    const element = elements[i];
+    processElementSafely(element, minSize);
+  }
+};
+
 // Firefox-optimized element processing with batching
 const processElementsInBatches = (elements: NodeListOf<Element>, minSize: number): void => {
-  const batchSize = isFirefox() ? 10 : 25; // Smaller batches for Firefox
+  const firefoxBrowser = isFirefox();
+  const batchSize = firefoxBrowser ? 10 : 25; // Smaller batches for Firefox
   let index = 0;
 
   const processBatch = (): void => {
     const endIndex = Math.min(index + batchSize, elements.length);
-
-    for (let i = index; i < endIndex; i++) {
-      const element = elements[i];
-      if (element instanceof HTMLElement) {
-        processElement(element, minSize);
-      }
-    }
-
+    processSingleBatch(elements, index, endIndex, minSize);
     index = endIndex;
 
     if (index < elements.length) {
-      // Use requestAnimationFrame for better performance in Firefox
-      if (isFirefox()) {
-        requestAnimationFrame(processBatch);
-      } else {
-        setTimeout(processBatch, 0);
-      }
+      scheduleNextBatch(processBatch, firefoxBrowser);
     }
   };
 
@@ -226,6 +269,28 @@ const getOptimizedSelector = (): string => {
   return INTERACTIVE_SELECTORS.join(', ');
 };
 
+// Helper function to process elements with standard method
+const processElementsStandard = (elements: NodeListOf<Element>, minSize: number): void => {
+  elements.forEach(element => {
+    processElementSafely(element, minSize);
+  });
+};
+
+// Helper function to process elements based on browser and count
+const processElementsByStrategy = (
+  elements: NodeListOf<Element>,
+  minSize: number,
+  firefoxBrowser: boolean
+): void => {
+  const shouldUseBatching = firefoxBrowser && elements.length > 20;
+
+  if (shouldUseBatching) {
+    processElementsInBatches(elements, minSize);
+  } else {
+    processElementsStandard(elements, minSize);
+  }
+};
+
 export const enforceWCAGTouchTargets = (): void => {
   if (inNonBrowser()) {
     return;
@@ -233,25 +298,16 @@ export const enforceWCAGTouchTargets = (): void => {
 
   const minSize = getMinimumSizeForDevice();
   const selector = getOptimizedSelector();
+  const firefoxBrowser = isFirefox();
 
   // Firefox optimization: Use more efficient DOM querying
   const elements = document.querySelectorAll(selector);
 
-  if (isFirefox() && elements.length > 20) {
-    // Use batched processing for Firefox when many elements exist
-    processElementsInBatches(elements, minSize);
-  } else {
-    // Standard processing for other browsers or small element counts
-    elements.forEach(element => {
-      if (element instanceof HTMLElement) {
-        processElement(element, minSize);
-      }
-    });
-  }
+  processElementsByStrategy(elements, minSize, firefoxBrowser);
 
   if (import.meta.env.DEV) {
     console.log(
-      `WCAG Enforcement: Applied ${minSize}px minimum touch targets to ${elements.length} elements (Firefox optimized: ${isFirefox()})`
+      `WCAG Enforcement: Applied ${minSize}px minimum touch targets to ${elements.length} elements (Firefox optimized: ${firefoxBrowser})`
     );
   }
 };
