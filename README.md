@@ -119,7 +119,7 @@ pnpm type-check
 pnpm lint
 pnpm format
 
-# Complete validation
+# Complete validation (runs lint, lint:css-html, type-check, sonar:check, i18n:check, build, playwright:check, and tests)
 pnpm validate
 ```
 
@@ -128,6 +128,7 @@ pnpm validate
 - **TypeScript strict mode**: Full type safety
 - **ESLint + Prettier**: Consistent code style
 - **Pre-commit hooks**: Automatic formatting and linting
+- **CSS & HTML Quality**: Unified quality checks with auto-fix capabilities
 - **Comprehensive testing**: Unit and E2E tests with cross-browser accessibility validation
 - **SonarQube Analysis**: Advanced code quality checks with HIGH priority rule focus
 - **Cross-Browser Accessibility**: Firefox-optimized WCAG enforcement for enhanced performance
@@ -380,6 +381,25 @@ After configuring the settings:
 - **Optimistic Updates**: Instant UI feedback
 - **Enhanced Performance**: Automatic batching and smart scheduling
 - **Error Boundaries**: Robust error handling with TypeScript
+
+#### CSS & HTML Quality Commands
+
+```bash
+# Unified CSS & HTML quality check with auto-fix (recommended for development)
+pnpm lint:css-html:fix
+
+# Unified CSS & HTML quality check (validation only, used in CI/CD)
+pnpm lint:css-html
+
+# Individual tool commands (for specific use cases)
+pnpm lint:css:fix    # CSS auto-fix only
+pnpm lint:html       # HTML validation only
+```
+
+**Quality Tools:**
+- **stylelint**: CSS quality checking with auto-fix capabilities
+- **html-validate**: Modern HTML validation (replaces HTMLHint)
+- **Unified Script**: Consolidated reporting and error handling
 
 ## 🧪 Testing
 
