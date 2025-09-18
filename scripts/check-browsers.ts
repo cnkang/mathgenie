@@ -28,6 +28,7 @@ const colors = {
 
 type ColorKey = keyof typeof colors;
 const MS_PLAYWRIGHT_DIR = 'ms-playwright' as const;
+const BROWSERS = ['chromium', 'firefox', 'webkit'] as const;
 
 function log(message: string, color: ColorKey = 'reset'): void {
   console.log(`${colors[color]}${message}${colors.reset}`);
@@ -49,12 +50,29 @@ function logError(message: string): void {
   log(`[ERROR] ${message}`, 'red');
 }
 
+const PLAYWRIGHT_ALLOWED_ARGS = new Set([
+  '--version',
+  'install',
+  '--dry-run',
+  ...BROWSERS,
+  '--with-deps',
+]);
+
 // Execute Playwright via Node with absolute CLI bin path
 function execPlaywright(
   args: string[],
   opts: { stdio?: 'pipe' | 'inherit'; encoding?: 'utf8'; timeout?: number } = {}
 ) {
   const { stdio = 'pipe', encoding = 'utf8', timeout = 300000 } = opts; // default 5 min
+
+  // Validate arguments to prevent code injection.
+  for (const arg of args) {
+    if (!PLAYWRIGHT_ALLOWED_ARGS.has(arg)) {
+      // Throw an error if any argument is not in the allowlist.
+      throw new Error(`Disallowed argument for Playwright: ${arg}`);
+    }
+  }
+
   return spawnNodeCli('playwright', 'playwright', args, {
     stdio,
     encoding,
@@ -129,15 +147,17 @@ function installBrowsers(): boolean {
  * Check if we're in CI environment
  */
 function isCI(): boolean {
-  return !!(
-    process.env.CI ||
-    process.env.CONTINUOUS_INTEGRATION ||
-    process.env.BUILD_NUMBER ||
-    process.env.GITHUB_ACTIONS ||
-    process.env.GITLAB_CI ||
-    process.env.CIRCLECI ||
-    process.env.JENKINS_URL
-  );
+  const ciEnvironmentVariables = [
+    'CI',
+    'CONTINUOUS_INTEGRATION',
+    'BUILD_NUMBER',
+    'GITHUB_ACTIONS',
+    'GITLAB_CI',
+    'CIRCLECI',
+    'JENKINS_URL',
+  ];
+
+  return ciEnvironmentVariables.some(variable => !!process.env[variable]);
 }
 
 /**
@@ -179,7 +199,7 @@ function checkBrowserCache(): boolean {
       const itemPath = join(cacheDir, item);
       return (
         statSync(itemPath).isDirectory() &&
-        (item.includes('chromium') || item.includes('firefox') || item.includes('webkit'))
+        BROWSERS.some(browser => item.includes(browser))
       );
     });
 
@@ -195,6 +215,38 @@ function checkBrowserCache(): boolean {
     logWarning(`Could not read browser cache: ${errorMessage}`);
     return false;
   }
+}
+
+/**
+ * Handles the installation of Playwright browsers if they are not found.
+ * @param ci - A boolean indicating if the environment is a CI environment.
+ */
+function handleBrowserInstallation(ci: boolean): void {
+  logWarning('Playwright browsers are not installed or not detected');
+
+  // In CI, we might want to fail fast if browsers aren't pre-installed
+  if (ci && process.env.PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD === '1') {
+    logError('Browser installation is disabled in CI (PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1)');
+    logError('Please ensure browsers are pre-installed in your CI environment');
+    process.exit(1);
+  }
+
+  // Install browsers
+  const installSuccess = installBrowsers();
+
+  if (!installSuccess) {
+    logError('Failed to install Playwright browsers');
+    process.exit(1);
+  }
+
+  // Verify installation
+  const verifyInstalled = checkBrowsersInstalled();
+  if (!verifyInstalled) {
+    logError('Browser installation verification failed');
+    process.exit(1);
+  }
+
+  logSuccess('Browser installation completed and verified');
 }
 
 /**
@@ -216,35 +268,8 @@ function main(): void {
 
   if (browsersInstalled && cacheExists) {
     logSuccess('Playwright browsers are already installed and ready');
-    process.exit(0);
-  }
-
-  if (!browsersInstalled || !cacheExists) {
-    logWarning('Playwright browsers are not installed or not detected');
-
-    // In CI, we might want to fail fast if browsers aren't pre-installed
-    if (ci && process.env.PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD === '1') {
-      logError('Browser installation is disabled in CI (PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1)');
-      logError('Please ensure browsers are pre-installed in your CI environment');
-      process.exit(1);
-    }
-
-    // Install browsers
-    const installSuccess = installBrowsers();
-
-    if (!installSuccess) {
-      logError('Failed to install Playwright browsers');
-      process.exit(1);
-    }
-
-    // Verify installation
-    const verifyInstalled = checkBrowsersInstalled();
-    if (!verifyInstalled) {
-      logError('Browser installation verification failed');
-      process.exit(1);
-    }
-
-    logSuccess('Browser installation completed and verified');
+  } else {
+    handleBrowserInstallation(ci);
   }
 
   process.exit(0);

@@ -98,7 +98,8 @@ export const useErrorHandler = (): ErrorHandlerReturn => {
     setError(error);
 
     if (import.meta.env.PROD) {
-      console.error('Application error:', error);
+      // Safe logging - only log error message, not full object
+      console.error('Application error:', error.message);
     }
   }, []);
 

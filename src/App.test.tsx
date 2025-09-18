@@ -18,6 +18,21 @@ vi.mock('./utils/wcagEnforcement', () => ({
   enforceWCAGTouchTargets: () => {},
 }));
 
+// Mock browser optimizations
+vi.mock('./utils/browserOptimizations', () => ({
+  applyBrowserSpecificStyles: vi.fn(),
+  createPerformanceMonitor: () => ({
+    logBrowserInfo: vi.fn(),
+    measureDOMOperation: vi.fn(operation => operation()),
+  }),
+  getBrowserInfo: () => ({
+    isFirefox: false,
+    isChrome: true,
+    isSafari: false,
+    isEdge: false,
+  }),
+}));
+
 // Mock i18n system
 vi.mock('./i18n', () => ({
   I18nProvider: ({ children }: { children: React.ReactNode }) => (

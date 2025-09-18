@@ -81,14 +81,16 @@ test.describe('Integration Tests', () => {
     await expect(page.locator('.error-message')).toBeVisible({ timeout: 5000 });
 
     // Apply another preset to fix the error
-    const intermediatePreset = page.locator('.settings-section .preset-card').nth(1);
+    // Use more specific selector for better Firefox performance
+    const intermediatePreset = page.locator('.preset-card:has-text("Intermediate")');
     await intermediatePreset.scrollIntoViewIfNeeded();
     await intermediatePreset.click();
-    await page.waitForTimeout(1000);
+
+    // Wait for preset settings to be applied first
+    await expect(page.locator('#numProblems')).toHaveValue('20');
 
     // Error should clear and new preset should be applied
     await expect(page.locator('.error-message')).not.toBeVisible();
-    await expect(page.locator('#numProblems')).toHaveValue('20');
   });
 
   test('should maintain error states across language changes with persistence', async ({
@@ -154,14 +156,14 @@ test.describe('Integration Tests', () => {
     const beginnerPreset = page.locator('.settings-section .preset-card').first();
     await beginnerPreset.scrollIntoViewIfNeeded();
     await beginnerPreset.click();
+
+    // Wait for preset settings to be applied first
+    await expect(page.locator('#numRangeFrom')).toHaveValue('1');
+    await expect(page.locator('#numRangeTo')).toHaveValue('10');
     await page.waitForTimeout(1000);
 
     // Error should be cleared by preset application
     await expect(page.locator('.error-message')).not.toBeVisible();
-
-    // Verify preset settings are applied correctly
-    await expect(page.locator('#numRangeFrom')).toHaveValue('1');
-    await expect(page.locator('#numRangeTo')).toHaveValue('10');
 
     // Problems should be generated successfully
     await page.waitForSelector('.problem-item', { timeout: 10000 });
@@ -178,7 +180,8 @@ test.describe('Integration Tests', () => {
     await page.waitForSelector('.settings-presets', { timeout: 10000 });
 
     // Step 1: Apply intermediate preset
-    const intermediatePreset = page.locator('.settings-section .preset-card').nth(1);
+    // Use more specific selector for better Firefox performance
+    const intermediatePreset = page.locator('.preset-card:has-text("Intermediate")');
     await intermediatePreset.scrollIntoViewIfNeeded();
     await intermediatePreset.click();
     await page.waitForTimeout(1000);
@@ -259,18 +262,19 @@ test.describe('Integration Tests', () => {
     await page.waitForSelector('.settings-presets', { timeout: 10000 });
 
     // Apply preset to fix all errors at once
-    const advancedPreset = page.locator('.settings-section .preset-card').nth(2); // Advanced preset
+    // Use more specific selector for better Firefox performance
+    const advancedPreset = page.locator('.preset-card:has-text("Advanced")'); // Advanced preset
     await advancedPreset.scrollIntoViewIfNeeded();
     await advancedPreset.click();
+
+    // Wait for preset settings to be applied first
+    await expect(page.locator('#numProblems')).toHaveValue('25');
+    await expect(page.locator('#numRangeFrom')).toHaveValue('1');
+    await expect(page.locator('#numRangeTo')).toHaveValue('100');
     await page.waitForTimeout(1000);
 
     // All errors should be cleared
     await expect(page.locator('.error-message')).not.toBeVisible();
-
-    // Verify valid settings are applied
-    await expect(page.locator('#numProblems')).toHaveValue('25');
-    await expect(page.locator('#numRangeFrom')).toHaveValue('1');
-    await expect(page.locator('#numRangeTo')).toHaveValue('100');
 
     // Operations should be selected
     const selectedOperations = await page.locator('#operations option:checked').allTextContents();
@@ -335,7 +339,8 @@ test.describe('Integration Tests', () => {
     await beginnerPreset.scrollIntoViewIfNeeded();
     await beginnerPreset.click(); // Apply preset
     await page.fill('#numProblems', '999'); // Create another error
-    const intermediatePreset = page.locator('.settings-section .preset-card').nth(1);
+    // Use more specific selector for better Firefox performance
+    const intermediatePreset = page.locator('.preset-card:has-text("Intermediate")');
     await intermediatePreset.scrollIntoViewIfNeeded();
     await intermediatePreset.click(); // Apply different preset
     await expandAdvancedSettings(page);

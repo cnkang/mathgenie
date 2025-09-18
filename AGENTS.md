@@ -383,6 +383,162 @@
    - New quality checks are added as the codebase evolves
    - Quality metrics are tracked and improved over time
 
+## DEVELOPER — React useEffect Best Practices
+
+### Async Operations & Timing
+
+106. **Custom Hook Abstraction**: Extract complex async + useEffect patterns into custom hooks:
+     ```typescript
+     // ✅ Good: Custom hook encapsulates async logic
+     const useAsyncEffect = <T>(asyncFn: () => Promise<T>, deps: React.DependencyArray) => {
+       const [data, setData] = useState<T | null>(null);
+       const [loading, setLoading] = useState(false);
+       const [error, setError] = useState<Error | null>(null);
+       
+       useEffect(() => {
+         let isCancelled = false;
+         const controller = new AbortController();
+         
+         const runAsync = async () => {
+           setLoading(true);
+           setError(null);
+           try {
+             const result = await asyncFn();
+             if (!isCancelled) setData(result);
+           } catch (err) {
+             if (!isCancelled) setError(err as Error);
+           } finally {
+             if (!isCancelled) setLoading(false);
+           }
+         };
+         
+         runAsync();
+         return () => {
+           isCancelled = true;
+           controller.abort();
+         };
+       }, deps);
+       
+       return { data, loading, error };
+     };
+     ```
+
+107. **AbortController for Cancellation**: Use AbortController for fetch requests and cancellable operations:
+     ```typescript
+     useEffect(() => {
+       const controller = new AbortController();
+       
+       fetch('/api/data', { signal: controller.signal })
+         .then(response => response.json())
+         .then(data => setState(data))
+         .catch(error => {
+           if (error.name !== 'AbortError') {
+             setError(error);
+           }
+         });
+       
+       return () => controller.abort();
+     }, []);
+     ```
+
+108. **Race Condition Prevention**: Track latest request to discard stale results:
+     ```typescript
+     useEffect(() => {
+       let isLatest = true;
+       const requestId = Date.now();
+       
+       fetchData(query).then(result => {
+         if (isLatest) {
+           setData(result);
+         }
+       });
+       
+       return () => { isLatest = false; };
+     }, [query]);
+     ```
+
+109. **State Management Pattern**: Consolidate loading, error, and success states:
+     ```typescript
+     type AsyncState<T> = 
+       | { status: 'idle' }
+       | { status: 'loading' }
+       | { status: 'success'; data: T }
+       | { status: 'error'; error: Error };
+     
+     const [state, setState] = useState<AsyncState<Data>>({ status: 'idle' });
+     ```
+
+110. **Cleanup Resource Management**: Always cleanup timers, listeners, and subscriptions:
+     ```typescript
+     useEffect(() => {
+       const timer = setInterval(() => setTime(Date.now()), 1000);
+       const listener = (e: Event) => handleEvent(e);
+       
+       window.addEventListener('resize', listener);
+       
+       return () => {
+         clearInterval(timer);
+         window.removeEventListener('resize', listener);
+       };
+     }, []);
+     ```
+
+111. **React Strict Mode Compatibility**: Ensure effects are idempotent and cleanup is safe:
+     ```typescript
+     // ✅ Good: Idempotent effect that handles double execution
+     useEffect(() => {
+       let subscription: Subscription | null = null;
+       
+       const subscribe = async () => {
+         if (!subscription) {
+           subscription = await createSubscription();
+         }
+       };
+       
+       subscribe();
+       
+       return () => {
+         if (subscription) {
+           subscription.unsubscribe();
+           subscription = null;
+         }
+       };
+     }, []);
+     ```
+
+112. **Dependency Array Best Practices**:
+     - Include all values from component scope used inside effect
+     - Use `useCallback` and `useMemo` to stabilize dependencies
+     - Extract constants outside component to avoid unnecessary re-runs
+     ```typescript
+     // ✅ Good: Stable dependencies
+     const fetchUser = useCallback(async (id: string) => {
+       return await api.getUser(id);
+     }, []);
+     
+     useEffect(() => {
+       fetchUser(userId).then(setUser);
+     }, [fetchUser, userId]);
+     ```
+
+113. **Error Boundary Integration**: Handle async errors properly with error boundaries:
+     ```typescript
+     useEffect(() => {
+       const handleAsync = async () => {
+         try {
+           const result = await riskyOperation();
+           setData(result);
+         } catch (error) {
+           // Log error and set error state instead of throwing
+           console.error('Async operation failed:', error);
+           setError(error as Error);
+         }
+       };
+       
+       handleAsync();
+     }, []);
+     ```
+
 ## DEVELOPER — Project-Specific Constraints (MathGenie)
 
 - **Languages/Frameworks**: TypeScript 5.9 + React 19.1.1; Node.js 22.19.1; Vite 7.1.4; pnpm 10.15.1.
@@ -391,10 +547,12 @@
   - Use `@/` path aliases and atomic design. Co-locate component `.tsx`, `.css`, and `.test.tsx` files.
   - Default exports for components; named exports for utilities. Strict TypeScript.
   - State: `useState` locally, `useLocalStorage` for persistence, React Context for global state, `useOptimistic` for optimistic UI.
+  - **useEffect Patterns**: Follow async best practices with AbortController, race condition prevention, and proper cleanup. Extract complex patterns into custom hooks.
 - **Testing Stack**:
   - Vitest with `happy-dom` for unit tests; Playwright for cross-browser E2E (Chromium, Firefox, WebKit) including mobile emulation.
   - WCAG 2.2 AAA accessibility tests mandatory. Verify keyboard navigation, screen reader, color contrast, reduced motion, and touch targets.
   - 90% coverage required per component/utility; changed lines ≥80%. Tests focus on behavior.
+  - **useEffect Testing**: Mock timers, test cleanup functions, verify async state transitions, and ensure effects handle component unmounting gracefully.
 - **Documentation**:
   - Update README, TESTING, CONTRIBUTING, and related docs in the same commit as code changes. Keep examples current.
 - **CI Commands**: `pnpm lint`, `pnpm lint:sonar:all` (code quality check), `pnpm type-check`, `pnpm test`, optional `pnpm test:e2e`, `pnpm format`.

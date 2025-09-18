@@ -1,21 +1,22 @@
-const isProduction = process.env.NODE_ENV === "production";
+/* eslint-env node */
+/* global process */
+const { default: purgecss } = require('@fullhuman/postcss-purgecss');
+const autoprefixer = require('autoprefixer');
+const cssnano = require('cssnano');
 
-const { purgeCSSPlugin } = require("@fullhuman/postcss-purgecss");
+const isProduction = process.env.NODE_ENV === 'production';
 
 module.exports = {
   plugins: [
     isProduction &&
-      purgeCSSPlugin({
-        content: ["./src/**/*.html", "./src/**/*.ts", "./src/**/*.tsx"],
-        defaultExtractor: (content) => {
-          return (content.match(/[\w-/:]+/g) || []).filter(
-            (token) => !token.endsWith(":")
-          );
-        },
+      purgecss({
+        content: ['./src/**/*.html', './src/**/*.ts', './src/**/*.tsx'],
+        defaultExtractor: content =>
+          (content.match(/[\w-/:%]+/g) || []).filter(token => !token.endsWith(':')),
       }),
-    require("autoprefixer"),
-    require("cssnano")({
-      preset: "advanced",
+    autoprefixer,
+    cssnano({
+      preset: 'advanced',
     }),
   ].filter(Boolean),
 };
