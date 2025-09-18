@@ -6,8 +6,7 @@
  */
 
 import { spawnSync } from 'child_process';
-import { existsSync } from 'fs';
-import { join } from 'path';
+import { findExecutable, isCommandAvailable } from './exec-utils';
 
 const colors = {
   reset: '\x1b[0m',
@@ -34,38 +33,6 @@ export interface QualityResult {
 }
 
 /**
- * Find executable path with cross-platform support
- */
-export function findExecutable(command: string): string | null {
-  const extensions = process.platform === 'win32' ? ['.cmd', '.bat', ''] : [''];
-  const basePath = './node_modules/.bin';
-
-  for (const ext of extensions) {
-    const fullPath = join(basePath, command + ext);
-    if (existsSync(fullPath)) {
-      return fullPath;
-    }
-  }
-  return null;
-}
-
-/**
- * Check if a command is available
- */
-export function isCommandAvailable(cmd: string): boolean {
-  try {
-    const result = spawnSync(cmd, ['--version'], {
-      stdio: 'pipe',
-      shell: false,
-      timeout: 5000, // 5 second timeout
-    });
-    return result.status === 0;
-  } catch {
-    return false;
-  }
-}
-
-/**
  * Execute a command safely using spawnSync with multiple fallback strategies
  */
 export function safeExec(command: string, args: string[]): { output: string; exitCode: number } {
@@ -73,19 +40,25 @@ export function safeExec(command: string, args: string[]): { output: string; exi
   const executablePath = findExecutable(command);
   if (executablePath) {
     const result = tryExecWithOutput(executablePath, args);
-    if (result) return result;
+    if (result) {
+      return result;
+    }
   }
 
   // Strategy 2: pnpm exec
   if (isCommandAvailable('pnpm')) {
     const result = tryExecWithOutput('pnpm', ['exec', command, ...args]);
-    if (result) return result;
+    if (result) {
+      return result;
+    }
   }
 
   // Strategy 3: npx
   if (isCommandAvailable('npx')) {
     const result = tryExecWithOutput('npx', [command, ...args]);
-    if (result) return result;
+    if (result) {
+      return result;
+    }
   }
 
   throw new Error(`Failed to execute ${command}`);

@@ -3,41 +3,7 @@
  * Test script to verify fallback strategies work correctly
  */
 
-import { spawnSync } from 'child_process';
-import { existsSync } from 'fs';
-import { join } from 'path';
-
-/**
- * Check if a command is available
- */
-function isCommandAvailable(cmd: string): boolean {
-  try {
-    const result = spawnSync(cmd, ['--version'], {
-      stdio: 'pipe',
-      shell: false,
-      timeout: 5000,
-    });
-    return result.status === 0;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Find executable path with cross-platform support
- */
-function findExecutable(command: string): string | null {
-  const extensions = process.platform === 'win32' ? ['.cmd', '.bat', ''] : [''];
-  const basePath = './node_modules/.bin';
-
-  for (const ext of extensions) {
-    const fullPath = join(basePath, command + ext);
-    if (existsSync(fullPath)) {
-      return fullPath;
-    }
-  }
-  return null;
-}
+import { findExecutable, isCommandAvailable } from './exec-utils';
 
 function main(): void {
   console.log('🔍 Testing fallback strategies...\n');
