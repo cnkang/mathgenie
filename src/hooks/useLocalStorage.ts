@@ -24,18 +24,32 @@ export const useLocalStorage = <T>(
       setValue(valueToStore);
       window.localStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {
-      console.warn(`Error setting localStorage key "${key}":`, error);
+      console.warn(`Error setting localStorage key "${key}":`, JSON.stringify(error));
     }
   };
 
   useEffect(() => {
-    const handleStorageChange = (e: StorageEvent): void => {
-      if (e.key === key && e.newValue !== null) {
-        try {
-          setValue(JSON.parse(e.newValue));
-        } catch (error) {
-          console.warn(`Error parsing localStorage change for key "${key}":`, error);
-        }
+    const parseNewValue = (rawValue: string | null): T | null => {
+      if (!rawValue) {
+        return null;
+      }
+
+      try {
+        return JSON.parse(rawValue);
+      } catch (error) {
+        console.warn(`Error parsing localStorage change for key "${key}":`, error);
+        return null;
+      }
+    };
+
+    const handleStorageChange = (event: StorageEvent): void => {
+      if (event.key !== key) {
+        return;
+      }
+
+      const parsedValue = parseNewValue(event.newValue);
+      if (parsedValue !== null) {
+        setValue(parsedValue);
       }
     };
 
