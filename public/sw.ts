@@ -3,9 +3,12 @@
 const sw = self as unknown as ServiceWorkerGlobalScope;
 
 const CACHE_NAME = 'mathgenie-v1';
+const INDEX_HTML = '/index.html';
+const OFFLINE_MESSAGE = 'Application is offline';
+const TEXT_PLAIN = 'text/plain';
 const STATIC_CACHE_URLS: string[] = [
   '/',
-  '/index.html',
+  INDEX_HTML,
   '/favicon.ico',
   '/logo192.png',
   '/logo512.png',
@@ -25,6 +28,51 @@ const sanitizeError = (error: Error): string => {
     .replace(/[\n\t]/g, ' ')
     .replace(/[^ -~]/g, '?')
     .substring(0, 200);
+};
+
+const handleNetworkFailure = async (request: Request): Promise<Response> => {
+  const fallbackResponse = await caches.match(request);
+  if (fallbackResponse) {
+    return fallbackResponse;
+  }
+
+  if (request.destination === 'document') {
+    const indexResponse = await caches.match(INDEX_HTML);
+    if (indexResponse) {
+      return indexResponse;
+    }
+    return new Response(OFFLINE_MESSAGE, {
+      status: 503,
+      statusText: 'Service Unavailable',
+      headers: { 'Content-Type': TEXT_PLAIN },
+    });
+  }
+
+  return new Response('Resource unavailable offline', {
+    status: 503,
+    statusText: 'Service Unavailable',
+    headers: { 'Content-Type': TEXT_PLAIN },
+  });
+};
+
+const handleServiceError = async (request: Request): Promise<Response> => {
+  if (request.destination === 'document') {
+    const fallbackResponse = await caches.match(INDEX_HTML);
+    if (fallbackResponse) {
+      return fallbackResponse;
+    }
+    return new Response('Application Error', {
+      status: 500,
+      statusText: 'Internal Server Error',
+      headers: { 'Content-Type': TEXT_PLAIN },
+    });
+  }
+
+  return new Response('Service Error', {
+    status: 500,
+    statusText: 'Internal Server Error',
+    headers: { 'Content-Type': TEXT_PLAIN },
+  });
 };
 
 // Install event - cache static assets
@@ -92,14 +140,9 @@ sw.addEventListener('fetch', (event: FetchEvent) => {
         // Cache miss - fetch from network
         return fetch(event.request)
           .then((networkResponse: Response) => {
-            // Check if we received a valid response
-            const isValidResponse =
-              !!networkResponse &&
-              networkResponse.status === 200 &&
-              networkResponse.type === 'basic';
-
-            if (isValidResponse) {
-              // Clone the response before caching (response can only be consumed once)
+            // Check if we received a successful response
+            if (networkResponse.status === 200 && networkResponse.type === 'basic') {
+              // Success response - cache and return
               const responseToCache = networkResponse.clone();
 
               // Cache response asynchronously
@@ -115,40 +158,25 @@ sw.addEventListener('fetch', (event: FetchEvent) => {
               return networkResponse;
             }
 
-            // Invalid response - return as-is without caching
+            // Error response (4xx, 5xx) - don't cache, return error response
+            if (networkResponse.status >= 400) {
+              console.warn(`HTTP error ${networkResponse.status} for ${event.request.url}`);
+              return networkResponse;
+            }
+
+            // Other response types (redirects, etc.) - return without caching
             return networkResponse;
           })
           .catch((error: Error) => {
             console.warn('Network request failed:', sanitizeError(error));
 
             // Network failed - try to serve from cache as fallback
-            return caches.match(event.request).then((fallbackResponse: Response | undefined) => {
-              if (fallbackResponse) {
-                return fallbackResponse;
-              }
-
-              // No cache available - return error response
-              throw error;
-            });
+            return handleNetworkFailure(event.request);
           });
       })
-      .catch(async (error: Error) => {
+      .catch((error: Error) => {
         console.warn('Service worker fetch failed:', sanitizeError(error));
-
-        // Fallback for offline scenarios
-        if (event.request.destination === 'document') {
-          const fallbackResponse = await caches.match('/index.html');
-          if (fallbackResponse) {
-            return fallbackResponse;
-          }
-          return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
-        }
-
-        // For other resources, return an explicit offline response
-        return new Response('Offline', {
-          status: 503,
-          statusText: 'Service Unavailable',
-        });
+        return handleServiceError(event.request);
       })
   );
 });
