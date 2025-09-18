@@ -13,7 +13,6 @@ This directory contains optimized build and test scripts for the MathGenie proje
 
 ### 🎭 Playwright Cache Management
 
-- **`playwright-cache-helper.sh`** - Core cache management functionality
 - **`debug-playwright-cache.sh`** - Comprehensive debugging tool for cache issues
 
 ### 🔧 Build & Quality Scripts (TypeScript)
@@ -54,10 +53,10 @@ This directory contains optimized build and test scripts for the MathGenie proje
 
 ```bash
 # Check browser installations
-./scripts/playwright-cache-helper.sh check all
+pnpm exec playwright install --dry-run
 
-# Smart install (cache-aware)
-./scripts/playwright-cache-helper.sh smart-install all
+# Install browsers
+pnpm exec playwright install --with-deps
 
 # Debug cache issues
 ./scripts/debug-playwright-cache.sh
@@ -82,9 +81,7 @@ pnpm test:e2e:quick           # Quick E2E tests
 pnpm test:mobile:iphone16     # Mobile device testing
 
 # Playwright cache management
-pnpm playwright:cache:check    # Check cache status
 pnpm playwright:cache:debug    # Debug cache issues
-pnpm playwright:cache:clean    # Clean cache
 ```
 
 ## Optimization Notes

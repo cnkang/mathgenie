@@ -3,6 +3,7 @@
 ## Pre-Development Setup
 
 ### Environment Verification
+
 ```bash
 # Verify required versions
 node --version    # Should be 22.19.1+
@@ -10,6 +11,7 @@ pnpm --version    # Should be 10.15.1+
 ```
 
 ### Project Activation
+
 ```bash
 # If using Serena MCP
 serena activate mathgenie
@@ -22,6 +24,7 @@ ls -la .kiro/     # Check Kiro configuration
 ## Daily Development Workflow
 
 ### 1. Start Development Session
+
 ```bash
 # Pull latest changes
 git pull origin main
@@ -36,6 +39,7 @@ pnpm dev
 ### 2. Feature Development Cycle
 
 #### Before Writing Code
+
 - [ ] Read relevant Kiro steering documents (`.kiro/steering/`)
 - [ ] Check existing patterns in similar components
 - [ ] Plan accessibility requirements (WCAG 2.2 AAA)
@@ -43,6 +47,7 @@ pnpm dev
 - [ ] Review security implications
 
 #### During Development
+
 - [ ] Use TypeScript strict mode
 - [ ] Follow React 19 patterns (`useTransition`, `useDeferredValue`, `useOptimistic`)
 - [ ] Co-locate files (`.tsx`, `.css`, `.test.tsx`)
@@ -51,6 +56,7 @@ pnpm dev
 - [ ] Add translation keys to all 6 language files
 
 #### Code Quality Checks (Real-time)
+
 ```bash
 # Run during development
 pnpm type-check      # TypeScript compilation
@@ -62,6 +68,7 @@ pnpm test:watch      # Unit tests in watch mode
 ### 3. Pre-Commit Quality Gates (Mandatory)
 
 #### Quality Pipeline (Must Pass)
+
 ```bash
 # 1. Format and fix basic issues
 pnpm format
@@ -87,6 +94,7 @@ pnpm validate
 ```
 
 #### Security Checklist
+
 - [ ] No `execSync`, `exec`, or `spawn` with `shell: true`
 - [ ] All user inputs validated with regex patterns
 - [ ] No shell metacharacters in inputs
@@ -96,6 +104,7 @@ pnpm validate
 ### 4. Accessibility Validation (WCAG 2.2 AAA)
 
 #### Manual Checks
+
 - [ ] Keyboard-only navigation works
 - [ ] Screen reader compatibility
 - [ ] Color contrast ratios (7:1 for normal text)
@@ -104,6 +113,7 @@ pnpm validate
 - [ ] Reduced motion preferences respected
 
 #### Automated Tests
+
 ```bash
 # Cross-browser accessibility testing
 pnpm test:e2e:accessibility
@@ -115,6 +125,7 @@ pnpm test:mobile
 ### 5. Internationalization Validation
 
 #### Translation Checklist
+
 - [ ] All user-facing text uses `t('key')` function
 - [ ] Translation keys added to all 6 language files
 - [ ] Hierarchical key naming (e.g., `errors.validation.required`)
@@ -122,6 +133,7 @@ pnpm test:mobile
 - [ ] UI tested with longest translations (German)
 
 #### Commands
+
 ```bash
 pnpm i18n:check     # Validate all translations
 ```
@@ -129,6 +141,7 @@ pnpm i18n:check     # Validate all translations
 ### 6. Performance Validation
 
 #### Performance Checks
+
 ```bash
 pnpm lighthouse     # Core Web Vitals
 pnpm build          # Production build verification
@@ -136,6 +149,7 @@ pnpm analyze        # Bundle analysis
 ```
 
 #### Performance Targets
+
 - [ ] First Contentful Paint < 1.5s
 - [ ] Largest Contentful Paint < 2.5s
 - [ ] Cumulative Layout Shift < 0.1
@@ -144,6 +158,7 @@ pnpm analyze        # Bundle analysis
 ### 7. Final Validation Before Push
 
 #### Complete Testing Suite
+
 ```bash
 # Full validation pipeline
 pnpm validate:full
@@ -159,6 +174,7 @@ pnpm test:e2e:accessibility
 ```
 
 #### Git Operations
+
 ```bash
 # Stage changes
 git add .
@@ -173,6 +189,7 @@ git push origin feature-branch
 ## Code Review Workflow
 
 ### Self-Review Checklist
+
 - [ ] Code follows MathGenie patterns
 - [ ] All quality gates pass
 - [ ] Accessibility requirements met
@@ -182,6 +199,7 @@ git push origin feature-branch
 - [ ] Tests provide adequate coverage
 
 ### Peer Review Focus Areas
+
 - [ ] Architecture and design patterns
 - [ ] Security implications
 - [ ] Accessibility compliance
@@ -192,6 +210,7 @@ git push origin feature-branch
 ## Troubleshooting Common Issues
 
 ### Quality Gate Failures
+
 ```bash
 # CSS/HTML issues
 pnpm lint:css-html:fix
@@ -207,16 +226,17 @@ pnpm test:watch
 ```
 
 ### Browser/Testing Issues
+
 ```bash
 # Playwright browser issues
 pnpm playwright:install
-pnpm playwright:cache:clean
 
 # Mobile testing issues
 pnpm test:mobile:latest
 ```
 
 ### Build Issues
+
 ```bash
 # Clean rebuild
 pnpm clean
@@ -227,6 +247,7 @@ pnpm build
 ## Emergency Procedures
 
 ### Never Use These Commands
+
 ```bash
 # ❌ NEVER bypass quality gates
 git commit --no-verify
@@ -238,6 +259,7 @@ git push --no-verify
 ```
 
 ### Instead, Fix Root Causes
+
 ```bash
 # ✅ Fix quality issues
 pnpm lint:css-html:fix
@@ -253,6 +275,7 @@ pnpm type-check
 ## Documentation Maintenance
 
 ### When to Update Documentation
+
 - Code changes affecting functionality
 - New features or components
 - Configuration changes
@@ -261,6 +284,7 @@ pnpm type-check
 - Accessibility improvements
 
 ### Documentation Files to Consider
+
 - `README.md` - Setup and usage
 - `TESTING.md` - Test strategy
 - `CONTRIBUTING.md` - Development guidelines
@@ -270,6 +294,7 @@ pnpm type-check
 ## Continuous Improvement
 
 ### Regular Maintenance Tasks
+
 - [ ] Update dependencies monthly
 - [ ] Review and optimize bundle size
 - [ ] Update browser compatibility
@@ -278,6 +303,7 @@ pnpm type-check
 - [ ] Update documentation
 
 ### Metrics to Monitor
+
 - Code coverage percentage
 - Bundle size trends
 - Performance metrics

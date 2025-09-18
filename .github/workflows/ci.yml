@@ -348,23 +348,25 @@ jobs:
 
       - name: 🎭 Install Playwright browsers
         run: |
-          # Debug cache and environment
+          echo "🎭 Installing Playwright browsers for accessibility testing..."
           echo "🎭 Cache status: ${{ steps.playwright-cache.outputs.cache-hit }}"
-          echo "🔍 Environment check:"
-          echo "   PWD: $(pwd)"
-          echo "   HOME: $HOME"
-          echo "   PLAYWRIGHT_BROWSERS_PATH: ${PLAYWRIGHT_BROWSERS_PATH:-not set}"
-          
-          # Check if any browsers already exist
-          echo "🔍 Pre-installation browser check:"
-          find ~/.cache/ms-playwright -name "*chromium*" -o -name "*firefox*" -o -name "*webkit*" 2>/dev/null | head -5 || echo "   No browsers in ~/.cache/ms-playwright"
-          find node_modules/playwright-core/.local-browsers -name "*chromium*" -o -name "*firefox*" -o -name "*webkit*" 2>/dev/null | head -5 || echo "   No browsers in node_modules/playwright-core/.local-browsers"
-          
-          # Use the cache helper script for smart browser installation
-          ./scripts/playwright-cache-helper.sh smart-install all
+
+          # Install only the browsers we need for accessibility testing
+          if [ "${{ steps.playwright-cache.outputs.cache-hit }}" != "true" ]; then
+            echo "📦 Installing browsers: chromium, firefox, webkit"
+            pnpm exec playwright install chromium firefox webkit --with-deps
+          else
+            echo "✅ Using cached browsers, verifying installation..."
+            # Verify browsers are available, install if missing
+            pnpm exec playwright install chromium firefox webkit --with-deps || {
+              echo "⚠️ Cache verification failed, reinstalling browsers..."
+              pnpm exec playwright install chromium firefox webkit --with-deps
+            }
+          fi
+
+          echo "🔍 Verifying browser installation..."
+          pnpm exec playwright install --dry-run chromium firefox webkit
         timeout-minutes: 15
-        env:
-          CACHE_HIT: ${{ steps.playwright-cache.outputs.cache-hit }}
 
       - name: 🏗️ Build application
         run: pnpm build
@@ -516,26 +518,22 @@ jobs:
           echo "📋 Project: ${{ matrix.project }}, Browser: ${{ matrix.browser }}"
           echo "🎭 Cache status: ${{ steps.playwright-cache.outputs.cache-hit }}"
 
-          # Debug environment
-          echo "🔍 Environment check:"
-          echo "   PWD: $(pwd)"
-          echo "   HOME: $HOME"
-          echo "   PLAYWRIGHT_BROWSERS_PATH: ${PLAYWRIGHT_BROWSERS_PATH:-not set}"
+          # Install the specific browser needed for this matrix job
+          if [ "${{ steps.playwright-cache.outputs.cache-hit }}" != "true" ]; then
+            echo "📦 Installing browser: ${{ matrix.browser }}"
+            pnpm exec playwright install ${{ matrix.browser }} --with-deps
+          else
+            echo "✅ Using cached browsers, verifying installation..."
+            # Verify browser is available, install if missing
+            pnpm exec playwright install ${{ matrix.browser }} --with-deps || {
+              echo "⚠️ Cache verification failed, reinstalling browser..."
+              pnpm exec playwright install ${{ matrix.browser }} --with-deps
+            }
+          fi
 
-          # Verify Playwright installation
-          echo "🔍 Playwright version:"
-          pnpm exec playwright --version
-
-          # Check existing browsers before installation
-          echo "🔍 Pre-installation browser check:"
-          find ~/.cache/ms-playwright -name "*${{ matrix.browser }}*" 2>/dev/null | head -3 || echo "   No ${{ matrix.browser }} in ~/.cache/ms-playwright"
-          find node_modules/playwright-core/.local-browsers -name "*${{ matrix.browser }}*" 2>/dev/null | head -3 || echo "   No ${{ matrix.browser }} in node_modules/playwright-core/.local-browsers"
-
-          # Use the cache helper script for smart browser installation
-          ./scripts/playwright-cache-helper.sh smart-install ${{ matrix.browser }}
+          echo "🔍 Verifying browser installation..."
+          pnpm exec playwright install --dry-run ${{ matrix.browser }}
         timeout-minutes: 15
-        env:
-          CACHE_HIT: ${{ steps.playwright-cache.outputs.cache-hit }}
 
       - name: 🏗️ Build application
         run: pnpm build
