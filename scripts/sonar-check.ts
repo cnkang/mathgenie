@@ -1,157 +1,325 @@
 #!/usr/bin/env tsx
 /**
- * SonarCloud Issue Checker and Fixer
- * - Identifies common Sonar-like issues
- * - Provides safe auto-fix for duplicate strings (sonarjs/no-duplicate-string)
+ * Enhanced SonarQube Local Checker
+ * 专注于 HIGH 级别的 SonarQube 规则检查
  *
- * Security:
- * - Avoids spawning shells; uses ESLint Node API (no execSync)
- * - Validates inputs; no user-controlled paths
+ * 支持的 HIGH 级别规则：
+ * - typescript:S3776: Cognitive Complexity (HIGH)
+ * - typescript:S1871: Identical Expressions (HIGH)
+ * - typescript:S138: Function Length (HIGH)
+ * - typescript:S107: Parameter Count (HIGH)
+ * - typescript:S134: Nested Control Flow (HIGH)
+ * - typescript:S1067: Expression Complexity (HIGH)
+ * - typescript:S3800: Multiple Returns (HIGH)
  */
 
+import { ESLint } from 'eslint';
 import { readFileSync } from 'fs';
 import { glob } from 'glob';
 import path from 'path';
-import * as ts from 'typescript';
-import { ESLint } from 'eslint';
-import { applyDuplicateStringFixesToFile, findDuplicateStringsInFile } from './lib/duplicate-string-fixer';
+
+// ANSI color codes
+const colors = {
+  reset: '\x1b[0m',
+  red: '\x1b[31m',
+  yellow: '\x1b[33m',
+  green: '\x1b[32m',
+  blue: '\x1b[34m',
+  cyan: '\x1b[36m',
+  bold: '\x1b[1m',
+};
 
 interface SonarIssue {
   file: string;
   line: number;
   rule: string;
+  sonarRule: string;
   message: string;
   severity: 'error' | 'warning' | 'info';
+  priority: 'HIGH' | 'MEDIUM' | 'LOW';
+}
+
+interface FunctionMetrics {
+  name: string;
+  startLine: number;
+  linesOfCode: number;
+  parameters: number;
+  cognitiveComplexity: number;
+  returnStatements: number;
+  nestingLevel: number;
+  expressionComplexity: number;
 }
 
 class SonarChecker {
   private issues: SonarIssue[] = [];
-  private fixMode = false;
-  private showWarnings = false;
+  private showOnlyHigh = false;
+  private verbose = false;
 
-  constructor(options: { fix?: boolean; warnings?: boolean } = {}) {
-    this.fixMode = options.fix || false;
-    this.showWarnings = options.warnings || false;
+  constructor(options: { highOnly?: boolean; verbose?: boolean } = {}) {
+    this.showOnlyHigh = options.highOnly || false;
+    this.verbose = options.verbose || false;
   }
 
   async run(): Promise<void> {
-    console.log('🔍 Checking for SonarCloud issues...\n');
+    console.log(`${colors.cyan}🔍 Enhanced SonarQube Local Checker${colors.reset}`);
+    console.log(
+      `${colors.blue}Focusing on ${this.showOnlyHigh ? 'HIGH priority' : 'all'} rules${colors.reset}\n`
+    );
 
-    await this.checkDuplicateStrings(this.fixMode);
-    await this.checkCognitiveComplexity();
-    await this.checkIdenticalExpressions();
-    await this.checkUnusedVariables();
-    await this.checkFunctionReturnTypes();
-
+    await this.checkAllRules();
     this.reportResults();
   }
 
-  private async checkDuplicateStrings(doFix: boolean): Promise<void> {
-    console.log('📝 Checking for duplicate strings...');
-
-    // Ignore translation source files where duplication is expected and harmless
+  private async checkAllRules(): Promise<void> {
     const files = await glob('src/**/*.{ts,tsx}', {
-      ignore: [
-        '**/*.test.*',
-        '**/*.spec.*',
-        'src/i18n/translations/*.ts',
-      ],
+      ignore: ['**/*.test.*', '**/*.spec.*', 'src/i18n/translations/*.ts'],
     });
 
-    for (const file of files) {
-      const first = findDuplicateStringsInFile(file, { minLength: 6, minCount: 3 });
+    console.log(`📊 Analyzing ${files.length} files...\n`);
 
-      if (doFix && first.duplicates.length > 0) {
-        const applied = applyDuplicateStringFixesToFile(file, { minLength: 6, minCount: 3 });
-        if (applied.changed) {
-          console.log(
-            `  ✨ Auto-fixed ${applied.replacedCount} duplicates in ${path.relative(process.cwd(), file)}`
-          );
-        }
-        // Re-scan after fix and only report remaining issues
-        const after = findDuplicateStringsInFile(file, { minLength: 6, minCount: 3 });
-        for (const d of after.duplicates) {
-          this.issues.push({
-            file,
-            line: d.line,
-            rule: 'sonarjs/no-duplicate-string',
-            message: `Duplicate string literal: ${d.preview}`,
-            severity: 'warning',
-          });
-        }
-      } else if (!doFix && first.duplicates.length > 0) {
-        for (const d of first.duplicates) {
-          this.issues.push({
-            file,
-            line: d.line,
-            rule: 'sonarjs/no-duplicate-string',
-            message: `Duplicate string literal: ${d.preview}`,
-            severity: 'warning',
-          });
+    for (const file of files) {
+      await this.analyzeFile(file);
+    }
+
+    // Check unused variables using ESLint
+    console.log('🗑️ Checking for unused variables...');
+    await this.checkUnusedVariables();
+  }
+
+  private async analyzeFile(filePath: string): Promise<void> {
+    const content = readFileSync(filePath, 'utf8');
+    const functions = this.extractFunctions(content);
+
+    for (const func of functions) {
+      this.checkCognitiveComplexity(filePath, func);
+      this.checkFunctionLength(filePath, func);
+      this.checkParameterCount(filePath, func);
+      this.checkReturnStatements(filePath, func);
+      this.checkNestingLevel(filePath, func);
+      this.checkExpressionComplexity(filePath, func);
+    }
+
+    this.checkIdenticalExpressions(filePath, content);
+  }
+
+  private extractFunctions(content: string): FunctionMetrics[] {
+    const functions: FunctionMetrics[] = [];
+    const lines = content.split('\n');
+
+    const functionPatterns = [
+      /^\s*(?:export\s+)?(?:async\s+)?function\s+(\w+)/,
+      /^\s*(?:export\s+)?const\s+(\w+)\s*=\s*(?:async\s+)?\(/,
+      /^\s*(\w+)\s*\([^)]*\)\s*{/,
+    ];
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+
+      for (const pattern of functionPatterns) {
+        const match = line.match(pattern);
+        if (match && !line.includes('//')) {
+          const functionName = match[1];
+          const startLine = i + 1;
+
+          // Extract function body
+          let braceCount = 0;
+          let functionContent = '';
+          let started = false;
+
+          for (let j = i; j < lines.length; j++) {
+            const currentLine = lines[j];
+            functionContent += currentLine + '\n';
+
+            for (const char of currentLine) {
+              if (char === '{') {
+                braceCount++;
+                started = true;
+              } else if (char === '}') {
+                braceCount--;
+                if (started && braceCount === 0) {
+                  break;
+                }
+              }
+            }
+            if (started && braceCount === 0) break;
+          }
+
+          const metrics = this.calculateMetrics(functionContent, functionName, startLine);
+          functions.push(metrics);
+          break;
         }
       }
     }
 
-    // Post-pass: when fixing, ensure JSX brace repair runs even for files without duplicates
-    if (doFix) {
-      const tsxFiles = await glob('src/**/*.tsx', { ignore: ['**/*.test.*', '**/*.spec.*'] });
-      for (const f of tsxFiles) {
-        applyDuplicateStringFixesToFile(f, { minLength: 6, minCount: 3 });
+    return functions;
+  }
+
+  private calculateMetrics(
+    functionContent: string,
+    name: string,
+    startLine: number
+  ): FunctionMetrics {
+    const lines = functionContent
+      .split('\n')
+      .filter(line => line.trim() && !line.trim().startsWith('//'));
+
+    // Count parameters
+    const paramMatch = functionContent.match(/\(([^)]*)\)/);
+    const parameters = paramMatch ? paramMatch[1].split(',').filter(p => p.trim()).length : 0;
+
+    // Calculate cognitive complexity
+    let cognitiveComplexity = 0;
+    const complexityPatterns = [
+      /\bif\b/g,
+      /\belse\b/g,
+      /\bfor\b/g,
+      /\bwhile\b/g,
+      /\bswitch\b/g,
+      /\bcatch\b/g,
+      /&&/g,
+      /\|\|/g,
+      /\?.*:/g,
+    ];
+
+    for (const pattern of complexityPatterns) {
+      const matches = functionContent.match(pattern);
+      if (matches) cognitiveComplexity += matches.length;
+    }
+
+    // Count return statements
+    const returnStatements = (functionContent.match(/\breturn\b/g) || []).length;
+
+    // Calculate nesting level
+    let maxLevel = 0;
+    let currentLevel = 0;
+    for (const char of functionContent) {
+      if (char === '{') {
+        currentLevel++;
+        maxLevel = Math.max(maxLevel, currentLevel);
+      } else if (char === '}') {
+        currentLevel--;
       }
+    }
+
+    // Calculate expression complexity
+    const expressionComplexity = (functionContent.match(/&&|\|\||\?.*:/g) || []).length;
+
+    return {
+      name,
+      startLine,
+      linesOfCode: lines.length,
+      parameters,
+      cognitiveComplexity,
+      returnStatements,
+      nestingLevel: maxLevel,
+      expressionComplexity,
+    };
+  }
+
+  // Rule checking methods
+  private checkCognitiveComplexity(filePath: string, func: FunctionMetrics): void {
+    if (func.cognitiveComplexity > 15) {
+      this.addIssue(
+        filePath,
+        func.startLine,
+        'typescript:S3776',
+        `Function '${func.name}' has cognitive complexity ${func.cognitiveComplexity}, which exceeds the maximum of 15`,
+        'error',
+        'HIGH'
+      );
     }
   }
 
-  private async checkCognitiveComplexity(): Promise<void> {
-    console.log('🧠 Checking cognitive complexity...');
-
-    const files = await glob('src/**/*.{ts,tsx}', { ignore: ['**/*.test.*', '**/*.spec.*'] });
-
-    for (const file of files) {
-      const content = readFileSync(file, 'utf-8');
-      const functions = this.extractFunctions(content);
-
-      functions.forEach(func => {
-        const complexity = this.calculateCognitiveComplexity(func.body);
-        if (complexity > 15) {
-          this.issues.push({
-            file,
-            line: func.line,
-            rule: 'sonarjs/cognitive-complexity',
-            message: `Function has cognitive complexity of ${complexity} (max: 15)`,
-            severity: 'error',
-          });
-        }
-      });
+  private checkFunctionLength(filePath: string, func: FunctionMetrics): void {
+    if (func.linesOfCode > 50) {
+      this.addIssue(
+        filePath,
+        func.startLine,
+        'typescript:S138',
+        `Function '${func.name}' has ${func.linesOfCode} lines, which exceeds the maximum of 50`,
+        'warning',
+        'HIGH'
+      );
     }
   }
 
-  private async checkIdenticalExpressions(): Promise<void> {
-    console.log('🔄 Checking for identical expressions...');
+  private checkParameterCount(filePath: string, func: FunctionMetrics): void {
+    if (func.parameters > 7) {
+      this.addIssue(
+        filePath,
+        func.startLine,
+        'typescript:S107',
+        `Function '${func.name}' has ${func.parameters} parameters, which exceeds the maximum of 7`,
+        'warning',
+        'HIGH'
+      );
+    }
+  }
 
-    const files = await glob('src/**/*.{ts,tsx}', { ignore: ['**/*.test.*', '**/*.spec.*'] });
+  private checkReturnStatements(filePath: string, func: FunctionMetrics): void {
+    if (func.returnStatements > 3) {
+      this.addIssue(
+        filePath,
+        func.startLine,
+        'typescript:S3800',
+        `Function '${func.name}' has ${func.returnStatements} return statements, which exceeds the maximum of 3`,
+        'warning',
+        'HIGH'
+      );
+    }
+  }
 
-    for (const file of files) {
-      const content = readFileSync(file, 'utf-8');
-      const functions = this.extractFunctions(content);
-      for (const func of functions) {
-        const ifStatements = func.body.match(/if\s*\([^)]+\)/g) || [];
-        if (ifStatements.length < 2) continue;
-        const duplicateConditions = this.findDuplicates(ifStatements.map(s => s.replace(/\s+/g, ' ')));
-        duplicateConditions.forEach(condition => {
-          this.issues.push({
-            file,
-            line: this.getLineNumber(content, condition.trim()),
-            rule: 'sonarjs/no-identical-conditions',
-            message: `Identical condition: ${condition}`,
-            severity: 'error',
-          });
-        });
-      }
+  private checkNestingLevel(filePath: string, func: FunctionMetrics): void {
+    if (func.nestingLevel > 3) {
+      this.addIssue(
+        filePath,
+        func.startLine,
+        'typescript:S134',
+        `Function '${func.name}' has nesting level ${func.nestingLevel}, which exceeds the maximum of 3`,
+        'warning',
+        'HIGH'
+      );
+    }
+  }
+
+  private checkExpressionComplexity(filePath: string, func: FunctionMetrics): void {
+    if (func.expressionComplexity > 3) {
+      this.addIssue(
+        filePath,
+        func.startLine,
+        'typescript:S1067',
+        `Function '${func.name}' has expression complexity ${func.expressionComplexity}, which exceeds the maximum of 3`,
+        'warning',
+        'HIGH'
+      );
+    }
+  }
+
+  private checkIdenticalExpressions(filePath: string, content: string): void {
+    const ifPattern = /if\s*\(([^)]+)\)/g;
+    const conditions: string[] = [];
+    let match;
+
+    while ((match = ifPattern.exec(content)) !== null) {
+      conditions.push(match[1].trim());
+    }
+
+    const duplicates = this.findDuplicates(conditions);
+    for (const duplicate of duplicates) {
+      const lineNumber = this.getLineNumber(content, duplicate);
+      this.addIssue(
+        filePath,
+        lineNumber,
+        'typescript:S1871',
+        `Identical condition found: ${duplicate}`,
+        'error',
+        'HIGH'
+      );
     }
   }
 
   private async checkUnusedVariables(): Promise<void> {
-    console.log('🗑️ Checking for unused variables...');
+    if (this.showOnlyHigh) return; // Skip for HIGH-only mode
 
     try {
       const eslint = new ESLint({
@@ -166,13 +334,14 @@ class SonarChecker {
       for (const result of results) {
         for (const message of result.messages) {
           if (message.ruleId === '@typescript-eslint/no-unused-vars') {
-            this.issues.push({
-              file: result.filePath,
-              line: message.line ?? 1,
-              rule: message.ruleId,
-              message: message.message,
-              severity: 'warning',
-            });
+            this.addIssue(
+              result.filePath,
+              message.line ?? 1,
+              'typescript:S1481',
+              message.message,
+              'warning',
+              'MEDIUM'
+            );
           }
         }
       }
@@ -181,44 +350,17 @@ class SonarChecker {
     }
   }
 
-  private async checkFunctionReturnTypes(): Promise<void> {
-    console.log('📤 Checking function return types...');
-
-    const files = await glob('src/**/*.{ts,tsx}', { ignore: ['**/*.test.*', '**/*.spec.*'] });
-
-    for (const file of files) {
-      const content = readFileSync(file, 'utf-8');
-
-      // Find functions without explicit return types
-      const functionsWithoutReturnType =
-        content.match(/(?:function|const\s+\w+\s*=\s*(?:async\s+)?)\s*\([^)]*\)\s*(?:=>)?\s*{/g) ||
-        [];
-
-      functionsWithoutReturnType.forEach(func => {
-        if (!func.includes('):') && !func.includes('=> void') && !func.includes('=> Promise')) {
-          this.issues.push({
-            file,
-            line: this.getLineNumber(content, func),
-            rule: 'typescript/explicit-function-return-type',
-            message: 'Function should have explicit return type',
-            severity: 'info',
-          });
-        }
-      });
-    }
-  }
-
   private findDuplicates<T>(array: T[]): T[] {
     const seen = new Set<T>();
     const duplicates = new Set<T>();
 
-    array.forEach(item => {
+    for (const item of array) {
       if (seen.has(item)) {
         duplicates.add(item);
       } else {
         seen.add(item);
       }
-    });
+    }
 
     return Array.from(duplicates);
   }
@@ -233,80 +375,87 @@ class SonarChecker {
     return 1;
   }
 
-  private extractFunctions(content: string): Array<{ line: number; body: string }> {
-    const functions: Array<{ line: number; body: string }> = [];
-    const lines = content.split('\n');
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      if (line.match(/(?:function|const\s+\w+\s*=|=>\s*{)/)) {
-        let braceCount = 0;
-        let functionBody = '';
-        let j = i;
-
-        while (j < lines.length) {
-          const currentLine = lines[j];
-          functionBody += currentLine + '\n';
-
-          braceCount += (currentLine.match(/{/g) || []).length;
-          braceCount -= (currentLine.match(/}/g) || []).length;
-
-          if (braceCount === 0 && j > i) {
-            break;
-          }
-          j++;
-        }
-
-        functions.push({ line: i + 1, body: functionBody });
-      }
-    }
-
-    return functions;
-  }
-
-  private calculateCognitiveComplexity(functionBody: string): number {
-    let complexity = 0;
-
-    // Count control flow statements
-    complexity += (functionBody.match(/\bif\b/g) || []).length;
-    complexity += (functionBody.match(/\belse\b/g) || []).length;
-    complexity += (functionBody.match(/\bfor\b/g) || []).length;
-    complexity += (functionBody.match(/\bwhile\b/g) || []).length;
-    complexity += (functionBody.match(/\bswitch\b/g) || []).length;
-    complexity += (functionBody.match(/\bcatch\b/g) || []).length;
-    complexity += (functionBody.match(/\btry\b/g) || []).length;
-
-    // Count logical operators
-    complexity += (functionBody.match(/&&/g) || []).length;
-    complexity += (functionBody.match(/\|\|/g) || []).length;
-
-    // Count nested functions
-    complexity += (functionBody.match(/function\s*\(/g) || []).length;
-    complexity += (functionBody.match(/=>\s*{/g) || []).length;
-
-    return complexity;
+  private addIssue(
+    file: string,
+    line: number,
+    sonarRule: string,
+    message: string,
+    severity: 'error' | 'warning' | 'info',
+    priority: 'HIGH' | 'MEDIUM' | 'LOW'
+  ): void {
+    this.issues.push({
+      file,
+      line,
+      rule: sonarRule.split(':')[1], // Extract rule ID
+      sonarRule,
+      message,
+      severity,
+      priority,
+    });
   }
 
   private reportResults(): void {
-    console.log('\n📊 SonarCloud Issue Report');
-    console.log('='.repeat(50));
+    console.log(`\n${colors.bold}📊 Enhanced SonarQube Issue Report${colors.reset}`);
+    console.log('='.repeat(60));
 
     if (this.issues.length === 0) {
-      console.log('✅ No issues found!');
+      console.log(
+        `${colors.green}✅ No ${this.showOnlyHigh ? 'HIGH priority ' : ''}issues found!${colors.reset}`
+      );
       return;
     }
 
+    const highCount = this.issues.filter(i => i.priority === 'HIGH').length;
+    const mediumCount = this.issues.filter(i => i.priority === 'MEDIUM').length;
+    const lowCount = this.issues.filter(i => i.priority === 'LOW').length;
+
     const errorCount = this.issues.filter(i => i.severity === 'error').length;
     const warningCount = this.issues.filter(i => i.severity === 'warning').length;
-    const infoCount = this.issues.filter(i => i.severity === 'info').length;
 
     console.log(`Found ${this.issues.length} issues:`);
     console.log(`  🔴 Errors: ${errorCount}`);
     console.log(`  🟡 Warnings: ${warningCount}`);
-    console.log(`  🔵 Info: ${infoCount}\n`);
+    console.log('');
+    console.log('Priority breakdown:');
+    console.log(`  🚨 HIGH: ${highCount}`);
+    console.log(`  ⚠️  MEDIUM: ${mediumCount}`);
+    console.log(`  ℹ️  LOW: ${lowCount}`);
+    console.log('');
 
-    // Group issues by file
-    const issuesByFile = this.issues.reduce(
+    // Group and display issues
+    const filteredIssues = this.showOnlyHigh
+      ? this.issues.filter(i => i.priority === 'HIGH')
+      : this.issues;
+
+    const issuesByFile = this.groupIssuesByFile(filteredIssues);
+
+    for (const [file, fileIssues] of Object.entries(issuesByFile)) {
+      console.log(`📁 ${path.relative(process.cwd(), file)}`);
+      for (const issue of fileIssues) {
+        const severityIcon = issue.severity === 'error' ? '🔴' : '🟡';
+        const priorityIcon = issue.priority === 'HIGH' ? '🚨' : '⚠️';
+        console.log(`  ${severityIcon} ${priorityIcon} Line ${issue.line}: ${issue.message}`);
+        console.log(`     Rule: ${issue.sonarRule}`);
+      }
+      console.log('');
+    }
+
+    console.log('💡 Tips:');
+    console.log('  • Focus on HIGH priority issues first');
+    console.log('  • Use --high flag to see only HIGH priority issues');
+    console.log('  • Use --verbose flag to see rule details');
+
+    // Exit with error code if there are HIGH priority errors
+    const hasHighPriorityErrors = this.issues.some(
+      issue => issue.priority === 'HIGH' && issue.severity === 'error'
+    );
+    if (hasHighPriorityErrors) {
+      process.exit(1);
+    }
+  }
+
+  private groupIssuesByFile(issues: SonarIssue[]): Record<string, SonarIssue[]> {
+    return issues.reduce(
       (acc, issue) => {
         if (!acc[issue.file]) {
           acc[issue.file] = [];
@@ -316,39 +465,18 @@ class SonarChecker {
       },
       {} as Record<string, SonarIssue[]>
     );
-
-    Object.entries(issuesByFile).forEach(([file, issues]) => {
-      console.log(`📁 ${path.relative(process.cwd(), file)}`);
-      issues.forEach(issue => {
-        const icon = issue.severity === 'error' ? '🔴' : issue.severity === 'warning' ? '🟡' : '🔵';
-        console.log(`  ${icon} Line ${issue.line}: ${issue.message} (${issue.rule})`);
-      });
-      console.log('');
-    });
-
-    if (this.fixMode) {
-      console.log('🔧 Auto-fix applied where supported (duplicate strings).');
-      console.log('Other issues require manual refactoring.');
-    } else {
-      console.log('💡 Run with --fix flag to attempt automatic fixes for duplicate strings.');
-    }
-
-    // Exit with error code if there are errors
-    if (errorCount > 0) {
-      process.exit(1);
-    }
   }
 }
 
 // CLI interface
 const args = process.argv.slice(2);
 const options = {
-  fix: args.includes('--fix'),
-  warnings: args.includes('--warnings'),
+  highOnly: args.includes('--high-only') || args.includes('--high'),
+  verbose: args.includes('--verbose') || args.includes('-v'),
 };
 
 const checker = new SonarChecker(options);
 checker.run().catch(error => {
-  console.error('❌ Error running SonarCloud checker:', error);
+  console.error('❌ Error running SonarQube checker:', error);
   process.exit(1);
 });

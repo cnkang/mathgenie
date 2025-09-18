@@ -18,50 +18,51 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  if (!error) {
-    return null;
-  }
-
   // Helper function to check if error is MessageState
   const isMessageState = (
     value: MessageValue
   ): value is { key: string; params?: Record<string, string | number> } => {
-    return typeof value === 'object' && 'key' in value;
+    return value != null && typeof value !== 'string' && 'key' in value;
   };
 
   // Get the display text - either translate MessageState or use string directly
   const getDisplayText = (): string => {
     if (isMessageState(error)) {
-      return t(error.key, error.params);
+      return error.key ? t(error.key, error.params) : '';
     }
-    return error;
+    return String(error);
   };
 
-  const getIcon = (): string => {
-    switch (type) {
-      case 'error':
-        return '⚠️';
-      case 'warning':
-        return '⚡';
-      case 'info':
-        return 'ℹ️';
-      default:
-        return '⚠️';
-    }
+  const displayText = getDisplayText();
+
+  // Check if error is empty or would result in empty display text
+  if (!error || !displayText) {
+    return null;
+  }
+
+  const messageConfig = {
+    error: {
+      icon: '⚠️',
+      ariaKey: 'accessibility.errorMessage',
+      fallback: 'Error message',
+    },
+    warning: {
+      icon: '⚡',
+      ariaKey: 'accessibility.warningMessage',
+      fallback: 'Warning message',
+    },
+    info: {
+      icon: 'ℹ️',
+      ariaKey: 'accessibility.infoMessage',
+      fallback: 'Information message',
+    },
   };
 
-  const getAriaLabel = (): string => {
-    switch (type) {
-      case 'error':
-        return t('accessibility.errorMessage') || 'Error message';
-      case 'warning':
-        return t('accessibility.warningMessage') || 'Warning message';
-      case 'info':
-        return t('accessibility.infoMessage') || 'Information message';
-      default:
-        return t('accessibility.errorMessage') || 'Error message';
-    }
-  };
+  const config = messageConfig[type] || messageConfig.error;
+
+  const getIcon = (): string => config.icon;
+
+  const getAriaLabel = (): string => t(config.ariaKey) || config.fallback;
 
   return (
     <div
@@ -73,7 +74,7 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
     >
       <div className='message-content'>
         {showIcon && <span className='message-icon'>{getIcon()}</span>}
-        <span className='message-text'>{getDisplayText()}</span>
+        <span className='message-text'>{displayText}</span>
       </div>
       {onDismiss && (
         <button

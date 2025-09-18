@@ -1,7 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { buildSafeEnv, resolveBin } from '../../scripts/exec-utils';
-import { validateFilePatterns } from '../../scripts/css-html-quality-check';
+import { isExecutedDirectly, validateFilePatterns } from '../../scripts/css-html-quality-check';
 import { existsSync } from 'node:fs';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 describe('css-html-quality-check helpers', () => {
   const originalEnv = { ...process.env };
@@ -56,6 +58,23 @@ describe('css-html-quality-check helpers', () => {
     const long = 'a'.repeat(201);
     expect(validateFilePatterns([long])).toBe(false);
     errSpy.mockRestore();
+  });
+
+  it('isExecutedDirectly identifies direct invocation with absolute path', () => {
+    const absolutePath = path.resolve('scripts/css-html-quality-check.ts');
+    const moduleUrl = pathToFileURL(absolutePath).href;
+    expect(isExecutedDirectly(['node', absolutePath], moduleUrl)).toBe(true);
+  });
+
+  it('isExecutedDirectly returns false when argv lacks script path', () => {
+    expect(isExecutedDirectly(['node'], 'file:///tmp/mock.js')).toBe(false);
+  });
+
+  it('isExecutedDirectly returns false when path does not match module url', () => {
+    const absolutePath = path.resolve('scripts/css-html-quality-check.ts');
+    const otherPath = path.resolve('scripts/another-script.ts');
+    const moduleUrl = pathToFileURL(absolutePath).href;
+    expect(isExecutedDirectly(['node', otherPath], moduleUrl)).toBe(false);
   });
 
   it('resolveBin should resolve stylelint CLI from package.json bin', () => {

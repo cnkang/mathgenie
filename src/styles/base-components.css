@@ -44,7 +44,7 @@ a {
 }
 
 /* Special handling for checkboxes and radio buttons */
-input[type='checkbox'],
+input[type="checkbox"],
 input[type='radio'] {
   min-width: 44px !important;
   min-height: 44px !important;
@@ -451,7 +451,7 @@ small {
 }
 
 /* Modern Checkbox Design - Enhanced with better visual feedback */
-.checkbox-item input[type='checkbox'] {
+.checkbox-item input[type="checkbox"] {
   position: relative;
   z-index: 1;
   flex-shrink: 0;
@@ -474,21 +474,21 @@ small {
 }
 
 /* Hover state for checkbox */
-.checkbox-item input[type='checkbox']:hover {
+.checkbox-item input[type="checkbox"]:hover {
   border-color: var(--primary-color);
   box-shadow: 0 0 0 4px rgb(79 70 229 / 10%);
   transform: scale(1.05);
 }
 
 /* Focus state for accessibility */
-.checkbox-item input[type='checkbox']:focus {
+.checkbox-item input[type="checkbox"]:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 4px rgb(79 70 229 / 25%);
 }
 
 /* Checked state with enhanced animation */
-.checkbox-item input[type='checkbox']:checked {
+.checkbox-item input[type="checkbox"]:checked {
   background: var(--primary-color);
   border-color: var(--primary-color);
   box-shadow: 0 0 0 4px rgb(79 70 229 / 20%);
@@ -496,7 +496,7 @@ small {
 }
 
 /* Checkmark with improved animation */
-.checkbox-item input[type='checkbox']:checked::after {
+.checkbox-item input[type="checkbox"]:checked::after {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -528,11 +528,11 @@ small {
 }
 
 /* Active/pressed state for checkbox */
-.checkbox-item input[type='checkbox']:active {
+.checkbox-item input[type="checkbox"]:active {
   transform: scale(0.95);
 }
 
-.checkbox-item input[type='checkbox']:checked:active {
+.checkbox-item input[type="checkbox"]:checked:active {
   transform: scale(1.05);
 }
 

@@ -85,4 +85,45 @@ describe('useSettings', () => {
     expect(localStorageMock.removeItem).toHaveBeenCalledWith('mathgenie-settings');
     expect(result.current.settings.operations).toEqual(['+', '-']);
   });
+
+  it('handles invalid operations array gracefully', () => {
+    const invalidSettings = {
+      operations: ['invalid', 'operations'],
+      numProblems: 20,
+      numRange: [1, 10],
+      resultRange: [0, 20],
+      numOperandsRange: [2, 3],
+      allowNegative: false,
+      showAnswers: false,
+      fontSize: 16,
+      lineSpacing: 12,
+      paperSize: 'a4',
+    };
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(invalidSettings));
+    const { result } = renderHook(() => useSettings());
+    // Should fallback to default operations when invalid operations are provided
+    expect(result.current.settings.operations).toEqual(['+', '-']);
+    // Other valid settings should be preserved
+    expect(result.current.settings.numProblems).toBe(20);
+  });
+
+  it('preserves valid operations array', () => {
+    const validSettings = {
+      operations: ['×', '÷'],
+      numProblems: 15,
+      numRange: [1, 10],
+      resultRange: [0, 20],
+      numOperandsRange: [2, 3],
+      allowNegative: false,
+      showAnswers: false,
+      fontSize: 16,
+      lineSpacing: 12,
+      paperSize: 'a4',
+    };
+    localStorageMock.getItem.mockReturnValue(JSON.stringify(validSettings));
+    const { result } = renderHook(() => useSettings());
+    // Should preserve valid operations
+    expect(result.current.settings.operations).toEqual(['×', '÷']);
+    expect(result.current.settings.numProblems).toBe(15);
+  });
 });

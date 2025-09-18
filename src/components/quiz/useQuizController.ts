@@ -1,6 +1,6 @@
-import { useEffect, useState, useCallback } from 'react';
-import type { Problem, QuizResult } from '@/types';
 import { safeEvaluateExpression } from '@/components/quiz/expression';
+import type { Problem, QuizResult } from '@/types';
+import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from 'react';
 
 export type Translator = (key: string, params?: Record<string, string | number>) => string;
 
@@ -55,48 +55,76 @@ const computeQuizResult = (problems: Problem[], t: Translator): QuizResult => {
   };
 };
 
-export const useQuizController = (
-  problems: Problem[],
-  t: Translator,
-  onQuizComplete: (result: QuizResult) => void
-) => {
+const useQuizProblemState = (problems: Problem[]) => {
   const [quizProblems, setQuizProblems] = useState<Problem[]>([]);
   const [currentProblemIndex, setCurrentProblemIndex] = useState(0);
   const [showResults, setShowResults] = useState(false);
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
-  const [timeElapsed, setTimeElapsed] = useState(0);
 
-  // Initialize problems with computed answers
   useEffect(() => {
     const problemsWithAnswers = mapProblemsWithAnswers(problems);
     setQuizProblems(problemsWithAnswers);
     setCurrentProblemIndex(0);
     setShowResults(false);
     setQuizResult(null);
-    setTimeElapsed(0);
   }, [problems]);
 
-  // Timer
+  return {
+    quizProblems,
+    setQuizProblems,
+    currentProblemIndex,
+    setCurrentProblemIndex,
+    showResults,
+    setShowResults,
+    quizResult,
+    setQuizResult,
+  } as const;
+};
+
+const useQuizTimer = () => {
+  const [timeElapsed, setTimeElapsed] = useState(0);
+
   useEffect(() => {
     const timer = setInterval(() => setTimeElapsed(prev => prev + 1), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  const finishQuiz = useCallback(
+  const resetTimer = useCallback(() => setTimeElapsed(0), []);
+
+  return { timeElapsed, setTimeElapsed, resetTimer } as const;
+};
+
+const useFinishQuiz = (
+  quizProblems: Problem[],
+  t: Translator,
+  onQuizComplete: (result: QuizResult) => void,
+  setQuizResult: (value: QuizResult | null) => void,
+  setShowResults: (value: boolean) => void
+) => {
+  return useCallback(
     (finalProblems?: Problem[]): void => {
-      const problemsToUse = finalProblems || quizProblems;
+      const problemsToUse = finalProblems ?? quizProblems;
       const result = computeQuizResult(problemsToUse, t);
       setQuizResult(result);
       setShowResults(true);
       onQuizComplete(result);
     },
-    [quizProblems, t, onQuizComplete]
+    [quizProblems, t, onQuizComplete, setQuizResult, setShowResults]
   );
+};
 
-  const handleAnswerSubmit = useCallback(
+const useAnswerSubmission = (params: {
+  setQuizProblems: Dispatch<SetStateAction<Problem[]>>;
+  finishQuiz: (finalProblems?: Problem[]) => void;
+  currentProblemIndex: number;
+  setCurrentProblemIndex: Dispatch<SetStateAction<number>>;
+}) => {
+  const { setQuizProblems, finishQuiz, currentProblemIndex, setCurrentProblemIndex } = params;
+
+  return useCallback(
     (problemId: number, answer: number): void => {
-      setQuizProblems(prev => {
-        const updatedProblems = prev.map(problem =>
+      setQuizProblems(prevProblems => {
+        const updatedProblems = prevProblems.map(problem =>
           problem.id === problemId
             ? {
                 ...problem,
@@ -106,18 +134,92 @@ export const useQuizController = (
               }
             : problem
         );
+
         setTimeout(() => {
           const isLast = currentProblemIndex >= updatedProblems.length - 1;
           if (isLast) {
             finishQuiz(updatedProblems);
-          } else {
-            setCurrentProblemIndex(currentProblemIndex + 1);
+            return;
           }
+          setCurrentProblemIndex(currentProblemIndex + 1);
         }, 1500);
+
         return updatedProblems;
       });
     },
-    [finishQuiz, currentProblemIndex]
+    [currentProblemIndex, finishQuiz, setCurrentProblemIndex, setQuizProblems]
+  );
+};
+
+const useQuizNavigation = (
+  currentProblemIndex: number,
+  setCurrentProblemIndex: Dispatch<SetStateAction<number>>,
+  quizProblemsLength: number
+) => {
+  const goToPrevious = useCallback((): void => {
+    setCurrentProblemIndex(idx => (idx > 0 ? idx - 1 : 0));
+  }, [setCurrentProblemIndex]);
+
+  const goToNext = useCallback((): void => {
+    setCurrentProblemIndex(idx => (idx < quizProblemsLength - 1 ? idx + 1 : idx));
+  }, [setCurrentProblemIndex, quizProblemsLength]);
+
+  return { goToPrevious, goToNext };
+};
+
+const useQuizActions = (
+  problems: Problem[],
+  quizProblems: Problem[],
+  t: Translator,
+  onQuizComplete: (result: QuizResult) => void,
+  setQuizProblems: Dispatch<SetStateAction<Problem[]>>,
+  setQuizResult: (value: QuizResult | null) => void,
+  setShowResults: (value: boolean) => void,
+  currentProblemIndex: number,
+  setCurrentProblemIndex: (value: number | ((prev: number) => number)) => void,
+  resetTimer: () => void
+) => {
+  const finishQuiz = useFinishQuiz(quizProblems, t, onQuizComplete, setQuizResult, setShowResults);
+
+  const handleAnswerSubmit = useAnswerSubmission({
+    setQuizProblems,
+    finishQuiz,
+    currentProblemIndex,
+    setCurrentProblemIndex,
+  });
+
+  useEffect(() => {
+    resetTimer();
+  }, [resetTimer, problems]);
+
+  return { handleAnswerSubmit };
+};
+
+export const useQuizController = (
+  problems: Problem[],
+  t: Translator,
+  onQuizComplete: (result: QuizResult) => void
+) => {
+  const problemState = useQuizProblemState(problems);
+  const timerState = useQuizTimer();
+
+  const navigation = useQuizNavigation(
+    problemState.currentProblemIndex,
+    problemState.setCurrentProblemIndex,
+    problemState.quizProblems.length
+  );
+
+  const actions = useQuizActions(
+    problems,
+    problemState.quizProblems,
+    t,
+    onQuizComplete,
+    problemState.setQuizProblems,
+    problemState.setQuizResult,
+    problemState.setShowResults,
+    problemState.currentProblemIndex,
+    problemState.setCurrentProblemIndex,
+    timerState.resetTimer
   );
 
   const formatTime = useCallback((seconds: number): string => {
@@ -126,27 +228,11 @@ export const useQuizController = (
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   }, []);
 
-  const goToPrevious = useCallback((): void => {
-    setCurrentProblemIndex(idx => (idx > 0 ? idx - 1 : 0));
-  }, []);
-
-  const goToNext = useCallback((): void => {
-    setCurrentProblemIndex(idx => (idx < quizProblems.length - 1 ? idx + 1 : idx));
-  }, [quizProblems.length]);
-
   return {
-    quizProblems,
-    currentProblemIndex,
-    showResults,
-    quizResult,
-    timeElapsed,
-    handleAnswerSubmit,
+    ...problemState,
+    ...timerState,
+    ...navigation,
+    ...actions,
     formatTime,
-    goToPrevious,
-    goToNext,
-    setShowResults,
-    setCurrentProblemIndex,
-    setQuizProblems,
-    setTimeElapsed,
   } as const;
 };

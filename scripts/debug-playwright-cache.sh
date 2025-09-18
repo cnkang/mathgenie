@@ -100,6 +100,46 @@ check_cache_directories() {
     done
 }
 
+# Cache for dry-run outputs to avoid repeated expensive calls
+declare -A DRY_RUN_CACHE
+
+# Reusable function to check if a browser is installed
+is_browser_installed() {
+    local browser="$1"
+    
+    # Use cached result if available
+    if [[ -n "${DRY_RUN_CACHE[$browser]}" ]]; then
+        local dry_run_output="${DRY_RUN_CACHE[$browser]}"
+    else
+        local dry_run_output=$(pnpm exec playwright install --dry-run "$browser" 2>&1)
+        DRY_RUN_CACHE[$browser]="$dry_run_output"
+    fi
+    
+    # Method 1: Check for "is already installed" message
+    if echo "$dry_run_output" | grep -q "is already installed"; then
+        return 0
+    fi
+    
+    # Method 2: Check if dry-run shows no download URLs (means already installed)
+    if ! echo "$dry_run_output" | grep -q "Download url:"; then
+        return 0
+    fi
+    
+    # Method 3: Check cache directory for browser files
+    local cache_dir=""
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        cache_dir="$HOME/Library/Caches/ms-playwright"
+    else
+        cache_dir="$HOME/.cache/ms-playwright"
+    fi
+    
+    if [ -d "$cache_dir" ] && find "$cache_dir" -name "*$browser*" -type d | grep -q "$browser"; then
+        return 0
+    fi
+    
+    return 1
+}
+
 # Function to check browser installations
 check_browser_installations() {
     print_section "Browser Installation Status"
@@ -109,39 +149,14 @@ check_browser_installations() {
     for browser in "${browsers[@]}"; do
         print_status $BLUE "🔍 Checking $browser..."
         
-        # Use the same logic as the cache helper
-        local dry_run_output=$(pnpm exec playwright install --dry-run $browser 2>&1)
-        local is_installed=false
-        
-        # Method 1: Check for "is already installed" message
-        if echo "$dry_run_output" | grep -q "is already installed"; then
-            is_installed=true
-        fi
-        
-        # Method 2: Check if dry-run shows no download URLs (means already installed)
-        if ! echo "$dry_run_output" | grep -q "Download url:"; then
-            is_installed=true
-        fi
-        
-        # Method 3: Check cache directory for browser files
-        local cache_dir=""
-        if [[ "$OSTYPE" == "darwin"* ]]; then
-            cache_dir="$HOME/Library/Caches/ms-playwright"
-        else
-            cache_dir="$HOME/.cache/ms-playwright"
-        fi
-        
-        if [ -d "$cache_dir" ] && find "$cache_dir" -name "*$browser*" -type d | grep -q "$browser"; then
-            is_installed=true
-        fi
-        
-        if [ "$is_installed" = true ]; then
+        if is_browser_installed "$browser"; then
             print_status $GREEN "  ✅ $browser is installed and available"
         else
             print_status $RED "  ❌ $browser is not installed or not available"
         fi
         
-        # Try to get browser path
+        # Try to get browser path using cached result
+        local dry_run_output="${DRY_RUN_CACHE[$browser]}"
         local browser_path=$(echo "$dry_run_output" | grep "Install location:" | head -1 | sed 's/.*Install location: *//' || echo "unknown")
         print_status $BLUE "  📍 Expected path: $browser_path"
         
@@ -164,32 +179,7 @@ analyze_cache_effectiveness() {
         local total_browsers=3
         
         for browser in "chromium" "firefox" "webkit"; do
-            local dry_run_output=$(pnpm exec playwright install --dry-run $browser 2>&1)
-            local is_installed=false
-            
-            # Method 1: Check for "is already installed" message
-            if echo "$dry_run_output" | grep -q "is already installed"; then
-                is_installed=true
-            fi
-            
-            # Method 2: Check if dry-run shows no download URLs (means already installed)
-            if ! echo "$dry_run_output" | grep -q "Download url:"; then
-                is_installed=true
-            fi
-            
-            # Method 3: Check cache directory for browser files
-            local cache_dir=""
-            if [[ "$OSTYPE" == "darwin"* ]]; then
-                cache_dir="$HOME/Library/Caches/ms-playwright"
-            else
-                cache_dir="$HOME/.cache/ms-playwright"
-            fi
-            
-            if [ -d "$cache_dir" ] && find "$cache_dir" -name "*$browser*" -type d | grep -q "$browser"; then
-                is_installed=true
-            fi
-            
-            if [ "$is_installed" = true ]; then
+            if is_browser_installed "$browser"; then
                 ((available_browsers++))
             fi
         done
@@ -221,32 +211,7 @@ provide_recommendations() {
     local available_browsers=0
     
     for browser in "chromium" "firefox" "webkit"; do
-        local dry_run_output=$(pnpm exec playwright install --dry-run $browser 2>&1)
-        local is_installed=false
-        
-        # Method 1: Check for "is already installed" message
-        if echo "$dry_run_output" | grep -q "is already installed"; then
-            is_installed=true
-        fi
-        
-        # Method 2: Check if dry-run shows no download URLs (means already installed)
-        if ! echo "$dry_run_output" | grep -q "Download url:"; then
-            is_installed=true
-        fi
-        
-        # Method 3: Check cache directory for browser files
-        local cache_dir=""
-        if [[ "$OSTYPE" == "darwin"* ]]; then
-            cache_dir="$HOME/Library/Caches/ms-playwright"
-        else
-            cache_dir="$HOME/.cache/ms-playwright"
-        fi
-        
-        if [ -d "$cache_dir" ] && find "$cache_dir" -name "*$browser*" -type d | grep -q "$browser"; then
-            is_installed=true
-        fi
-        
-        if [ "$is_installed" = true ]; then
+        if is_browser_installed "$browser"; then
             ((available_browsers++))
         fi
     done
