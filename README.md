@@ -147,6 +147,9 @@ pnpm sonar:check
 # Detailed analysis of all rules
 pnpm sonar:verbose
 
+# Local validation (lint + SonarJS checks)
+pnpm sonar:local
+
 # Full SonarQube scan (CI/CD)
 pnpm sonar:scan
 ```
@@ -179,6 +182,12 @@ pnpm sonar:high:verbose  # Detailed HIGH priority analysis (~15s)
 
 ```bash
 pnpm sonar:check  # Comprehensive check (~15s)
+```
+
+**Local Validation**
+
+```bash
+pnpm sonar:local  # Complete local validation (lint + SonarJS, ~20s)
 ```
 
 **Deep Analysis**

@@ -58,6 +58,7 @@ pnpm sonar:high       # HIGH priority issues only (recommended for daily use)
 pnpm sonar:check      # Check all SonarQube rules
 pnpm sonar:verbose    # Detailed output with rule explanations
 pnpm sonar:high:verbose # HIGH priority with detailed output
+pnpm sonar:local      # Complete local validation (lint + SonarJS)
 pnpm sonar:scan       # Full SonarQube scan (CI/CD)
 ```
 
@@ -198,6 +199,9 @@ pnpm lint:css-html:fix
 
 # 4. Check for critical code quality issues
 pnpm sonar:high
+
+# Alternative: Complete local validation (lint + SonarJS)
+pnpm sonar:local
 
 # 5. Verify TypeScript compilation
 pnpm type-check
