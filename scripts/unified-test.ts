@@ -5,10 +5,8 @@
  */
 
 import { spawnSync } from 'child_process';
-import { existsSync } from 'fs';
 import { cpus, freemem, totalmem } from 'os';
-import { join } from 'path';
-import { buildSafeEnv } from './exec-utils';
+import { buildSafeEnv, findExecutable, isCommandAvailable } from './exec-utils';
 
 // 颜色输出 (支持 NO_COLOR 环境变量)
 const colors = process.env.NO_COLOR
@@ -41,39 +39,6 @@ function log(level: LogLevel, message: string): void {
     .substring(0, 500); // Limit length
 
   console.log(`${prefix} ${sanitizedMessage}`);
-}
-
-/**
- * Find executable path with cross-platform support
- */
-function findExecutable(command: string): string | null {
-  // Windows executables might have extensions
-  const extensions = process.platform === 'win32' ? ['.cmd', '.bat', ''] : [''];
-  const basePath = './node_modules/.bin';
-
-  for (const ext of extensions) {
-    const fullPath = join(basePath, command + ext);
-    if (existsSync(fullPath)) {
-      return fullPath;
-    }
-  }
-  return null;
-}
-
-/**
- * Check if a command is available
- */
-function isCommandAvailable(cmd: string): boolean {
-  try {
-    const result = spawnSync(cmd, ['--version'], {
-      stdio: 'pipe',
-      shell: false,
-      timeout: 5000, // 5 second timeout
-    });
-    return result.status === 0;
-  } catch {
-    return false;
-  }
 }
 
 /**

@@ -1,15 +1,49 @@
 #!/usr/bin/env tsx
 
 import { SpawnSyncOptions, SpawnSyncReturns, spawnSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 
 const require = createRequire(import.meta.url);
 
+const EXEC_TIMEOUT_MS = 5000;
+const EXECUTABLE_EXTENSIONS = process.platform === 'win32' ? ['.cmd', '.bat', ''] : [''];
+const DEFAULT_BASE_PATH = './node_modules/.bin';
+
 export type SafeEnvOptions = {
   removePath?: boolean;
 };
+
+export function findExecutable(
+  command: string,
+  basePath: string = DEFAULT_BASE_PATH
+): string | null {
+  for (const ext of EXECUTABLE_EXTENSIONS) {
+    const fullPath = path.join(basePath, command + ext);
+    if (existsSync(fullPath)) {
+      return fullPath;
+    }
+  }
+  return null;
+}
+
+export function isCommandAvailable(
+  cmd: string,
+  args: string[] = ['--version'],
+  timeoutMs: number = EXEC_TIMEOUT_MS
+): boolean {
+  try {
+    const result = spawnSync(cmd, args, {
+      stdio: 'pipe',
+      shell: false,
+      timeout: timeoutMs,
+    });
+    return result.status === 0;
+  } catch {
+    return false;
+  }
+}
 
 export function buildSafeEnv(opts: SafeEnvOptions = {}): Record<string, string> {
   const { removePath = true } = opts;
