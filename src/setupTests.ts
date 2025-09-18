@@ -135,14 +135,18 @@ Object.defineProperty(window, 'HTMLCanvasElement', {
   value: vi.fn().mockImplementation(() => mockCanvas),
 });
 
-// 简化的 crypto mock
+// 简化的 crypto mock using Node.js crypto for security compliance
+import { randomBytes } from 'crypto';
+
 Object.defineProperty(window, 'crypto', {
   writable: true,
   value: {
     getRandomValues: vi.fn((arr: Uint32Array) => {
+      // Use Node.js crypto.randomBytes for cryptographically secure random values
+      const bytes = randomBytes(arr.length * 4); // 4 bytes per Uint32
       for (let i = 0; i < arr.length; i++) {
-        // SONAR-SAFE: Using Math.random() for test mocking, not security-sensitive operations
-        arr[i] = Math.floor(Math.random() * 0xffffffff);
+        // Convert 4 bytes to Uint32
+        arr[i] = bytes.readUInt32BE(i * 4);
       }
       return arr;
     }),
