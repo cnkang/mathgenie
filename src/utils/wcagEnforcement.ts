@@ -166,6 +166,13 @@ const handleFirefoxSizeAdjustments = (element: HTMLElement, minSize: number): vo
   }
 };
 
+// Helper function to apply button styles if needed
+const applyButtonStylesIfNeeded = (element: HTMLElement): void => {
+  if (element.tagName === 'BUTTON') {
+    applyButtonStyles(element);
+  }
+};
+
 // Helper function to handle standard size adjustments
 const handleStandardSizeAdjustments = (
   element: HTMLElement,
@@ -175,7 +182,8 @@ const handleStandardSizeAdjustments = (
   applyMinimumDimensions(element, minSize);
   applyStandardPaddingOptimization(element, style);
 
-  applyButtonStylesIfNeeded(element);};
+  applyButtonStylesIfNeeded(element);
+};
 
 // Firefox-optimized element processing with reduced style calculations
 const processElement = (element: HTMLElement, minSize: number): void => {
