@@ -143,28 +143,37 @@ const applyStandardPadding = (element: HTMLElement, style: CSSStyleDeclaration):
   }
 };
 
-// Helper function to apply padding based on browser
-const applyPaddingOptimization = (
+// Helper function to apply Firefox-specific padding optimization
+const applyFirefoxPaddingOptimization = (element: HTMLElement): void => {
+  applyFirefoxPadding(element);
+};
+
+// Helper function to apply standard padding optimization
+const applyStandardPaddingOptimization = (
   element: HTMLElement,
-  style: CSSStyleDeclaration,
-  useFirefoxOptimization: boolean
+  style: CSSStyleDeclaration
 ): void => {
-  if (useFirefoxOptimization) {
-    applyFirefoxPadding(element);
-  } else {
-    applyStandardPadding(element, style);
+  applyStandardPadding(element, style);
+};
+
+// Helper function to handle Firefox-specific size adjustments
+const handleFirefoxSizeAdjustments = (element: HTMLElement, minSize: number): void => {
+  applyMinimumDimensions(element, minSize);
+  applyFirefoxPaddingOptimization(element);
+
+  if (element.tagName === 'BUTTON') {
+    applyButtonStyles(element);
   }
 };
 
-// Helper function to handle size adjustments
-const handleSizeAdjustments = (
+// Helper function to handle standard size adjustments
+const handleStandardSizeAdjustments = (
   element: HTMLElement,
   minSize: number,
-  style: CSSStyleDeclaration,
-  useFirefoxOptimization: boolean
+  style: CSSStyleDeclaration
 ): void => {
   applyMinimumDimensions(element, minSize);
-  applyPaddingOptimization(element, style, useFirefoxOptimization);
+  applyStandardPaddingOptimization(element, style);
 
   if (element.tagName === 'BUTTON') {
     applyButtonStyles(element);
@@ -196,7 +205,11 @@ const processElement = (element: HTMLElement, minSize: number): void => {
   const useFirefoxOptimization = isFirefox();
 
   if (currentHeight < minSize || currentWidth < minSize) {
-    handleSizeAdjustments(element, minSize, style, useFirefoxOptimization);
+    if (useFirefoxOptimization) {
+      handleFirefoxSizeAdjustments(element, minSize);
+    } else {
+      handleStandardSizeAdjustments(element, minSize, style);
+    }
   }
 
   if (element.tagName === 'INPUT') {
@@ -212,13 +225,14 @@ const isFirefox = (): boolean => {
   return typeof navigator !== 'undefined' && navigator.userAgent.includes('Firefox');
 };
 
-// Helper function to schedule next batch processing
-const scheduleNextBatch = (processBatch: () => void, firefoxBrowser: boolean): void => {
-  if (firefoxBrowser) {
-    requestAnimationFrame(processBatch);
-  } else {
-    setTimeout(processBatch, 0);
-  }
+// Helper function to schedule next batch processing for Firefox
+const scheduleNextBatchForFirefox = (processBatch: () => void): void => {
+  requestAnimationFrame(processBatch);
+};
+
+// Helper function to schedule next batch processing for standard browsers
+const scheduleNextBatchForStandard = (processBatch: () => void): void => {
+  setTimeout(processBatch, 0);
 };
 
 // Helper function to process a single batch of elements
@@ -253,7 +267,11 @@ const processElementsInBatches = (elements: NodeListOf<Element>, minSize: number
     index = endIndex;
 
     if (index < elements.length) {
-      scheduleNextBatch(processBatch, firefoxBrowser);
+      if (firefoxBrowser) {
+        scheduleNextBatchForFirefox(processBatch);
+      } else {
+        scheduleNextBatchForStandard(processBatch);
+      }
     }
   };
 
