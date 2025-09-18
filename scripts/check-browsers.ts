@@ -197,10 +197,7 @@ function checkBrowserCache(): boolean {
     const contents = readdirSync(cacheDir);
     const hasBrowsers = contents.some(item => {
       const itemPath = join(cacheDir, item);
-      return (
-        statSync(itemPath).isDirectory() &&
-        BROWSERS.some(browser => item.includes(browser))
-      );
+      return statSync(itemPath).isDirectory() && BROWSERS.some(browser => item.includes(browser));
     });
 
     if (hasBrowsers) {
