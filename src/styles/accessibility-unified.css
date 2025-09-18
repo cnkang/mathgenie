@@ -23,10 +23,10 @@
 *[onmouseup],
 *[ontouchstart],
 *[ontouchend],
-*[role='button'],
+*[role="button"],
 *[role='tab'],
-*[role='menuitem'],
-*[role='option'],
+*[role="menuitem"],
+*[role="option"],
 *[tabindex='0'],
 *[tabindex]:not([tabindex='-1']),
 button,
@@ -77,7 +77,7 @@ label,
 }
 
 /* Special handling for checkboxes and radio buttons */
-input[type='checkbox'],
+input[type="checkbox"],
 input[type='radio'],
 .form-checkbox {
   position: relative;
@@ -88,7 +88,7 @@ input[type='radio'],
   padding: 12px !important;
 }
 
-input[type='checkbox']::before,
+input[type="checkbox"]::before,
 input[type='radio']::before,
 .form-checkbox::before {
   position: absolute;
@@ -153,10 +153,10 @@ textarea,
   *[onmouseup],
   *[ontouchstart],
   *[ontouchend],
-  *[role='button'],
+  *[role="button"],
   *[role='tab'],
-  *[role='menuitem'],
-  *[role='option'],
+  *[role="menuitem"],
+  *[role="option"],
   *[tabindex='0'],
   *[tabindex]:not([tabindex='-1']),
   button,
@@ -211,7 +211,7 @@ textarea,
     font-size: 16px !important; /* Prevent iOS zoom */
   }
 
-  input[type='checkbox'],
+  input[type="checkbox"],
   input[type='radio'],
   .form-checkbox {
     min-width: 48px !important;
@@ -244,10 +244,10 @@ textarea,
   *[onmouseup],
   *[ontouchstart],
   *[ontouchend],
-  *[role='button'],
+  *[role="button"],
   *[role='tab'],
-  *[role='menuitem'],
-  *[role='option'],
+  *[role="menuitem"],
+  *[role="option"],
   *[tabindex='0'],
   *[tabindex]:not([tabindex='-1']),
   button,
@@ -303,7 +303,7 @@ textarea,
     line-height: 1.2 !important;
   }
 
-  input[type='checkbox'],
+  input[type="checkbox"],
   input[type='radio'],
   .form-checkbox {
     min-width: 50px !important;
@@ -393,7 +393,7 @@ button:not([tabindex='-1']),
 input:not([tabindex='-1']),
 select:not([tabindex='-1']),
 textarea:not([tabindex='-1']),
-[role='button']:not([tabindex='-1']),
+[role="button"]:not([tabindex='-1']),
 [onclick]:not([tabindex='-1']),
 a[href]:not([tabindex='-1']) {
   /* Ensure all interactive elements are focusable */
@@ -418,7 +418,7 @@ a[href]:not([tabindex='-1']) {
   input,
   select,
   textarea,
-  [role='button'] {
+  [role="button"] {
     color: ButtonText !important;
     background-color: ButtonFace !important;
     border: 2px solid currentcolor !important;
