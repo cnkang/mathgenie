@@ -8,7 +8,6 @@
 
 import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
-import { runInNewContext } from 'vm';
 
 interface TranslationObject {
   [key: string]: string | TranslationObject;
@@ -50,23 +49,27 @@ function flattenTranslations(obj: TranslationObject, prefix = ''): Record<string
 /**
  * Load and parse a translation file
  */
-function loadTranslationFile(language: string): Record<string, string> {
+async function loadTranslationFile(language: string): Promise<Record<string, string>> {
   try {
+    // Sanitize language parameter to prevent path traversal
+    if (!/^[a-z]{2}$/.test(language)) {
+      throw new Error(`Invalid language code: ${language}`);
+    }
     const filePath = join(TRANSLATIONS_DIR, `${language}.ts`);
-    const content = readFileSync(filePath, 'utf-8');
+    
+    // Additional path traversal protection
+    if (!filePath.startsWith(TRANSLATIONS_DIR)) {
+      throw new Error(`Invalid file path: ${filePath}`);
+    }
+    
+    const module = await import(filePath);
+    const translations = module.default as TranslationObject;
 
-    // Extract the default export object
-    const regex = /export default\s+({[\s\S]*})\s*as const;?/;
-    const match = regex.exec(content);
-    if (!match) {
-      throw new Error(`Could not parse translation file for ${language}`);
+    // Validate the imported object structure
+    if (typeof translations !== 'object' || translations == null || Array.isArray(translations)) {
+      throw new Error('Invalid translation object structure');
     }
 
-    const translations = runInNewContext(
-      `(${match[1]})`,
-      {},
-      { timeout: 1000 }
-    ) as TranslationObject;
     return flattenTranslations(translations);
   } catch (error) {
     throw new Error(`Failed to load translations for ${language}: ${error}`);
@@ -123,7 +126,7 @@ function checkParameterConsistency(
 /**
  * Load translation files and return translations with available languages
  */
-function loadTranslations(): { translations: Record<string, Record<string, string>>; availableLanguages: string[] } {
+async function loadTranslations(): Promise<{ translations: Record<string, Record<string, string>>; availableLanguages: string[] }> {
   const files = readdirSync(TRANSLATIONS_DIR);
   const translationFiles = files.filter(file => file.endsWith('.ts'));
   
@@ -134,11 +137,16 @@ function loadTranslations(): { translations: Record<string, Record<string, strin
   const translations: Record<string, Record<string, string>> = {};
   const availableLanguages: string[] = [];
 
-  for (const file of translationFiles) {
+  const loadPromises = translationFiles.map(async (file) => {
     const lang = file.replace('.ts', '');
     availableLanguages.push(lang);
-    translations[lang] = loadTranslationFile(lang);
-  }
+    translations[lang] = await loadTranslationFile(lang);
+  });
+
+  await Promise.all(loadPromises);
+
+  // Sort availableLanguages to have a consistent order
+  availableLanguages.sort();
 
   return { translations, availableLanguages };
 }
@@ -189,7 +197,7 @@ function checkEmptyTranslations(translations: Record<string, Record<string, stri
   
   for (const [lang, langTranslations] of Object.entries(translations)) {
     for (const [key, value] of Object.entries(langTranslations)) {
-      if (!value || value.trim() === '') {
+      if (!value || (typeof value === 'string' && value.trim() === '')) {
         warnings.push(`${lang}.${key}: Empty translation`);
       }
     }
@@ -201,7 +209,7 @@ function checkEmptyTranslations(translations: Record<string, Record<string, stri
 /**
  * Validate all translation files
  */
-function validateTranslations(): ValidationResult {
+async function validateTranslations(): Promise<ValidationResult> {
   const result: ValidationResult = {
     isValid: true,
     errors: [],
@@ -214,7 +222,7 @@ function validateTranslations(): ValidationResult {
   };
 
   try {
-    const { translations, availableLanguages } = loadTranslations();
+    const { translations, availableLanguages } = await loadTranslations();
     result.stats.languages = availableLanguages;
 
     // Check for missing supported languages
@@ -337,7 +345,7 @@ function generateReport(result: ValidationResult): string {
 async function main(): Promise<void> {
   console.log('🌐 Checking i18n translation completeness...\n');
 
-  const result = validateTranslations();
+  const result = await validateTranslations();
   const report = generateReport(result);
 
   console.log(report);
