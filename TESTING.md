@@ -60,6 +60,11 @@ pnpm test:smoke
 
 # E2E with UI (interactive debugging)
 pnpm test:e2e:ui
+
+# Advanced code quality analysis
+pnpm sonar:high              # HIGH priority issues only
+pnpm sonar:verbose           # Detailed output with rule explanations
+pnpm sonar:high:verbose      # HIGH priority with detailed output
 ```
 
 ## ⚙️ Test Configuration Optimization
@@ -157,6 +162,7 @@ pnpm test:unit:dev src/components/ComponentName.test.tsx
 3. Use `pnpm test:unit:dev` for detailed information when encountering issues
 4. **Write tests first** for new components to ensure coverage
 5. **Test accessibility** during development, not as an afterthought
+6. **Use MessageState objects** for new error/warning/success messages instead of strings
 
 ### Before Committing
 
@@ -188,17 +194,46 @@ pnpm test:unit:dev src/components/ComponentName.test.tsx
 // Example accessibility test
 test('should be accessible to screen readers', async () => {
   render(<Component />);
-  
+
   // Check ARIA labels
   expect(screen.getByLabelText('Submit form')).toBeInTheDocument();
-  
+
   // Verify keyboard navigation
   await user.tab();
   expect(screen.getByRole('button')).toHaveFocus();
-  
+
   // Run axe accessibility tests
   const results = await axe(container);
   expect(results).toHaveNoViolations();
+});
+```
+
+#### Message System Test Patterns
+
+```typescript
+// Testing MessageState objects (new approach)
+test('should handle error messages with translation keys', () => {
+  const mockSetError = vi.fn();
+
+  // Test MessageState object
+  mockSetError({ key: 'errors.validation.required', params: { field: 'name' } });
+  expect(mockSetError).toHaveBeenCalledWith({
+    key: 'errors.validation.required',
+    params: { field: 'name' },
+  });
+
+  // Test clearing messages
+  mockSetError({ key: '' });
+  expect(mockSetError).toHaveBeenCalledWith({ key: '' });
+});
+
+// Testing legacy string support
+test('should support legacy string messages', () => {
+  const mockSetError = vi.fn();
+
+  // Legacy string support
+  mockSetError('Legacy error message');
+  expect(mockSetError).toHaveBeenCalledWith('Legacy error message');
 });
 ```
 
@@ -220,6 +255,160 @@ pnpm test:watch
 # Coverage report
 pnpm test:coverage
 ```
+
+#### Hook Testing Patterns
+
+MathGenie uses a balanced hook architecture that requires specific testing approaches:
+
+**Simplified Hook Testing (for focused hooks like `useProblemGenerator`)**:
+
+```typescript
+describe('useProblemGenerator', () => {
+  test('should generate problems and return success message', () => {
+    const validateSettings = vi.fn(() => '');
+    const { result } = renderHook(() => useProblemGenerator(settings, false, validateSettings));
+
+    let messages: ReturnType<typeof result.current.generateProblems>;
+
+    act(() => {
+      messages = result.current.generateProblems();
+    });
+
+    expect(result.current.problems).toHaveLength(2);
+    expect(messages.successMessage).toEqual({
+      key: 'messages.success.problemsGenerated',
+      params: { count: 2 },
+    });
+  });
+
+  test('should handle validation errors', () => {
+    const validateSettings = vi.fn(() => 'errors.noOperations');
+    const { result } = renderHook(() => useProblemGenerator(settings, false, validateSettings));
+
+    let messages: ReturnType<typeof result.current.generateProblems>;
+
+    act(() => {
+      messages = result.current.generateProblems();
+    });
+
+    expect(messages.error).toEqual({ key: 'errors.noOperations' });
+  });
+
+  test('should prevent generation during loading state', () => {
+    const validateSettings = vi.fn(() => '');
+    const { result } = renderHook(() => useProblemGenerator(settings, true, validateSettings)); // isLoading = true
+
+    let messages: ReturnType<typeof result.current.generateProblems>;
+
+    act(() => {
+      messages = result.current.generateProblems();
+    });
+
+    expect(messages).toEqual({ error: '', warning: '', successMessage: '' });
+    expect(validateSettings).not.toHaveBeenCalled();
+  });
+});
+```
+
+**Composable Hook Testing (for complex multi-concern hooks)**:
+
+```typescript
+// Test helper hooks indirectly through main hooks
+describe('useAppHandlers', () => {
+  test('should handle validation feedback correctly', () => {
+    // Test the composed behavior of useValidationFeedback
+    const { result } = renderHook(() => useAppHandlers(...));
+
+    act(() => {
+      result.current.handleChange('numProblems', invalidValue);
+    });
+
+    expect(mockSetError).toHaveBeenCalledWith({ key: 'validation.error' });
+  });
+
+  test('should skip validation during loading', () => {
+    // Test the composed behavior of useFieldValidation
+    const { result } = renderHook(() => useAppHandlers(..., true)); // isLoading
+
+    act(() => {
+      result.current.handleChange('numProblems', value);
+    });
+
+    expect(mockValidateSettings).not.toHaveBeenCalled();
+  });
+
+  test('should handle settings changes with proper validation', () => {
+    // Test the composed behavior of useSettingsChangeHandler
+    const { result } = renderHook(() => useAppHandlers(...));
+
+    act(() => {
+      result.current.handleChange('operations', ['+', '-']);
+    });
+
+    expect(mockSetSettings).toHaveBeenCalledWith(
+      expect.objectContaining({ operations: ['+', '-'] })
+    );
+    expect(mockClearMessages).toHaveBeenCalled();
+  });
+
+  test('should handle preset application with success message', () => {
+    // Test the composed behavior of usePresetHandler
+    const { result } = renderHook(() => useAppHandlers(...));
+    const presetSettings = { operations: ['*'], numProblems: 10 };
+
+    act(() => {
+      result.current.handleApplyPreset(presetSettings);
+    });
+
+    expect(mockSetSettings).toHaveBeenCalledWith(presetSettings);
+    expect(mockSetSuccessMessage).toHaveBeenCalledWith({
+      key: 'messages.info.presetApplied',
+      params: { name: 'Preset' }
+    });
+  });
+
+  test('should not show success message during loading state', () => {
+    // Test loading state handling in preset application
+    const { result } = renderHook(() => useAppHandlers(..., true)); // isLoading
+    const presetSettings = { operations: ['*'], numProblems: 10 };
+
+    act(() => {
+      result.current.handleApplyPreset(presetSettings);
+    });
+
+    expect(mockSetSettings).toHaveBeenCalledWith(presetSettings);
+    expect(mockSetSuccessMessage).not.toHaveBeenCalled();
+  });
+});
+```
+
+**Key Testing Principles**:
+
+**For Simplified Hooks (like `useProblemGenerator`)**:
+
+- Test the main functionality through the hook's public API (`generateProblems`)
+- Verify loading state handling prevents unnecessary operations
+- Test validation error handling and message generation
+- Test auto-regeneration behavior through useEffect
+- Ensure proper state management and callback memoization
+
+**For Composable Hooks (like `useAppHandlers`)**:
+
+- Test composed behavior through public APIs (handleChange, handleApplyPreset)
+- Verify loading state handling in validation and preset hooks
+- Test error and warning message generation with MessageState objects
+- Test settings change handling with proper validation flow
+- Test preset application with success messaging
+- Ensure proper callback dependencies and memoization
+- Verify message clearing behavior in all scenarios
+
+**Common Testing Patterns**:
+
+- Always test both success and error scenarios
+- Verify loading state handling across all hook types
+- Test MessageState object generation for internationalization
+- Ensure proper cleanup and state management
+- Test callback dependencies and memoization behavior
 
 ### 2. End-to-End Tests
 
@@ -282,18 +471,21 @@ pnpm test:mobile:e2e
 ### 4. Supported Mobile Devices
 
 **iPhone Models:**
+
 - iPhone 16 Pro Max, iPhone 16 Pro, iPhone 16
 - iPhone 15 Pro Max, iPhone 15 Pro, iPhone 15
 - iPhone 14 Pro Max, iPhone 14 Pro
 - iPhone 13 Pro
 
 **iPad Models:**
+
 - Large iPad (custom 1366x1024) - Portrait & Landscape
 - iPad Pro 11" (2024) - Portrait & Landscape
 - iPad Air (2024) - Portrait & Landscape
 - iPad (2024) - Portrait & Landscape
 
 **Android Models:**
+
 - Samsung Galaxy S24, Galaxy S23
 - Galaxy Tab S9 Landscape
 
@@ -416,6 +608,158 @@ pnpm test:accessibility:mobile
 - **Retries**: 2 retries on failure
 - **Parallel Workers**: 6 workers for optimal performance
 - **Browser Engines**: Chromium, Firefox, WebKit
+
+### Advanced Code Quality Analysis
+
+The advanced Sonar checker provides static analysis focusing on maintainability metrics:
+
+#### Supported HIGH Priority Rules
+
+- **typescript:S3776**: Cognitive Complexity (max: 15)
+- **typescript:S138**: Function Length (max: 50 lines)
+- **typescript:S107**: Parameter Count (max: 7 parameters)
+- **typescript:S3800**: Return Statements (max: 3)
+- **typescript:S134**: Nesting Level (max: 3 levels)
+- **typescript:S1067**: Expression Complexity (max: 3 operators)
+- **typescript:S1871**: Identical Expressions detection
+
+#### Usage Examples
+
+```bash
+# Quick HIGH priority check (recommended for daily use)
+pnpm sonar:high
+
+# Comprehensive check (all rules)
+pnpm sonar:check
+
+# Detailed HIGH priority analysis
+pnpm sonar:high:verbose
+
+# Detailed analysis of all rules
+pnpm sonar:verbose
+```
+
+#### Documentation
+
+For detailed usage and integration patterns, see [SonarQube Commands Guide](docs/SONAR_COMMANDS.md).
+
+#### Implementation
+
+The SonarQube checker is implemented in `scripts/sonar-check.ts` and provides:
+
+- **Static Analysis**: Analyzes TypeScript/TSX files for quality issues
+- **Priority Filtering**: Focus on HIGH priority issues with `--high` flag
+- **Detailed Output**: Verbose reporting with `--verbose` flag
+- **ESLint Integration**: Checks for unused variables and other ESLint rules
+- **File Grouping**: Organizes results by file for easy navigation
+
+### Message System Testing
+
+#### MessageValue Type Testing
+
+The application uses a sophisticated message system that supports both legacy strings and new `MessageState` objects:
+
+```typescript
+// MessageValue type definition
+export type MessageValue = string | MessageState;
+
+export interface MessageState {
+  key: string; // Translation key
+  params?: Record<string, string | number>; // Optional parameters
+}
+```
+
+#### Testing Message Handlers
+
+When testing components that use the message system, ensure tests cover both formats:
+
+```typescript
+// Test MessageState objects (recommended approach)
+expect(mockSetError).toHaveBeenCalledWith({
+  key: 'errors.validation.invalidRange',
+  params: { min: 1, max: 100 },
+});
+
+// Test clearing messages
+expect(mockSetError).toHaveBeenCalledWith({ key: '' });
+expect(mockSetWarning).toHaveBeenCalledWith({ key: '' });
+
+// Test legacy string support (backward compatibility)
+expect(mockSetError).toHaveBeenCalledWith('Legacy error message');
+```
+
+#### Internationalization Testing Requirements
+
+- **Translation Key Validation**: Verify all message keys exist in translation files
+- **Parameter Interpolation**: Test dynamic parameter substitution
+- **Fallback Behavior**: Ensure graceful handling of missing translations
+- **Type Safety**: Verify TypeScript compliance for message objects
+
+#### Migration Guide for Existing Tests
+
+When updating tests that use the message system, change from string expectations to MessageState objects:
+
+```typescript
+// ❌ Old approach (will fail)
+expect(mockSetError).toHaveBeenCalledWith('');
+expect(mockSetWarning).toHaveBeenCalledWith('');
+
+// ✅ New approach (correct)
+expect(mockSetError).toHaveBeenCalledWith({ key: '' });
+expect(mockSetWarning).toHaveBeenCalledWith({ key: '' });
+
+// ✅ For messages with content
+expect(mockSetError).toHaveBeenCalledWith({
+  key: 'errors.validation.required',
+  params: { field: 'name' },
+});
+```
+
+#### Testing Data Validation Patterns
+
+When testing components that handle data validation (like settings), ensure comprehensive coverage:
+
+```typescript
+// Test valid data handling
+test('should handle valid settings data', () => {
+  const validSettings = { operations: ['+', '-'], numProblems: 20 };
+  const result = validateAndMergeSettings(validSettings);
+  expect(result.operations).toEqual(['+', '-']);
+});
+
+// Test invalid data recovery
+test('should recover from invalid array data', () => {
+  const invalidSettings = { operations: 'not-an-array' };
+  const result = validateAndMergeSettings(invalidSettings);
+  expect(result.operations).toEqual(defaultSettings.operations);
+});
+
+// Test localStorage error recovery
+test('should handle localStorage corruption gracefully', () => {
+  localStorage.setItem('test-key', 'invalid-json{');
+  const result = loadSettings();
+  expect(result).toEqual(defaultSettings);
+  expect(localStorage.getItem('test-key')).toBeNull(); // Should be cleared
+});
+
+// Test type guard functions
+test('should validate arrays correctly', () => {
+  expect(isValidArray([1, 2, 3])).toBe(true);
+  expect(isValidArray([1, 2], 2)).toBe(true);
+  expect(isValidArray([1, 2], 3)).toBe(false);
+  expect(isValidArray('not-array')).toBe(false);
+});
+
+// Test operation-specific validation
+test('should validate operation arrays correctly', () => {
+  expect(isValidOperationArray(['+', '-'])).toBe(true);
+  expect(isValidOperationArray(['×', '÷'])).toBe(true);
+  expect(isValidOperationArray(['*', '/'])).toBe(true);
+  expect(isValidOperationArray(['invalid'])).toBe(false);
+  expect(isValidOperationArray('not-array')).toBe(false);
+  expect(isValidOperationArray(['+', 123])).toBe(false);
+});
+```
 
 ### Test Optimization Strategy
 
@@ -540,11 +884,13 @@ pnpm test:e2e:error-handling   # Error handling and validation
 ### Performance Optimization
 
 **Test Execution Speed**:
+
 - Run tests in parallel when possible
 - Use `test.describe.configure({ mode: 'parallel' })` for independent tests
 - Optimize test setup and teardown
 
 **Resource Usage**:
+
 - Close browser contexts properly
 - Clean up test data between runs
 - Monitor memory usage during long test runs
