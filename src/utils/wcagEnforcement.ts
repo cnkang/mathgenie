@@ -22,9 +22,15 @@ const INTERACTIVE_SELECTORS = [
   '[onclick]',
 ] as const;
 
-const isInteractive = (node: Node): boolean =>
-  node instanceof Element &&
-  node.matches('button, input, select, textarea, a, [role="button"], [tabindex], [onclick]');
+const INTERACTIVE_SELECTOR =
+  'button, input, select, textarea, a, [role="button"], [tabindex], [onclick]';
+
+const isInteractive = (node: Node): boolean => {
+  if (!(node instanceof Element)) {
+    return false;
+  }
+  return node.matches(INTERACTIVE_SELECTOR);
+};
 
 const isVisible = (el: HTMLElement): boolean => {
   const style = window.getComputedStyle(el);
@@ -178,34 +184,39 @@ export const enforceWCAGTouchTargets = (): void => {
   }
 };
 
-export const setupWCAGEnforcement = (): (() => void) => {
-  if (inNonBrowser()) {
-    return () => {};
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', enforceWCAGTouchTargets);
-  } else {
-    enforceWCAGTouchTargets();
-  }
+const hasAddedInteractiveNodes = (mutation: MutationRecord): boolean => {
+  return mutation.type === 'childList' && Array.from(mutation.addedNodes).some(isInteractive);
+};
 
+const hasElementBecomeVisible = (mutation: MutationRecord): boolean => {
+  return (
+    mutation.type === 'attributes' &&
+    mutation.target instanceof HTMLElement &&
+    isVisible(mutation.target)
+  );
+};
+
+const shouldTriggerMutation = (mutation: MutationRecord): boolean => {
+  return hasAddedInteractiveNodes(mutation) || hasElementBecomeVisible(mutation);
+};
+
+const hasRelevantMutation = (mutations: MutationRecord[]): boolean =>
+  mutations.some(shouldTriggerMutation);
+
+const createMutationObserver = (mutationHandler: () => void): MutationObserver => {
+  return new MutationObserver(mutations => {
+    if (hasRelevantMutation(mutations)) {
+      mutationHandler();
+    }
+  });
+};
+
+const setupEventListeners = () => {
   const resizeHandler = debounce(enforceWCAGTouchTargets, 250);
   window.addEventListener('resize', resizeHandler);
 
   const mutationHandler = debounce(enforceWCAGTouchTargets, 100);
-  const observer = new MutationObserver(mutations => {
-    for (const mutation of mutations) {
-      const addedInteractive =
-        mutation.type === 'childList' && Array.from(mutation.addedNodes).some(isInteractive);
-      const becameVisible =
-        mutation.type === 'attributes' &&
-        mutation.target instanceof HTMLElement &&
-        isVisible(mutation.target);
-      if (addedInteractive || becameVisible) {
-        mutationHandler();
-        break;
-      }
-    }
-  });
+  const observer = createMutationObserver(mutationHandler);
 
   observer.observe(document.body, {
     childList: true,
@@ -214,7 +225,24 @@ export const setupWCAGEnforcement = (): (() => void) => {
     attributeFilter: ['style', 'class', STR_HIDDEN],
   });
 
-  // Cleanup function
+  return { observer, resizeHandler, mutationHandler };
+};
+
+const isServerSideRendering = (): boolean => inNonBrowser();
+
+export const setupWCAGEnforcement = (): (() => void) => {
+  if (isServerSideRendering()) {
+    return () => {};
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', enforceWCAGTouchTargets);
+  } else {
+    enforceWCAGTouchTargets();
+  }
+
+  const { observer, resizeHandler, mutationHandler } = setupEventListeners();
+
   return () => {
     observer.disconnect();
     window.removeEventListener('resize', resizeHandler);
