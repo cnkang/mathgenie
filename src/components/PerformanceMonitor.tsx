@@ -54,27 +54,35 @@ const PerformanceMonitor: FC<PerformanceMonitorProps> = ({ children }) => {
   return children ? <>{children}</> : null;
 };
 
+const reportMetrics = (
+  isProd: boolean,
+  devLogger: ((...args: unknown[]) => void) | undefined,
+  entry: PerformanceEntryWithValue
+): void => {
+  const value = entry.value ?? entry.duration;
+  if (devLogger) {
+    devLogger(`${entry.name}: ${value}ms`);
+    return;
+  }
+
+  if (isProd && window.gtag) {
+    window.gtag('event', 'web_vitals', {
+      event_category: 'Performance',
+      event_label: entry.name,
+      value: Math.round(value || 0),
+      non_interaction: true,
+    });
+  }
+};
+
 const createPerformanceObserver = (
   isProd: boolean,
   devLogger?: (...args: unknown[]) => void
 ): PerformanceObserver => {
-  const reportEntry = (entry: PerformanceEntry): void => {
-    const entryWithValue = entry as PerformanceEntryWithValue;
-    const value = entryWithValue.value ?? entry.duration;
-    if (devLogger) {
-      devLogger(`${entry.name}: ${value}ms`);
-    } else if (isProd && window.gtag) {
-      window.gtag('event', 'web_vitals', {
-        event_category: 'Performance',
-        event_label: entry.name,
-        value: Math.round(value || 0),
-        non_interaction: true,
-      });
-    }
-  };
-
   return new PerformanceObserver(list => {
-    list.getEntries().forEach(reportEntry);
+    list.getEntries().forEach(entry => {
+      reportMetrics(isProd, devLogger, entry as PerformanceEntryWithValue);
+    });
   });
 };
 

@@ -244,7 +244,7 @@ describe('useErrorHandler', () => {
       );
     }).not.toThrow();
 
-    expect(consoleSpy).toHaveBeenCalledWith('Application error:', expect.any(Error));
+    expect(consoleSpy).toHaveBeenCalledWith('Application error:', 'Test error');
 
     consoleSpy.mockRestore();
   });

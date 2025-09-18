@@ -1,0 +1,23 @@
+# Serena MCP - Cache and temporary files
+/cache
+cache/
+
+# Temporary analysis files
+analysis-*.json
+analysis-*.md
+
+# Debug and diagnostic files
+debug-*.log
+diagnostic-*.json
+
+# Temporary memory files (keep actual memories)
+temp-memory-*.md
+backup-memory-*.md
+
+# Project analysis cache
+project-analysis/
+code-analysis/
+
+# Temporary configuration
+temp-config.yml
+backup-config.yml

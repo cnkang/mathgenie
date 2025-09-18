@@ -47,6 +47,7 @@ describe('ErrorMessage', () => {
     ['', null],
     [null, null],
     [undefined, null],
+    [{ key: '' }, null], // Test empty key case
   ] as Array<[MessageValue | null | undefined, null]>)(
     'does not render when error is %s',
     (error, expected) => {

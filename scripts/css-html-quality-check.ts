@@ -6,11 +6,11 @@
  * Usage: tsx scripts/css-html-quality-check.ts [--fix]
  */
 
-import { SpawnSyncReturns } from 'child_process';
+import { SpawnSyncReturns, spawnSync } from 'child_process';
 import { existsSync } from 'fs';
-import path from 'path';
 import { pathToFileURL } from 'node:url';
-import { spawnNodeCli } from './exec-utils';
+import path from 'path';
+import { buildSafeEnv } from './exec-utils';
 
 // Parse command line arguments
 const args = process.argv.slice(2);
@@ -24,18 +24,6 @@ const INVALID_HTML_PATTERNS = 'Invalid HTML file patterns' as const;
 const STYLELINT_TOOL = 'stylelint' as const;
 const HTML_VALIDATE_TOOL = 'html-validate' as const;
 // spawn options are provided per-call in spawnNodeCli
-
-/**
- * Build a sanitized environment for child processes
- * - Removes dangerous variables to prevent library injection
- * - Sets a fixed PATH containing only system directories (no writable dirs)
- */
-export { buildSafeEnv } from './exec-utils';
-
-/**
- * Resolve the absolute path to a package's bin script to avoid PATH lookups.
- */
-export { resolveBin } from './exec-utils';
 
 /**
  * Creates a failed result object
@@ -65,27 +53,39 @@ export function validateFilePatterns(patterns: string[]): boolean {
   const allowedPattern = /^[a-zA-Z0-9_\-./*]+$/;
   const dangerousPattern = /[;&|`$(){}[\]<>?~]/;
 
-  return patterns.every(pattern => {
+  let errorMessage = '';
+  let invalidPattern = '';
+
+  const allValid = patterns.every(pattern => {
     if (!allowedPattern.test(pattern)) {
-      console.error(`❌ Invalid file pattern: ${pattern}`);
+      errorMessage = '❌ Invalid file pattern';
+      invalidPattern = pattern;
       return false;
     }
     if (dangerousPattern.test(pattern)) {
-      console.error(`❌ Dangerous characters in pattern: ${pattern}`);
+      errorMessage = '❌ Dangerous characters in pattern';
+      invalidPattern = pattern;
       return false;
     }
     if (pattern.length > 200) {
-      console.error(`❌ Pattern too long: ${pattern}`);
+      errorMessage = '❌ Pattern too long';
+      invalidPattern = pattern;
       return false;
     }
     return true;
   });
+
+  if (!allValid) {
+    console.error(`${errorMessage}: ${sanitizeLogOutput(invalidPattern)}`);
+  }
+
+  return allValid;
 }
 
 /**
  * Checks if stylelint execution was successful
  */
-function isStylelintSuccess(result: SpawnSyncReturns<string>): boolean {
+function isToolSuccess(result: SpawnSyncReturns<string>): boolean {
   return result.status === 0 || (result.status === null && result.signal === null && !result.error);
 }
 
@@ -115,10 +115,10 @@ function handleStylelintFailure(result: SpawnSyncReturns<string>): QualityCheckR
     : '❌ Stylelint: Found CSS quality issues';
   console.log(message);
   if (result.stdout) {
-    console.log(result.stdout);
+    console.log(sanitizeLogOutput(result.stdout));
   }
   if (result.stderr) {
-    console.error(result.stderr);
+    console.error(sanitizeLogOutput(result.stderr));
   }
   return createFailedResult(STYLELINT_TOOL, result.stdout || result.stderr || UNKNOWN_ERROR);
 }
@@ -137,35 +137,62 @@ function runStylelint(): QualityCheckResult {
   }
 
   try {
-    // Execute stylelint via the Node binary with an absolute bin script path
+    // Use npx to run stylelint directly
     const stylelintArgs = [
+      'stylelint',
       ...cssPatterns,
       '--formatter',
       'string',
       ...(shouldFix ? ['--fix'] : []),
     ];
 
-    const result = spawnNodeCli(STYLELINT_TOOL, STYLELINT_TOOL, stylelintArgs, {
+    const result = spawnSync('npx', stylelintArgs, {
       encoding: 'utf8',
       stdio: 'pipe',
-      removePath: true,
+      shell: false,
       timeout: 60000,
+      env: buildSafeEnv({ removePath: false }),
     });
 
-    return isStylelintSuccess(result)
-      ? handleStylelintSuccess(result)
-      : handleStylelintFailure(result);
+    return isToolSuccess(result) ? handleStylelintSuccess(result) : handleStylelintFailure(result);
   } catch (error: unknown) {
+    console.error('❌ Stylelint execution failed:', error);
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('❌ Stylelint execution failed:', errorMessage);
     return createFailedResult(STYLELINT_TOOL, errorMessage);
   }
 }
 
 /**
+ * Handles html-validate success result
+ */
+function handleHtmlValidateSuccess(result: SpawnSyncReturns<string>): QualityCheckResult {
+  console.log('✅ html-validate: All HTML files passed quality checks');
+  return {
+    tool: HTML_VALIDATE_TOOL,
+    status: 'passed',
+    errors: 0,
+    warnings: 0,
+    output: result.stdout,
+  };
+}
+
+/**
+ * Handles html-validate failure result
+ */
+function handleHtmlValidateFailure(result: SpawnSyncReturns<string>): QualityCheckResult {
+  console.log('❌ html-validate: Found HTML quality issues');
+  if (result.stdout) {
+    console.log(sanitizeLogOutput(result.stdout));
+  }
+  if (result.stderr) {
+    console.error(sanitizeLogOutput(result.stderr));
+  }
+  return createFailedResult(HTML_VALIDATE_TOOL, result.stdout || result.stderr || UNKNOWN_ERROR);
+}
+
+/**
  * Runs html-validate for HTML quality checking
  */
-
 function runHTMLValidate(): QualityCheckResult {
   console.log('🌐 Running html-validate for HTML quality check...');
 
@@ -176,44 +203,52 @@ function runHTMLValidate(): QualityCheckResult {
   }
 
   try {
-    const args = [...htmlPatterns];
-    const result = spawnNodeCli(HTML_VALIDATE_TOOL, HTML_VALIDATE_TOOL, args, {
+    const args = ['html-validate', ...htmlPatterns];
+    const result = spawnSync('npx', args, {
       encoding: 'utf8',
       stdio: 'pipe',
-      removePath: true,
+      shell: false,
       timeout: 60000,
+      env: buildSafeEnv({ removePath: false }),
     });
 
-    // Handle successful execution (status 0 or null with no error/signal)
-    if (
-      result.status === 0 ||
-      (result.status === null && result.signal === null && !result.error)
-    ) {
-      console.log('✅ html-validate: All HTML files passed quality checks');
-      return {
-        tool: HTML_VALIDATE_TOOL,
-        status: 'passed',
-        errors: 0,
-        warnings: 0,
-        output: result.stdout,
-      };
-    } else {
-      console.log('❌ html-validate: Found HTML quality issues');
-      if (result.stdout) {
-        console.log(result.stdout);
-      }
-      if (result.stderr) {
-        console.error(result.stderr);
-      }
-      return createFailedResult(
-        HTML_VALIDATE_TOOL,
-        result.stdout || result.stderr || UNKNOWN_ERROR
-      );
-    }
+    return isToolSuccess(result)
+      ? handleHtmlValidateSuccess(result)
+      : handleHtmlValidateFailure(result);
   } catch (error: unknown) {
+    console.error('❌ html-validate execution failed:', error);
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('❌ html-validate execution failed:', errorMessage);
     return createFailedResult(HTML_VALIDATE_TOOL, errorMessage);
+  }
+}
+
+/**
+ * Sanitizes log output to prevent log injection attacks
+ */
+function sanitizeLogOutput(input: string): string {
+  // Keep only printable ASCII characters and replace newlines/tabs with spaces
+  const sanitized = input.replace(/[\n\t]/g, ' ').replace(/[^ -~]/g, '');
+  return sanitized.replace(/\s+/g, ' ').trim().substring(0, 100);
+}
+
+export function isExecutedDirectly(
+  argv: string[] = process.argv,
+  moduleUrl: string = import.meta.url
+): boolean {
+  if (!Array.isArray(argv) || argv.length < 2) {
+    return false;
+  }
+
+  const invokedPath = argv[1];
+  if (typeof invokedPath !== 'string' || invokedPath.length === 0) {
+    return false;
+  }
+
+  try {
+    const absolutePath = path.isAbsolute(invokedPath) ? invokedPath : path.resolve(invokedPath);
+    return moduleUrl === pathToFileURL(absolutePath).href;
+  } catch {
+    return false;
   }
 }
 
@@ -230,7 +265,10 @@ function generateReport(results: QualityCheckResult[]): void {
 
   results.forEach(result => {
     const status = result.status === 'passed' ? '✅' : '❌';
-    console.log(`${status} ${result.tool}: ${result.status.toUpperCase()}`);
+    const sanitizedTool = sanitizeLogOutput(result.tool);
+    const sanitizedStatus = sanitizeLogOutput(result.status.toUpperCase());
+
+    console.log(`${status} ${sanitizedTool}: ${sanitizedStatus}`);
     console.log(`   Errors: ${result.errors}, Warnings: ${result.warnings}`);
 
     totalErrors += result.errors;
@@ -289,6 +327,6 @@ function main(): void {
 }
 
 // Run only when executed directly (not when imported for tests)
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (isExecutedDirectly()) {
   main();
 }

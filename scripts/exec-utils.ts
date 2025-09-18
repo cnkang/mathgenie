@@ -1,9 +1,9 @@
 #!/usr/bin/env tsx
 
-import { spawnSync, SpawnSyncReturns, SpawnSyncOptions } from 'node:child_process';
+import { SpawnSyncOptions, SpawnSyncReturns, spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import path from 'node:path';
 import { createRequire } from 'node:module';
+import path from 'node:path';
 
 const require = createRequire(import.meta.url);
 
@@ -23,8 +23,9 @@ export function buildSafeEnv(opts: SafeEnvOptions = {}): Record<string, string> 
 
   const baseEnv: Record<string, string> = {};
   for (const [k, v] of Object.entries(process.env)) {
-    if (dangerousVars.includes(k)) continue;
-    if (typeof v === 'string') baseEnv[k] = v;
+    if (!dangerousVars.includes(k) && typeof v === 'string') {
+      baseEnv[k] = v;
+    }
   }
 
   if (removePath) {
@@ -35,22 +36,50 @@ export function buildSafeEnv(opts: SafeEnvOptions = {}): Record<string, string> 
   return baseEnv;
 }
 
+function validateBinPath(binPath: string): string {
+  if (!binPath || typeof binPath !== 'string') {
+    throw new Error('Invalid bin path');
+  }
+  // Prevent path traversal
+  if (binPath.includes('..') || path.isAbsolute(binPath)) {
+    throw new Error(`Unsafe bin path: ${binPath}`);
+  }
+  return binPath;
+}
+
 export function resolveBin(pkgName: string, binName?: string): string {
+  // Validate package name to prevent path traversal
+  if (
+    !pkgName ||
+    typeof pkgName !== 'string' ||
+    pkgName.includes('..') ||
+    pkgName.includes('/') ||
+    pkgName.includes('\\')
+  ) {
+    throw new Error(`Invalid package name: ${pkgName}`);
+  }
+
   const pkgJsonPath = require.resolve(`${pkgName}/package.json`);
   const pkgDir = path.dirname(pkgJsonPath);
   const raw = readFileSync(pkgJsonPath, 'utf8');
   const pkg = JSON.parse(raw) as { name?: string; bin?: string | Record<string, string> };
   const binField = pkg.bin;
 
-  if (typeof binField === 'string') return path.resolve(pkgDir, binField);
+  if (typeof binField === 'string') {
+    return path.resolve(pkgDir, validateBinPath(binField));
+  }
 
   if (binField && typeof binField === 'object') {
-    if (binName && typeof binField[binName] === 'string')
-      return path.resolve(pkgDir, binField[binName]);
-    if (pkg.name && typeof binField[pkg.name] === 'string')
-      return path.resolve(pkgDir, binField[pkg.name]);
+    if (binName && typeof binField[binName] === 'string') {
+      return path.resolve(pkgDir, validateBinPath(binField[binName]));
+    }
+    if (pkg.name && typeof binField[pkg.name] === 'string') {
+      return path.resolve(pkgDir, validateBinPath(binField[pkg.name]));
+    }
     const values = Object.values(binField).filter((v): v is string => typeof v === 'string');
-    if (values.length === 1) return path.resolve(pkgDir, values[0]);
+    if (values.length === 1) {
+      return path.resolve(pkgDir, validateBinPath(values[0]));
+    }
   }
 
   const suffix = binName ? ` (bin: ${binName})` : '';
@@ -62,6 +91,21 @@ export type SpawnNodeCliOptions = Omit<SpawnSyncOptions, 'shell' | 'env' | 'enco
   encoding?: 'utf8';
   stdio?: 'pipe' | 'inherit' | 'ignore';
 };
+
+function sanitizeArg(arg: unknown): arg is string {
+  if (typeof arg !== 'string' || arg.length === 0) {
+    return false;
+  }
+  // Block dangerous characters and patterns
+  if (/[;|&`$\n\r]/.test(arg)) {
+    return false;
+  }
+  // Block eval flags
+  if (arg.startsWith('-e') || arg.startsWith('--eval')) {
+    return false;
+  }
+  return true;
+}
 
 export function spawnNodeCli(
   pkg: string,
@@ -78,7 +122,15 @@ export function spawnNodeCli(
     timeout = 60000,
     ...rest
   } = options;
-  return spawnSync(nodeBin, [binPath, ...args], {
+
+  // Validate and sanitize arguments to prevent code injection
+  if (!Array.isArray(args)) {
+    throw new Error('Arguments must be an array');
+  }
+
+  const sanitizedArgs = args.filter(sanitizeArg);
+
+  return spawnSync(nodeBin, [binPath, ...sanitizedArgs], {
     encoding,
     stdio,
     shell: false,
