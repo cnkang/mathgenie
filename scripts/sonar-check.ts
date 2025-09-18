@@ -11,12 +11,17 @@
  * - typescript:S134: Nested Control Flow (HIGH)
  * - typescript:S1067: Expression Complexity (HIGH)
  * - typescript:S3800: Multiple Returns (HIGH)
+ *
+ * Security:
+ * - All regex patterns use bounded quantifiers to prevent ReDoS attacks
+ * - Character classes are limited to reasonable lengths (e.g., {0,500}, {1,10})
+ * - Whitespace matching uses specific character classes [ \t] instead of \s
  */
 
 import { ESLint } from 'eslint';
 import { readFileSync } from 'fs';
 import { glob } from 'glob';
-import path from 'path';
+import * as path from 'path';
 
 // ANSI color codes
 const colors = {
@@ -107,9 +112,9 @@ class SonarChecker {
     const lines = content.split('\n');
 
     const functionPatterns = [
-      /^\s*(?:export\s+)?(?:async\s+)?function\s+(\w+)/,
-      /^\s*(?:export\s+)?const\s+(\w+)\s*=\s*(?:async\s+)?\(/,
-      /^\s*(\w+)\s*\([^)]*\)\s*{/,
+      /^[ \t]{0,10}(?:export[ \t]{1,10})?(?:async[ \t]{1,10})?function[ \t]{1,10}(\w+)/,
+      /^[ \t]{0,10}(?:export[ \t]{1,10})?const[ \t]{1,10}(\w+)[ \t]{0,10}=[ \t]{0,10}(?:async[ \t]{1,10})?\(/,
+      /^[ \t]{0,10}(\w+)[ \t]{0,10}\([^)]{0,500}\)[ \t]{0,10}{/,
     ];
 
     for (let i = 0; i < lines.length; i++) {
@@ -164,7 +169,7 @@ class SonarChecker {
       .filter(line => line.trim() && !line.trim().startsWith('//'));
 
     // Count parameters
-    const paramMatch = functionContent.match(/\(([^)]*)\)/);
+    const paramMatch = functionContent.match(/\(([^)]{0,500})\)/);
     const parameters = paramMatch ? paramMatch[1].split(',').filter(p => p.trim()).length : 0;
 
     // Calculate cognitive complexity
@@ -178,7 +183,7 @@ class SonarChecker {
       /\bcatch\b/g,
       /&&/g,
       /\|\|/g,
-      /\?.*:/g,
+      /\?.{0,100}:/g,
     ];
 
     for (const pattern of complexityPatterns) {
@@ -202,7 +207,7 @@ class SonarChecker {
     }
 
     // Calculate expression complexity
-    const expressionComplexity = (functionContent.match(/&&|\|\||\?.*:/g) || []).length;
+    const expressionComplexity = (functionContent.match(/&&|\|\||\?.{0,100}:/g) || []).length;
 
     return {
       name,
@@ -296,7 +301,7 @@ class SonarChecker {
   }
 
   private checkIdenticalExpressions(filePath: string, content: string): void {
-    const ifPattern = /if\s*\(([^)]+)\)/g;
+    const ifPattern = /if[ \t]{0,10}\(([^)]{1,500})\)/g;
     const conditions: string[] = [];
     let match;
 
