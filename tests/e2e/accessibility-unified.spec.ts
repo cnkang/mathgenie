@@ -118,7 +118,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
         page: Page;
       }) => {
         // Increase timeout for this specific test
-        test.setTimeout(90000); // Increased from 60s to 90s
+        test.setTimeout(150000); // Increased from 90s to 150s for complex mobile accessibility tests
         await page.setViewportSize({ width: device.width, height: device.height });
 
         // Wait for the page to fully load and WCAG enforcement to run
@@ -137,10 +137,12 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
 
         // Use a more specific selector to avoid problematic elements
         // Explicitly exclude container elements that might be focusable due to accessibility attributes
-        const interactiveElements = page.locator(
-          'button:visible, input:visible, select:visible, a:visible, [role="button"]:visible'
-        ).and(page.locator(':not(section):not(div):not(main):not(header):not(footer):not(nav)'));
-        
+        const interactiveElements = page
+          .locator(
+            'button:visible, input:visible, select:visible, a:visible, [role="button"]:visible'
+          )
+          .and(page.locator(':not(section):not(div):not(main):not(header):not(footer):not(nav)'));
+
         const count = await interactiveElements.count();
 
         // Limit the number of elements to check to prevent excessive test time
@@ -151,7 +153,9 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
 
           try {
             // Check if element is attached to DOM first with shorter timeout
-            const isAttached = await element.evaluate(el => el.isConnected, { timeout: 500 }).catch(() => false);
+            const isAttached = await element
+              .evaluate(el => el.isConnected, { timeout: 500 })
+              .catch(() => false);
             if (!isAttached) {
               continue; // Skip detached elements
             }

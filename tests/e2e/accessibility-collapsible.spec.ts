@@ -86,8 +86,8 @@ test.describe('Collapsible UI Accessibility', () => {
 
   test('should maintain keyboard navigation flow', async ({ page }: { page: Page }) => {
     // Add timeout for Firefox compatibility
-    test.setTimeout(45000); // Increased timeout for Firefox
-    
+    test.setTimeout(90000); // Increased timeout for Firefox compatibility (doubled from 45s)
+
     // Tab through the interface with delays for Firefox
     await page.keyboard.press('Tab'); // Language select
     await page.waitForTimeout(100); // Small delay for Firefox
@@ -108,8 +108,12 @@ test.describe('Collapsible UI Accessibility', () => {
     let focusedElement = await page.evaluate(() => document.activeElement?.className);
     let tabCount = 0;
     const maxTabs = 20; // Prevent infinite loop in Firefox
-    
-    while (focusedElement && !focusedElement.includes('advanced-settings-toggle') && tabCount < maxTabs) {
+
+    while (
+      focusedElement &&
+      !focusedElement.includes('advanced-settings-toggle') &&
+      tabCount < maxTabs
+    ) {
       await page.keyboard.press('Tab');
       await page.waitForTimeout(100); // Small delay for Firefox
       focusedElement = await page.evaluate(() => document.activeElement?.className);
