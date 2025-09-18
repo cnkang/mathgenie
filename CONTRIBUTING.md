@@ -63,9 +63,10 @@ Thank you for your interest in contributing to MathGenie! This guide will help y
 
 2. **Maintain Quality**
    ```bash
-   pnpm lint      # Fix linting issues
-   pnpm type-check # Verify TypeScript compilation
-   pnpm test      # Run unit tests
+   pnpm lint           # Fix linting issues
+   pnpm type-check     # Verify TypeScript compilation
+   pnpm test           # Run unit tests
+   pnpm sonar:high     # Check for critical code quality issues
    ```
 
 ### Before Submitting
@@ -73,7 +74,8 @@ Thank you for your interest in contributing to MathGenie! This guide will help y
 1. **Complete Validation**
 
    ```bash
-   pnpm validate  # Full validation pipeline
+   pnpm validate       # Full validation pipeline
+   pnpm sonar:high     # Advanced code quality analysis
    ```
 
 2. **Update Documentation** (if needed)
@@ -112,6 +114,131 @@ Thank you for your interest in contributing to MathGenie! This guide will help y
 - **Prettier**: Consistent formatting required
 - **Naming**: Use descriptive, clear names for variables and functions
 - **Comments**: Add JSDoc for public APIs and complex logic
+- **Input Validation**: Use robust validation patterns like those in `useSettings` hook
+- **Error Handling**: Implement graceful fallbacks and proper error recovery
+
+#### Enhanced Code Quality (SonarQube Standards)
+
+- **Cognitive Complexity**: Keep functions under 15 cognitive complexity points
+- **Function Length**: Limit functions to 50 lines of code
+- **Parameter Count**: Maximum 7 parameters per function
+- **Return Statements**: Maximum 3 return statements per function
+- **Nesting Level**: Maximum 3 levels of nested control structures
+- **Expression Complexity**: Limit logical operators in expressions
+
+Use `pnpm sonar:high` to check for violations of these standards.
+
+#### Hook Architecture Patterns
+
+Follow the balanced hook architecture patterns established in the codebase:
+
+**Option 1: Simplified Internal Organization (for focused hooks like `useProblemGenerator`)**
+
+```typescript
+export const useProblemGenerator = (
+  settings: Settings,
+  isLoading: boolean,
+  validateSettings: (settings: Settings) => string
+) => {
+  const [problems, setProblems] = useState<Problem[]>([]);
+
+  // ✅ Organize complex logic with useCallback for performance
+  const processGeneration = useCallback(
+    (showSuccessMessage: boolean) => {
+      const validationError = validateSettings(settings);
+      if (validationError) {
+        return processValidationError(validationError);
+      }
+      return createGenerationOutcome({ settings, showSuccessMessage, setProblems });
+    },
+    [settings, validateSettings, setProblems]
+  );
+
+  const generateProblems = useCallback(
+    (showSuccessMessage: boolean = true) => {
+      if (isLoading) {
+        return { ...EMPTY_MESSAGES };
+      }
+      return processGeneration(showSuccessMessage);
+    },
+    [isLoading, processGeneration]
+  );
+
+  // Auto-regeneration effect
+  useEffect(() => {
+    if (!isLoading) {
+      generateProblems(false);
+    }
+  }, [settings, isLoading, validateSettings]);
+
+  return { problems, generateProblems };
+};
+```
+
+**Option 2: Modular Helper Hooks (for complex multi-concern hooks like `useAppLogic`)**
+
+```typescript
+// ✅ Extract complex logic into focused helper hooks
+const useValidationFeedback = (
+  validateSettings: (s: Settings) => string,
+  checkRestrictiveSettings: (s: Settings) => boolean,
+  setError: (msg: MessageValue) => void,
+  setWarning: (msg: MessageValue) => void
+) => {
+  return useCallback((pendingSettings: Settings): void => {
+    // Focused validation logic
+  }, [validateSettings, setError, checkRestrictiveSettings, setWarning]);
+};
+
+const useSettingsChangeHandler = (
+  settings: Settings,
+  setSettings: (s: Settings) => void,
+  clearMessages: () => void,
+  shouldValidateField: (field: keyof Settings) => boolean,
+  provideValidationFeedback: (settings: Settings) => void
+) => {
+  return useCallback(<K extends keyof Settings>(field: K, value: Settings[K]): void => {
+    // Settings change logic with validation
+  }, [settings, clearMessages, shouldValidateField, provideValidationFeedback, setSettings]);
+};
+
+// ✅ Compose helper hooks in main hook
+export const useAppHandlers = (...params) => {
+  const provideValidationFeedback = useValidationFeedback(...);
+  const shouldValidateField = useFieldValidation(...);
+
+  // Main hook logic using composed helpers for settings management
+  const handleChange = useCallback((field, value) => {
+    // Uses composed validation and change handling logic
+  }, [/* proper dependencies */]);
+
+  const handleApplyPreset = useCallback((presetSettings) => {
+    // Uses composed preset application logic
+  }, [/* proper dependencies */]);
+
+  return { handleChange, handleApplyPreset };
+};
+```
+
+**When to Use Each Pattern**:
+
+- **Simplified Internal Organization**: For hooks with a single primary concern (like problem generation)
+  - Use when the hook has focused responsibility (e.g., `useProblemGenerator`)
+  - Organize logic with internal `useCallback` functions for performance
+  - Keep all related logic within the hook for easier maintenance
+- **Modular Helper Hooks**: For hooks managing multiple related concerns (like app-wide state management)
+  - Use when the hook manages multiple distinct concerns
+  - Extract complex logic into focused helper hooks
+  - Compose helper hooks for maximum reusability
+
+**Benefits of both patterns**:
+
+- **Clear Organization**: Logic is well-structured and easy to follow
+- **Performance**: Proper memoization prevents unnecessary re-renders
+- **Testability**: Hook functionality can be tested through public APIs
+- **Type Safety**: Full TypeScript support with proper dependency tracking
+- **Maintainability**: Code is organized for long-term maintenance
+- **Flexibility**: Choose the pattern that best fits the hook's complexity and scope
 
 ### Testing Requirements
 
@@ -190,6 +317,58 @@ const message = 'This field is required';
 3. Use `t()` function in components
 4. Test language switching functionality
 
+#### Message System Architecture
+
+MathGenie uses a sophisticated message system that supports both legacy strings and new internationalized message objects:
+
+**MessageValue Type**:
+
+```typescript
+export type MessageValue = string | MessageState;
+
+export interface MessageState {
+  key: string; // Translation key (e.g., 'errors.validation.required')
+  params?: Record<string, string | number>; // Optional parameters for interpolation
+}
+```
+
+**Usage Patterns**:
+
+```typescript
+// ✅ Recommended: MessageState with translation key
+setError({ key: 'errors.validation.invalidRange', params: { min: 1, max: 100 } });
+setSuccessMessage({ key: 'messages.success.problemsGenerated', params: { count: 20 } });
+
+// ✅ Clear messages
+setError({ key: '' });
+setWarning({ key: '' });
+
+// ✅ Legacy string support (backward compatibility)
+setError('Legacy error message'); // Still supported but not recommended
+```
+
+**Component Integration**:
+
+The `ErrorMessage` component automatically handles both formats:
+
+- **MessageState objects**: Translates using `t(key, params)`
+- **Legacy strings**: Displays directly
+- **Type safety**: Full TypeScript support with proper type guards
+
+**Testing Message Systems**:
+
+```typescript
+// Test MessageState objects
+expect(mockSetError).toHaveBeenCalledWith({
+  key: 'errors.validation.required',
+  params: { field: 'name' },
+});
+
+// Test clearing messages
+expect(mockSetError).toHaveBeenCalledWith({ key: '' });
+expect(mockSetWarning).toHaveBeenCalledWith({ key: '' });
+```
+
 ### Performance Standards
 
 #### React 19 Optimizations
@@ -204,6 +383,52 @@ const message = 'This field is required';
 - **Tree Shaking**: Ensure imports are tree-shakeable
 - **Dynamic Imports**: Use for large dependencies
 - **Bundle Analysis**: Check impact with `pnpm analyze`
+
+### Data Validation and Error Handling
+
+#### Settings Management Pattern
+
+Follow the robust validation pattern established in `useSettings` hook:
+
+```typescript
+// ✅ Robust validation with type guards
+const isValidArray = (value: unknown, expectedLength?: number): value is unknown[] => {
+  return Array.isArray(value) && (expectedLength === undefined || value.length === expectedLength);
+};
+
+// ✅ Specific validation for operation arrays
+const isValidOperationArray = (value: unknown): value is Operation[] => {
+  if (!Array.isArray(value)) {
+    return false;
+  }
+  const validOperations: Operation[] = ['+', '-', '*', '/', '×', '÷'];
+  return value.every(op => typeof op === 'string' && validOperations.includes(op as Operation));
+};
+
+// ✅ Comprehensive validation and fallback
+const validateAndMergeSettings = (parsed: unknown): Settings => {
+  const parsedObj = parsed as Record<string, unknown>;
+
+  return {
+    ...defaultSettings,
+    ...parsedObj,
+    // Validate each property with fallback to defaults
+    operations: isValidOperationArray(parsedObj.operations)
+      ? parsedObj.operations
+      : defaultSettings.operations,
+    numRange: isValidArray(parsedObj.numRange, 2)
+      ? (parsedObj.numRange as [number, number])
+      : defaultSettings.numRange,
+  };
+};
+```
+
+#### Error Recovery Patterns
+
+- **Graceful Degradation**: Always provide fallback to safe defaults
+- **localStorage Handling**: Clear corrupted data and continue with defaults
+- **Type Safety**: Use type guards for runtime validation
+- **User Feedback**: Provide clear error messages for validation failures
 
 ## 🐛 Bug Reports
 

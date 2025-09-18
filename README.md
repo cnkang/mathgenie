@@ -35,6 +35,8 @@ MathGenie is a modern web application built with **React 19.1.1**, **TypeScript 
 - **🌍 Multi-Language Support**: Available in English, Chinese, Spanish, French, German, and Japanese
 - **📱 Mobile-Optimized**: Responsive design with React 19 performance improvements
 - **♿ Accessibility**: Full keyboard navigation and screen reader support
+- **🛡️ Robust Error Handling**: Graceful error recovery with automatic fallback to safe defaults
+- **💾 Reliable Data Persistence**: Enhanced localStorage handling with corruption recovery
 
 ## 🛠️ Tech Stack
 
@@ -127,12 +129,99 @@ pnpm validate
 - **ESLint + Prettier**: Consistent code style
 - **Pre-commit hooks**: Automatic formatting and linting
 - **Comprehensive testing**: Unit and E2E tests
-- **Sonar checks**: `pnpm lint:sonar` and auto-fix duplicate strings with `pnpm lint:sonar:fix`
+- **SonarQube Analysis**: Advanced code quality checks with HIGH priority rule focus
 
-Auto-fix details:
-- AST-based extraction of repeated string literals into file-local constants (sonarjs/no-duplicate-string)
-- Safe for TS/TSX, including JSX attributes (proper `{CONST}` wrapping)
-- i18n dictionaries under `src/i18n/translations/` are excluded from duplicate-string checks
+#### SonarQube Commands
+
+```bash
+# Quick HIGH priority check (recommended for daily use)
+pnpm sonar:high
+
+# Detailed HIGH priority analysis
+pnpm sonar:high:verbose
+
+# Check all SonarQube rules
+pnpm sonar:check
+
+# Detailed analysis of all rules
+pnpm sonar:verbose
+
+# Full SonarQube scan (CI/CD)
+pnpm sonar:scan
+```
+
+**Supported HIGH Priority Rules:**
+
+- 🚨 **S3776**: Cognitive Complexity (max: 15)
+- 🚨 **S138**: Function Length (max: 50 lines)
+- 🚨 **S107**: Parameter Count (max: 7)
+- 🚨 **S134**: Nesting Level (max: 3)
+- 🚨 **S1067**: Expression Complexity (max: 3)
+- 🚨 **S3800**: Return Statements (max: 3)
+- 🚨 **S1871**: Identical Expressions
+
+#### Usage Scenarios
+
+**Daily Development**
+
+```bash
+pnpm sonar:high  # Quick HIGH priority check (~10s)
+```
+
+**Pre-commit Validation**
+
+```bash
+pnpm sonar:high:verbose  # Detailed HIGH priority analysis (~15s)
+```
+
+**Code Review**
+
+```bash
+pnpm sonar:check  # Comprehensive check (~15s)
+```
+
+**Deep Analysis**
+
+```bash
+pnpm sonar:verbose  # Detailed analysis of all rules (~20s)
+```
+
+#### Output Legend
+
+- 🔴 **Error** - Must fix before commit
+- 🟡 **Warning** - Recommended to fix
+- 🚨 **HIGH** - High priority issues
+- ⚠️ **MEDIUM** - Medium priority issues
+- ℹ️ **LOW** - Low priority issues
+
+#### Development Workflow Integration
+
+**Git Hooks**
+
+```bash
+# .husky/pre-commit
+pnpm sonar:high
+```
+
+**VS Code Tasks**
+
+```json
+{
+  "label": "SonarQube Check",
+  "type": "shell",
+  "command": "pnpm sonar:high",
+  "group": "build"
+}
+```
+
+**CI/CD Integration**
+
+```yaml
+- name: SonarQube Quality Check
+  run: pnpm sonar:high
+```
+
+📖 **Documentation**: See [SonarQube Commands Guide](docs/SONAR_COMMANDS.md) for detailed usage and workflow integration
 
 ## 🔧 TypeScript Configuration
 
@@ -151,6 +240,95 @@ The project uses a strict TypeScript configuration with the following features:
 - **Interface Definitions**: Clear contracts for all data structures
 - **Generic Types**: Reusable type-safe components and hooks
 - **Utility Types**: Advanced TypeScript patterns for better DX
+- **Runtime Validation**: Type guards and validation functions for data integrity
+- **Error Recovery**: Robust error handling with type-safe fallback mechanisms
+
+### Hook Architecture
+
+MathGenie uses a balanced hook architecture that promotes code reusability and maintainability:
+
+- **Focused Hooks**: Each hook has a single, well-defined responsibility
+- **Simplified Structure**: Complex logic is organized within hooks using clear internal functions
+- **Type Safety**: All hooks are fully typed with comprehensive TypeScript support
+- **Testability**: Hook design enables comprehensive testing of functionality through public APIs
+
+**Example: Problem Generation Hook Structure**
+
+```typescript
+export const useProblemGenerator = (
+  settings: Settings,
+  isLoading: boolean,
+  validateSettings: (settings: Settings) => string
+) => {
+  const [problems, setProblems] = useState<Problem[]>([]);
+
+  // Internal logic organized with useCallback for performance
+  const processGeneration = useCallback(
+    (showSuccessMessage: boolean) => {
+      const validationError = validateSettings(settings);
+      if (validationError) {
+        return processValidationError(validationError);
+      }
+      return createGenerationOutcome({ settings, showSuccessMessage, setProblems });
+    },
+    [settings, validateSettings, setProblems]
+  );
+
+  const generateProblems = useCallback(
+    (showSuccessMessage: boolean = true) => {
+      if (isLoading) {
+        return { ...EMPTY_MESSAGES };
+      }
+      return processGeneration(showSuccessMessage);
+    },
+    [isLoading, processGeneration]
+  );
+
+  // Auto-regeneration effect
+  useEffect(() => {
+    if (!isLoading) {
+      generateProblems(false);
+    }
+  }, [settings, isLoading, validateSettings]);
+
+  return { problems, generateProblems };
+};
+```
+
+**Example: Settings Management Hook Composition**
+
+```typescript
+// Helper hooks for specific concerns
+const useValidationFeedback = (...) => { /* validation logic */ };
+const useFieldValidation = (...) => { /* field validation logic */ };
+const useSettingsChangeHandler = (...) => { /* settings change logic */ };
+const usePresetHandler = (...) => { /* preset application logic */ };
+
+// Main hook composing helpers
+export const useAppHandlers = (...) => {
+  const provideValidationFeedback = useValidationFeedback(...);
+  const shouldValidateField = useFieldValidation(...);
+
+  // Composed functionality using helper hooks for settings management
+  const handleChange = useCallback((field, value) => {
+    // Uses composed validation and change handling logic
+  }, [/* dependencies */]);
+
+  const handleApplyPreset = useCallback((presetSettings) => {
+    // Uses composed preset application logic
+  }, [/* dependencies */]);
+
+  return { handleChange, handleApplyPreset };
+};
+```
+
+**Key Architecture Benefits**:
+
+- **Clear Organization**: Logic is organized within hooks using internal functions and useCallback
+- **Performance Optimization**: Proper memoization prevents unnecessary re-renders
+- **Focused Responsibility**: Each hook handles one specific domain (problem generation, settings management)
+- **Enhanced Testing**: Hook functionality can be tested comprehensively through public APIs
+- **Type Safety**: Full TypeScript support with proper dependency tracking and memoization
 
 ## Usage
 
@@ -371,6 +549,31 @@ GitHub Actions handles quality assurance with an optimized test suite:
 - 🇫🇷 French
 - 🇩🇪 German
 - 🇯🇵 Japanese
+
+### Message System Architecture
+
+MathGenie uses a sophisticated message system that supports dynamic translation with parameter interpolation:
+
+- **MessageValue Type**: Supports both legacy strings and new `MessageState` objects
+- **Translation Keys**: Hierarchical key structure (e.g., `'messages.success.problemsGenerated'`)
+- **Parameter Interpolation**: Dynamic values in messages (e.g., `{ count: 20 }`)
+- **Type Safety**: Full TypeScript support for message handling
+- **Backward Compatibility**: Seamless migration from string-based messages
+
+#### Message System Usage
+
+```typescript
+// New MessageState object approach (recommended)
+setError({ key: 'errors.validation.invalidRange', params: { min: 1, max: 100 } });
+setSuccessMessage({ key: 'messages.success.problemsGenerated', params: { count: 20 } });
+
+// Legacy string support (still supported)
+setError('Error message');
+
+// Clear messages
+setError({ key: '' });
+setWarning({ key: '' });
+```
 
 ## 🔧 Configuration
 

@@ -5,11 +5,17 @@ import { I18nProvider } from './i18n';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import * as serviceWorker from './utils/serviceWorker';
+import { applyBrowserSpecificStyles, createPerformanceMonitor } from './utils/browserOptimizations';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
   throw new Error('Root element not found');
 }
+
+// Apply browser-specific optimizations
+applyBrowserSpecificStyles();
+const performanceMonitor = createPerformanceMonitor();
+performanceMonitor.logBrowserInfo();
 
 const root = createRoot(rootElement);
 root.render(
