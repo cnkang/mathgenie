@@ -180,10 +180,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-vitest-
 
+      - name: 🔧 Set Node.js binary path for secure execution
+        run: |
+          NODE_BIN_PATH=$(dirname $(which node))
+          echo "NODE_BIN_PATH=$NODE_BIN_PATH" >> $GITHUB_ENV
+          echo "Node.js binary path: $NODE_BIN_PATH"
+
       - name: 🧪 Run unit tests with coverage
         run: pnpm test:unit
         env:
           CI: true
+          NODE_BIN_PATH: ${{ env.NODE_BIN_PATH }}
 
       - name: 📊 Upload coverage to Codecov
         uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
