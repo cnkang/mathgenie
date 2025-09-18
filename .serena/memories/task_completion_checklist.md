@@ -3,6 +3,7 @@
 ## Pre-Development Checklist
 
 ### Environment Setup
+
 - [ ] Node.js 22.19.1+ installed and verified
 - [ ] pnpm 10.15.1+ installed and verified
 - [ ] Project dependencies installed (`pnpm install`)
@@ -10,6 +11,7 @@
 - [ ] All browsers installed for testing (`pnpm playwright:install`)
 
 ### Project Understanding
+
 - [ ] Read relevant Kiro steering documents (`.kiro/steering/`)
 - [ ] Understand existing code patterns and architecture
 - [ ] Review accessibility requirements (WCAG 2.2 AAA)
@@ -19,6 +21,7 @@
 ## Development Phase Checklist
 
 ### Code Quality Standards
+
 - [ ] TypeScript strict mode compliance
 - [ ] React 19 patterns used (`useTransition`, `useDeferredValue`, `useOptimistic`)
 - [ ] Files co-located (`.tsx`, `.css`, `.test.tsx`)
@@ -29,9 +32,10 @@
 - [ ] No duplicate code blocks > 3 lines
 
 ### Security Validation (Critical)
+
 - [ ] **No `execSync`, `exec`, or `spawn` with `shell: true`**
 - [ ] **All user inputs validated with regex patterns**
-- [ ] **No shell metacharacters in inputs `[;&|`$(){}[]<>*?~]`**
+- [ ] **No shell metacharacters in inputs `[;&|`$(){}[]<>\*?~]`**
 - [ ] **Environment variables cleaned for child processes**
 - [ ] **Process timeouts set (≤ 60 seconds)**
 - [ ] **No hardcoded secrets or credentials**
@@ -39,6 +43,7 @@
 - [ ] **Whitelist validation for all external inputs**
 
 ### React & Hook Best Practices
+
 - [ ] useEffect cleanup functions implemented
 - [ ] AbortController used for fetch requests
 - [ ] Race condition prevention implemented
@@ -49,6 +54,7 @@
 - [ ] Custom hooks extracted for complex logic
 
 ### Accessibility Compliance (WCAG 2.2 AAA)
+
 - [ ] **Color contrast ratios: 7:1 for normal text, 4.5:1 for large text**
 - [ ] **Touch targets ≥ 44px minimum**
 - [ ] **Full keyboard navigation support**
@@ -59,6 +65,7 @@
 - [ ] **Semantic HTML elements used appropriately**
 
 ### Internationalization (Critical)
+
 - [ ] **All user-facing text uses `t('key')` function**
 - [ ] **Translation keys added to ALL 6 language files**
 - [ ] **Hierarchical key naming used (e.g., `errors.validation.required`)**
@@ -70,6 +77,7 @@
 ## Testing Phase Checklist
 
 ### Unit Testing (90% Coverage Required)
+
 - [ ] **All components have comprehensive tests**
 - [ ] **All custom hooks tested**
 - [ ] **All utilities tested**
@@ -80,6 +88,7 @@
 - [ ] **Async operations tested with proper cleanup**
 
 ### E2E Testing (Cross-Browser)
+
 - [ ] **Tests pass on Chromium engine**
 - [ ] **Tests pass on Firefox engine**
 - [ ] **Tests pass on WebKit engine**
@@ -88,6 +97,7 @@
 - [ ] **Keyboard navigation tested**
 
 ### Accessibility Testing (Mandatory)
+
 - [ ] **axe-core tests pass with WCAG 2.2 AAA rules**
 - [ ] **Keyboard-only navigation tested**
 - [ ] **Screen reader compatibility verified**
@@ -98,6 +108,7 @@
 ## Quality Gates Checklist (Must Pass)
 
 ### Code Quality Analysis
+
 - [ ] **ESLint passes with zero errors**
 - [ ] **Prettier formatting applied**
 - [ ] **TypeScript compilation successful**
@@ -106,6 +117,7 @@
 - [ ] **No code smells above acceptable levels**
 
 ### Pre-commit Validation (Mandatory Order)
+
 1. [ ] `pnpm format` - Code formatting
 2. [ ] `pnpm lint` - Linting fixes
 3. [ ] `pnpm lint:css-html:fix` - CSS/HTML quality auto-fix
@@ -116,6 +128,7 @@
 8. [ ] `pnpm validate` - Complete validation pipeline
 
 ### Pre-push Validation
+
 - [ ] `pnpm validate:full` - Complete validation
 - [ ] `pnpm build` - Production build verification
 - [ ] `pnpm test:e2e:accessibility` - WCAG 2.2 AAA compliance
@@ -124,6 +137,7 @@
 ## Performance Checklist
 
 ### Core Web Vitals (Required Targets)
+
 - [ ] **First Contentful Paint (FCP) < 1.5s**
 - [ ] **Largest Contentful Paint (LCP) < 2.5s**
 - [ ] **First Input Delay (FID) < 100ms**
@@ -131,6 +145,7 @@
 - [ ] **Interaction to Next Paint (INP) < 200ms**
 
 ### Bundle Optimization
+
 - [ ] Bundle size < 500KB gzipped
 - [ ] Code splitting implemented appropriately
 - [ ] Tree shaking enabled and effective
@@ -138,6 +153,7 @@
 - [ ] Dynamic imports used for large dependencies
 
 ### Performance Testing
+
 - [ ] Lighthouse tests pass Core Web Vitals
 - [ ] Bundle analysis completed
 - [ ] Performance regression tests pass
@@ -146,6 +162,7 @@
 ## Documentation Checklist
 
 ### Documentation Updates (Critical)
+
 - [ ] **README.md updated for feature changes**
 - [ ] **TESTING.md updated for test strategy changes**
 - [ ] **JSDoc comments added/updated for new APIs**
@@ -154,6 +171,7 @@
 - [ ] **Related documentation files reviewed**
 
 ### Documentation Synchronization
+
 - [ ] **Documentation updated in same commit as code changes**
 - [ ] **No deferred documentation updates**
 - [ ] **Documentation accuracy verified**
@@ -162,6 +180,7 @@
 ## Security Checklist (Critical)
 
 ### Command Execution Security
+
 - [ ] **Only `spawnSync`/`spawn` with `shell: false` used**
 - [ ] **Command arguments validated against whitelists**
 - [ ] **No string concatenation for commands**
@@ -170,6 +189,7 @@
 - [ ] **Error handling doesn't expose sensitive info**
 
 ### Input Validation & Sanitization
+
 - [ ] **All inputs validated at boundaries**
 - [ ] **Regex patterns used for validation**
 - [ ] **Length limits enforced**
@@ -177,6 +197,7 @@
 - [ ] **Type safety with runtime validation**
 
 ### Dependency Security
+
 - [ ] `pnpm audit` passes with no high/critical vulnerabilities
 - [ ] Dependencies are up-to-date
 - [ ] No abandoned or unmaintained dependencies
@@ -185,6 +206,7 @@
 ## Final Validation Checklist
 
 ### Complete Testing Suite
+
 - [ ] All unit tests pass
 - [ ] All E2E tests pass across browsers
 - [ ] All accessibility tests pass
@@ -192,6 +214,7 @@
 - [ ] Performance tests meet targets
 
 ### Quality Assurance
+
 - [ ] Code review completed
 - [ ] Security review completed
 - [ ] Accessibility review completed
@@ -199,6 +222,7 @@
 - [ ] Documentation review completed
 
 ### Deployment Readiness
+
 - [ ] Production build successful
 - [ ] All CI/CD checks pass
 - [ ] No breaking changes introduced
@@ -208,9 +232,11 @@
 ## Emergency Procedures
 
 ### Quality Gate Failures
+
 **NEVER use `--no-verify` or bypass quality gates**
 
 Instead, fix underlying issues:
+
 - [ ] CSS issues: `pnpm lint:css:fix`
 - [ ] HTML issues: `pnpm lint:html`
 - [ ] SonarQube issues: `pnpm sonar:high:verbose`
@@ -218,11 +244,12 @@ Instead, fix underlying issues:
 - [ ] Test failures: `pnpm test:watch`
 
 ### Browser/Testing Issues
+
 - [ ] Reinstall browsers: `pnpm playwright:install`
-- [ ] Clear browser cache: `pnpm playwright:cache:clean`
 - [ ] Debug browser issues: `pnpm playwright:cache:debug`
 
 ### Build Issues
+
 - [ ] Clean rebuild: `pnpm clean && pnpm reinstall`
 - [ ] Check dependencies: `pnpm deps:check`
 - [ ] Verify Node.js/pnpm versions
@@ -230,6 +257,7 @@ Instead, fix underlying issues:
 ## Post-Completion Checklist
 
 ### Code Review Preparation
+
 - [ ] Self-review completed using this checklist
 - [ ] All quality gates passed
 - [ ] Documentation updated and accurate
@@ -237,12 +265,14 @@ Instead, fix underlying issues:
 - [ ] Security implications considered
 
 ### Handoff Documentation
+
 - [ ] Feature description provided
 - [ ] Testing instructions included
 - [ ] Known limitations documented
 - [ ] Future improvement suggestions noted
 
 ### Continuous Improvement
+
 - [ ] Lessons learned documented
 - [ ] Process improvements identified
 - [ ] Quality metrics recorded
@@ -251,6 +281,7 @@ Instead, fix underlying issues:
 ## Maintenance Checklist
 
 ### Regular Tasks
+
 - [ ] Dependencies updated monthly
 - [ ] Security audit completed
 - [ ] Performance metrics reviewed
@@ -258,6 +289,7 @@ Instead, fix underlying issues:
 - [ ] Documentation accuracy checked
 
 ### Quality Monitoring
+
 - [ ] Code coverage trends monitored
 - [ ] Performance regression alerts configured
 - [ ] Accessibility compliance tracked

@@ -1,6 +1,7 @@
 # MathGenie Project Structure
 
 ## Root Directory Organization
+
 ```
 ├── src/                    # Source code
 ├── public/                 # Static assets
@@ -18,6 +19,7 @@
 ```
 
 ## Source Code Structure (`src/`)
+
 ```
 src/
 ├── components/            # React components
@@ -39,6 +41,7 @@ src/
 ## Component Organization Principles
 
 ### Atomic Design Pattern
+
 - **Atoms**: Basic building blocks (NumberInput, LoadingButton)
 - **Molecules**: Simple combinations (RangeInput, ErrorMessage)
 - **Organisms**: Complex components (SettingsSection, QuizMode)
@@ -46,12 +49,14 @@ src/
 - **Pages**: Complete page implementations
 
 ### Co-location Strategy
+
 - **Component Files**: `ComponentName.tsx`
 - **Styles**: `ComponentName.css` (same directory)
 - **Tests**: `ComponentName.test.tsx` (same directory)
 - **Types**: Component-specific types in same file or adjacent `types.ts`
 
 ### Directory Hygiene (≤ 8 items per directory)
+
 - Group related components in subdirectories
 - Extract shared components to appropriate level
 - Use index files for clean exports when needed
@@ -59,7 +64,9 @@ src/
 ## Key Directories Deep Dive
 
 ### `/src/components/`
+
 **Main React Components with Co-located Files**
+
 - `ActionCards.tsx` + `ActionCards.test.tsx`
 - `AppHeader.tsx` + `AppHeader.css` + `AppHeader.test.tsx`
 - `ErrorBoundary.tsx` + `ErrorBoundary.test.tsx`
@@ -75,12 +82,15 @@ src/
 - `TranslationLoader.tsx` + `TranslationLoader.css` + `TranslationLoader.test.tsx`
 
 **Subdirectories:**
+
 - `form/` - Form-related components (RangeInput)
 - `quiz/` - Quiz-specific components (QuizHeader, QuizNavigation, QuizResults, useQuizController)
 - `settings/` - Settings components (AdvancedSettings, PdfSettings)
 
 ### `/src/hooks/`
+
 **Custom React Hooks with Comprehensive Testing**
+
 - `useAppLogic.ts` + `useAppLogic.test.ts` - Main application logic composition
 - `useAppMessages.ts` + `useAppMessages.test.ts` - Message state management
 - `useDebounce.ts` + `useDebounce.test.ts` - Debouncing utility
@@ -92,7 +102,9 @@ src/
 - `useSettingsValidation.ts` + `useSettingsValidation.test.ts` - Settings validation logic
 
 ### `/src/utils/`
+
 **Utility Functions with Security Focus**
+
 - `analytics.ts` + `analytics.test.ts` - Performance monitoring
 - `debounce.ts` + `debounce.test.ts` - Debouncing utility
 - `pdf.ts` + `pdf.test.ts` - PDF generation with jsPDF
@@ -103,7 +115,9 @@ src/
 - `wcagEnforcement.ts` + `wcagEnforcement.test.ts` - Accessibility enforcement
 
 ### `/src/i18n/`
+
 **Internationalization System (6 Languages)**
+
 - `index.tsx` + `index.test.tsx` - i18n system implementation
 - `translations/` - Language files:
   - `en.ts` - English (base language)
@@ -114,13 +128,17 @@ src/
   - `ja.ts` - Japanese
 
 ### `/src/types/`
+
 **TypeScript Type Definitions**
+
 - `index.ts` - Centralized type definitions
 - `index.test.ts` - Type validation tests
 - `vitest.d.ts` - Vitest type extensions
 
 ### `/src/styles/`
+
 **Global CSS Organization**
+
 - `accessibility-unified.css` - WCAG 2.2 AAA compliance styles
 - `action-cards.css` - Action card component styles
 - `base-components.css` - Base component styles
@@ -131,20 +149,24 @@ src/
 - `utilities.css` - Utility classes
 
 ### `/tests/e2e/`
+
 **End-to-End Testing (Playwright)**
+
 - Cross-browser testing (Chromium, Firefox, WebKit)
 - Mobile device testing (iPhone, iPad, Android)
 - WCAG 2.2 AAA accessibility compliance testing
 - Integration test scenarios
 
 ### `/scripts/`
+
 **Build and Utility Scripts (Security-Focused)**
+
 - `check-browsers.ts` - Browser installation verification
 - `check-i18n.ts` - Translation validation
 - `css-html-quality-check.ts` - CSS/HTML quality validation
 - `debug-playwright-cache.sh` - Browser cache debugging
 - `exec-utils.ts` - Secure command execution utilities
-- `playwright-cache-helper.sh` - Browser cache management
+
 - `sonar-check.ts` - SonarQube analysis
 - `test-e2e.sh` - E2E test runner
 - `unified-test.ts` - Unified test execution
@@ -152,6 +174,7 @@ src/
 ## Configuration Files
 
 ### Core Configuration
+
 - **TypeScript**: `tsconfig.json` - Strict mode with path aliases
 - **Vite**: `vite.config.ts` - React plugin with optimization
 - **ESLint**: `eslint.config.ts` - TypeScript and React rules
@@ -159,17 +182,20 @@ src/
 - **Package**: `package.json` - pnpm as package manager
 
 ### Testing Configuration
+
 - **Playwright**: `playwright.config.ts`, `playwright.e2e.config.ts`, `playwright.test.config.ts`
 - **Vitest**: Configuration in `vite.config.ts`
 - **Coverage**: V8 provider with 90% threshold
 
 ### Quality & Performance
+
 - **Lighthouse**: `lighthouserc.yml` - Performance testing
 - **SonarQube**: `sonar-project.properties` - Code quality
 - **Stylelint**: `.stylelintrc.json` - CSS linting
 - **HTML Validate**: `.htmlvalidate.json` - HTML validation
 
 ### Git & Development
+
 - **Git**: `.gitignore`, `.editorconfig`
 - **Husky**: `.husky/` - Git hooks
 - **Lint Staged**: Configuration in `package.json`
@@ -177,6 +203,7 @@ src/
 ## Import Path Strategy
 
 ### Path Aliases (Mandatory)
+
 ```typescript
 // ✅ Use these aliases instead of relative paths
 import { Component } from '@/components/Component';
@@ -187,6 +214,7 @@ import { useTranslation } from '@/i18n';
 ```
 
 ### Import Order Convention
+
 1. External libraries (React, third-party)
 2. Internal modules with `@/` aliases
 3. Relative imports (only when necessary)
@@ -195,16 +223,19 @@ import { useTranslation } from '@/i18n';
 ## Asset Organization
 
 ### Public Assets (`public/`)
+
 - Static files: favicon, manifest, service worker
 - No processing by build system
 - Direct URL access
 
 ### Component Assets
+
 - Co-located with components when component-specific
 - Imported through build system for optimization
 - Automatic optimization and caching
 
 ### Global Styles (`src/styles/`)
+
 - Organized by purpose and scope
 - CSS custom properties for theming
 - Mobile-first responsive design
@@ -213,18 +244,21 @@ import { useTranslation } from '@/i18n';
 ## Architecture Patterns
 
 ### State Management
+
 - **Local State**: `useState` for component-specific state
 - **Persistent State**: `useLocalStorage` hook for browser storage
 - **Global State**: React Context for app-wide state (i18n, settings)
 - **Optimistic Updates**: `useOptimistic` for immediate UI feedback
 
 ### Component Patterns
+
 - **Function Components**: Only function components with hooks
 - **Hook Composition**: Complex logic composed from focused hooks
 - **Render Props**: For flexible component composition
 - **Error Boundaries**: Comprehensive error handling
 
 ### Security Patterns
+
 - **Input Validation**: All user inputs validated at boundaries
 - **Command Execution**: Secure patterns with `spawnSync`
 - **Environment Isolation**: Clean environments for child processes

@@ -3,12 +3,14 @@
 ## Development Commands
 
 ### Development Server
+
 ```bash
 pnpm dev              # Start dev server on port 3000
 pnpm preview          # Preview production build on port 4173
 ```
 
 ### Building
+
 ```bash
 pnpm build            # Optimized production build with tree shaking
 pnpm build:fast       # Fast build without optimizations
@@ -16,6 +18,7 @@ pnpm build:types      # Generate TypeScript declaration files
 ```
 
 ### Testing (90% Coverage Required)
+
 ```bash
 pnpm test             # Run unit tests with coverage
 pnpm test:watch       # Watch mode for unit tests
@@ -28,6 +31,7 @@ pnpm test:all         # Run all tests (unit + E2E)
 ```
 
 ### Mobile Testing (WCAG 2.2 AAA Compliance)
+
 ```bash
 pnpm test:mobile      # Test on all mobile devices
 pnpm test:mobile:iphone    # iPhone device testing (WebKit engine)
@@ -38,6 +42,7 @@ pnpm test:e2e:accessibility # WCAG 2.2 AAA compliance tests (mandatory)
 ```
 
 ### Code Quality (Zero Critical Issues Required)
+
 ```bash
 pnpm lint             # ESLint with auto-fix
 pnpm format           # Prettier formatting
@@ -47,6 +52,7 @@ pnpm validate         # Full validation pipeline (mandatory before commit)
 ```
 
 ### SonarQube Analysis (Critical Issues Must Be Fixed)
+
 ```bash
 pnpm sonar:high       # HIGH priority issues only (recommended for daily use)
 pnpm sonar:check      # Check all SonarQube rules
@@ -56,6 +62,7 @@ pnpm sonar:scan       # Full SonarQube scan (CI/CD)
 ```
 
 ### CSS & HTML Quality (Mandatory Pre-commit)
+
 ```bash
 pnpm lint:css-html:fix # Auto-fix CSS issues and validate HTML (use in pre-commit)
 pnpm lint:css-html     # Validation-only quality checks (use in pre-push)
@@ -64,22 +71,23 @@ pnpm lint:html         # HTML-specific validation
 ```
 
 ### Performance & Quality
+
 ```bash
 pnpm lighthouse      # Run Lighthouse performance tests
 pnpm lighthouse:ci    # CI-friendly Lighthouse tests
 ```
 
 ### Playwright Browser Management
+
 ```bash
 pnpm playwright:install    # Install all browsers (Chromium, Firefox, WebKit)
 pnpm playwright:install:ci # Install browsers for CI
 pnpm playwright:check      # Check browser installation status
-pnpm playwright:cache:check # Check browser cache status
 pnpm playwright:cache:debug # Debug browser cache issues
-pnpm playwright:cache:clean # Clean browser cache
 ```
 
 ### Utilities
+
 ```bash
 pnpm clean            # Clean node_modules and build artifacts
 pnpm reinstall        # Clean reinstall of dependencies
@@ -88,12 +96,14 @@ pnpm analyze          # Bundle analysis
 ```
 
 ### Git Hooks (Mandatory Quality Gates)
+
 ```bash
 pnpm pre-commit       # Run pre-commit checks (format + lint-staged + quality)
 pnpm pre-push         # Run pre-push validation (type-check + i18n + test + build)
 ```
 
 ### Complete Validation Pipeline
+
 ```bash
 pnpm validate         # Complete validation pipeline (mandatory before commit)
 pnpm validate:full    # Full validation with all checks
@@ -102,6 +112,7 @@ pnpm validate:full    # Full validation with all checks
 ## Security Commands (Command Injection Prevention)
 
 ### Secure Command Execution Patterns
+
 ```typescript
 // ❌ NEVER DO THIS - Vulnerable to injection
 const result = execSync(`command ${userInput}`);
@@ -110,20 +121,19 @@ const result = execSync(`command ${userInput}`);
 const result = spawnSync('command', [validatedArg], {
   shell: false,
   timeout: 60000,
-  env: buildSafeEnv()
+  env: buildSafeEnv(),
 });
 ```
 
 ### Input Validation Examples
+
 ```typescript
 // ✅ Secure validation patterns
 const validateFilePattern = (input: string): boolean => {
   const allowedPattern = /^[a-zA-Z0-9_\-./]+$/;
   const dangerousPattern = /[;&|`$(){}[\]<>*?~]/;
-  
-  return allowedPattern.test(input) && 
-         !dangerousPattern.test(input) && 
-         input.length <= 200;
+
+  return allowedPattern.test(input) && !dangerousPattern.test(input) && input.length <= 200;
 };
 
 // ✅ Safe environment handling
@@ -139,6 +149,7 @@ const buildSafeEnv = () => ({
 ## System Commands (macOS/Darwin)
 
 ### File Operations
+
 ```bash
 ls -la                # List files with details
 find . -name "*.ts"   # Find TypeScript files
@@ -146,6 +157,7 @@ grep -r "pattern"     # Search for patterns in files
 ```
 
 ### Git Operations
+
 ```bash
 git status            # Check repository status
 git add .             # Stage all changes
@@ -155,6 +167,7 @@ git pull              # Pull from remote
 ```
 
 ### Process Management
+
 ```bash
 ps aux | grep node    # Find Node.js processes
 kill -9 <pid>         # Kill process by PID
@@ -162,6 +175,7 @@ lsof -i :3000         # Check what's using port 3000
 ```
 
 ### System Information
+
 ```bash
 node --version        # Check Node.js version (should be 22.19.1+)
 pnpm --version        # Check pnpm version (should be 10.15.1+)
@@ -171,6 +185,7 @@ which pnpm            # Find pnpm location
 ## Quality Gate Commands (Must Pass Before Commit)
 
 ### Pre-commit Quality Checks (Mandatory Order)
+
 ```bash
 # 1. Format code
 pnpm format
@@ -198,6 +213,7 @@ pnpm validate
 ```
 
 ### Pre-push Validation
+
 ```bash
 # Final validation before push
 pnpm validate:full    # Complete validation pipeline
@@ -208,13 +224,14 @@ pnpm test:e2e:accessibility # WCAG 2.2 AAA compliance
 ## Emergency Commands & Troubleshooting
 
 ### Quality Issue Resolution (NEVER Use --no-verify)
+
 ```bash
 # If quality checks fail, fix the underlying issues:
 
 # For CSS issues
 pnpm lint:css:fix
 
-# For HTML issues  
+# For HTML issues
 pnpm lint:html
 
 # For SonarQube issues (get detailed descriptions)
@@ -231,19 +248,18 @@ pnpm i18n:check
 ```
 
 ### Browser Issues
+
 ```bash
 # If Playwright browsers missing
 pnpm playwright:install
 
 # If browser cache issues
-pnpm playwright:cache:clean
-pnpm playwright:cache:check
-
 # Debug browser problems
 pnpm playwright:cache:debug
 ```
 
 ### Build Issues
+
 ```bash
 # Clean rebuild
 pnpm clean
@@ -256,6 +272,7 @@ pnpm audit
 ```
 
 ### Performance Issues
+
 ```bash
 # Bundle analysis
 pnpm analyze
@@ -268,6 +285,7 @@ pnpm lighthouse:ci
 ## Development Workflow Commands
 
 ### Daily Development Cycle
+
 ```bash
 # 1. Start development
 git pull origin main
@@ -288,6 +306,7 @@ git push origin feature-branch
 ```
 
 ### Feature Development
+
 ```bash
 # 1. Create feature branch
 git checkout -b feature/new-feature
@@ -312,6 +331,7 @@ pnpm build
 ## CI/CD Commands
 
 ### Continuous Integration
+
 ```bash
 # Install dependencies
 pnpm install --frozen-lockfile
@@ -328,6 +348,7 @@ pnpm build
 ```
 
 ### Deployment Preparation
+
 ```bash
 # Pre-deployment checks
 pnpm validate:full
@@ -342,6 +363,7 @@ pnpm audit
 ## Debugging Commands
 
 ### Test Debugging
+
 ```bash
 # Debug specific test
 pnpm test ComponentName.test.tsx
@@ -357,6 +379,7 @@ pnpm test:mobile:iphone --debug
 ```
 
 ### Performance Debugging
+
 ```bash
 # Analyze bundle
 pnpm analyze
@@ -369,6 +392,7 @@ pnpm lighthouse:ci
 ```
 
 ### Quality Debugging
+
 ```bash
 # Detailed SonarQube analysis
 pnpm sonar:verbose
@@ -383,6 +407,7 @@ pnpm type-check --pretty
 ## Security Best Practices Commands
 
 ### Security Validation
+
 ```bash
 # Dependency security audit
 pnpm audit
@@ -395,6 +420,7 @@ pnpm lint --config .eslintrc.security.js
 ```
 
 ### Secure Development
+
 ```bash
 # Validate inputs before processing
 # Use spawnSync with shell: false
@@ -406,6 +432,7 @@ pnpm lint --config .eslintrc.security.js
 ## Documentation Commands
 
 ### Documentation Maintenance
+
 ```bash
 # Update documentation after changes
 # Check README.md for accuracy
@@ -415,6 +442,7 @@ pnpm lint --config .eslintrc.security.js
 ```
 
 ### Documentation Validation
+
 ```bash
 # Lint markdown files
 pnpm lint:md

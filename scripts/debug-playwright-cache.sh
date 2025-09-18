@@ -2,7 +2,7 @@
 
 # Debug Playwright Cache Script
 # Helps debug cache issues in CI/CD environments
-# Works in conjunction with playwright-cache-helper.sh for cache management
+# Helps debug Playwright browser cache issues in CI/CD environments
 
 set -e
 
