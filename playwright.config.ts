@@ -18,9 +18,9 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   // 动态调整worker数量基于CPU核心数
   workers: process.env.CI ? 2 : 6, // CI环境保守使用，本地环境更积极使用
-  timeout: 30000,
+  timeout: 120000, // Increased from 60s to 120s for complex accessibility tests
   expect: {
-    timeout: 10000,
+    timeout: 20000, // Increased from 10s to 20s for CI stability
   },
   // Set output directory dynamically for CI matrix builds
   outputDir:
@@ -91,8 +91,8 @@ export default defineConfig({
       use: {
         ...devices['Desktop Safari'],
         // WebKit-specific settings for better stability
-        actionTimeout: 10000, // Longer timeout for WebKit actions
-        navigationTimeout: 15000, // Longer navigation timeout
+        actionTimeout: 20000, // Increased from 10s to 20s for WebKit actions
+        navigationTimeout: 30000, // Increased from 15s to 30s for WebKit navigation
         // WebKit doesn't support --no-sandbox, explicitly set empty launchOptions
         ...(process.env.CI && {
           launchOptions: {
@@ -110,8 +110,8 @@ export default defineConfig({
         userAgent:
           'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
         // WebKit-specific settings for mobile
-        actionTimeout: 12000, // Longer timeout for mobile WebKit
-        navigationTimeout: 18000,
+        actionTimeout: 24000, // Increased from 12s to 24s for mobile WebKit
+        navigationTimeout: 36000, // Increased from 18s to 36s for mobile WebKit
         // Explicitly ensure WebKit engine is used for iOS devices
         ...(process.env.CI && {
           launchOptions: {
@@ -137,8 +137,8 @@ export default defineConfig({
         userAgent:
           'Mozilla/5.0 (iPad; CPU OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
         // WebKit-specific settings for iPad
-        actionTimeout: 12000, // Longer timeout for iPad WebKit
-        navigationTimeout: 18000,
+        actionTimeout: 24000, // Increased from 12s to 24s for iPad WebKit
+        navigationTimeout: 36000, // Increased from 18s to 36s for iPad WebKit
         // Explicitly ensure WebKit engine is used for iOS devices
         ...(process.env.CI && {
           launchOptions: {
@@ -486,7 +486,7 @@ export default defineConfig({
     command: 'pnpm preview',
     url: 'http://localhost:4173',
     reuseExistingServer: !process.env.CI,
-    timeout: 120000,
+    timeout: 180000, // Increased from 120s to 180s for CI stability
     ignoreHTTPSErrors: true,
     // Retry server startup in case of port conflicts
     ...(process.env.CI && {

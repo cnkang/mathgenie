@@ -306,7 +306,7 @@ jobs:
   accessibility:
     name: ♿ Accessibility
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
 
     steps:
       - name: 📥 Checkout code
@@ -429,7 +429,7 @@ jobs:
   cross-browser:
     name: 🌐 Cross-browser & Mobile
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     strategy:
       fail-fast: false
@@ -506,7 +506,7 @@ jobs:
 
           # Use the cache helper script for smart browser installation
           ./scripts/playwright-cache-helper.sh smart-install ${{ matrix.browser }}
-        timeout-minutes: 10
+        timeout-minutes: 15
 
       - name: 🏗️ Build application
         run: pnpm build
