@@ -548,21 +548,23 @@ pnpm test:accessibility:mobile
 
 #### Automated Testing
 
-- **axe-core**: Run with WCAG 2.2 AAA rules on Chromium, Firefox, WebKit
+- **axe-core**: Run with WCAG 2.2 AAA rules on Chromium, Firefox (with performance optimizations), WebKit
 - **Color Contrast**: Automated contrast ratio testing across all engines
-- **Keyboard Navigation**: Automated keyboard accessibility testing
-- **Screen Reader**: Test with screen reader simulation on all engines
+- **Keyboard Navigation**: Automated keyboard accessibility testing with Firefox-specific optimizations
+- **Screen Reader**: Test with screen reader simulation on all engines with enhanced Firefox performance
+- **Firefox Performance**: Specialized WCAG enforcement optimizations including batched processing, reduced DOM queries, and optimized mutation observation
 
 #### Manual Testing Checklist
 
 - [ ] **Keyboard Only**: Complete navigation using only keyboard
-- [ ] **Screen Reader**: Test with NVDA, JAWS, VoiceOver
+- [ ] **Screen Reader**: Test with NVDA, JAWS, VoiceOver (Firefox optimized for better performance)
 - [ ] **High Contrast**: Verify functionality in high contrast mode
 - [ ] **200% Zoom**: Test at 200% zoom level without horizontal scrolling
 - [ ] **Reduced Motion**: Test with reduced motion preferences
-- [ ] **Touch Targets**: Verify 44px minimum on mobile devices
+- [ ] **Touch Targets**: Verify 44px minimum on mobile devices (Firefox-optimized enforcement)
 - [ ] **Focus Indicators**: Visible focus indicators with 3:1 contrast
 - [ ] **Color Independence**: Information not conveyed by color alone
+- [ ] **Firefox Performance**: Verify accessibility features work smoothly in Firefox with optimized processing
 
 #### Mobile Accessibility
 
@@ -575,9 +577,47 @@ pnpm test:accessibility:mobile
 
 1. **Component Level**: Each component must pass accessibility tests
 2. **Integration Level**: Full user flows must be accessible
-3. **Cross-Browser**: Test on Chromium, Firefox, and WebKit engines
+3. **Cross-Browser**: Test on Chromium, Firefox (with performance optimizations), and WebKit engines
 4. **Mobile Testing**: Verify on iPhone, iPad, and Android devices
 5. **Assistive Technology**: Test with actual screen readers
+
+### Firefox Accessibility Optimizations
+
+MathGenie includes specialized optimizations for Firefox to ensure optimal accessibility performance:
+
+#### Performance Enhancements
+
+- **Batched Processing**: Elements are processed in smaller batches (10 vs 25) for Firefox to prevent UI blocking
+- **Optimized DOM Queries**: Simplified selectors reduce query complexity in Firefox
+- **Enhanced Debouncing**: Longer debounce delays (500ms resize, 200ms mutation) for better Firefox performance
+- **Reduced Mutation Observation**: Limited observation scope to improve Firefox responsiveness
+- **Cached Style Calculations**: Computed styles are cached to minimize repeated calculations
+
+#### Implementation Details
+
+- **Browser Detection**: Automatic Firefox detection using `navigator.userAgent`
+- **Conditional Processing**: Different processing strategies based on browser and element count
+- **Memory Optimization**: `getBoundingClientRect()` used for better Firefox performance
+- **Scheduling Strategy**: `requestAnimationFrame` for Firefox vs `setTimeout` for other browsers
+
+#### Testing Firefox Optimizations
+
+```bash
+# Test accessibility specifically in Firefox
+pnpm test:e2e:accessibility --project=firefox
+
+# Verify Firefox-specific performance
+pnpm test:e2e --grep "Firefox" --project=firefox
+```
+
+#### Monitoring Firefox Performance
+
+The WCAG enforcement system logs Firefox-specific metrics in development mode:
+
+```javascript
+// Development console output example
+WCAG Enforcement: Applied 44px minimum touch targets to 25 elements (Firefox optimized: true)
+```
 
 ## 🔍 Test Architecture
 

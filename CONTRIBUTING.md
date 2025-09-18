@@ -275,22 +275,27 @@ test('should call validateInput function', async () => {
 #### WCAG 2.2 AAA Compliance
 
 - **Color Contrast**: Minimum 7:1 ratio for normal text, 4.5:1 for large text
-- **Touch Targets**: Minimum 44px for all interactive elements
+- **Touch Targets**: Minimum 44px for all interactive elements (Firefox-optimized enforcement)
 - **Keyboard Navigation**: Full keyboard accessibility required
 - **Screen Readers**: Proper ARIA labels and semantic HTML
 - **Focus Management**: Visible focus indicators and logical tab order
+- **Cross-Browser Performance**: Firefox-specific optimizations for accessibility enforcement
 
 #### Testing Accessibility
 
 ```bash
-# Run accessibility tests
+# Run accessibility tests (includes Firefox optimizations)
 pnpm test:e2e:accessibility
+
+# Test Firefox-specific accessibility performance
+pnpm test:e2e:accessibility --project=firefox
 
 # Manual testing checklist:
 # - Navigate using only keyboard
-# - Test with screen reader
+# - Test with screen reader (especially in Firefox)
 # - Verify color contrast
-# - Check touch target sizes
+# - Check touch target sizes (Firefox-optimized enforcement)
+# - Verify performance in Firefox with many interactive elements
 ```
 
 ### Internationalization (i18n) Requirements
@@ -377,6 +382,13 @@ expect(mockSetWarning).toHaveBeenCalledWith({ key: '' });
 - **Automatic Batching**: Leverage for better performance
 - **Code Splitting**: Implement for large features
 - **Memoization**: Use `useMemo`/`useCallback` judiciously
+
+#### Accessibility Performance
+
+- **Cross-Browser Optimization**: Firefox-specific optimizations for WCAG enforcement
+- **Batched Processing**: Efficient processing of accessibility enhancements
+- **DOM Query Optimization**: Reduced complexity for better performance
+- **Mutation Observation**: Optimized observation patterns for different browsers
 
 #### Bundle Size
 
