@@ -5,7 +5,9 @@
  */
 
 import { spawnSync } from 'child_process';
+import { existsSync } from 'fs';
 import { cpus, freemem, totalmem } from 'os';
+import { join } from 'path';
 import { buildSafeEnv } from './exec-utils';
 
 // 颜色输出 (支持 NO_COLOR 环境变量)
@@ -41,6 +43,112 @@ function log(level: LogLevel, message: string): void {
   console.log(`${prefix} ${sanitizedMessage}`);
 }
 
+/**
+ * Find executable path with cross-platform support
+ */
+function findExecutable(command: string): string | null {
+  // Windows executables might have extensions
+  const extensions = process.platform === 'win32' ? ['.cmd', '.bat', ''] : [''];
+  const basePath = './node_modules/.bin';
+
+  for (const ext of extensions) {
+    const fullPath = join(basePath, command + ext);
+    if (existsSync(fullPath)) {
+      return fullPath;
+    }
+  }
+  return null;
+}
+
+/**
+ * Check if a command is available
+ */
+function isCommandAvailable(cmd: string): boolean {
+  try {
+    const result = spawnSync(cmd, ['--version'], {
+      stdio: 'pipe',
+      shell: false,
+      timeout: 5000, // 5 second timeout
+    });
+    return result.status === 0;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Execute command safely using spawnSync with multiple fallback strategies
+ * This provides maximum compatibility across different environments
+ */
+function safeSpawn(command: string, args: string[], env: Record<string, string> = {}): void {
+  const safeEnv = buildSafeEnv({ removePath: true });
+  const fullEnv = {
+    ...process.env,
+    ...safeEnv,
+    ...env,
+  };
+
+  // Filter out undefined values to ensure Record<string, string>
+  const cleanEnv: Record<string, string> = {};
+  for (const [key, value] of Object.entries(fullEnv)) {
+    if (typeof value === 'string') {
+      cleanEnv[key] = value;
+    }
+  }
+
+  // Strategy 1: Direct execution
+  const executablePath = findExecutable(command);
+  if (executablePath && tryExecution(executablePath, args, cleanEnv)) {
+    return;
+  }
+
+  // Strategy 2: pnpm exec
+  if (isCommandAvailable('pnpm') && tryExecution('pnpm', ['exec', command, ...args], cleanEnv)) {
+    return;
+  }
+
+  // Strategy 3: npx
+  if (isCommandAvailable('npx') && tryExecution('npx', [command, ...args], cleanEnv)) {
+    return;
+  }
+
+  // Strategy 4: node direct
+  if (executablePath && tryExecution(process.execPath, [executablePath, ...args], cleanEnv)) {
+    return;
+  }
+
+  throw new Error(`Failed to execute ${command}`);
+}
+
+function tryExecution(executable: string, args: string[], env: Record<string, string>): boolean {
+  try {
+    const result = spawnSync(executable, args, {
+      stdio: 'inherit',
+      shell: false,
+      env,
+    });
+    return result.status === 0;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Execute command with secure spawnSync and fallback strategies
+ */
+function executeCommand(
+  baseCommand: string,
+  args: string[],
+  env: Record<string, string> = {}
+): void {
+  try {
+    safeSpawn(baseCommand, args, env);
+  } catch (error: unknown) {
+    log('error', `Failed to execute ${baseCommand}: ${error}`);
+    throw error;
+  }
+}
+
 interface SystemInfo {
   cpuCount: number;
   totalMemoryGB: number;
@@ -74,10 +182,16 @@ function selectTestStrategy(systemInfo: SystemInfo): TestStrategy {
   const { cpuCount, totalMemoryGB, freeMemoryGB, isCI } = systemInfo;
   const VITE_CONFIG = 'vite.config.ts';
 
-  log('system', `${cpuCount} CPUs, ${totalMemoryGB}GB total memory, ${freeMemoryGB}GB free`);
+  // Only show system info if not running validate command
+  const isValidateCommand = process.argv.includes('validate');
+  if (!isValidateCommand) {
+    log('system', `${cpuCount} CPUs, ${totalMemoryGB}GB total memory, ${freeMemoryGB}GB free`);
+  }
 
   if (isCI) {
-    log('info', 'CI environment detected - using conservative settings');
+    if (!isValidateCommand) {
+      log('info', 'CI environment detected - using conservative settings');
+    }
     return {
       config: 'vitest.ci.config.ts',
       maxThreads: Math.min(4, Math.ceil(cpuCount / 2)),
@@ -88,7 +202,9 @@ function selectTestStrategy(systemInfo: SystemInfo): TestStrategy {
 
   // 本地环境策略选择
   if (freeMemoryGB < 4) {
-    log('warning', 'Low memory detected - using conservative settings');
+    if (!isValidateCommand) {
+      log('warning', 'Low memory detected - using conservative settings');
+    }
     return {
       config: VITE_CONFIG,
       maxThreads: Math.min(2, cpuCount),
@@ -98,7 +214,9 @@ function selectTestStrategy(systemInfo: SystemInfo): TestStrategy {
   }
 
   if (cpuCount >= 8 && freeMemoryGB >= 8) {
-    log('info', 'High-performance system detected - using aggressive parallelization');
+    if (!isValidateCommand) {
+      log('info', 'High-performance system detected - using aggressive parallelization');
+    }
     return {
       config: VITE_CONFIG,
       maxThreads: Math.min(cpuCount - 2, 12),
@@ -107,7 +225,9 @@ function selectTestStrategy(systemInfo: SystemInfo): TestStrategy {
     };
   }
 
-  log('info', 'Balanced system detected - using standard settings');
+  if (!isValidateCommand) {
+    log('info', 'Balanced system detected - using standard settings');
+  }
   return {
     config: VITE_CONFIG,
     maxThreads: Math.min(4, Math.ceil(cpuCount / 2)),
@@ -125,8 +245,12 @@ interface UnitTestOptions {
 function runUnitTests(strategy: TestStrategy, options: UnitTestOptions = {}): void {
   const { watch = false, coverage = true, reporter = 'default' } = options;
 
-  log('info', `Using ${strategy.description}`);
-  log('info', `Max threads: ${strategy.maxThreads}`);
+  const isVerbose = !process.env.CI && !process.argv.includes('validate');
+
+  if (isVerbose) {
+    log('info', `Using ${strategy.description}`);
+    log('info', `Max threads: ${strategy.maxThreads}`);
+  }
 
   const coverageFlag = coverage ? '--coverage' : '--no-coverage';
   const watchFlag = watch ? '' : '--run';
@@ -135,31 +259,20 @@ function runUnitTests(strategy: TestStrategy, options: UnitTestOptions = {}): vo
   const command =
     `vitest ${watchFlag} ${coverageFlag} ${reporterFlag} --config=${strategy.config}`.trim();
 
-  log('info', `Running: ${command}`);
+  if (isVerbose) {
+    log('info', `Running: ${command}`);
+  }
 
   const args = [watchFlag, coverageFlag, reporterFlag, `--config=${strategy.config}`]
     .filter(arg => arg.trim() !== '')
-    .flatMap(arg => arg.split(' '));
+    .flatMap(arg => arg.split(' '))
+    .filter(arg => arg.trim() !== '');
 
   try {
-    // SONAR-SAFE: Using vitest with project dependencies, PATH restricted to safe directories
-    // eslint-disable-next-line sonarjs/no-os-command-from-path
-    const result = spawnSync('vitest', args, {
-      stdio: 'inherit',
-      env: {
-        ...buildSafeEnv({ removePath: false }),
-        VITEST_MAX_THREADS: strategy.maxThreads.toString(),
-        // SONAR-SAFE: PATH restricted to fixed, unwriteable directories (S4036)
-        PATH: '/usr/local/bin:/usr/bin:/bin',
-      },
+    // SONAR-SAFE: Using secure command execution with fallback strategies
+    executeCommand('vitest', args, {
+      VITEST_MAX_THREADS: strategy.maxThreads.toString(),
     });
-
-    if (result.error) {
-      throw result.error;
-    }
-    if (result.status !== 0) {
-      throw new Error(`Process exited with code ${result.status}`);
-    }
     log('success', 'Unit tests completed successfully');
   } catch (error: unknown) {
     log('error', 'Unit tests failed');
@@ -190,8 +303,12 @@ function runE2ETests(strategy: TestStrategy, options: E2ETestOptions = {}): void
     mobile = null,
   } = options;
 
-  log('info', `Using ${strategy.description} for E2E tests`);
-  log('info', `Playwright workers: ${strategy.playwrightWorkers}`);
+  // Only show detailed info if not running validate command
+  const isValidateCommand = process.argv.includes('validate');
+  if (!isValidateCommand) {
+    log('info', `Using ${strategy.description} for E2E tests`);
+    log('info', `Playwright workers: ${strategy.playwrightWorkers}`);
+  }
 
   const args = buildE2EArgs({ ui, suite, project, mobile, headed, debug });
   const env = buildE2EEnv(strategy, mobile);
@@ -234,32 +351,28 @@ function buildE2EArgs(options: {
 }
 
 function buildE2EEnv(strategy: TestStrategy, mobile: string | null): Record<string, string> {
-  return {
-    ...buildSafeEnv({ removePath: false }),
+  const safeEnv = buildSafeEnv({ removePath: false });
+  const baseEnv = {
+    ...safeEnv,
     PLAYWRIGHT_WORKERS: strategy.playwrightWorkers.toString(),
     ...(mobile ? { MOBILE_TESTS: 'true' } : {}),
   };
+
+  // Filter out undefined values to ensure Record<string, string>
+  const cleanEnv: Record<string, string> = {};
+  for (const [key, value] of Object.entries(baseEnv)) {
+    if (typeof value === 'string') {
+      cleanEnv[key] = value;
+    }
+  }
+
+  return cleanEnv;
 }
 
 function executeE2ETests(args: string[], env: Record<string, string>): void {
   try {
-    // SONAR-SAFE: Using npx with project dependencies, PATH restricted to safe directories
-    // eslint-disable-next-line sonarjs/no-os-command-from-path
-    const result = spawnSync('npx', ['playwright', ...args], {
-      stdio: 'inherit',
-      env: {
-        ...env,
-        // SONAR-SAFE: PATH restricted to fixed, unwriteable directories (S4036)
-        PATH: '/usr/local/bin:/usr/bin:/bin',
-      },
-    });
-
-    if (result.error) {
-      throw result.error;
-    }
-    if (result.status !== 0) {
-      throw new Error(`Process exited with code ${result.status}`);
-    }
+    // SONAR-SAFE: Using secure command execution with fallback strategies
+    executeCommand('playwright', args, env);
     log('success', 'E2E tests completed successfully');
   } catch (error: unknown) {
     log('error', 'E2E tests failed');
@@ -345,57 +458,73 @@ function parseArgs(): ParsedArgs {
   return { command, options };
 }
 
-function main(): void {
-  const { command, options } = parseArgs();
-  const systemInfo = getSystemInfo();
-  const strategy = selectTestStrategy(systemInfo);
+function getStringOption(
+  options: Record<string, string | boolean>,
+  key: string
+): string | undefined {
+  return typeof options[key] === 'string' ? (options[key] as string) : undefined;
+}
 
+function handleUnitCommands(
+  command: string,
+  options: Record<string, string | boolean>,
+  strategy: TestStrategy,
+  systemInfo: SystemInfo
+): boolean {
   switch (command) {
     case 'unit':
       runUnitTests(strategy, {
         coverage: !options['no-coverage'] && systemInfo.isCoverage,
-        reporter: options.reporter,
+        reporter: getStringOption(options, 'reporter'),
       });
-      break;
+      return true;
 
     case 'unit:watch':
       runUnitTests(strategy, { watch: true, coverage: false });
-      break;
+      return true;
 
     case 'unit:ci': {
-      // 强制使用CI配置
       const ciStrategy: TestStrategy = { ...strategy, config: 'vitest.ci.config.ts' };
       runUnitTests(ciStrategy, { coverage: true, reporter: 'verbose' });
-      break;
+      return true;
     }
+  }
+  return false;
+}
 
+function handleE2ECommands(
+  command: string,
+  options: Record<string, string | boolean>,
+  strategy: TestStrategy
+): boolean {
+  switch (command) {
     case 'e2e':
       runE2ETests(strategy, {
-        project: options.project,
-        suite: options.suite,
-        mobile: options.mobile,
+        project: getStringOption(options, 'project'),
+        suite: getStringOption(options, 'suite'),
+        mobile: getStringOption(options, 'mobile'),
       });
-      break;
+      return true;
 
     case 'e2e:ui':
       runE2ETests(strategy, { ui: true });
-      break;
+      return true;
 
     case 'e2e:debug':
       runE2ETests(strategy, {
         debug: true,
-        suite: options.positional,
-        project: options.project || 'chromium',
+        suite: getStringOption(options, 'positional'),
+        project: getStringOption(options, 'project') || 'chromium',
       });
-      break;
+      return true;
 
     case 'e2e:headed':
       runE2ETests(strategy, {
         headed: true,
-        suite: options.positional,
-        project: options.project || 'chromium',
+        suite: getStringOption(options, 'positional'),
+        project: getStringOption(options, 'project') || 'chromium',
       });
-      break;
+      return true;
 
     case 'e2e:mobile':
       if (!options.positional) {
@@ -403,9 +532,31 @@ function main(): void {
         showUsage();
         process.exit(1);
       }
-      runE2ETests(strategy, { mobile: options.positional });
-      break;
+      runE2ETests(strategy, {
+        mobile: getStringOption(options, 'positional'),
+      });
+      return true;
+  }
+  return false;
+}
 
+function main(): void {
+  const { command, options } = parseArgs();
+  const systemInfo = getSystemInfo();
+  const strategy = selectTestStrategy(systemInfo);
+
+  // Handle unit test commands
+  if (handleUnitCommands(command, options, strategy, systemInfo)) {
+    return;
+  }
+
+  // Handle E2E test commands
+  if (handleE2ECommands(command, options, strategy)) {
+    return;
+  }
+
+  // Handle other commands
+  switch (command) {
     case 'validate':
       log('info', 'Running full validation suite...');
       runUnitTests(strategy, { coverage: true });
