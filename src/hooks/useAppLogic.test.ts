@@ -311,6 +311,41 @@ describe('useAppLogic', () => {
       expect(mockSetError).toHaveBeenCalledWith({ key: 'validation.error' });
     });
 
+    test('should skip validation when loading', () => {
+      const mockSetSettings = vi.fn();
+      const mockClearMessages = vi.fn();
+      const mockIsValidationSensitiveField = vi.fn(() => true);
+      const mockValidateSettings = vi.fn(() => 'validation.error');
+      const mockCheckRestrictiveSettings = vi.fn(() => false);
+      const mockSetError = vi.fn();
+      const mockSetWarning = vi.fn();
+      const mockSetSuccessMessage = vi.fn();
+
+      const { result } = renderHook(() =>
+        useAppHandlers(
+          mockSettings,
+          mockSetSettings,
+          mockClearMessages,
+          mockIsValidationSensitiveField,
+          mockValidateSettings,
+          true, // isLoading - should skip validation
+          mockCheckRestrictiveSettings,
+          mockSetError,
+          mockSetWarning,
+          mockSetSuccessMessage
+        )
+      );
+
+      act(() => {
+        result.current.handleChange('numProblems', 20);
+      });
+
+      // Should not call validation functions when loading
+      expect(mockSetError).not.toHaveBeenCalled();
+      expect(mockSetWarning).not.toHaveBeenCalled();
+      expect(mockSetSettings).toHaveBeenCalledWith({ ...mockSettings, numProblems: 20 });
+    });
+
     test('should handle restrictive settings warning', () => {
       const mockSetSettings = vi.fn();
       const mockClearMessages = vi.fn();
@@ -375,8 +410,7 @@ describe('useAppLogic', () => {
       });
 
       expect(mockSetSettings).toHaveBeenCalledWith(presetSettings);
-      expect(mockSetError).toHaveBeenCalledWith('');
-      expect(mockSetWarning).toHaveBeenCalledWith('');
+      expect(mockClearMessages).toHaveBeenCalled();
       expect(mockSetSuccessMessage).toHaveBeenCalledWith({
         key: 'messages.info.presetApplied',
         params: { name: 'Preset' },
@@ -414,8 +448,8 @@ describe('useAppLogic', () => {
         result.current.handleApplyPreset(presetSettings);
       });
 
-      expect(mockSetSuccessMessage).toHaveBeenCalledTimes(1); // Only called once with empty string
-      expect(mockSetSuccessMessage).toHaveBeenCalledWith('');
+      expect(mockSetSuccessMessage).not.toHaveBeenCalled(); // Should not be called when loading
+      expect(mockClearMessages).toHaveBeenCalled();
     });
   });
 });
