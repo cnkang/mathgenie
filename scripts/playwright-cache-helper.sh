@@ -36,30 +36,50 @@ is_browser_installed_via_dry_run() {
     local browser=$1
     local dry_run_output
     
+    print_status "$BLUE" "   🔍 Running dry-run check for $browser..."
     dry_run_output=$(pnpm exec playwright install --dry-run "$browser" 2>&1)
+    
+    # Show relevant parts of dry-run output for debugging
+    echo "$dry_run_output" | grep -E "(already installed|Download url|Install location)" | head -5
     
     # Check for "is already installed" message or absence of download URLs
     if echo "$dry_run_output" | grep -q "is already installed"; then
+        print_status "$GREEN" "   ✅ Dry-run confirms $browser is already installed"
         return 0
     fi
     
     if ! echo "$dry_run_output" | grep -q "Download url:"; then
+        print_status "$GREEN" "   ✅ Dry-run shows no download needed for $browser"
         return 0
     fi
     
+    print_status "$YELLOW" "   ❌ Dry-run indicates $browser needs to be downloaded"
     return 1
 }
 
-# Function to check if browser exists in cache directory
+# Function to check if browser exists in any cache directory
 is_browser_in_cache() {
     local browser=$1
-    local cache_dir
     
-    cache_dir=$(get_primary_cache_dir)
+    print_status "$BLUE" "   🔍 Checking cache directories for $browser..."
     
-    if [[ -d "$cache_dir" ]] && find "$cache_dir" -name "*$browser*" -type d | grep -q "$browser"; then
-        return 0
-    fi
+    # Check all possible cache directories
+    while IFS= read -r dir; do
+        print_status "$BLUE" "   📁 Checking: $dir"
+        if [[ -d "$dir" ]]; then
+            local browser_dirs
+            browser_dirs=$(find "$dir" -name "*$browser*" -type d 2>/dev/null)
+            if [[ -n "$browser_dirs" ]]; then
+                print_status "$GREEN" "   ✅ Found $browser in: $dir"
+                echo "$browser_dirs" | head -3
+                return 0
+            else
+                print_status "$YELLOW" "   ❌ No $browser found in: $dir"
+            fi
+        else
+            print_status "$YELLOW" "   ❌ Directory does not exist: $dir"
+        fi
+    done < <(get_cache_directories)
     
     return 1
 }
@@ -70,13 +90,20 @@ check_browser() {
     print_status "$BLUE" "🔍 Checking $browser installation..."
     
     # Check via multiple methods for reliability
-    if is_browser_installed_via_dry_run "$browser" || is_browser_in_cache "$browser"; then
-        print_status "$GREEN" "✅ $browser is installed and available"
+    # First check cache directories (faster)
+    if is_browser_in_cache "$browser"; then
+        print_status "$GREEN" "✅ $browser is installed and available (found in cache)"
         return 0
-    else
-        print_status "$YELLOW" "❌ $browser is not installed"
-        return 1
     fi
+    
+    # Then check via dry-run (more reliable but slower)
+    if is_browser_installed_via_dry_run "$browser"; then
+        print_status "$GREEN" "✅ $browser is installed and available (verified via dry-run)"
+        return 0
+    fi
+    
+    print_status "$YELLOW" "❌ $browser is not installed"
+    return 1
 }
 
 # Function to install a browser
@@ -130,7 +157,10 @@ verify_cache_dirs() {
     while IFS= read -r dir; do
         if [[ -d "$dir" ]]; then
             print_status "$GREEN" "✅ Found: $dir"
-            find "$dir" -maxdepth 1 \( -type f -o -type d \) | head -5 || true
+            local file_count
+            file_count=$(find "$dir" -maxdepth 2 -type d 2>/dev/null | wc -l)
+            print_status "$BLUE" "   📁 Contains $file_count directories"
+            find "$dir" -maxdepth 2 -name "*chromium*" -o -name "*firefox*" -o -name "*webkit*" 2>/dev/null | head -3 || true
         else
             print_status "$YELLOW" "❌ Missing: $dir"
         fi
@@ -233,7 +263,36 @@ handle_cache_miss() {
 # Function to handle smart-install action
 handle_smart_install_action() {
     local browser=$1
-    local cache_hit=${CACHE_HIT:-"false"}
+    
+    # Show environment info for debugging
+    print_status "$BLUE" "🔍 Environment debugging info:"
+    echo "   PWD: $(pwd)"
+    echo "   HOME: $HOME"
+    echo "   USER: ${USER:-unknown}"
+    echo "   PLAYWRIGHT_BROWSERS_PATH: ${PLAYWRIGHT_BROWSERS_PATH:-not set}"
+    echo "   CI: ${CI:-not set}"
+    
+    # Show Playwright info
+    print_status "$BLUE" "🎭 Playwright debugging info:"
+    pnpm exec playwright install --dry-run 2>&1 | head -10 || true
+    
+    # Auto-detect cache hit by checking if any browsers are already installed
+    local cache_hit="false"
+    populate_browser_list "$browser"
+    
+    local installed_count=0
+    for b in "${BROWSER_LIST[@]}"; do
+        if check_browser "$b" >/dev/null 2>&1; then
+            ((installed_count++))
+        fi
+    done
+    
+    if [[ $installed_count -gt 0 ]]; then
+        cache_hit="true"
+        print_status "$GREEN" "🎯 Auto-detected cache hit ($installed_count/${#BROWSER_LIST[@]} browsers found)"
+    else
+        print_status "$YELLOW" "🎯 Auto-detected cache miss (no browsers found)"
+    fi
     
     if [[ "$cache_hit" == "true" ]]; then
         handle_cache_hit "$browser"

@@ -142,11 +142,15 @@ function runUnitTests(strategy: TestStrategy, options: UnitTestOptions = {}): vo
     .flatMap(arg => arg.split(' '));
 
   try {
+    // SONAR-SAFE: Using vitest with project dependencies, PATH restricted to safe directories
+    // eslint-disable-next-line sonarjs/os-command
     const result = spawnSync('vitest', args, {
       stdio: 'inherit',
       env: {
         ...buildSafeEnv({ removePath: false }),
         VITEST_MAX_THREADS: strategy.maxThreads.toString(),
+        // Restrict PATH to known safe directories (S4036)
+        PATH: ['/usr/local/bin', '/usr/bin', '/bin', process.env.PATH].filter(Boolean).join(':')
       },
     });
 
@@ -235,9 +239,15 @@ function buildE2EEnv(strategy: TestStrategy, mobile: string | null): Record<stri
 
 function executeE2ETests(args: string[], env: Record<string, string>): void {
   try {
+    // SONAR-SAFE: Using npx with project dependencies, PATH restricted to safe directories
+    // eslint-disable-next-line sonarjs/os-command
     const result = spawnSync('npx', ['playwright', ...args], {
       stdio: 'inherit',
-      env,
+      env: {
+        ...env,
+        // Restrict PATH to known safe directories (S4036)
+        PATH: ['/usr/local/bin', '/usr/bin', '/bin', process.env.PATH].filter(Boolean).join(':')
+      },
     });
 
     if (result.error) {

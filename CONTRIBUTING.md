@@ -2,6 +2,29 @@
 
 Thank you for your interest in contributing to MathGenie! This guide will help you get started with contributing to our React 19 + TypeScript project.
 
+## 🎯 Development Philosophy: "Good Tools Are Those That Accomplish the Task"
+
+**Core Principle**: The primary objective is to complete tasks effectively, not to use specific tools or methods.
+
+### Quick Decision Framework
+
+```
+Problem to Solve → Choose Approach → Try It → Evaluate Result
+                                      ↓
+                                   Working?
+                                   ├─ YES → Continue
+                                   └─ NO → Failed 2-3 times?
+                                           ├─ YES → Switch Method
+                                           └─ NO → Adjust & Retry
+```
+
+**Key Guidelines**:
+
+- **Results Over Methods**: Task completion matters more than tool preference
+- **Rapid Adaptation**: Switch approaches after 2-3 failures rather than persisting
+- **Quality Standards**: Maintain security, functionality, and maintainability regardless of method used
+- **Efficiency Focus**: Time spent fighting tools is time not spent solving problems
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -69,6 +92,104 @@ Thank you for your interest in contributing to MathGenie! This guide will help y
    pnpm sonar:high     # Check for critical code quality issues
    ```
 
+### Pragmatic Problem-Solving Approach
+
+#### 🎯 Goal Preservation Principle (Critical)
+
+**Before choosing any "simpler" approach, always ask:**
+- Will this approach still achieve the original objective?
+- Are we solving the problem or just avoiding it?
+- What functionality or quality might we be sacrificing?
+- Is there a way to simplify the method without compromising the goal?
+
+**❌ Destructive Simplification (Never Do)**:
+- Delete failing tests instead of fixing code
+- Remove error-prone features instead of debugging
+- Disable quality checks instead of improving code
+- Cut requirements instead of improving implementation
+
+**✅ Constructive Simplification (Always Do)**:
+- Simplify implementation while preserving functionality
+- Use different tools while maintaining quality standards
+- Optimize processes without skipping essential steps
+- Reduce complexity without reducing value
+
+#### 🔧 Tool Selection Guidelines
+
+**When MCP tools fail repeatedly**:
+
+- **❌ Don't**: Keep trying the same tool with minor variations
+- **✅ Do**: Switch to bash/sed/fsWrite after 2-3 failures
+- **Why**: Time is valuable, results matter more than tool preference
+
+**When complex regex isn't working**:
+
+- **❌ Don't**: Spend hours perfecting the regex
+- **✅ Do**: Use simple string replacement or rewrite the file
+- **Why**: Simple solutions are often more maintainable
+
+#### 🏗️ Architecture Decision Guidelines
+
+**When design patterns don't fit**:
+
+- **❌ Don't**: Force the pattern to work
+- **✅ Do**: Use a simpler, more appropriate approach
+- **Why**: Code should serve the problem, not the other way around
+
+**When "best practices" cause complications**:
+
+- **❌ Don't**: Insist on following them despite issues
+- **✅ Do**: Adapt or use a different approach for this context
+- **Why**: Context matters more than universal rules
+
+#### 🐛 Debugging & Problem Solving
+
+**When debugging approaches aren't working**:
+
+- **❌ Don't**: Continue with the same method indefinitely
+- **✅ Do**: Try different debugging methods, add logging, simplify
+- **Why**: Different problems need different approaches
+
+**When implementation takes much longer than expected**:
+
+- **❌ Don't**: Push through with the current approach
+- **✅ Do**: Reassess the problem and try a different solution
+- **Why**: Efficiency matters for team productivity
+
+### Emergency Protocols
+
+#### When Completely Stuck (> 2 hours on same approach)
+
+1. **Stop and Reassess**: What exactly are we trying to achieve?
+2. **Simplify**: Can we solve a smaller version of this problem?
+3. **Alternative Research**: What other approaches exist?
+4. **Ask for Help**: Get a fresh perspective
+5. **Break Down**: Divide the problem into smaller pieces
+
+#### When Under Time Pressure
+
+1. **Prioritize**: What's the minimum viable solution?
+2. **Cut Scope**: What can be simplified or deferred?
+3. **Use Known Tools**: Stick with familiar, reliable approaches
+4. **Document Shortcuts**: Note what needs to be improved later
+5. **Validate Core Requirements**: Ensure essential functionality works
+
+### Red Flags (When to Switch Approaches)
+
+🚩 **Immediate Switch Signals**:
+
+- Same method failed 2-3 times
+- Spending more time fighting tools than solving problems
+- Team productivity being significantly impacted
+- Solution becoming overly complex for the problem size
+
+🚩 **Warning Signs**:
+
+- Feeling frustrated with the current approach
+- Making excuses for why the method "should" work
+- Spending more time on setup than implementation
+- Other team members can't understand the approach
+
 ### Before Submitting
 
 1. **Complete Validation**
@@ -92,7 +213,15 @@ Thank you for your interest in contributing to MathGenie! This guide will help y
 
 ## 🎯 Contribution Guidelines
 
-### Code Quality Standards
+### Code Quality Standards (Non-Negotiable)
+
+Regardless of the approach chosen, always ensure:
+
+- ✅ **Security**: No vulnerabilities introduced
+- ✅ **Functionality**: Code works as required
+- ✅ **Maintainability**: Team can understand and modify it
+- ✅ **Testing**: Adequate test coverage
+- ✅ **Documentation**: Decisions and trade-offs documented
 
 #### TypeScript Requirements
 
@@ -128,7 +257,30 @@ Thank you for your interest in contributing to MathGenie! This guide will help y
 
 Use `pnpm sonar:high` to check for violations of these standards.
 
-#### Hook Architecture Patterns
+### Real Development Examples
+
+#### Example 1: File Modification
+
+**Problem**: Need to update multiple files with similar changes
+**Failed Approach**: Complex MCP regex replacement (failed 3 times)
+**Successful Approach**: Simple bash loop with sed
+**Result**: Task completed in 10 minutes vs. 2 hours of struggling
+
+#### Example 2: Data Processing
+
+**Problem**: Complex data transformation needed
+**Failed Approach**: Trying to do everything in one complex function
+**Successful Approach**: Break into simple, testable functions
+**Result**: Easier to debug, test, and maintain
+
+#### Example 3: UI Component
+
+**Problem**: Component needs to handle many edge cases
+**Failed Approach**: One complex component with many conditionals
+**Successful Approach**: Compose smaller, focused components
+**Result**: More reusable, easier to understand and test
+
+### Hook Architecture Patterns
 
 Follow the balanced hook architecture patterns established in the codebase:
 
@@ -230,15 +382,6 @@ export const useAppHandlers = (...params) => {
   - Use when the hook manages multiple distinct concerns
   - Extract complex logic into focused helper hooks
   - Compose helper hooks for maximum reusability
-
-**Benefits of both patterns**:
-
-- **Clear Organization**: Logic is well-structured and easy to follow
-- **Performance**: Proper memoization prevents unnecessary re-renders
-- **Testability**: Hook functionality can be tested through public APIs
-- **Type Safety**: Full TypeScript support with proper dependency tracking
-- **Maintainability**: Code is organized for long-term maintenance
-- **Flexibility**: Choose the pattern that best fits the hook's complexity and scope
 
 ### Testing Requirements
 
@@ -442,6 +585,23 @@ const validateAndMergeSettings = (parsed: unknown): Settings => {
 - **Type Safety**: Use type guards for runtime validation
 - **User Feedback**: Provide clear error messages for validation failures
 
+### Team Communication
+
+#### When Switching Approaches
+
+**Communicate**:
+
+- What approach was tried and why it didn't work
+- What alternative is being attempted
+- Expected timeline for the new approach
+- Any help or resources needed
+
+**Document**:
+
+- Decision rationale in commit messages or comments
+- Trade-offs made due to time or complexity constraints
+- Lessons learned for future similar problems
+
 ## 🐛 Bug Reports
 
 ### Before Reporting
@@ -525,6 +685,7 @@ Mockups, examples, etc.
 - [ ] **i18n**: All text properly internationalized
 - [ ] **Documentation**: Updated relevant documentation
 - [ ] **Performance**: No significant performance regression
+- [ ] **Pragmatic Approach**: Used most effective tools and methods for the task
 
 ### PR Template
 
@@ -540,6 +701,13 @@ Brief description of changes
 - [ ] Breaking change
 - [ ] Documentation update
 
+## Approach & Tools Used
+
+- [ ] Used standard MCP tools successfully
+- [ ] Switched to alternative tools (bash/sed/fsWrite) due to MCP failures
+- [ ] Applied pragmatic problem-solving approach
+- [ ] Documented tool selection reasoning
+
 ## Testing
 
 - [ ] Unit tests pass
@@ -553,6 +721,7 @@ Brief description of changes
 - [ ] Self-review completed
 - [ ] Documentation updated
 - [ ] No breaking changes (or documented)
+- [ ] Quality standards maintained regardless of tools used
 ```
 
 ### Review Process
@@ -651,6 +820,12 @@ Active contributors may be invited to become maintainers with:
 - Commit access to the repository
 - Ability to review and merge PRs
 - Responsibility for project direction and quality
+
+## 💡 Remember
+
+> "The best code is code that works, is secure, and can be maintained by your team. Everything else is secondary."
+
+The goal is not to use the most sophisticated tools or follow the most elegant patterns. The goal is to deliver working, maintainable, secure software efficiently.
 
 ## 📞 Contact
 
