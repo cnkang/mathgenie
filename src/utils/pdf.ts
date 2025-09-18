@@ -10,6 +10,25 @@ const loadJsPDF = async (): Promise<typeof import('jspdf').default> => {
   return jsPDFModule;
 };
 
+const shouldAddNewPage = (currentY: number, spacing: number, pageHeight: number): boolean => {
+  return currentY + spacing > pageHeight;
+};
+
+const resetColumns = (state: Record<'left' | 'right', number>, marginTop: number): void => {
+  state.left = marginTop;
+  state.right = marginTop;
+};
+
+const getColumnKey = (index: number): 'left' | 'right' => (index % 2 === 0 ? 'left' : 'right');
+
+const getTextXPosition = (
+  column: 'left' | 'right',
+  marginLeft: number,
+  colWidth: number
+): number => {
+  return column === 'left' ? marginLeft : marginLeft + colWidth + marginLeft;
+};
+
 export const generatePdf = async (
   problems: Problem[],
   settings: Settings,
@@ -28,27 +47,18 @@ export const generatePdf = async (
   const lineSpacing = settings.lineSpacing;
   const colWidth = (pageWidth - 3 * marginLeft) / 2;
 
-  let currYLeft = marginTop;
-  let currYRight = marginTop;
+  const columnState: Record<'left' | 'right', number> = { left: marginTop, right: marginTop };
 
   problems.forEach((problem, index) => {
-    if (index % 2 === 0) {
-      if (currYLeft + lineSpacing > pageHeight) {
-        doc.addPage();
-        currYLeft = marginTop;
-        currYRight = marginTop;
-      }
-      doc.text(problem.text, marginLeft, currYLeft);
-      currYLeft += lineSpacing;
-    } else {
-      if (currYRight + lineSpacing > pageHeight) {
-        doc.addPage();
-        currYLeft = marginTop;
-        currYRight = marginTop;
-      }
-      doc.text(problem.text, marginLeft + colWidth + marginLeft, currYRight);
-      currYRight += lineSpacing;
+    const columnKey = getColumnKey(index);
+    if (shouldAddNewPage(columnState[columnKey], lineSpacing, pageHeight)) {
+      doc.addPage();
+      resetColumns(columnState, marginTop);
     }
+
+    const yPosition = columnState[columnKey];
+    doc.text(problem.text, getTextXPosition(columnKey, marginLeft, colWidth), yPosition);
+    columnState[columnKey] = yPosition + lineSpacing;
   });
 
   doc.save(filename);
