@@ -85,20 +85,35 @@ test.describe('Collapsible UI Accessibility', () => {
   });
 
   test('should maintain keyboard navigation flow', async ({ page }: { page: Page }) => {
-    // Tab through the interface
+    // Add timeout for Firefox compatibility
+    test.setTimeout(45000); // Increased timeout for Firefox
+    
+    // Tab through the interface with delays for Firefox
     await page.keyboard.press('Tab'); // Language select
+    await page.waitForTimeout(100); // Small delay for Firefox
     await page.keyboard.press('Tab'); // First preset card
+    await page.waitForTimeout(100);
     await page.keyboard.press('Tab'); // Second preset card
+    await page.waitForTimeout(100);
     await page.keyboard.press('Tab'); // Third preset card
+    await page.waitForTimeout(100);
     await page.keyboard.press('Tab'); // Fourth preset card
+    await page.waitForTimeout(100);
     await page.keyboard.press('Tab'); // Operations select
+    await page.waitForTimeout(100);
     await page.keyboard.press('Tab'); // Number of problems
+    await page.waitForTimeout(100);
 
-    // Should be able to reach advanced settings toggle
+    // Should be able to reach advanced settings toggle with timeout protection
     let focusedElement = await page.evaluate(() => document.activeElement?.className);
-    while (focusedElement && !focusedElement.includes('advanced-settings-toggle')) {
+    let tabCount = 0;
+    const maxTabs = 20; // Prevent infinite loop in Firefox
+    
+    while (focusedElement && !focusedElement.includes('advanced-settings-toggle') && tabCount < maxTabs) {
       await page.keyboard.press('Tab');
+      await page.waitForTimeout(100); // Small delay for Firefox
       focusedElement = await page.evaluate(() => document.activeElement?.className);
+      tabCount++;
     }
 
     expect(focusedElement).toContain('advanced-settings-toggle');

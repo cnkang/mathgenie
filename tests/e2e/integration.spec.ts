@@ -81,7 +81,8 @@ test.describe('Integration Tests', () => {
     await expect(page.locator('.error-message')).toBeVisible({ timeout: 5000 });
 
     // Apply another preset to fix the error
-    const intermediatePreset = page.locator('.settings-section .preset-card').nth(1);
+    // Use more specific selector for better Firefox performance
+    const intermediatePreset = page.locator('.preset-card:has-text("Intermediate")');
     await intermediatePreset.scrollIntoViewIfNeeded();
     await intermediatePreset.click();
 
@@ -179,7 +180,8 @@ test.describe('Integration Tests', () => {
     await page.waitForSelector('.settings-presets', { timeout: 10000 });
 
     // Step 1: Apply intermediate preset
-    const intermediatePreset = page.locator('.settings-section .preset-card').nth(1);
+    // Use more specific selector for better Firefox performance
+    const intermediatePreset = page.locator('.preset-card:has-text("Intermediate")');
     await intermediatePreset.scrollIntoViewIfNeeded();
     await intermediatePreset.click();
     await page.waitForTimeout(1000);
@@ -260,7 +262,8 @@ test.describe('Integration Tests', () => {
     await page.waitForSelector('.settings-presets', { timeout: 10000 });
 
     // Apply preset to fix all errors at once
-    const advancedPreset = page.locator('.settings-section .preset-card').nth(2); // Advanced preset
+    // Use more specific selector for better Firefox performance
+    const advancedPreset = page.locator('.preset-card:has-text("Advanced")'); // Advanced preset
     await advancedPreset.scrollIntoViewIfNeeded();
     await advancedPreset.click();
 
@@ -336,7 +339,8 @@ test.describe('Integration Tests', () => {
     await beginnerPreset.scrollIntoViewIfNeeded();
     await beginnerPreset.click(); // Apply preset
     await page.fill('#numProblems', '999'); // Create another error
-    const intermediatePreset = page.locator('.settings-section .preset-card').nth(1);
+    // Use more specific selector for better Firefox performance
+    const intermediatePreset = page.locator('.preset-card:has-text("Intermediate")');
     await intermediatePreset.scrollIntoViewIfNeeded();
     await intermediatePreset.click(); // Apply different preset
     await expandAdvancedSettings(page);
