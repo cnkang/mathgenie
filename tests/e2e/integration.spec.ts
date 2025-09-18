@@ -84,11 +84,12 @@ test.describe('Integration Tests', () => {
     const intermediatePreset = page.locator('.settings-section .preset-card').nth(1);
     await intermediatePreset.scrollIntoViewIfNeeded();
     await intermediatePreset.click();
-    await page.waitForTimeout(1000);
+
+    // Wait for preset settings to be applied first
+    await expect(page.locator('#numProblems')).toHaveValue('20');
 
     // Error should clear and new preset should be applied
     await expect(page.locator('.error-message')).not.toBeVisible();
-    await expect(page.locator('#numProblems')).toHaveValue('20');
   });
 
   test('should maintain error states across language changes with persistence', async ({
@@ -154,14 +155,14 @@ test.describe('Integration Tests', () => {
     const beginnerPreset = page.locator('.settings-section .preset-card').first();
     await beginnerPreset.scrollIntoViewIfNeeded();
     await beginnerPreset.click();
+
+    // Wait for preset settings to be applied first
+    await expect(page.locator('#numRangeFrom')).toHaveValue('1');
+    await expect(page.locator('#numRangeTo')).toHaveValue('10');
     await page.waitForTimeout(1000);
 
     // Error should be cleared by preset application
     await expect(page.locator('.error-message')).not.toBeVisible();
-
-    // Verify preset settings are applied correctly
-    await expect(page.locator('#numRangeFrom')).toHaveValue('1');
-    await expect(page.locator('#numRangeTo')).toHaveValue('10');
 
     // Problems should be generated successfully
     await page.waitForSelector('.problem-item', { timeout: 10000 });
@@ -262,15 +263,15 @@ test.describe('Integration Tests', () => {
     const advancedPreset = page.locator('.settings-section .preset-card').nth(2); // Advanced preset
     await advancedPreset.scrollIntoViewIfNeeded();
     await advancedPreset.click();
+
+    // Wait for preset settings to be applied first
+    await expect(page.locator('#numProblems')).toHaveValue('25');
+    await expect(page.locator('#numRangeFrom')).toHaveValue('1');
+    await expect(page.locator('#numRangeTo')).toHaveValue('100');
     await page.waitForTimeout(1000);
 
     // All errors should be cleared
     await expect(page.locator('.error-message')).not.toBeVisible();
-
-    // Verify valid settings are applied
-    await expect(page.locator('#numProblems')).toHaveValue('25');
-    await expect(page.locator('#numRangeFrom')).toHaveValue('1');
-    await expect(page.locator('#numRangeTo')).toHaveValue('100');
 
     // Operations should be selected
     const selectedOperations = await page.locator('#operations option:checked').allTextContents();

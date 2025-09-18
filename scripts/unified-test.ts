@@ -4,8 +4,9 @@
  * 统一测试脚本 - 智能选择最佳测试配置并支持多种测试类型
  */
 
-import { execSync } from 'child_process';
+import { spawnSync } from 'child_process';
 import { cpus, freemem, totalmem } from 'os';
+import { buildSafeEnv } from './exec-utils';
 
 // 颜色输出 (支持 NO_COLOR 环境变量)
 const colors = process.env.NO_COLOR
@@ -31,7 +32,13 @@ function log(level: LogLevel, message: string): void {
       system: `${colors.cyan || ''}[SYSTEM]${colors.reset || ''}`,
     }[level] || '[LOG]';
 
-  console.log(`${prefix} ${message}`);
+  // Sanitize message to prevent log injection (CWE-117)
+  const sanitizedMessage = message
+    .replace(/[\r\n\t]/g, ' ') // Remove line breaks and tabs
+    .replace(/[^\x20-\x7E]/g, '?') // Replace non-printable chars
+    .substring(0, 500); // Limit length
+
+  console.log(`${prefix} ${sanitizedMessage}`);
 }
 
 interface SystemInfo {
@@ -65,6 +72,7 @@ interface TestStrategy {
 
 function selectTestStrategy(systemInfo: SystemInfo): TestStrategy {
   const { cpuCount, totalMemoryGB, freeMemoryGB, isCI } = systemInfo;
+  const VITE_CONFIG = 'vite.config.ts';
 
   log('system', `${cpuCount} CPUs, ${totalMemoryGB}GB total memory, ${freeMemoryGB}GB free`);
 
@@ -82,7 +90,7 @@ function selectTestStrategy(systemInfo: SystemInfo): TestStrategy {
   if (freeMemoryGB < 4) {
     log('warning', 'Low memory detected - using conservative settings');
     return {
-      config: 'vite.config.ts',
+      config: VITE_CONFIG,
       maxThreads: Math.min(2, cpuCount),
       playwrightWorkers: 1,
       description: 'Memory conservative configuration',
@@ -92,7 +100,7 @@ function selectTestStrategy(systemInfo: SystemInfo): TestStrategy {
   if (cpuCount >= 8 && freeMemoryGB >= 8) {
     log('info', 'High-performance system detected - using aggressive parallelization');
     return {
-      config: 'vite.config.ts',
+      config: VITE_CONFIG,
       maxThreads: Math.min(cpuCount - 2, 12),
       playwrightWorkers: Math.min(6, Math.ceil(cpuCount / 2)),
       description: 'High-performance configuration',
@@ -101,7 +109,7 @@ function selectTestStrategy(systemInfo: SystemInfo): TestStrategy {
 
   log('info', 'Balanced system detected - using standard settings');
   return {
-    config: 'vite.config.ts',
+    config: VITE_CONFIG,
     maxThreads: Math.min(4, Math.ceil(cpuCount / 2)),
     playwrightWorkers: Math.min(4, Math.ceil(cpuCount / 3)),
     description: 'Balanced configuration',
@@ -129,14 +137,25 @@ function runUnitTests(strategy: TestStrategy, options: UnitTestOptions = {}): vo
 
   log('info', `Running: ${command}`);
 
+  const args = [watchFlag, coverageFlag, reporterFlag, `--config=${strategy.config}`]
+    .filter(arg => arg.trim() !== '')
+    .flatMap(arg => arg.split(' '));
+
   try {
-    execSync(command, {
+    const result = spawnSync('vitest', args, {
       stdio: 'inherit',
       env: {
-        ...process.env,
+        ...buildSafeEnv({ removePath: false }),
         VITEST_MAX_THREADS: strategy.maxThreads.toString(),
       },
     });
+
+    if (result.error) {
+      throw result.error;
+    }
+    if (result.status !== 0) {
+      throw new Error(`Process exited with code ${result.status}`);
+    }
     log('success', 'Unit tests completed successfully');
   } catch (error: any) {
     log('error', 'Unit tests failed');
@@ -166,46 +185,67 @@ function runE2ETests(strategy: TestStrategy, options: E2ETestOptions = {}): void
   log('info', `Using ${strategy.description} for E2E tests`);
   log('info', `Playwright workers: ${strategy.playwrightWorkers}`);
 
-  let command = 'npx playwright test';
+  const args = buildE2EArgs({ ui, suite, project, mobile, headed, debug });
+  const env = buildE2EEnv(strategy, mobile);
 
-  if (ui) {
-    command += ' --ui';
-  } else {
-    if (suite) {
-      command += ` tests/e2e/${suite}.spec.ts`;
-    }
+  executeE2ETests(args, env);
+}
 
-    if (project && !mobile) {
-      command += ` --project=${project}`;
-    }
+function buildE2EArgs(options: {
+  ui: boolean;
+  suite: string | null;
+  project: string;
+  mobile: string | null;
+  headed: boolean;
+  debug: boolean;
+}): string[] {
+  const args = ['test'];
 
-    if (headed) {
-      command += ' --headed';
-    }
-
-    if (debug) {
-      command += ' --debug';
-    }
-
-    if (mobile) {
-      // 设置移动设备测试环境变量
-      process.env.MOBILE_TESTS = 'true';
-      if (mobile !== 'all') {
-        command += ` --grep="${mobile}"`;
-      }
-    }
+  if (options.ui) {
+    args.push('--ui');
+    return args;
   }
 
-  log('info', `Running: ${command}`);
+  if (options.suite) {
+    args.push(`tests/e2e/${options.suite}.spec.ts`);
+  }
+  if (options.project && !options.mobile) {
+    args.push(`--project=${options.project}`);
+  }
+  if (options.headed) {
+    args.push('--headed');
+  }
+  if (options.debug) {
+    args.push('--debug');
+  }
+  if (options.mobile && options.mobile !== 'all') {
+    args.push(`--grep=${options.mobile}`);
+  }
 
+  return args;
+}
+
+function buildE2EEnv(strategy: TestStrategy, mobile: string | null): Record<string, string> {
+  return {
+    ...buildSafeEnv({ removePath: false }),
+    PLAYWRIGHT_WORKERS: strategy.playwrightWorkers.toString(),
+    ...(mobile ? { MOBILE_TESTS: 'true' } : {}),
+  };
+}
+
+function executeE2ETests(args: string[], env: Record<string, string>): void {
   try {
-    execSync(command, {
+    const result = spawnSync('npx', ['playwright', ...args], {
       stdio: 'inherit',
-      env: {
-        ...process.env,
-        PLAYWRIGHT_WORKERS: strategy.playwrightWorkers.toString(),
-      },
+      env,
     });
+
+    if (result.error) {
+      throw result.error;
+    }
+    if (result.status !== 0) {
+      throw new Error(`Process exited with code ${result.status}`);
+    }
     log('success', 'E2E tests completed successfully');
   } catch (error: any) {
     log('error', 'E2E tests failed');
@@ -304,11 +344,12 @@ function main(): void {
       runUnitTests(strategy, { watch: true, coverage: false });
       break;
 
-    case 'unit:ci':
+    case 'unit:ci': {
       // 强制使用CI配置
       const ciStrategy: TestStrategy = { ...strategy, config: 'vitest.ci.config.ts' };
       runUnitTests(ciStrategy, { coverage: true, reporter: 'verbose' });
       break;
+    }
 
     case 'e2e':
       runE2ETests(strategy, {
