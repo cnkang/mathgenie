@@ -171,6 +171,51 @@ Before creating a new file, ask:
 - Information serves a completely different audience or purpose
 - Existing files would lose focus or clarity with additions
 
+## MCP Tools Usage (Critical)
+
+### Sequential Thinking MCP Priority
+
+- **ALWAYS** use sequential-thinking MCP for complex problem analysis and solution evaluation
+- **ALWAYS** use sequential-thinking MCP when facing architectural decisions or design choices
+- **ALWAYS** use sequential-thinking MCP to reflect on and validate proposed solutions before implementation
+- **ALWAYS** use sequential-thinking MCP when debugging complex issues or analyzing root causes
+
+### Serena MCP Priority
+
+- **ALWAYS** use serena MCP for code inspection, analysis, and modification tasks
+- **ALWAYS** use serena MCP to check existing code structure and identify potential issues
+- **ALWAYS** use serena MCP for refactoring and code quality improvements
+- **ALWAYS** use serena MCP when working with large codebases or unfamiliar code sections
+
+### MCP Tools Integration Workflow
+
+#### Problem Analysis Phase
+1. **Use sequential-thinking MCP** to break down complex problems into manageable components
+2. **Use sequential-thinking MCP** to evaluate multiple solution approaches and their trade-offs
+3. **Use sequential-thinking MCP** to identify potential risks and edge cases
+
+#### Code Investigation Phase
+1. **Use serena MCP** to explore and understand existing code structure
+2. **Use serena MCP** to identify code patterns, dependencies, and potential issues
+3. **Use serena MCP** to analyze code quality and suggest improvements
+
+#### Implementation Phase
+1. **Use sequential-thinking MCP** to validate implementation approach before coding
+2. **Use serena MCP** to make precise code modifications and refactoring
+3. **Use sequential-thinking MCP** to review and reflect on implemented changes
+
+#### Quality Assurance Phase
+1. **Use serena MCP** to run tests and validate code changes
+2. **Use sequential-thinking MCP** to evaluate overall solution quality and completeness
+3. **Use serena MCP** to ensure code follows project standards and best practices
+
+### MCP Tools Best Practices
+
+- **Combine Tools**: Use sequential-thinking for analysis and serena for implementation
+- **Iterative Approach**: Use tools iteratively to refine understanding and solutions
+- **Documentation**: Use sequential-thinking to reflect on decisions and document reasoning
+- **Validation**: Use both tools to cross-validate solutions and catch potential issues
+
 ## Development Workflow
 
 ### Commands (pnpm only)
@@ -699,6 +744,10 @@ Before executing any external command:
 
 ### ALWAYS
 
+- **Use sequential-thinking MCP for complex problem analysis and solution evaluation**
+- **Use serena MCP for code inspection, modification, and quality assurance**
+- **Combine MCP tools iteratively throughout the development workflow**
+- **Validate solutions using both sequential-thinking and serena MCP tools**
 - **Ensure WCAG 2.2 AAA compliance for all new features**
 - **Test with keyboard-only navigation**
 - **Verify color contrast ratios meet AAA standards**
@@ -1240,23 +1289,37 @@ Before writing tests, evaluate:
 
 ## Decision Priority
 
-1. **🔒 Security** - Safe and secure implementation with no injection vulnerabilities?
+1. **🧠 MCP Tools Usage** - Are sequential-thinking and serena MCP tools being used appropriately?
+   - Sequential-thinking MCP for problem analysis and solution evaluation ✅
+   - Serena MCP for code inspection and modification ✅
+   - Integrated workflow with both tools ✅
+   - Cross-validation using MCP tools ✅
+2. **🔒 Security** - Safe and secure implementation with no injection vulnerabilities?
    - Command injection prevention ✅
    - Library injection prevention ✅
    - Input validation & sanitization ✅
    - Secure process execution ✅
-2. **Test Coverage** - Does this meet 80% coverage with meaningful tests?
-3. **Internationalization** - Are all user-facing strings properly translated?
-4. **Accessibility (WCAG 2.2 AAA)** - Meets highest accessibility standards for all users?
-5. **User Experience** - Follows mobile-first, card-based interaction principles?
-6. **Simplicity** - Is this the simplest effective solution with intuitive interactions?
-7. **Performance** - Optimized for use case without compromising accessibility or UX?
-8. **Testability** - Easily testable with accessibility validation?
-9. **Consistency** - Matches existing accessible and modern design patterns?
+3. **Test Coverage** - Does this meet 80% coverage with meaningful tests?
+4. **Internationalization** - Are all user-facing strings properly translated?
+5. **Accessibility (WCAG 2.2 AAA)** - Meets highest accessibility standards for all users?
+6. **User Experience** - Follows mobile-first, card-based interaction principles?
+7. **Simplicity** - Is this the simplest effective solution with intuitive interactions?
+8. **Performance** - Optimized for use case without compromising accessibility or UX?
+9. **Testability** - Easily testable with accessibility validation?
+10. **Consistency** - Matches existing accessible and modern design patterns?
+
+### MCP-First Development
+
+**MCP Tools are the primary methodology** - All complex analysis and code operations should leverage MCP tools:
+
+- 🧠 **Sequential Thinking**: All problem analysis and solution evaluation must use sequential-thinking MCP
+- 🔧 **Serena Integration**: All code inspection and modification must use serena MCP
+- 🔄 **Iterative Workflow**: Combine both tools throughout the development process
+- ✅ **Cross-Validation**: Use both tools to validate solutions and catch issues
 
 ### Security-First Development
 
-**Security is the top priority** - No feature or optimization should compromise security:
+**Security is the second priority** - No feature or optimization should compromise security:
 
 - 🔒 **Command Injection**: All external command execution must be secure
 - 🔒 **Library Injection**: Environment variables must be cleaned

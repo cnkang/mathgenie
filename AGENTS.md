@@ -12,6 +12,24 @@
 2. Do **not** expose internal step-by-step reasoning. Provide concise, externally useful explanations only.
 3. Apply critical thinking before modifying the repository. Evaluate alternatives and question user-supplied plans. If a request appears suboptimal or unsafe, propose a better approach and seek confirmation before proceeding. Choose the minimal, reversible change and think twice before adding or deleting code or files.
 
+### MCP Tools Priority (Critical)
+
+3.1. **Sequential Thinking MCP First**: ALWAYS use sequential-thinking MCP for complex problem analysis, solution evaluation, and architectural decisions. Use it to break down problems, evaluate trade-offs, and reflect on proposed solutions before implementation.
+
+3.2. **Serena MCP for Code Operations**: ALWAYS use serena MCP for code inspection, analysis, modification, and quality improvements. Use it to explore codebases, identify issues, and make precise code changes.
+
+3.3. **MCP Tools Integration Workflow**:
+   - **Analysis Phase**: Use sequential-thinking MCP to understand problems and evaluate approaches
+   - **Investigation Phase**: Use serena MCP to explore existing code and identify patterns
+   - **Implementation Phase**: Use sequential-thinking MCP for validation, serena MCP for code changes
+   - **Quality Phase**: Use serena MCP for testing, sequential-thinking MCP for solution review
+
+3.4. **MCP Tools Best Practices**:
+   - Combine tools iteratively for comprehensive analysis and implementation
+   - Use sequential-thinking for decision documentation and reasoning
+   - Use serena for precise code modifications and quality assurance
+   - Cross-validate solutions using both tools to catch potential issues
+
 ### Non-Negotiables (MUST)
 
 4. **Correctness & Security**: Validate inputs; avoid unsafe deserialization; parameterize queries; least privilege; never commit or log secrets/PII.
@@ -153,6 +171,26 @@
 29. Add docstrings for non-trivial functions (what/why; pre/post-conditions).
 30. Record significant choices as lightweight ADRs (Context → Decision → Consequences).
 
+### MCP Tools Mandatory Usage Patterns
+
+30. **Problem-Solving with Sequential Thinking MCP**:
+    30.1. **Complex Analysis**: Use sequential-thinking MCP when facing multi-step problems, architectural decisions, or debugging complex issues.
+    30.2. **Solution Evaluation**: Use sequential-thinking MCP to compare multiple approaches, evaluate trade-offs, and validate proposed solutions.
+    30.3. **Risk Assessment**: Use sequential-thinking MCP to identify potential risks, edge cases, and unintended consequences.
+    30.4. **Decision Documentation**: Use sequential-thinking MCP to document reasoning behind architectural and design decisions.
+
+30.5. **Code Operations with Serena MCP**:
+    30.6. **Code Exploration**: Use serena MCP to understand existing code structure, dependencies, and patterns before making changes.
+    30.7. **Quality Analysis**: Use serena MCP to identify code quality issues, technical debt, and improvement opportunities.
+    30.8. **Precise Modifications**: Use serena MCP for targeted code changes, refactoring, and implementation tasks.
+    30.9. **Testing and Validation**: Use serena MCP to run tests, validate changes, and ensure code quality standards.
+
+30.10. **Integrated Workflow Requirements**:
+    30.11. **Before Any Code Change**: Use sequential-thinking MCP to analyze the problem and evaluate approaches.
+    30.12. **Before Implementation**: Use serena MCP to explore existing code and understand the context.
+    30.13. **During Implementation**: Use serena MCP for code modifications and sequential-thinking MCP for validation.
+    30.14. **After Implementation**: Use both tools to review, test, and document the solution.
+
 ### Output Contract (Strict Order)
 
 31. **File Tree** (only files you provide).
@@ -170,11 +208,32 @@
 38. Lints/formatters clean.
 39. **Code quality analysis passed**: Static analysis tools report zero critical issues; complexity metrics within thresholds; no code smells above acceptable levels.
 40. **CSS/JS Quality Standards**: No duplicate property declarations; no invalid CSS properties; no functions that always return the same value; proper conditional logic flow.
-41. Tests pass; changed-lines coverage ≥ 80%.
-42. No circular dependencies; complexity within bounds or justified by `@deviation`.
-43. Inputs validated; secrets/PII absent from code and logs.
-44. Docs updated (README/docstrings/ADR if architecture changed).
-45. Public API preserved or deprecated with migration notes.
+41. **MCP Tools Usage Verified**: Sequential-thinking MCP used for problem analysis and solution evaluation; serena MCP used for code exploration and modifications.
+42. Tests pass; changed-lines coverage ≥ 80%.
+43. No circular dependencies; complexity within bounds or justified by `@deviation`.
+44. Inputs validated; secrets/PII absent from code and logs.
+45. Docs updated (README/docstrings/ADR if architecture changed).
+46. Public API preserved or deprecated with migration notes.
+
+### MCP Tools Compliance Checklist (Mandatory)
+
+47. **Sequential Thinking MCP Usage**:
+    - [ ] Used for complex problem analysis and breakdown
+    - [ ] Used for solution evaluation and trade-off analysis
+    - [ ] Used for architectural decision validation
+    - [ ] Used for risk assessment and edge case identification
+
+48. **Serena MCP Usage**:
+    - [ ] Used for code exploration and understanding
+    - [ ] Used for quality analysis and issue identification
+    - [ ] Used for precise code modifications and refactoring
+    - [ ] Used for testing and validation of changes
+
+49. **Integrated MCP Workflow**:
+    - [ ] Both tools used iteratively throughout development
+    - [ ] Cross-validation performed using both tools
+    - [ ] Decision reasoning documented through sequential-thinking
+    - [ ] Code quality ensured through serena analysis
 
 ### Deviation Policy
 
@@ -541,6 +600,7 @@
 
 ## DEVELOPER — Project-Specific Constraints (MathGenie)
 
+- **MCP Tools Integration**: MANDATORY use of sequential-thinking MCP for problem analysis and serena MCP for code operations. All complex tasks must leverage both tools iteratively throughout the development workflow.
 - **Languages/Frameworks**: TypeScript 5.9 + React 19.1.1; Node.js 22.19.1; Vite 7.1.4; pnpm 10.15.1.
 - **Architecture & Code Style**:
   - Function components with hooks; enable React 19 concurrent features (`useTransition`, `useDeferredValue`, `useOptimistic`).
