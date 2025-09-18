@@ -147,7 +147,7 @@ function runStylelint(): QualityCheckResult {
     ];
 
     // SONAR-SAFE: Using npx with project dependencies, PATH restricted to safe directories
-    // eslint-disable-next-line sonarjs/os-command
+    // eslint-disable-next-line sonarjs/no-os-command-from-path
     const result = spawnSync('npx', stylelintArgs, {
       encoding: 'utf8',
       stdio: 'pipe',
@@ -155,8 +155,8 @@ function runStylelint(): QualityCheckResult {
       timeout: 60000,
       env: {
         ...buildSafeEnv({ removePath: false }),
-        // Restrict PATH to known safe directories (S4036)
-        PATH: ['/usr/local/bin', '/usr/bin', '/bin', process.env.PATH].filter(Boolean).join(':')
+        // SONAR-SAFE: PATH restricted to fixed, unwriteable directories (S4036)
+        PATH: '/usr/local/bin:/usr/bin:/bin',
       },
     });
 
@@ -211,7 +211,7 @@ function runHTMLValidate(): QualityCheckResult {
   try {
     const args = ['html-validate', ...htmlPatterns];
     // SONAR-SAFE: Using npx with project dependencies, PATH restricted to safe directories
-    // eslint-disable-next-line sonarjs/os-command
+    // eslint-disable-next-line sonarjs/no-os-command-from-path
     const result = spawnSync('npx', args, {
       encoding: 'utf8',
       stdio: 'pipe',
@@ -219,8 +219,8 @@ function runHTMLValidate(): QualityCheckResult {
       timeout: 60000,
       env: {
         ...buildSafeEnv({ removePath: false }),
-        // Restrict PATH to known safe directories (S4036)
-        PATH: ['/usr/local/bin', '/usr/bin', '/bin', process.env.PATH].filter(Boolean).join(':')
+        // SONAR-SAFE: PATH restricted to fixed, unwriteable directories (S4036)
+        PATH: '/usr/local/bin:/usr/bin:/bin',
       },
     });
 

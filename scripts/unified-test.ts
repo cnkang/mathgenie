@@ -143,14 +143,14 @@ function runUnitTests(strategy: TestStrategy, options: UnitTestOptions = {}): vo
 
   try {
     // SONAR-SAFE: Using vitest with project dependencies, PATH restricted to safe directories
-    // eslint-disable-next-line sonarjs/os-command
+    // eslint-disable-next-line sonarjs/no-os-command-from-path
     const result = spawnSync('vitest', args, {
       stdio: 'inherit',
       env: {
         ...buildSafeEnv({ removePath: false }),
         VITEST_MAX_THREADS: strategy.maxThreads.toString(),
-        // Restrict PATH to known safe directories (S4036)
-        PATH: ['/usr/local/bin', '/usr/bin', '/bin', process.env.PATH].filter(Boolean).join(':')
+        // SONAR-SAFE: PATH restricted to fixed, unwriteable directories (S4036)
+        PATH: '/usr/local/bin:/usr/bin:/bin',
       },
     });
 
@@ -161,9 +161,13 @@ function runUnitTests(strategy: TestStrategy, options: UnitTestOptions = {}): vo
       throw new Error(`Process exited with code ${result.status}`);
     }
     log('success', 'Unit tests completed successfully');
-  } catch (error: any) {
+  } catch (error: unknown) {
     log('error', 'Unit tests failed');
-    process.exit(error.status || 1);
+    const exitCode =
+      error && typeof error === 'object' && 'status' in error
+        ? (error as { status?: number }).status
+        : 1;
+    process.exit(exitCode || 1);
   }
 }
 
@@ -240,13 +244,13 @@ function buildE2EEnv(strategy: TestStrategy, mobile: string | null): Record<stri
 function executeE2ETests(args: string[], env: Record<string, string>): void {
   try {
     // SONAR-SAFE: Using npx with project dependencies, PATH restricted to safe directories
-    // eslint-disable-next-line sonarjs/os-command
+    // eslint-disable-next-line sonarjs/no-os-command-from-path
     const result = spawnSync('npx', ['playwright', ...args], {
       stdio: 'inherit',
       env: {
         ...env,
-        // Restrict PATH to known safe directories (S4036)
-        PATH: ['/usr/local/bin', '/usr/bin', '/bin', process.env.PATH].filter(Boolean).join(':')
+        // SONAR-SAFE: PATH restricted to fixed, unwriteable directories (S4036)
+        PATH: '/usr/local/bin:/usr/bin:/bin',
       },
     });
 
@@ -257,9 +261,13 @@ function executeE2ETests(args: string[], env: Record<string, string>): void {
       throw new Error(`Process exited with code ${result.status}`);
     }
     log('success', 'E2E tests completed successfully');
-  } catch (error: any) {
+  } catch (error: unknown) {
     log('error', 'E2E tests failed');
-    process.exit(error.status || 1);
+    const exitCode =
+      error && typeof error === 'object' && 'status' in error
+        ? (error as { status?: number }).status
+        : 1;
+    process.exit(exitCode || 1);
   }
 }
 
@@ -311,13 +319,13 @@ Available Mobile Devices:
 
 interface ParsedArgs {
   command: string;
-  options: Record<string, any>;
+  options: Record<string, string | boolean>;
 }
 
 function parseArgs(): ParsedArgs {
   const args = process.argv.slice(2);
   const command = args[0] || 'help';
-  const options: Record<string, any> = {};
+  const options: Record<string, string | boolean> = {};
 
   // 解析选项
   for (let i = 1; i < args.length; i++) {
