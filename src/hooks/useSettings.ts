@@ -1,4 +1,4 @@
-import type { Settings } from '@/types';
+import type { Operation, Settings } from '@/types';
 import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from 'react';
 
 // Constants to avoid duplicate strings
@@ -17,36 +17,53 @@ const defaultSettings: Settings = {
   paperSize: 'a4',
 };
 
+const isValidArray = (value: unknown, expectedLength?: number): value is unknown[] => {
+  return Array.isArray(value) && (expectedLength === undefined || value.length === expectedLength);
+};
+
+const isValidOperationArray = (value: unknown): value is Operation[] => {
+  if (!Array.isArray(value)) {
+    return false;
+  }
+  const validOperations: Operation[] = ['+', '-', '*', '/', '×', '÷'];
+  return value.every(op => typeof op === 'string' && validOperations.includes(op as Operation));
+};
+
+const validateAndMergeSettings = (parsed: unknown): Settings => {
+  const parsedObj = parsed as Record<string, unknown>;
+
+  return {
+    ...defaultSettings,
+    ...parsedObj,
+    operations: isValidOperationArray(parsedObj.operations)
+      ? parsedObj.operations
+      : defaultSettings.operations,
+    numRange: isValidArray(parsedObj.numRange, 2)
+      ? (parsedObj.numRange as [number, number])
+      : defaultSettings.numRange,
+    resultRange: isValidArray(parsedObj.resultRange, 2)
+      ? (parsedObj.resultRange as [number, number])
+      : defaultSettings.resultRange,
+    numOperandsRange: isValidArray(parsedObj.numOperandsRange, 2)
+      ? (parsedObj.numOperandsRange as [number, number])
+      : defaultSettings.numOperandsRange,
+  };
+};
+
 const loadSettings = (): Settings => {
   try {
     const saved = localStorage.getItem(SETTINGS_STORAGE_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      return {
-        ...defaultSettings,
-        ...parsed,
-        operations: Array.isArray(parsed.operations)
-          ? parsed.operations
-          : defaultSettings.operations,
-        numRange:
-          Array.isArray(parsed.numRange) && parsed.numRange.length === 2
-            ? parsed.numRange
-            : defaultSettings.numRange,
-        resultRange:
-          Array.isArray(parsed.resultRange) && parsed.resultRange.length === 2
-            ? parsed.resultRange
-            : defaultSettings.resultRange,
-        numOperandsRange:
-          Array.isArray(parsed.numOperandsRange) && parsed.numOperandsRange.length === 2
-            ? parsed.numOperandsRange
-            : defaultSettings.numOperandsRange,
-      };
+    if (!saved) {
+      return defaultSettings;
     }
+
+    const parsed = JSON.parse(saved);
+    return validateAndMergeSettings(parsed);
   } catch (error) {
     localStorage.removeItem(SETTINGS_STORAGE_KEY);
     devWarn('Failed to load settings from localStorage:', error);
+    return defaultSettings;
   }
-  return defaultSettings;
 };
 
 const devWarn = (...args: unknown[]): void => {
@@ -73,25 +90,30 @@ export const useSettings = (): UseSettingsResult => {
   }, [settings]);
 
   const validateSettings = useCallback((newSettings: Settings): string => {
-    if (newSettings.operations.length === 0) {
-      return 'errors.noOperations';
-    }
-    if (newSettings.numProblems <= 0 || newSettings.numProblems > 100) {
-      return 'errors.invalidProblemCount';
-    }
-    if (newSettings.numRange[0] > newSettings.numRange[1]) {
-      return 'errors.invalidNumberRange';
-    }
-    if (newSettings.resultRange[0] > newSettings.resultRange[1]) {
-      return 'errors.invalidResultRange';
-    }
-    if (
-      newSettings.numOperandsRange[0] > newSettings.numOperandsRange[1] ||
-      newSettings.numOperandsRange[0] < 2
-    ) {
-      return 'errors.invalidOperandsRange';
-    }
-    return '';
+    const validations = [
+      { condition: newSettings.operations.length === 0, error: 'errors.noOperations' },
+      {
+        condition: newSettings.numProblems <= 0 || newSettings.numProblems > 100,
+        error: 'errors.invalidProblemCount',
+      },
+      {
+        condition: newSettings.numRange[0] > newSettings.numRange[1],
+        error: 'errors.invalidNumberRange',
+      },
+      {
+        condition: newSettings.resultRange[0] > newSettings.resultRange[1],
+        error: 'errors.invalidResultRange',
+      },
+      {
+        condition:
+          newSettings.numOperandsRange[0] > newSettings.numOperandsRange[1] ||
+          newSettings.numOperandsRange[0] < 2,
+        error: 'errors.invalidOperandsRange',
+      },
+    ];
+
+    const failedValidation = validations.find(validation => validation.condition);
+    return failedValidation ? failedValidation.error : '';
   }, []);
 
   return { settings, setSettings, validateSettings };

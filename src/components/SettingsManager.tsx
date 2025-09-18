@@ -32,28 +32,36 @@ const exportSettingsToFile = (settings: Settings): void => {
   URL.revokeObjectURL(url);
 };
 
+const handleImportedContent = (
+  rawContent: string,
+  t: TFunc,
+  onImportSettings: (settings: Settings) => void
+): void => {
+  try {
+    const importedData = parseSettingsFile(rawContent);
+    onImportSettings(importedData.settings);
+  } catch (error) {
+    const message = t('settings.importError') || 'Error importing settings file';
+    alert(message);
+    if (!(error instanceof SettingsParseError)) {
+      console.error('Settings import error:', JSON.stringify(error));
+    }
+  }
+};
+
 const importSettingsFromFile = (
   file: File,
   t: TFunc,
   onImportSettings: (settings: Settings) => void
 ): void => {
   const reader = new FileReader();
-  reader.onload = (e: ProgressEvent<FileReader>) => {
-    const result = e.target?.result;
+  reader.onload = (event: ProgressEvent<FileReader>) => {
+    const result = event.target?.result;
     if (typeof result !== 'string') {
       alert(t('settings.importError') || 'Invalid settings file format');
       return;
     }
-    try {
-      const importedData = parseSettingsFile(result);
-      onImportSettings(importedData.settings);
-    } catch (error) {
-      const message = t('settings.importError') || 'Error importing settings file';
-      alert(message);
-      if (!(error instanceof SettingsParseError)) {
-        console.error('Settings import error:', error);
-      }
-    }
+    handleImportedContent(result, t, onImportSettings);
   };
   reader.readAsText(file);
 };
