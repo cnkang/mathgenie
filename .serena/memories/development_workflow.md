@@ -79,6 +79,8 @@ pnpm lint:css-html:fix
 
 # 3. Critical code quality issues
 pnpm sonar:high
+# Alternative: Complete local validation
+pnpm sonar:local
 
 # 4. TypeScript compilation
 pnpm type-check

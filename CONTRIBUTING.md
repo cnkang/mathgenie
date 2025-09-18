@@ -90,6 +90,7 @@ Problem to Solve → Choose Approach → Try It → Evaluate Result
    pnpm type-check     # Verify TypeScript compilation
    pnpm test           # Run unit tests
    pnpm sonar:high     # Check for critical code quality issues
+   pnpm sonar:local    # Complete local validation (lint + SonarJS)
    ```
 
 ### Pragmatic Problem-Solving Approach
@@ -197,6 +198,7 @@ Problem to Solve → Choose Approach → Try It → Evaluate Result
    ```bash
    pnpm validate       # Full validation pipeline
    pnpm sonar:high     # Advanced code quality analysis
+   pnpm sonar:local    # Complete local validation (lint + SonarJS)
    ```
 
 2. **Update Documentation** (if needed)
