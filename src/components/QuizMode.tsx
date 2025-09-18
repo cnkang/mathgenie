@@ -15,65 +15,61 @@ interface QuizModeProps {
   onExitQuiz: () => void;
 }
 
-const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQuiz }) => {
-  const { t } = useTranslation();
+const QUIZ_LOADING_KEY = 'quiz.loading';
+
+const renderLoadingState = (
+  translate: (key: string, params?: Record<string, string | number>) => string
+) => <div className='quiz-loading'>{translate(QUIZ_LOADING_KEY)}</div>;
+
+const renderResults = (params: {
+  t: (key: string, params?: Record<string, string | number>) => string;
+  quizResult: QuizResult;
+  quizProblems: Problem[];
+  timeElapsed: number;
+  formatTime: (seconds: number) => string;
+  onExitQuiz: () => void;
+  onRetry: () => void;
+}) => {
+  const { t, quizResult, quizProblems, timeElapsed, formatTime, onExitQuiz, onRetry } = params;
+  return (
+    <QuizResults
+      t={t}
+      quizResult={quizResult}
+      quizProblems={quizProblems}
+      timeElapsed={timeElapsed}
+      formatTime={formatTime}
+      onExitQuiz={onExitQuiz}
+      onRetry={onRetry}
+    />
+  );
+};
+
+const renderQuizLayout = (params: {
+  t: (key: string, params?: Record<string, string | number>) => string;
+  quizProblems: Problem[];
+  currentProblemIndex: number;
+  timeElapsed: number;
+  formatTime: (seconds: number) => string;
+  onExitQuiz: () => void;
+  handleAnswerSubmit: (problemId: number, answer: number) => void;
+  goToPrevious: () => void;
+  goToNext: () => void;
+}) => {
   const {
+    t,
     quizProblems,
     currentProblemIndex,
-    showResults,
-    quizResult,
     timeElapsed,
-    handleAnswerSubmit,
     formatTime,
+    onExitQuiz,
+    handleAnswerSubmit,
     goToPrevious,
     goToNext,
-    setShowResults,
-    setCurrentProblemIndex,
-    setQuizProblems,
-    setTimeElapsed,
-  } = useQuizController(problems, t, onQuizComplete);
-
-  if (showResults && quizResult) {
-    return (
-      <QuizResults
-        t={t}
-        quizResult={quizResult}
-        quizProblems={quizProblems}
-        timeElapsed={timeElapsed}
-        formatTime={formatTime}
-        onExitQuiz={onExitQuiz}
-        onRetry={() => {
-          setShowResults(false);
-          setCurrentProblemIndex(0);
-          setQuizProblems((prev: Problem[]) =>
-            prev.map((p: Problem) => ({
-              ...p,
-              userAnswer: undefined,
-              isCorrect: false,
-              isAnswered: false,
-            }))
-          );
-          setTimeElapsed(0);
-        }}
-      />
-    );
-  }
-
-  const QUIZ_LOADING_KEY = 'quiz.loading';
-  if (quizProblems.length === 0) {
-    return <div className='quiz-loading'>{t(QUIZ_LOADING_KEY)}</div>;
-  }
+  } = params;
 
   const currentProblem = quizProblems[currentProblemIndex];
   const progress = ((currentProblemIndex + 1) / quizProblems.length) * 100;
-
-  // Calculate progress percentage for inline style
   const progressPercentage = Math.round(progress);
-
-  // If current problem doesn't exist, return loading state
-  if (!currentProblem) {
-    return <div className='quiz-loading'>{t(QUIZ_LOADING_KEY)}</div>;
-  }
 
   return (
     <div className='quiz-mode'>
@@ -107,6 +103,72 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
       </div>
     </div>
   );
+};
+
+const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQuiz }) => {
+  const { t } = useTranslation();
+  const {
+    quizProblems,
+    currentProblemIndex,
+    showResults,
+    quizResult,
+    timeElapsed,
+    handleAnswerSubmit,
+    formatTime,
+    goToPrevious,
+    goToNext,
+    setShowResults,
+    setCurrentProblemIndex,
+    setQuizProblems,
+    setTimeElapsed,
+  } = useQuizController(problems, t, onQuizComplete);
+
+  const resetQuizState = (): void => {
+    setShowResults(false);
+    setCurrentProblemIndex(0);
+    setQuizProblems(prev =>
+      prev.map(problem => ({
+        ...problem,
+        userAnswer: undefined,
+        isCorrect: false,
+        isAnswered: false,
+      }))
+    );
+    setTimeElapsed(0);
+  };
+
+  if (showResults && quizResult) {
+    return renderResults({
+      t,
+      quizResult,
+      quizProblems,
+      timeElapsed,
+      formatTime,
+      onExitQuiz,
+      onRetry: resetQuizState,
+    });
+  }
+
+  if (quizProblems.length === 0) {
+    return renderLoadingState(t);
+  }
+
+  const currentProblem = quizProblems[currentProblemIndex];
+  if (!currentProblem) {
+    return renderLoadingState(t);
+  }
+
+  return renderQuizLayout({
+    t,
+    quizProblems,
+    currentProblemIndex,
+    timeElapsed,
+    formatTime,
+    onExitQuiz,
+    handleAnswerSubmit,
+    goToPrevious,
+    goToNext,
+  });
 };
 
 export default QuizMode;
