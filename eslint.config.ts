@@ -1,9 +1,9 @@
 import js from '@eslint/js';
 import typescript from '@typescript-eslint/eslint-plugin';
 import typescriptParser from '@typescript-eslint/parser';
-import reactHooks from 'eslint-plugin-react-hooks';
 import type { ESLint, Linter } from 'eslint';
 import react from 'eslint-plugin-react';
+import reactHooks from 'eslint-plugin-react-hooks';
 import sonarjs from 'eslint-plugin-sonarjs';
 import globals from 'globals';
 
@@ -16,7 +16,13 @@ const config = [
   js.configs.recommended,
   {
     files: ['**/*.{ts,tsx}'],
-    ignores: ['**/*.test.{js,jsx,ts,tsx}', '**/*.spec.{js,jsx,ts,tsx}', '**/setupTests.ts'],
+    ignores: [
+      '**/*.test.{js,jsx,ts,tsx}',
+      '**/*.spec.{js,jsx,ts,tsx}',
+      '**/setupTests.ts',
+      // Include scripts directory for SonarCloud alignment
+      // 'scripts/**/*' - commented out to match SonarCloud analysis
+    ],
     languageOptions: {
       parser: typescriptParser,
       ecmaVersion: 'latest',
@@ -132,7 +138,7 @@ const config = [
       },
     },
   },
-// Enforce flat config typing without loosening plugin types
+  // Enforce flat config typing without loosening plugin types
 ] satisfies Linter.Config[];
 
 export default config;
