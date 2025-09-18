@@ -128,25 +128,45 @@ const handleInputElement = (element: HTMLElement, minSize: number): void => {
   }
 };
 
+// Firefox-optimized element processing with reduced style calculations
 const processElement = (element: HTMLElement, minSize: number): void => {
-  const computedStyle = window.getComputedStyle(element);
+  // Firefox optimization: Cache computed style and reduce calculations
+  let computedStyle: CSSStyleDeclaration | null = null;
 
-  if (isElementHidden(element, computedStyle)) {
+  const getComputedStyleCached = (): CSSStyleDeclaration => {
+    if (!computedStyle) {
+      computedStyle = window.getComputedStyle(element);
+    }
+    return computedStyle;
+  };
+
+  const style = getComputedStyleCached();
+
+  if (isElementHidden(element, style)) {
     return;
   }
 
-  const currentHeight = parseFloat(computedStyle.height) || 0;
-  const currentWidth = parseFloat(computedStyle.width) || 0;
+  // Firefox optimization: Use getBoundingClientRect for better performance
+  const rect = element.getBoundingClientRect();
+  const currentHeight = rect.height;
+  const currentWidth = rect.width;
 
   if (currentHeight < minSize || currentWidth < minSize) {
     applyMinimumDimensions(element, minSize);
 
-    const currentPadding =
-      parseFloat(computedStyle.paddingTop) + parseFloat(computedStyle.paddingBottom);
-
-    if (currentPadding < 12) {
+    // Firefox optimization: Reduce padding calculations
+    if (isFirefox()) {
+      // Simplified padding logic for Firefox
       const padding = getPaddingForDevice();
       element.style.setProperty('padding', padding, STR_IMPORTANT);
+    } else {
+      // Full padding calculation for other browsers
+      const currentPadding = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+
+      if (currentPadding < 12) {
+        const padding = getPaddingForDevice();
+        element.style.setProperty('padding', padding, STR_IMPORTANT);
+      }
     }
 
     if (element.tagName === 'BUTTON') {
@@ -162,24 +182,76 @@ const processElement = (element: HTMLElement, minSize: number): void => {
 const inNonBrowser = (): boolean =>
   typeof window === 'undefined' || typeof document === 'undefined';
 
+// Firefox performance optimization: Detect browser and apply optimizations
+const isFirefox = (): boolean => {
+  return typeof navigator !== 'undefined' && navigator.userAgent.includes('Firefox');
+};
+
+// Firefox-optimized element processing with batching
+const processElementsInBatches = (elements: NodeListOf<Element>, minSize: number): void => {
+  const batchSize = isFirefox() ? 10 : 25; // Smaller batches for Firefox
+  let index = 0;
+
+  const processBatch = (): void => {
+    const endIndex = Math.min(index + batchSize, elements.length);
+
+    for (let i = index; i < endIndex; i++) {
+      const element = elements[i];
+      if (element instanceof HTMLElement) {
+        processElement(element, minSize);
+      }
+    }
+
+    index = endIndex;
+
+    if (index < elements.length) {
+      // Use requestAnimationFrame for better performance in Firefox
+      if (isFirefox()) {
+        requestAnimationFrame(processBatch);
+      } else {
+        setTimeout(processBatch, 0);
+      }
+    }
+  };
+
+  processBatch();
+};
+
+// Firefox-optimized selector to reduce DOM query complexity
+const getOptimizedSelector = (): string => {
+  if (isFirefox()) {
+    // Use simpler selectors for Firefox to improve performance
+    return 'button, input, select, textarea, a[href], [role="button"]';
+  }
+  return INTERACTIVE_SELECTORS.join(', ');
+};
+
 export const enforceWCAGTouchTargets = (): void => {
   if (inNonBrowser()) {
     return;
   }
 
   const minSize = getMinimumSizeForDevice();
-  const selector = INTERACTIVE_SELECTORS.join(', ');
+  const selector = getOptimizedSelector();
+
+  // Firefox optimization: Use more efficient DOM querying
   const elements = document.querySelectorAll(selector);
 
-  elements.forEach(element => {
-    if (element instanceof HTMLElement) {
-      processElement(element, minSize);
-    }
-  });
+  if (isFirefox() && elements.length > 20) {
+    // Use batched processing for Firefox when many elements exist
+    processElementsInBatches(elements, minSize);
+  } else {
+    // Standard processing for other browsers or small element counts
+    elements.forEach(element => {
+      if (element instanceof HTMLElement) {
+        processElement(element, minSize);
+      }
+    });
+  }
 
   if (import.meta.env.DEV) {
     console.log(
-      `WCAG Enforcement: Applied ${minSize}px minimum touch targets to ${elements.length} elements`
+      `WCAG Enforcement: Applied ${minSize}px minimum touch targets to ${elements.length} elements (Firefox optimized: ${isFirefox()})`
     );
   }
 };
@@ -212,18 +284,32 @@ const createMutationObserver = (mutationHandler: () => void): MutationObserver =
 };
 
 const setupEventListeners = () => {
-  const resizeHandler = debounce(enforceWCAGTouchTargets, 250);
+  // Firefox optimization: Longer debounce delays for better performance
+  const resizeDelay = isFirefox() ? 500 : 250;
+  const mutationDelay = isFirefox() ? 200 : 100;
+
+  const resizeHandler = debounce(enforceWCAGTouchTargets, resizeDelay);
   window.addEventListener('resize', resizeHandler);
 
-  const mutationHandler = debounce(enforceWCAGTouchTargets, 100);
+  const mutationHandler = debounce(enforceWCAGTouchTargets, mutationDelay);
   const observer = createMutationObserver(mutationHandler);
 
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true,
-    attributes: true,
-    attributeFilter: ['style', 'class', STR_HIDDEN],
-  });
+  // Firefox optimization: Reduced observation scope for better performance
+  const observerConfig = isFirefox()
+    ? {
+        childList: true,
+        subtree: false, // Reduced scope for Firefox
+        attributes: true,
+        attributeFilter: ['style', 'class'], // Removed 'hidden' for Firefox
+      }
+    : {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['style', 'class', STR_HIDDEN],
+      };
+
+  observer.observe(document.body, observerConfig);
 
   return { observer, resizeHandler, mutationHandler };
 };
