@@ -1,18 +1,34 @@
 #!/bin/bash
 
 # E2E Test Runner Script for MathGenie
-# This script provides different ways to run the e2e tests
+# 
+# This script provides a comprehensive interface for running end-to-end tests
+# with support for multiple browsers, mobile devices, and test execution modes.
+#
+# Features:
+# - Cross-browser testing (Chromium, Firefox, WebKit)
+# - Mobile device testing with comprehensive device coverage
+# - WCAG 2.2 AAA accessibility testing
+# - Multiple execution modes (headed, debug, UI)
+# - Automated server management
+# - Test suite organization and filtering
+#
+# Usage: ./scripts/test-e2e.sh [COMMAND] [OPTIONS]
+# Run './scripts/test-e2e.sh help' for detailed usage information
 
 set -e
 
 # Colors for output (respect NO_COLOR environment variable)
+# ANSI color codes for terminal output formatting
+# Automatically disabled when NO_COLOR environment variable is set
 if [[ -z "${NO_COLOR:-}" ]]; then
-    RED='\033[0;31m'
-    GREEN='\033[0;32m'
-    YELLOW='\033[1;33m'
-    BLUE='\033[0;34m'
-    NC='\033[0m' # No Color
+    RED='\033[0;31m'     # Red text for errors
+    GREEN='\033[0;32m'   # Green text for success messages
+    YELLOW='\033[1;33m'  # Yellow text for warnings
+    BLUE='\033[0;34m'    # Blue text for info messages
+    NC='\033[0m'         # No Color - reset to default
 else
+    # Disable colors when NO_COLOR is set (accessibility/CI compatibility)
     RED=''
     GREEN=''
     YELLOW=''
@@ -55,6 +71,7 @@ check_dependencies() {
 }
 
 # Function to install playwright browsers if needed
+# Downloads and installs Chromium, Firefox, and WebKit browsers for testing
 install_browsers() {
     print_status "Installing Playwright browsers..."
     npx playwright install
@@ -62,6 +79,7 @@ install_browsers() {
 }
 
 # Function to build the project
+# Creates an optimized production build for testing
 build_project() {
     print_status "Building the project..."
     pnpm build
@@ -69,6 +87,8 @@ build_project() {
 }
 
 # Function to start the preview server
+# Starts the Vite preview server on port 4173 for E2E testing
+# Includes retry logic and server availability checking
 start_server() {
     print_status "Starting preview server..."
     
@@ -103,6 +123,7 @@ start_server() {
 }
 
 # Function to stop the server
+# Gracefully stops the preview server and cleans up background processes
 stop_server() {
     if [ ! -z "$SERVER_PID" ]; then
         print_status "Stopping preview server..."
@@ -117,6 +138,10 @@ stop_server() {
 }
 
 # Function to run mobile device tests
+# Executes tests on specific mobile devices or device categories
+# Parameters:
+#   $1 - device_type: Device category (iphone, android, galaxy, etc.)
+#   $2 - config: Playwright config file (optional, defaults to playwright.config.ts)
 run_mobile_tests() {
     local device_type=$1
     local config=${2:-playwright.config.ts}
@@ -172,6 +197,10 @@ run_mobile_tests() {
 }
 
 # Function to run specific test suites
+# Executes a named test suite on a specified browser
+# Parameters:
+#   $1 - suite: Test suite name (error-handling, accessibility, etc.)
+#   $2 - browser: Browser to run tests on (optional, defaults to chromium)
 run_test_suite() {
     local suite=$1
     local browser=${2:-chromium}
@@ -221,6 +250,11 @@ run_test_suite() {
 }
 
 # Function to run tests in different modes
+# Orchestrates test execution based on the specified mode
+# Parameters:
+#   $1 - mode: Execution mode (headed, debug, ui, suite, mobile, etc.)
+#   $2 - suite: Test suite or device type (optional, defaults to all)
+#   $3 - browser: Browser for execution (optional, defaults to chromium)
 run_tests() {
     local mode=$1
     local suite=${2:-all}
@@ -265,12 +299,14 @@ run_tests() {
 }
 
 # Function to generate test report
+# Opens the Playwright HTML test report in the default browser
 generate_report() {
     print_status "Generating test report..."
     npx playwright show-report
 }
 
-# Function to show usage
+# Function to show usage information and available commands
+# Displays comprehensive help text with examples and options
 show_usage() {
     echo "Usage: $0 [COMMAND] [OPTIONS]"
     echo ""
@@ -292,11 +328,11 @@ show_usage() {
     echo "  localstorage           - localStorage persistence tests"
     echo "  presets                - Presets functionality tests"
     echo "  integration            - Integration tests"
-    echo "  accessibility          - Unified WCAG 2.2 AAA accessibility tests
-  accessibility-comprehensive - Same as accessibility (unified test)
-  accessibility-mobile       - Same as accessibility (unified test)
-  accessibility-themes       - Same as accessibility (unified test)
-  accessibility-all          - Same as accessibility (unified test)"
+    echo "  accessibility          - Unified WCAG 2.2 AAA accessibility tests"
+    echo "  accessibility-comprehensive - Same as accessibility (unified test)"
+    echo "  accessibility-mobile       - Same as accessibility (unified test)"
+    echo "  accessibility-themes       - Same as accessibility (unified test)"
+    echo "  accessibility-all          - Same as accessibility (unified test)"
     echo "  basic                  - Basic functionality tests"
     echo "  all                    - All test suites"
     echo ""
@@ -326,8 +362,8 @@ show_usage() {
     echo "  $0 full                            # Run all tests"
     echo "  $0 suite error-handling            # Run error handling tests"
     echo "  $0 suite presets firefox           # Run presets tests on Firefox"
-    echo "  $0 suite accessibility             # Run unified WCAG 2.2 AAA accessibility tests"
-    echo "  $0 suite accessibility-all         # Run unified accessibility tests (same as above)"
+    echo "  $0 suite accessibility             # Run unified WCAG 2.2 AAA tests"
+    echo "  $0 suite accessibility-all         # Run unified accessibility tests"
     echo "  $0 mobile iphone16                 # Run iPhone 16 tests"
     echo "  $0 mobile ipad                     # Run iPad tests"
     echo "  $0 mobile android                  # Run Android tests"
@@ -340,9 +376,22 @@ show_usage() {
 }
 
 # Trap to ensure server is stopped on exit
+# Automatically stops the preview server when the script exits
+# This prevents orphaned server processes and port conflicts
 trap stop_server EXIT
 
 # Main script logic
+# Command dispatcher that handles different test execution modes
+# Defaults to 'help' if no command is provided
+# 
+# This case statement processes the first command-line argument and executes
+# the corresponding test workflow. Each command includes dependency checking,
+# project building, server management, and test execution.
+# 
+# Parameters:
+#   $1 - Command to execute (setup, quick, full, suite, mobile, etc.)
+#   $2 - Additional parameter (suite name, device type, browser)
+#   $3 - Browser selection (chromium, firefox, webkit)
 case ${1:-help} in
     "setup")
         check_dependencies
