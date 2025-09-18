@@ -190,21 +190,25 @@ Before creating a new file, ask:
 ### MCP Tools Integration Workflow
 
 #### Problem Analysis Phase
+
 1. **Use sequential-thinking MCP** to break down complex problems into manageable components
 2. **Use sequential-thinking MCP** to evaluate multiple solution approaches and their trade-offs
 3. **Use sequential-thinking MCP** to identify potential risks and edge cases
 
 #### Code Investigation Phase
+
 1. **Use serena MCP** to explore and understand existing code structure
 2. **Use serena MCP** to identify code patterns, dependencies, and potential issues
 3. **Use serena MCP** to analyze code quality and suggest improvements
 
 #### Implementation Phase
+
 1. **Use sequential-thinking MCP** to validate implementation approach before coding
 2. **Use serena MCP** to make precise code modifications and refactoring
 3. **Use sequential-thinking MCP** to review and reflect on implemented changes
 
 #### Quality Assurance Phase
+
 1. **Use serena MCP** to run tests and validate code changes
 2. **Use sequential-thinking MCP** to evaluate overall solution quality and completeness
 3. **Use serena MCP** to ensure code follows project standards and best practices
@@ -1325,6 +1329,8 @@ Before writing tests, evaluate:
 - 🔒 **Library Injection**: Environment variables must be cleaned
 - 🔒 **Input Validation**: All inputs must be validated and sanitized
 - 🔒 **Process Security**: All child processes must have proper isolation
+- 🔒 **PATH Security (S4036)**: Only use fixed, unwriteable directories in PATH when executing OS commands
+- 🔒 **Cryptographic Randomness (S2245)**: Use crypto.randomBytes() for security-sensitive random generation, Math.random() only for tests/UI
 
 **Security Review Checklist** (mandatory before commit):
 
@@ -1334,3 +1340,462 @@ Before writing tests, evaluate:
 - [ ] Input validation functions implemented
 - [ ] Timeout and error handling configured
 - [ ] Security logging implemented
+- [ ] **PATH Security (S4036)**: OS commands use restricted PATH or absolute paths with SONAR-SAFE comments
+- [ ] **Random Generation (S2245)**: crypto.randomBytes() for security, Math.random() only for tests with SONAR-SAFE comments
+
+## MCP Tools Flexibility & Alternative Approaches (Critical)
+
+### Tool Selection Strategy
+
+**Primary Approach**: Always start with MCP tools for their intended purposes
+
+- **Sequential-thinking MCP**: Problem analysis, solution evaluation, architectural decisions
+- **Serena MCP**: Code inspection, modification, quality improvements
+
+**Flexibility Rule**: If an MCP tool fails repeatedly (3+ attempts) for the same operation, immediately switch to alternative approaches.
+
+### Alternative Tools by Use Case
+
+**File Operations**:
+
+- **Instead of**: `mcp_serena_replace_regex` (when failing repeatedly)
+- **Use**: `fsWrite` (complete file rewrite), `fsAppend` (additions), `executeBash` with `sed`/`awk`
+- **When**: Complex regex patterns fail, multi-line replacements, or encoding issues
+
+**Text Processing**:
+
+- **Instead of**: Complex MCP text operations
+- **Use**: `executeBash` with `grep`, `sed`, `awk`, `cut`
+- **When**: Pattern matching is complex, batch processing needed, or MCP tools are unresponsive
+
+**Code Analysis**:
+
+- **Instead of**: Unresponsive MCP analysis tools
+- **Use**: `readFile` + manual analysis, `grepSearch`, `fileSearch`
+- **When**: MCP tools timeout or provide incomplete results
+
+### Decision Criteria for Tool Switching
+
+**Immediate Switch Triggers**:
+
+1. **3+ Failed Attempts**: Same MCP operation fails 3 times consecutively
+2. **Timeout Issues**: MCP tool consistently times out or hangs
+3. **Incomplete Results**: MCP tool returns partial or corrupted data
+4. **Complex Patterns**: Regex or pattern matching too complex for MCP tools
+
+**Alternative Selection Logic**:
+
+- **Simple Text Changes**: Use `sed` or direct `fsWrite`
+- **Multi-file Operations**: Use bash loops with standard Unix tools
+- **Complex Parsing**: Use `awk` or `grep` with proper regex
+- **File Management**: Use standard Unix commands (`mv`, `cp`, `rm`)
+
+### Best Practices for Tool Flexibility
+
+**Efficiency Guidelines**:
+
+- Don't persist with failing MCP tools beyond 3 attempts
+- Choose the simplest effective tool for the task
+- Document tool selection reasoning when switching approaches
+- Validate results regardless of tool used
+
+**Quality Assurance**:
+
+- Test changes after using alternative tools
+- Run quality checks (`pnpm lint`, `pnpm test`) after modifications
+- Ensure security standards are maintained with any tool choice
+- Document any tool-specific considerations
+
+### Examples of Effective Tool Switching
+
+**Scenario 1**: Complex regex replacement failing in `mcp_serena_replace_regex`
+
+```bash
+# Switch to sed for simple pattern replacement
+sed -i 's/old_pattern/new_pattern/g' file.ts
+```
+
+**Scenario 2**: Multi-line code block replacement
+
+```bash
+# Use fsWrite to rewrite entire function
+# Read existing file, modify in memory, write complete new version
+```
+
+**Scenario 3**: Batch file operations
+
+```bash
+# Use bash loops for repetitive tasks
+for file in src/**/*.ts; do
+  sed -i 's/pattern/replacement/g' "$file"
+done
+```
+
+This flexibility ensures tasks are completed efficiently regardless of individual tool limitations.
+
+## Pragmatic Engineering Philosophy (Core Principle)
+
+### "Good Tools Are Those That Accomplish the Task"
+
+**Core Belief**: The value of any tool, method, or approach is measured solely by its ability to achieve the desired outcome effectively and safely.
+
+#### Fundamental Principles
+
+**1. Results Over Process**
+
+- The goal is to deliver working, secure, maintainable code
+- The specific tools or methods used are secondary to achieving this goal
+- A simple solution that works is better than an elegant solution that doesn't
+
+**2. Adaptive Problem-Solving**
+
+- When one approach fails repeatedly, pivot immediately to alternatives
+- Don't persist with ineffective methods due to preference or familiarity
+- Time spent fighting tools is time not spent solving actual problems
+
+**3. Efficiency Through Flexibility**
+
+- Use the right tool for the job, not the "preferred" tool
+- Combine different approaches when it makes sense
+- Optimize for team productivity and task completion
+
+**4. Quality Standards Are Non-Negotiable**
+
+- Regardless of tools used, maintain security, performance, and maintainability standards
+- Test thoroughly, validate results, ensure code quality
+- Document decisions and trade-offs made
+
+#### Practical Application Framework
+
+**Decision Matrix for Tool/Method Selection:**
+
+```
+Is the current approach working?
+├─ YES → Continue, but monitor efficiency
+└─ NO → Has it failed 2-3 times?
+    ├─ YES → Switch to alternative immediately
+    └─ NO → Try once more with different parameters
+```
+
+**Alternative Evaluation Criteria:**
+
+1. **Effectiveness**: Will this approach solve the problem?
+2. **Efficiency**: Is it reasonably fast to implement?
+3. **Reliability**: Does it work consistently?
+4. **Maintainability**: Can the team understand and maintain it?
+5. **Safety**: Does it meet security and quality standards?
+
+#### Common Scenarios and Responses
+
+**Scenario 1: MCP Tool Repeatedly Failing**
+
+- **Wrong Response**: Keep trying the same tool with slight variations
+- **Right Response**: Switch to bash/sed/fsWrite after 2-3 failures
+- **Principle**: Tool preference < Task completion
+
+**Scenario 2: Complex Architecture Pattern Not Fitting**
+
+- **Wrong Response**: Force the pattern to work despite complications
+- **Right Response**: Use a simpler, more appropriate pattern
+- **Principle**: Elegance < Functionality
+
+**Scenario 3: "Best Practice" Causing Problems**
+
+- **Wrong Response**: Insist on following the practice despite issues
+- **Right Response**: Adapt or abandon the practice for this context
+- **Principle**: Dogma < Pragmatism
+
+**Scenario 4: Debugging Taking Too Long**
+
+- **Wrong Response**: Continue with the same debugging approach
+- **Right Response**: Try different debugging methods, add logging, simplify
+- **Principle**: Persistence < Progress
+
+#### Anti-Patterns to Avoid
+
+**Tool Worship**
+
+- Believing certain tools are inherently superior
+- Refusing to use "simpler" tools when they're more effective
+- Spending more time configuring tools than solving problems
+
+**Method Rigidity**
+
+- Following processes that clearly aren't working
+- Insisting on specific approaches due to personal preference
+- Ignoring context-specific needs
+
+**Perfectionism Paralysis**
+
+- Seeking the "perfect" solution instead of a working one
+- Over-engineering simple problems
+- Analysis paralysis when quick action is needed
+
+**Sunk Cost Fallacy**
+
+- Continuing with failing approaches because of time invested
+- Refusing to abandon complex solutions that aren't working
+- Escalating commitment to ineffective methods
+
+#### Success Metrics
+
+**Primary Indicators:**
+
+- Task completed successfully
+- Code meets quality and security standards
+- Team can understand and maintain the solution
+- Implementation time was reasonable
+
+**Secondary Indicators:**
+
+- Approach can be reused for similar problems
+- Team learned something valuable from the process
+- Technical debt was minimized
+- User requirements were fully satisfied
+
+#### Cultural Integration
+
+**Team Mindset:**
+
+- Celebrate solutions, not specific tools or methods
+- Share effective approaches regardless of their "sophistication"
+- Learn from failures and adapt quickly
+- Value practical knowledge over theoretical purity
+
+**Code Review Focus:**
+
+- Does it work correctly?
+- Is it secure and maintainable?
+- Can the team support it?
+- Are the trade-offs documented?
+
+**Decision Documentation:**
+
+- Why was this approach chosen?
+- What alternatives were considered?
+- What are the trade-offs?
+- How can this inform future decisions?
+
+### Implementation Guidelines
+
+**Daily Practice:**
+
+1. Start with the most straightforward approach
+2. If it doesn't work after 2-3 attempts, try alternatives
+3. Always validate results regardless of method used
+4. Document significant decisions and their reasoning
+5. Share effective solutions with the team
+
+**When Stuck:**
+
+1. Step back and reassess the actual goal
+2. Consider if you're solving the right problem
+3. Try a completely different approach
+4. Ask for help or pair with someone
+5. Break the problem into smaller pieces
+
+**Quality Assurance:**
+
+- Run all tests regardless of implementation method
+- Validate security standards are maintained
+- Ensure code is readable and maintainable
+- Check that requirements are fully met
+
+This philosophy ensures that we remain focused on delivering value while maintaining high standards, regardless of the specific tools or methods employed.
+
+## Goal Preservation & Problem-Solving Integrity (Critical)
+
+### "Solve Problems, Don't Eliminate Objectives"
+
+**Core Understanding**: True problem-solving maintains the original objective while finding better ways to achieve it. Eliminating the objective to avoid the problem is not a solution—it's avoidance.
+
+#### The Fundamental Distinction
+
+**✅ Constructive Simplification** (Good):
+
+- Change the **method** while preserving the **goal**
+- Optimize the **process** while maintaining the **outcome**
+- Use simpler **tools** while ensuring **quality**
+- Reduce **complexity** without reducing **value**
+
+**❌ Destructive Simplification** (Bad):
+
+- Remove **functionality** to eliminate **errors**
+- Delete **tests** to avoid **failures**
+- Disable **checks** to prevent **warnings**
+- Cut **requirements** to ease **implementation**
+
+#### Mandatory Pre-Action Evaluation
+
+Before choosing any "simpler" approach, **ALWAYS** complete this evaluation:
+
+**1. Goal Alignment Assessment**
+
+```
+Original Objective: [What were we trying to achieve?]
+Proposed Method: [How will the new approach work?]
+Goal Preservation: [Does this still accomplish the original objective?]
+Value Delivery: [Will users/team still get the expected value?]
+```
+
+**2. Problem Resolution Analysis**
+
+```
+Root Cause: [What is the actual underlying problem?]
+Symptom vs Cause: [Are we addressing the cause or just hiding symptoms?]
+Long-term Impact: [Will this create bigger problems later?]
+Alternative Solutions: [What other approaches could address the root cause?]
+```
+
+**3. Functional Integrity Check**
+
+```
+Essential Features: [What functionality is absolutely necessary?]
+Quality Standards: [What standards cannot be compromised?]
+User Impact: [How will this affect the end user experience?]
+Team Impact: [How will this affect team productivity and maintenance?]
+```
+
+#### Common Destructive Patterns & Correct Alternatives
+
+**Pattern 1: Test Failures**
+
+- ❌ **Wrong**: Delete failing tests to make CI pass
+- ✅ **Right**: Fix the code or update tests to reflect correct behavior
+- **Why**: Tests represent expected behavior; removing them removes verification
+
+**Pattern 2: Code Errors**
+
+- ❌ **Wrong**: Comment out or delete error-prone code
+- ✅ **Right**: Debug and fix the underlying issue
+- **Why**: The code exists for a reason; removing it removes functionality
+
+**Pattern 3: Quality Check Failures**
+
+- ❌ **Wrong**: Disable linting rules or quality gates
+- ✅ **Right**: Improve code quality to meet standards
+- **Why**: Quality standards protect long-term maintainability
+
+**Pattern 4: Complex Requirements**
+
+- ❌ **Wrong**: Simplify requirements to avoid implementation challenges
+- ✅ **Right**: Find simpler ways to implement the full requirements
+- **Why**: Requirements represent user needs; cutting them reduces value
+
+**Pattern 5: Performance Issues**
+
+- ❌ **Wrong**: Remove features that cause performance problems
+- ✅ **Right**: Optimize the features or find more efficient implementations
+- **Why**: Features provide value; optimization maintains both value and performance
+
+#### Decision Framework for Simplification
+
+**Step 1: Identify the Core Objective**
+
+- What is the fundamental goal we're trying to achieve?
+- What value are we trying to deliver to users/team?
+- What problem are we actually trying to solve?
+
+**Step 2: Analyze the Current Approach**
+
+- Why is the current method failing or difficult?
+- What specific aspects are causing problems?
+- Are the problems with the method or the objective?
+
+**Step 3: Evaluate Alternative Methods**
+
+- Can we achieve the same objective with different tools?
+- Can we simplify the implementation without changing the outcome?
+- Are there proven patterns for this type of problem?
+
+**Step 4: Validate the Proposed Solution**
+
+- Does this approach achieve the original objective?
+- Does it maintain necessary functionality and quality?
+- Will it be sustainable and maintainable long-term?
+- Does it solve the root cause or just hide symptoms?
+
+#### Quality Assurance for Simplification
+
+**Before Implementation Checklist**:
+
+- [ ] Original objective clearly defined and understood
+- [ ] Root cause of current problems identified
+- [ ] Alternative approach addresses root cause, not just symptoms
+- [ ] Functional requirements fully preserved
+- [ ] Quality standards maintained (security, performance, maintainability)
+- [ ] User value delivery unchanged or improved
+- [ ] Team can understand and maintain the solution
+- [ ] Long-term sustainability considered
+
+**After Implementation Validation**:
+
+- [ ] Original objective successfully achieved
+- [ ] All essential functionality working correctly
+- [ ] Quality standards met or exceeded
+- [ ] No new problems introduced
+- [ ] Team satisfied with maintainability
+- [ ] Users receiving expected value
+- [ ] Documentation updated to reflect changes
+
+#### Examples of Proper Goal-Preserving Simplification
+
+**Example 1: Complex Build Process**
+
+- **Problem**: Build pipeline too complex and frequently failing
+- ❌ **Wrong**: Remove build steps to make it "simpler"
+- ✅ **Right**: Simplify build configuration while maintaining all necessary checks
+- **Result**: Faster, more reliable builds with same quality assurance
+
+**Example 2: Difficult Test Setup**
+
+- **Problem**: E2E tests are flaky and hard to maintain
+- ❌ **Wrong**: Delete E2E tests and rely only on unit tests
+- ✅ **Right**: Improve test infrastructure and make tests more reliable
+- **Result**: Stable, maintainable tests with same coverage
+
+**Example 3: Complex API Integration**
+
+- **Problem**: Third-party API integration is unreliable
+- ❌ **Wrong**: Remove the integration and lose functionality
+- ✅ **Right**: Add retry logic, fallbacks, and better error handling
+- **Result**: Reliable integration with graceful degradation
+
+#### Cultural Integration
+
+**Team Mindset**:
+
+- Celebrate solutions that maintain objectives while simplifying methods
+- Question any proposal that reduces functionality to solve problems
+- Always ask "What are we trying to achieve?" before simplifying
+- Value thorough problem analysis over quick fixes
+
+**Code Review Focus**:
+
+- Verify that simplifications preserve intended functionality
+- Check that quality standards are maintained
+- Ensure root causes are addressed, not just symptoms
+- Validate that user value is preserved or enhanced
+
+**Decision Documentation**:
+
+- Record the original objective and why it's important
+- Document the problems with previous approaches
+- Explain how the new approach maintains the objective
+- Note any trade-offs and their justifications
+
+### Remember: Smart Pragmatism vs. Destructive Shortcuts
+
+**Smart Pragmatism**:
+
+- "How can we achieve this goal more effectively?"
+- "What's a simpler way to deliver the same value?"
+- "How can we solve this problem without compromising quality?"
+
+**Destructive Shortcuts**:
+
+- "How can we make this error go away?"
+- "What can we remove to avoid this complexity?"
+- "How can we lower the bar to meet it more easily?"
+
+The goal is to be pragmatic about **methods** while being uncompromising about **objectives** and **quality**. This ensures we deliver maximum value efficiently without sacrificing what matters most.

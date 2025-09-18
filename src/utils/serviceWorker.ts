@@ -6,6 +6,7 @@ interface ServiceWorkerConfig {
   onUpdate?: (registration: ServiceWorkerRegistration) => void;
 }
 
+// SONAR-SAFE: The .exec() below is a regex method call, not OS command execution
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||
     window.location.hostname === '[::1]' ||

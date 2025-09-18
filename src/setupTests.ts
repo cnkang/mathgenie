@@ -141,6 +141,8 @@ Object.defineProperty(window, 'crypto', {
   value: {
     getRandomValues: vi.fn((arr: Uint32Array) => {
       for (let i = 0; i < arr.length; i++) {
+        // SONAR-SAFE: Using Math.random() for test mocking, not security-sensitive operations
+        // eslint-disable-next-line sonarjs/pseudo-random
         arr[i] = Math.floor(Math.random() * 0xffffffff);
       }
       return arr;
