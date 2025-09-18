@@ -117,103 +117,94 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
       }: {
         page: Page;
       }) => {
-        // Increase timeout for this specific test
-        test.setTimeout(150000); // Increased from 90s to 150s for complex mobile accessibility tests
         await page.setViewportSize({ width: device.width, height: device.height });
 
-        // Wait for the page to fully load and WCAG enforcement to run
-        await page.waitForTimeout(3000);
+        // Wait for the page to fully load with a more reasonable timeout
+        await page.waitForLoadState('networkidle');
+        await page.waitForTimeout(1000); // Reduced from 4000ms total
 
-        // Force WCAG enforcement to run
-        await page.evaluate(() => {
-          // @ts-ignore
-          if (window.enforceWCAGTouchTargets) {
-            // @ts-ignore
-            window.enforceWCAGTouchTargets();
+        // Use a more efficient batch approach to check touch targets
+        const touchTargetResults = await page.evaluate(() => {
+          // Get all interactive elements in one go
+          const selectors = [
+            'button:not([hidden]):not([aria-hidden="true"])',
+            'input:not([type="hidden"]):not([hidden]):not([aria-hidden="true"])',
+            'select:not([hidden]):not([aria-hidden="true"])',
+            'a[href]:not([hidden]):not([aria-hidden="true"])',
+            '[role="button"]:not([hidden]):not([aria-hidden="true"])',
+            '[tabindex]:not([tabindex="-1"]):not([hidden]):not([aria-hidden="true"])',
+          ];
+
+          const elements = document.querySelectorAll(selectors.join(', '));
+          const results: Array<{
+            index: number;
+            tagName: string;
+            className: string;
+            textContent: string;
+            width: number;
+            height: number;
+            isVisible: boolean;
+          }> = [];
+
+          // Process elements efficiently
+          Array.from(elements)
+            .slice(0, 20)
+            .forEach((el, index) => {
+              try {
+                const rect = el.getBoundingClientRect();
+                const computedStyle = window.getComputedStyle(el);
+
+                // Skip hidden or zero-size elements
+                if (
+                  rect.width === 0 ||
+                  rect.height === 0 ||
+                  computedStyle.display === 'none' ||
+                  computedStyle.visibility === 'hidden' ||
+                  computedStyle.opacity === '0'
+                ) {
+                  return;
+                }
+
+                results.push({
+                  index,
+                  tagName: el.tagName,
+                  className: el.className || '',
+                  textContent: (el.textContent || '').slice(0, 30),
+                  width: rect.width,
+                  height: rect.height,
+                  isVisible: rect.width > 0 && rect.height > 0,
+                });
+              } catch (error) {
+                // Skip problematic elements
+                console.warn(`Skipping element ${index}:`, error);
+              }
+            });
+
+          return results;
+        });
+
+        // Check results efficiently
+        const failedElements: string[] = [];
+
+        touchTargetResults.forEach(element => {
+          if (element.isVisible && (element.width < 43.99 || element.height < 43.99)) {
+            failedElements.push(
+              `${element.tagName}.${element.className} "${element.textContent}" - Size: ${element.width.toFixed(1)}x${element.height.toFixed(1)}`
+            );
           }
         });
 
-        await page.waitForTimeout(1000);
-
-        // Use a more specific selector to avoid problematic elements
-        // Explicitly exclude container elements that might be focusable due to accessibility attributes
-        const interactiveElements = page
-          .locator(
-            'button:visible, input:visible, select:visible, a:visible, [role="button"]:visible'
-          )
-          .and(page.locator(':not(section):not(div):not(main):not(header):not(footer):not(nav)'));
-
-        const count = await interactiveElements.count();
-
-        // Limit the number of elements to check to prevent excessive test time
-        const maxElementsToCheck = Math.min(count, 30); // Reduced from 50 to 30
-
-        for (let i = 0; i < maxElementsToCheck; i++) {
-          const element = interactiveElements.nth(i);
-
-          try {
-            // Check if element is attached to DOM first with shorter timeout
-            const isAttached = await element
-              .evaluate(el => el.isConnected, { timeout: 500 })
-              .catch(() => false);
-            if (!isAttached) {
-              continue; // Skip detached elements
-            }
-
-            // Add timeout for individual element operations with shorter timeouts
-            const isVisible = await element.isVisible({ timeout: 1000 }); // Reduced from 3000ms
-            if (!isVisible) {
-              continue; // Skip invisible elements
-            }
-
-            const boundingBox = await element.boundingBox({ timeout: 1000 }); // Reduced from 3000ms
-            if (!boundingBox) {
-              continue; // Skip elements without bounding box
-            }
-
-            // Get element info for debugging with shorter timeouts
-            const [tagName, className, textContent] = await Promise.all([
-              element.evaluate(el => el.tagName, { timeout: 500 }).catch(() => 'UNKNOWN'), // Reduced from 1000ms
-              element.evaluate(el => el.className, { timeout: 500 }).catch(() => ''), // Reduced from 1000ms
-              element
-                .evaluate(el => el.textContent?.slice(0, 50) || '', { timeout: 500 }) // Reduced from 1000ms
-                .catch(() => ''),
-            ]);
-
-            // Skip elements that are likely to be problematic or non-interactive
-            if (
-              className.includes('hidden') ||
-              className.includes('sr-only') ||
-              tagName === 'BODY' ||
-              tagName === 'SECTION' ||
-              tagName === 'DIV' ||
-              tagName === 'MAIN' ||
-              tagName === 'HEADER' ||
-              tagName === 'FOOTER' ||
-              tagName === 'NAV' ||
-              (tagName === 'SUMMARY' && textContent === '') ||
-              boundingBox.width === 0 ||
-              boundingBox.height === 0
-            ) {
-              continue;
-            }
-
-            // Account for floating-point precision in browser rendering
-            try {
-              expect(boundingBox.width).toBeGreaterThanOrEqual(43.99);
-              expect(boundingBox.height).toBeGreaterThanOrEqual(43.99);
-            } catch (error) {
-              console.log(
-                `❌ Touch target too small - Element ${i}: ${tagName}.${className} "${textContent}" - Size: ${boundingBox.width}x${boundingBox.height} (minimum: 44x44)`
-              );
-              throw error;
-            }
-          } catch (error) {
-            // Log the problematic element and continue with the next one
-            console.log(`Skipping element ${i} due to timeout or error:`, error);
-            continue;
-          }
+        // Report all failures at once
+        if (failedElements.length > 0) {
+          throw new Error(
+            `❌ ${failedElements.length} touch targets are too small (minimum: 44x44px):\n` +
+              failedElements.map(el => `  - ${el}`).join('\n')
+          );
         }
+
+        // Ensure we actually tested some elements
+        const visibleElements = touchTargetResults.filter(el => el.isVisible);
+        expect(visibleElements.length).toBeGreaterThan(0);
       });
     }
 
