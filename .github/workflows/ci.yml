@@ -653,10 +653,28 @@ jobs:
 
           echo "🚀 Running Lighthouse CI performance tests..."
 
-          # Run Lighthouse CI and capture results
+          # Run Lighthouse CI collect first to generate local files
           set +e
-          pnpm lighthouse:ci
-          LIGHTHOUSE_EXIT_CODE=$?
+          echo "📊 Collecting Lighthouse data..."
+          pnpm lighthouse:collect
+          COLLECT_EXIT_CODE=$?
+
+          echo "📋 Asserting Lighthouse thresholds..."
+          pnpm lighthouse:assert
+          ASSERT_EXIT_CODE=$?
+
+          echo "☁️ Uploading Lighthouse results..."
+          pnpm lighthouse:upload
+          UPLOAD_EXIT_CODE=$?
+
+          # Overall exit code (prioritize assertion failures)
+          if [ $ASSERT_EXIT_CODE -ne 0 ]; then
+            LIGHTHOUSE_EXIT_CODE=$ASSERT_EXIT_CODE
+          elif [ $COLLECT_EXIT_CODE -ne 0 ]; then
+            LIGHTHOUSE_EXIT_CODE=$COLLECT_EXIT_CODE
+          else
+            LIGHTHOUSE_EXIT_CODE=$UPLOAD_EXIT_CODE
+          fi
           set -e
 
           # Create a summary report regardless of success/failure
@@ -674,11 +692,20 @@ jobs:
           # List generated files for debugging
           echo "📁 Generated Lighthouse files:" >> $GITHUB_STEP_SUMMARY
           if [ -d ".lighthouseci" ] && [ "$(ls -A .lighthouseci 2>/dev/null)" ]; then
-            ls -la .lighthouseci/ >> $GITHUB_STEP_SUMMARY 2>/dev/null || echo "No files in .lighthouseci directory" >> $GITHUB_STEP_SUMMARY
+            echo "Files found in .lighthouseci directory:" >> $GITHUB_STEP_SUMMARY
+            ls -la .lighthouseci/ >> $GITHUB_STEP_SUMMARY 2>/dev/null || echo "Error listing files" >> $GITHUB_STEP_SUMMARY
           else
             echo "No .lighthouseci directory or files found" >> $GITHUB_STEP_SUMMARY
             # Create a placeholder file to ensure artifact upload works
+            mkdir -p .lighthouseci
             echo "Lighthouse CI run completed at $(date)" > .lighthouseci/lighthouse-summary.txt
+            echo "Created placeholder file: lighthouse-summary.txt" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Also try to collect any JSON reports that might have been generated
+          if find . -name "*.report.json" -type f 2>/dev/null | head -1 | grep -q .; then
+            echo "Found JSON reports, copying to .lighthouseci/" >> $GITHUB_STEP_SUMMARY
+            find . -name "*.report.json" -type f -exec cp {} .lighthouseci/ \; 2>/dev/null || true
           fi
 
           # Don't fail the job for performance issues, just report them
