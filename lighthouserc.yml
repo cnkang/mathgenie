@@ -9,6 +9,7 @@ ci:
     startServerReadyPattern: "Local:.*http://localhost:4173"
     startServerReadyTimeout: 30000
     numberOfRuns: 3
+    outputDir: ".lighthouseci"
     settings:
       # Chrome flags optimized for CI/headless environments
       # --no-sandbox: Required for most CI environments (Docker, GitHub Actions)
