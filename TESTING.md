@@ -603,8 +603,10 @@ pnpm test:accessibility:mobile
 
 ### Playwright Configuration
 
-- **Base URL**: `http://localhost:3000`
-- **Timeout**: 30 seconds per test
+- **Base URL**: `http://localhost:4173` (preview server)
+- **Test Timeout**: 120 seconds per test (increased for complex accessibility tests)
+- **Expect Timeout**: 20 seconds for assertions (increased for CI stability)
+- **Server Timeout**: 180 seconds for webServer startup (increased for CI stability)
 - **Retries**: 2 retries on failure
 - **Parallel Workers**: 6 workers for optimal performance
 - **Browser Engines**: Chromium, Firefox, WebKit
