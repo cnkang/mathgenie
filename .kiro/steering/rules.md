@@ -314,9 +314,11 @@ Before creating a new file, ask:
 
 ### Settings
 
-- Use `settingsManager` utility
+- Use `useSettings` hook for settings management with built-in validation
 - Implement presets following existing patterns
-- Persist with `useLocalStorage`
+- Automatic localStorage persistence with error recovery
+- Robust validation and type safety for all settings properties
+- Enhanced error handling with graceful fallback to defaults
 
 ## Performance
 
