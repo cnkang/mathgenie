@@ -34,7 +34,7 @@ MathGenie is a modern web application built with **React 19.1.1**, **TypeScript 
 - **🔒 Type Safety**: Full TypeScript support with strict type checking
 - **🌍 Multi-Language Support**: Available in English, Chinese, Spanish, French, German, and Japanese
 - **📱 Mobile-Optimized**: Responsive design with React 19 performance improvements
-- **♿ Accessibility**: Full keyboard navigation and screen reader support
+- **♿ Accessibility**: Full WCAG 2.2 AAA compliance with cross-browser optimizations and screen reader support
 - **🛡️ Robust Error Handling**: Graceful error recovery with automatic fallback to safe defaults
 - **💾 Reliable Data Persistence**: Enhanced localStorage handling with corruption recovery
 
@@ -56,7 +56,7 @@ MathGenie is a modern web application built with **React 19.1.1**, **TypeScript 
 - **Re-renders**: ~30% reduction with React 19 automatic batching
 - **Bundle Size**: Optimized with tree shaking and code splitting
 - **Core Web Vitals**: Excellent scores across all metrics
-- **Accessibility**: WCAG 2.2 AAA compliant
+- **Accessibility**: WCAG 2.2 AAA compliant with Firefox performance optimizations
 - **Type Safety**: 100% TypeScript coverage with strict mode
 - **Test Execution**: Optimized E2E suite (595 tests, 2.6min runtime)
 
@@ -128,8 +128,9 @@ pnpm validate
 - **TypeScript strict mode**: Full type safety
 - **ESLint + Prettier**: Consistent code style
 - **Pre-commit hooks**: Automatic formatting and linting
-- **Comprehensive testing**: Unit and E2E tests
+- **Comprehensive testing**: Unit and E2E tests with cross-browser accessibility validation
 - **SonarQube Analysis**: Advanced code quality checks with HIGH priority rule focus
+- **Cross-Browser Accessibility**: Firefox-optimized WCAG enforcement for enhanced performance
 
 #### SonarQube Commands
 
@@ -379,8 +380,8 @@ MathGenie features a comprehensive, optimized test suite:
 
 - **595 E2E tests** (optimized from 623, ~7% faster execution)
 - **90% code coverage** with unit and integration tests
-- **WCAG 2.2 AAA compliance** testing across all devices and themes
-- **Cross-browser compatibility** (Chrome, Firefox, Safari)
+- **WCAG 2.2 AAA compliance** testing across all devices and themes with Firefox performance optimizations
+- **Cross-browser compatibility** (Chrome, Firefox with enhanced optimizations, Safari)
 - **Mobile device testing** (iPhone, iPad, Android)
 
 ### Unit & Integration Tests
@@ -538,6 +539,7 @@ GitHub Actions handles quality assurance with an optimized test suite:
 - **Cumulative Layout Shift (CLS)**: < 0.1
 - **First Input Delay (FID)**: < 100ms
 - **Type Safety**: 100% TypeScript coverage
+- **Accessibility Performance**: Firefox-optimized WCAG 2.2 AAA enforcement
 
 ## 🌍 Internationalization
 
