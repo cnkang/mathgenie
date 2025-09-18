@@ -54,24 +54,61 @@ export const usePdfDownload = (
   clearMessages: () => void,
   isDev: boolean
 ) => {
+  const handlePdfError = useCallback(
+    (err: unknown) => {
+      const pdfFailedMessage = { key: 'errors.pdfFailed' } as const;
+      setError(pdfFailedMessage);
+      if (isDev) {
+        console.error('PDF generation error:', JSON.stringify(err));
+      }
+    },
+    [setError, isDev]
+  );
+
   return useCallback(async (): Promise<void> => {
-    if (!problems.length) {
-      const msg = { key: 'errors.noProblemsToPdf' } as const;
-      setError(msg);
+    const emptyProblemsMessage = { key: 'errors.noProblemsToPdf' } as const;
+    const pdfGeneratedMessage = { key: 'messages.success.pdfGenerated' } as const;
+
+    if (problems.length === 0) {
+      setError(emptyProblemsMessage);
       return;
     }
+
     clearMessages();
+
     try {
       await generatePdf(problems, settings, paperSizeOptions);
-      showSuccessMessage({ key: 'messages.success.pdfGenerated' });
+      showSuccessMessage(pdfGeneratedMessage);
     } catch (err) {
-      const msg = { key: 'errors.pdfFailed' } as const;
-      setError(msg);
-      if (isDev) {
-        console.error('PDF generation error:', err);
-      }
+      handlePdfError(err);
     }
-  }, [problems, settings, paperSizeOptions, showSuccessMessage, setError, clearMessages, isDev]);
+  }, [
+    problems,
+    settings,
+    paperSizeOptions,
+    showSuccessMessage,
+    setError,
+    clearMessages,
+    handlePdfError,
+  ]);
+};
+
+const startQuizModeLogic = (
+  hasProblems: boolean,
+  isI18nReady: boolean,
+  setError: (msg: MessageValue) => void,
+  setIsQuizMode: (v: boolean) => void,
+  setQuizResult: (v: QuizResult | null) => void
+): void => {
+  if (hasProblems) {
+    setIsQuizMode(true);
+    setQuizResult(null);
+    return;
+  }
+
+  if (isI18nReady) {
+    setError({ key: 'errors.noProblemsForQuiz' });
+  }
 };
 
 export const useQuizHandlers = (
@@ -82,14 +119,8 @@ export const useQuizHandlers = (
   setQuizResult: (v: QuizResult | null) => void
 ) => {
   const startQuizMode = useCallback((): void => {
-    if (problems.length === 0) {
-      if (isI18nReady) {
-        setError({ key: 'errors.noProblemsForQuiz' });
-      }
-      return;
-    }
-    setIsQuizMode(true);
-    setQuizResult(null);
+    const hasProblems = problems.length > 0;
+    startQuizModeLogic(hasProblems, isI18nReady, setError, setIsQuizMode, setQuizResult);
   }, [problems.length, isI18nReady, setError, setIsQuizMode, setQuizResult]);
 
   const exitQuizMode = useCallback((): void => {
@@ -97,6 +128,123 @@ export const useQuizHandlers = (
   }, [setIsQuizMode]);
 
   return { startQuizMode, exitQuizMode };
+};
+
+/**
+ * Hook for providing validation feedback to users.
+ * Handles both validation errors and restrictive settings warnings.
+ *
+ * @param validateSettings - Function to validate settings and return error key
+ * @param checkRestrictiveSettings - Function to check if settings are too restrictive
+ * @param setError - Function to set error messages
+ * @param setWarning - Function to set warning messages
+ * @returns Callback function to provide validation feedback for pending settings
+ */
+const useValidationFeedback = (
+  validateSettings: (s: Settings) => string,
+  checkRestrictiveSettings: (s: Settings) => boolean,
+  setError: (msg: MessageValue) => void,
+  setWarning: (msg: MessageValue) => void
+) => {
+  const handleValidationError = useCallback(
+    (validationError: string) => {
+      setError({ key: validationError });
+    },
+    [setError]
+  );
+
+  const handleRestrictiveWarning = useCallback(() => {
+    setWarning({ key: 'warnings.restrictiveSettings' });
+  }, [setWarning]);
+
+  return useCallback(
+    (pendingSettings: Settings): void => {
+      const validationError = validateSettings(pendingSettings);
+
+      if (validationError) {
+        handleValidationError(validationError);
+        return;
+      }
+
+      if (checkRestrictiveSettings(pendingSettings)) {
+        handleRestrictiveWarning();
+      }
+    },
+    [validateSettings, checkRestrictiveSettings, handleValidationError, handleRestrictiveWarning]
+  );
+};
+
+/**
+ * Hook for determining whether a field should be validated.
+ * Prevents validation during loading states and checks field sensitivity.
+ *
+ * @param isLoading - Whether the application is in a loading state
+ * @param isValidationSensitiveField - Function to check if a field requires validation
+ * @returns Function that determines if a field should be validated
+ */
+const useFieldValidation = (
+  isLoading: boolean,
+  isValidationSensitiveField: (field: keyof Settings) => boolean
+) => {
+  return useCallback(
+    (field: keyof Settings): boolean => {
+      return !isLoading && isValidationSensitiveField(field);
+    },
+    [isLoading, isValidationSensitiveField]
+  );
+};
+
+const useSettingsChangeHandler = (
+  settings: Settings,
+  setSettings: (s: Settings) => void,
+  clearMessages: () => void,
+  shouldValidateField: (field: keyof Settings) => boolean,
+  provideValidationFeedback: (settings: Settings) => void
+) => {
+  return useCallback(
+    <K extends keyof Settings>(field: K, value: Settings[K]): void => {
+      const newSettings = { ...settings, [field]: value };
+      clearMessages();
+
+      if (shouldValidateField(field)) {
+        provideValidationFeedback(newSettings);
+      }
+
+      setSettings(newSettings);
+    },
+    [settings, clearMessages, shouldValidateField, provideValidationFeedback, setSettings]
+  );
+};
+
+const applyPresetSettings = (
+  presetSettings: Settings,
+  setSettings: (s: Settings) => void,
+  clearMessages: () => void,
+  isLoading: boolean,
+  setSuccessMessage: (msg: MessageValue) => void
+): void => {
+  setSettings(presetSettings);
+  clearMessages();
+
+  if (isLoading) {
+    return;
+  }
+
+  setSuccessMessage({ key: 'messages.info.presetApplied', params: { name: 'Preset' } });
+};
+
+const usePresetHandler = (
+  setSettings: (s: Settings) => void,
+  clearMessages: () => void,
+  isLoading: boolean,
+  setSuccessMessage: (msg: MessageValue) => void
+) => {
+  return useCallback(
+    (presetSettings: Settings): void => {
+      applyPresetSettings(presetSettings, setSettings, clearMessages, isLoading, setSuccessMessage);
+    },
+    [setSettings, clearMessages, isLoading, setSuccessMessage]
+  );
 };
 
 export const useAppHandlers = (
@@ -111,45 +259,28 @@ export const useAppHandlers = (
   setWarning: (msg: MessageValue) => void,
   setSuccessMessage: (msg: MessageValue) => void
 ) => {
-  const handleChange = useCallback(
-    <K extends keyof Settings>(field: K, value: Settings[K]): void => {
-      const newSettings = { ...settings, [field]: value };
-      clearMessages();
-      if (isValidationSensitiveField(field)) {
-        const validationError = validateSettings(newSettings);
-        if (validationError && !isLoading) {
-          setError({ key: validationError });
-        } else if (checkRestrictiveSettings(newSettings) && !isLoading) {
-          setWarning({ key: 'warnings.restrictiveSettings' });
-        }
-      }
-      setSettings(newSettings);
-    },
-    [
-      settings,
-      clearMessages,
-      isValidationSensitiveField,
-      validateSettings,
-      isLoading,
-      checkRestrictiveSettings,
-      setError,
-      setWarning,
-      setSettings,
-    ]
+  const provideValidationFeedback = useValidationFeedback(
+    validateSettings,
+    checkRestrictiveSettings,
+    setError,
+    setWarning
   );
 
-  const handleApplyPreset = useCallback(
-    (presetSettings: Settings): void => {
-      setSettings(presetSettings);
-      setError('');
-      setWarning('');
-      if (!isLoading) {
-        setSuccessMessage({ key: 'messages.info.presetApplied', params: { name: 'Preset' } });
-      } else {
-        setSuccessMessage('');
-      }
-    },
-    [setSettings, setError, setWarning, setSuccessMessage, isLoading]
+  const shouldValidateField = useFieldValidation(isLoading, isValidationSensitiveField);
+
+  const handleChange = useSettingsChangeHandler(
+    settings,
+    setSettings,
+    clearMessages,
+    shouldValidateField,
+    provideValidationFeedback
+  );
+
+  const handleApplyPreset = usePresetHandler(
+    setSettings,
+    clearMessages,
+    isLoading,
+    setSuccessMessage
   );
 
   return { handleChange, handleApplyPreset } as const;
