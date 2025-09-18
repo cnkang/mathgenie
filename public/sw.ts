@@ -12,40 +12,59 @@ const STATIC_CACHE_URLS: string[] = [
   '/manifest.json',
 ];
 
+const sanitizeError = (error: Error): string => {
+  const message = error.message || String(error);
+  // A simple sanitizer to prevent log injection and XSS.
+  // 1. Escape HTML tags.
+  // 2. Replace newlines and tabs with spaces.
+  // 3. Remove non-printable characters.
+  // 4. Truncate the message.
+  return message
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/[\n\t]/g, ' ')
+    .replace(/[^ -~]/g, '?')
+    .substring(0, 200);
+};
+
 // Install event - cache static assets
-sw.addEventListener('install', (event: ExtendableEvent) => {
+sw.addEventListener('install', async (event: ExtendableEvent) => {
   event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then((cache: Cache) => {
-        return cache.addAll(STATIC_CACHE_URLS);
-      })
-      .then(() => {
-        // Ensure the new SW activates immediately without returning a value
-        sw.skipWaiting();
-      })
+    (async () => {
+      try {
+        const cache = await caches.open(CACHE_NAME);
+        await cache.addAll(STATIC_CACHE_URLS);
+        // Ensure the new SW activates immediately
+        await sw.skipWaiting();
+      } catch (error) {
+        console.warn('Failed to install service worker:', sanitizeError(error as Error));
+        throw error;
+      }
+    })()
   );
 });
 
 // Activate event - clean up old caches
-sw.addEventListener('activate', (event: ExtendableEvent) => {
+sw.addEventListener('activate', async (event: ExtendableEvent) => {
   event.waitUntil(
-    caches
-      .keys()
-      .then((cacheNames: string[]) => {
-        return Promise.all(
+    (async () => {
+      try {
+        const cacheNames = await caches.keys();
+        await Promise.all(
           cacheNames.map((cacheName: string) => {
             if (cacheName !== CACHE_NAME) {
               return caches.delete(cacheName);
             }
-            return undefined;
+            return Promise.resolve();
           })
         );
-      })
-      .then(() => {
-        // Take control immediately without returning from the handler
-        sw.clients.claim();
-      })
+        // Take control immediately
+        await sw.clients.claim();
+      } catch (error) {
+        console.warn('Failed to activate service worker:', sanitizeError(error as Error));
+        throw error;
+      }
+    })()
   );
 });
 
@@ -65,12 +84,12 @@ sw.addEventListener('fetch', (event: FetchEvent) => {
     caches
       .match(event.request)
       .then((cachedResponse: Response | undefined) => {
-        // If we have a cached response, return it
+        // Cache hit - return cached response immediately
         if (cachedResponse) {
           return cachedResponse;
         }
 
-        // Otherwise, fetch from network
+        // Cache miss - fetch from network
         return fetch(event.request)
           .then((networkResponse: Response) => {
             // Check if we received a valid response
@@ -83,40 +102,53 @@ sw.addEventListener('fetch', (event: FetchEvent) => {
               // Clone the response before caching (response can only be consumed once)
               const responseToCache = networkResponse.clone();
 
-              // Perform caching as a side-effect without altering the returned value
+              // Cache response asynchronously
               caches
                 .open(CACHE_NAME)
                 .then((cache: Cache) => {
-                  cache.put(event.request, responseToCache);
+                  return cache.put(event.request, responseToCache);
                 })
                 .catch((error: Error) => {
-                  console.warn('Failed to cache response:', error);
+                  console.warn('Failed to cache response:', sanitizeError(error));
                 });
+
+              return networkResponse;
             }
 
-            // Always return the network response (single return point)
+            // Invalid response - return as-is without caching
             return networkResponse;
           })
           .catch((error: Error) => {
-            console.warn('Network request failed:', error);
-            // Return a meaningful error response or fallback
-            throw error;
+            console.warn('Network request failed:', sanitizeError(error));
+
+            // Network failed - try to serve from cache as fallback
+            return caches.match(event.request).then((fallbackResponse: Response | undefined) => {
+              if (fallbackResponse) {
+                return fallbackResponse;
+              }
+
+              // No cache available - return error response
+              throw error;
+            });
           });
       })
-      .catch(() => {
+      .catch(async (error: Error) => {
+        console.warn('Service worker fetch failed:', sanitizeError(error));
+
         // Fallback for offline scenarios
         if (event.request.destination === 'document') {
-          return caches
-            .match('/index.html')
-            .then(res => res ?? new Response('Offline', { status: 503, statusText: 'Service Unavailable' }));
+          const fallbackResponse = await caches.match('/index.html');
+          if (fallbackResponse) {
+            return fallbackResponse;
+          }
+          return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
         }
+
         // For other resources, return an explicit offline response
-        return Promise.resolve(
-          new Response('Offline', {
-            status: 503,
-            statusText: 'Service Unavailable',
-          })
-        );
+        return new Response('Offline', {
+          status: 503,
+          statusText: 'Service Unavailable',
+        });
       })
   );
 });
