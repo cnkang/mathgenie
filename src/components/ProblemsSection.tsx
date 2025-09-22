@@ -8,6 +8,8 @@ type ProblemsSectionProps = {
 };
 
 const ProblemsSection: React.FC<ProblemsSectionProps> = ({ t, problems }) => {
+  const problemsListLabel = t('accessibility.problemsList');
+
   return (
     <section aria-labelledby='results-title' className='problems-section'>
       <div className='problems-container'>
@@ -17,9 +19,17 @@ const ProblemsSection: React.FC<ProblemsSectionProps> = ({ t, problems }) => {
               `Generated Problems (${problems.length})`}
           </h2>
         </div>
-        <div className='problems-content' tabIndex={0} aria-label={t('accessibility.problemsList')}>
+        <div
+          className='problems-content'
+          role='region'
+          aria-labelledby='results-title'
+          aria-label={problemsListLabel}
+          // SONAR-SAFE: Scrollable region must be focusable to satisfy WCAG 2.1.1 (scrollable-region-focusable).
+          tabIndex={0}
+          aria-live='polite'
+        >
           {problems.length === 0 ? (
-            <p role='status'>{t('results.noProblems')}</p>
+            <output aria-live='polite'>{t('results.noProblems')}</output>
           ) : (
             <ol className='problems-grid'>
               {problems.map(p => (
