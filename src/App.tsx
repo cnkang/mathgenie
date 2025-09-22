@@ -284,7 +284,7 @@ const useAppInitialization = (params: {
     scheduleSuccessMessage,
   } = params;
 
-  useInitialGeneration(
+  useInitialGeneration({
     isI18nReady,
     settings,
     validateSettings,
@@ -293,8 +293,8 @@ const useAppInitialization = (params: {
     setHasInitialGenerated,
     setError,
     setWarning,
-    scheduleSuccessMessage
-  );
+    setAndScheduleSuccess: scheduleSuccessMessage,
+  });
 
   useEffect(() => {
     if (import.meta.env.MODE === 'test') {
@@ -523,18 +523,18 @@ const useFormHandlersBundle = (params: {
 }): ReturnType<typeof useAppHandlers> => {
   const { settingsState, validationState, isLoading, messageActions, setSuccessMessage } = params;
 
-  return useAppHandlers(
-    settingsState.settings,
-    settingsState.setSettings,
-    messageActions.clearMessages,
-    validationState.isValidationSensitiveField,
-    settingsState.validateSettings,
+  return useAppHandlers({
+    settings: settingsState.settings,
+    setSettings: settingsState.setSettings,
+    clearMessages: messageActions.clearMessages,
+    isValidationSensitiveField: validationState.isValidationSensitiveField,
+    validateSettings: settingsState.validateSettings,
     isLoading,
-    validationState.checkRestrictiveSettings,
-    messageActions.setError,
-    messageActions.setWarning,
-    setSuccessMessage
-  );
+    checkRestrictiveSettings: validationState.checkRestrictiveSettings,
+    setError: messageActions.setError,
+    setWarning: messageActions.setWarning,
+    setSuccessMessage,
+  });
 };
 
 const useQuizControlsBundle = (params: {

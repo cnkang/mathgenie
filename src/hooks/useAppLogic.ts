@@ -2,21 +2,33 @@ import type { MessageValue, PaperSizeOptions, Problem, QuizResult, Settings } fr
 import { generatePdf } from '@/utils/pdf';
 import { useCallback, useEffect } from 'react';
 
-export const useInitialGeneration = (
-  isI18nReady: boolean,
-  settings: Settings,
-  validateSettings: (s: Settings) => string,
+type UseInitialGenerationArgs = {
+  isI18nReady: boolean;
+  settings: Settings;
+  validateSettings: (s: Settings) => string;
   generateProblems: (initial?: boolean) => {
     error: MessageValue;
     warning: MessageValue;
     successMessage: MessageValue;
-  },
-  hasInitialGenerated: boolean,
-  setHasInitialGenerated: (v: boolean) => void,
-  setError: (v: MessageValue) => void,
-  setWarning: (v: MessageValue) => void,
-  setAndScheduleSuccess: (v: MessageValue) => void
-): void => {
+  };
+  hasInitialGenerated: boolean;
+  setHasInitialGenerated: (v: boolean) => void;
+  setError: (v: MessageValue) => void;
+  setWarning: (v: MessageValue) => void;
+  setAndScheduleSuccess: (v: MessageValue) => void;
+};
+
+export const useInitialGeneration = ({
+  isI18nReady,
+  settings,
+  validateSettings,
+  generateProblems,
+  hasInitialGenerated,
+  setHasInitialGenerated,
+  setError,
+  setWarning,
+  setAndScheduleSuccess,
+}: UseInitialGenerationArgs): void => {
   useEffect(() => {
     if (!isI18nReady || hasInitialGenerated) {
       return;
@@ -247,18 +259,31 @@ const usePresetHandler = (
   );
 };
 
-export const useAppHandlers = (
-  settings: Settings,
-  setSettings: (s: Settings) => void,
-  clearMessages: () => void,
-  isValidationSensitiveField: (field: keyof Settings) => boolean,
-  validateSettings: (s: Settings) => string,
-  isLoading: boolean,
-  checkRestrictiveSettings: (s: Settings) => boolean,
-  setError: (msg: MessageValue) => void,
-  setWarning: (msg: MessageValue) => void,
-  setSuccessMessage: (msg: MessageValue) => void
-) => {
+type UseAppHandlersArgs = {
+  settings: Settings;
+  setSettings: (s: Settings) => void;
+  clearMessages: () => void;
+  isValidationSensitiveField: (field: keyof Settings) => boolean;
+  validateSettings: (s: Settings) => string;
+  isLoading: boolean;
+  checkRestrictiveSettings: (s: Settings) => boolean;
+  setError: (msg: MessageValue) => void;
+  setWarning: (msg: MessageValue) => void;
+  setSuccessMessage: (msg: MessageValue) => void;
+};
+
+export const useAppHandlers = ({
+  settings,
+  setSettings,
+  clearMessages,
+  isValidationSensitiveField,
+  validateSettings,
+  isLoading,
+  checkRestrictiveSettings,
+  setError,
+  setWarning,
+  setSuccessMessage,
+}: UseAppHandlersArgs) => {
   const provideValidationFeedback = useValidationFeedback(
     validateSettings,
     checkRestrictiveSettings,

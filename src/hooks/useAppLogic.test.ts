@@ -47,17 +47,17 @@ describe('useAppLogic', () => {
       const mockSetAndScheduleSuccess = vi.fn();
 
       renderHook(() =>
-        useInitialGeneration(
-          true, // isI18nReady
-          mockSettings,
-          mockValidateSettings,
-          mockGenerateProblems,
-          false, // hasInitialGenerated
-          mockSetHasInitialGenerated,
-          mockSetError,
-          mockSetWarning,
-          mockSetAndScheduleSuccess
-        )
+        useInitialGeneration({
+          isI18nReady: true,
+          settings: mockSettings,
+          validateSettings: mockValidateSettings,
+          generateProblems: mockGenerateProblems,
+          hasInitialGenerated: false,
+          setHasInitialGenerated: mockSetHasInitialGenerated,
+          setError: mockSetError,
+          setWarning: mockSetWarning,
+          setAndScheduleSuccess: mockSetAndScheduleSuccess,
+        })
       );
 
       expect(mockValidateSettings).toHaveBeenCalledWith(mockSettings);
@@ -75,17 +75,17 @@ describe('useAppLogic', () => {
       const mockSetAndScheduleSuccess = vi.fn();
 
       renderHook(() =>
-        useInitialGeneration(
-          false, // isI18nReady
-          mockSettings,
-          mockValidateSettings,
-          mockGenerateProblems,
-          false,
-          mockSetHasInitialGenerated,
-          mockSetError,
-          mockSetWarning,
-          mockSetAndScheduleSuccess
-        )
+        useInitialGeneration({
+          isI18nReady: false,
+          settings: mockSettings,
+          validateSettings: mockValidateSettings,
+          generateProblems: mockGenerateProblems,
+          hasInitialGenerated: false,
+          setHasInitialGenerated: mockSetHasInitialGenerated,
+          setError: mockSetError,
+          setWarning: mockSetWarning,
+          setAndScheduleSuccess: mockSetAndScheduleSuccess,
+        })
       );
 
       expect(mockGenerateProblems).not.toHaveBeenCalled();
@@ -100,17 +100,17 @@ describe('useAppLogic', () => {
       const mockSetAndScheduleSuccess = vi.fn();
 
       renderHook(() =>
-        useInitialGeneration(
-          true,
-          mockSettings,
-          mockValidateSettings,
-          mockGenerateProblems,
-          true, // hasInitialGenerated
-          mockSetHasInitialGenerated,
-          mockSetError,
-          mockSetWarning,
-          mockSetAndScheduleSuccess
-        )
+        useInitialGeneration({
+          isI18nReady: true,
+          settings: mockSettings,
+          validateSettings: mockValidateSettings,
+          generateProblems: mockGenerateProblems,
+          hasInitialGenerated: true,
+          setHasInitialGenerated: mockSetHasInitialGenerated,
+          setError: mockSetError,
+          setWarning: mockSetWarning,
+          setAndScheduleSuccess: mockSetAndScheduleSuccess,
+        })
       );
 
       expect(mockGenerateProblems).not.toHaveBeenCalled();
@@ -125,17 +125,17 @@ describe('useAppLogic', () => {
       const mockSetAndScheduleSuccess = vi.fn();
 
       renderHook(() =>
-        useInitialGeneration(
-          true,
-          mockSettings,
-          mockValidateSettings,
-          mockGenerateProblems,
-          false,
-          mockSetHasInitialGenerated,
-          mockSetError,
-          mockSetWarning,
-          mockSetAndScheduleSuccess
-        )
+        useInitialGeneration({
+          isI18nReady: true,
+          settings: mockSettings,
+          validateSettings: mockValidateSettings,
+          generateProblems: mockGenerateProblems,
+          hasInitialGenerated: false,
+          setHasInitialGenerated: mockSetHasInitialGenerated,
+          setError: mockSetError,
+          setWarning: mockSetWarning,
+          setAndScheduleSuccess: mockSetAndScheduleSuccess,
+        })
       );
 
       expect(mockSetError).toHaveBeenCalledWith({ key: 'validation.error' });
@@ -257,18 +257,18 @@ describe('useAppLogic', () => {
       const mockSetSuccessMessage = vi.fn();
 
       const { result } = renderHook(() =>
-        useAppHandlers(
-          mockSettings,
-          mockSetSettings,
-          mockClearMessages,
-          mockIsValidationSensitiveField,
-          mockValidateSettings,
-          false, // isLoading
-          mockCheckRestrictiveSettings,
-          mockSetError,
-          mockSetWarning,
-          mockSetSuccessMessage
-        )
+        useAppHandlers({
+          settings: mockSettings,
+          setSettings: mockSetSettings,
+          clearMessages: mockClearMessages,
+          isValidationSensitiveField: mockIsValidationSensitiveField,
+          validateSettings: mockValidateSettings,
+          isLoading: false,
+          checkRestrictiveSettings: mockCheckRestrictiveSettings,
+          setError: mockSetError,
+          setWarning: mockSetWarning,
+          setSuccessMessage: mockSetSuccessMessage,
+        })
       );
 
       act(() => {
@@ -290,18 +290,18 @@ describe('useAppLogic', () => {
       const mockSetSuccessMessage = vi.fn();
 
       const { result } = renderHook(() =>
-        useAppHandlers(
-          mockSettings,
-          mockSetSettings,
-          mockClearMessages,
-          mockIsValidationSensitiveField,
-          mockValidateSettings,
-          false, // isLoading
-          mockCheckRestrictiveSettings,
-          mockSetError,
-          mockSetWarning,
-          mockSetSuccessMessage
-        )
+        useAppHandlers({
+          settings: mockSettings,
+          setSettings: mockSetSettings,
+          clearMessages: mockClearMessages,
+          isValidationSensitiveField: mockIsValidationSensitiveField,
+          validateSettings: mockValidateSettings,
+          isLoading: false,
+          checkRestrictiveSettings: mockCheckRestrictiveSettings,
+          setError: mockSetError,
+          setWarning: mockSetWarning,
+          setSuccessMessage: mockSetSuccessMessage,
+        })
       );
 
       act(() => {
@@ -322,18 +322,18 @@ describe('useAppLogic', () => {
       const mockSetSuccessMessage = vi.fn();
 
       const { result } = renderHook(() =>
-        useAppHandlers(
-          mockSettings,
-          mockSetSettings,
-          mockClearMessages,
-          mockIsValidationSensitiveField,
-          mockValidateSettings,
-          true, // isLoading - should skip validation
-          mockCheckRestrictiveSettings,
-          mockSetError,
-          mockSetWarning,
-          mockSetSuccessMessage
-        )
+        useAppHandlers({
+          settings: mockSettings,
+          setSettings: mockSetSettings,
+          clearMessages: mockClearMessages,
+          isValidationSensitiveField: mockIsValidationSensitiveField,
+          validateSettings: mockValidateSettings,
+          isLoading: true,
+          checkRestrictiveSettings: mockCheckRestrictiveSettings,
+          setError: mockSetError,
+          setWarning: mockSetWarning,
+          setSuccessMessage: mockSetSuccessMessage,
+        })
       );
 
       act(() => {
@@ -357,18 +357,18 @@ describe('useAppLogic', () => {
       const mockSetSuccessMessage = vi.fn();
 
       const { result } = renderHook(() =>
-        useAppHandlers(
-          mockSettings,
-          mockSetSettings,
-          mockClearMessages,
-          mockIsValidationSensitiveField,
-          mockValidateSettings,
-          false, // isLoading
-          mockCheckRestrictiveSettings,
-          mockSetError,
-          mockSetWarning,
-          mockSetSuccessMessage
-        )
+        useAppHandlers({
+          settings: mockSettings,
+          setSettings: mockSetSettings,
+          clearMessages: mockClearMessages,
+          isValidationSensitiveField: mockIsValidationSensitiveField,
+          validateSettings: mockValidateSettings,
+          isLoading: false,
+          checkRestrictiveSettings: mockCheckRestrictiveSettings,
+          setError: mockSetError,
+          setWarning: mockSetWarning,
+          setSuccessMessage: mockSetSuccessMessage,
+        })
       );
 
       act(() => {
@@ -389,18 +389,18 @@ describe('useAppLogic', () => {
       const mockSetSuccessMessage = vi.fn();
 
       const { result } = renderHook(() =>
-        useAppHandlers(
-          mockSettings,
-          mockSetSettings,
-          mockClearMessages,
-          mockIsValidationSensitiveField,
-          mockValidateSettings,
-          false, // isLoading
-          mockCheckRestrictiveSettings,
-          mockSetError,
-          mockSetWarning,
-          mockSetSuccessMessage
-        )
+        useAppHandlers({
+          settings: mockSettings,
+          setSettings: mockSetSettings,
+          clearMessages: mockClearMessages,
+          isValidationSensitiveField: mockIsValidationSensitiveField,
+          validateSettings: mockValidateSettings,
+          isLoading: false,
+          checkRestrictiveSettings: mockCheckRestrictiveSettings,
+          setError: mockSetError,
+          setWarning: mockSetWarning,
+          setSuccessMessage: mockSetSuccessMessage,
+        })
       );
 
       const presetSettings = { ...mockSettings, numProblems: 50 };
@@ -428,18 +428,18 @@ describe('useAppLogic', () => {
       const mockSetSuccessMessage = vi.fn();
 
       const { result } = renderHook(() =>
-        useAppHandlers(
-          mockSettings,
-          mockSetSettings,
-          mockClearMessages,
-          mockIsValidationSensitiveField,
-          mockValidateSettings,
-          true, // isLoading
-          mockCheckRestrictiveSettings,
-          mockSetError,
-          mockSetWarning,
-          mockSetSuccessMessage
-        )
+        useAppHandlers({
+          settings: mockSettings,
+          setSettings: mockSetSettings,
+          clearMessages: mockClearMessages,
+          isValidationSensitiveField: mockIsValidationSensitiveField,
+          validateSettings: mockValidateSettings,
+          isLoading: true,
+          checkRestrictiveSettings: mockCheckRestrictiveSettings,
+          setError: mockSetError,
+          setWarning: mockSetWarning,
+          setSuccessMessage: mockSetSuccessMessage,
+        })
       );
 
       const presetSettings = { ...mockSettings, numProblems: 50 };
