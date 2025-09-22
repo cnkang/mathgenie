@@ -131,7 +131,11 @@ describe.sequential('InfoPanel', () => {
     const enabledButton = downloadButtons.find(button => !button.disabled);
     expect(enabledButton).toBeInTheDocument();
 
-    fireEvent.click(enabledButton!);
+    if (!enabledButton) {
+      throw new Error('Expected an enabled download button to be present');
+    }
+
+    fireEvent.click(enabledButton);
     expect(mockDownload).toHaveBeenCalledTimes(1);
   });
 

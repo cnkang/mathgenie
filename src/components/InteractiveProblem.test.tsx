@@ -146,7 +146,7 @@ describe('InteractiveProblem', () => {
       // Use fireEvent instead of userEvent for more reliable testing
       fireEvent.change(input, { target: { value: '5' } });
 
-      expect((input as HTMLInputElement).value).toBe('5');
+      expect(input.value).toBe('5');
     });
 
     test('calls onAnswerSubmit when form is submitted with valid answer', () => {
@@ -317,7 +317,7 @@ describe('InteractiveProblem', () => {
       await user.click(button);
 
       // Input should be cleared after submission
-      expect((input as HTMLInputElement).value).toBe('');
+      expect(input.value).toBe('');
     });
   });
 });
