@@ -427,7 +427,8 @@ function getStringOption(
   options: Record<string, string | boolean>,
   key: string
 ): string | undefined {
-  return typeof options[key] === 'string' ? (options[key] as string) : undefined;
+  const value = options[key];
+  return typeof value === 'string' ? value : undefined;
 }
 
 function handleUnitCommands(
