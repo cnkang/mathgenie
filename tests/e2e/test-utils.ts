@@ -143,10 +143,15 @@ export async function webkitSafeClick(page: Page, selector: string): Promise<voi
     await element.scrollIntoViewIfNeeded();
     await page.waitForTimeout(50);
 
-    // Try normal click first
+    // Try normal click first and fall back if needed
+    let clickError: unknown;
     try {
       await element.click({ timeout: 3000 });
     } catch (error) {
+      clickError = error;
+    }
+
+    if (clickError) {
       // Fallback: Use JavaScript click for WebKit if normal click fails
       await element.evaluate(el => {
         if (el instanceof HTMLElement) {
@@ -154,6 +159,10 @@ export async function webkitSafeClick(page: Page, selector: string): Promise<voi
           el.click();
         }
       });
+
+      if (clickError instanceof Error) {
+        console.warn(`WebKit click fallback triggered: ${clickError.message}`);
+      }
     }
   } else {
     // For other browsers, use normal click

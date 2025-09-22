@@ -48,9 +48,15 @@ describe('LanguageSelector', () => {
 
     await waitFor(() => {
       const select = container.querySelector('select');
-      expect((select as HTMLSelectElement).value).toBe('en');
+      expect(select).toBeInstanceOf(HTMLSelectElement);
 
-      fireEvent.change(select!, { target: { value: 'zh' } });
+      if (!(select instanceof HTMLSelectElement)) {
+        throw new Error('Expected language selector element to be a <select> element');
+      }
+
+      expect(select.value).toBe('en');
+
+      fireEvent.change(select, { target: { value: 'zh' } });
       expect(mockChangeLanguage).toHaveBeenCalledWith('zh');
     });
   });
