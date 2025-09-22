@@ -147,38 +147,37 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
           }> = [];
 
           // Process elements efficiently
-          Array.from(elements)
-            .slice(0, 20)
-            .forEach((el, index) => {
-              try {
-                const rect = el.getBoundingClientRect();
-                const computedStyle = window.getComputedStyle(el);
+          const limitedElements = Array.from(elements).slice(0, 20);
+          for (const [index, el] of limitedElements.entries()) {
+            try {
+              const rect = el.getBoundingClientRect();
+              const computedStyle = window.getComputedStyle(el);
 
-                // Skip hidden or zero-size elements
-                if (
-                  rect.width === 0 ||
-                  rect.height === 0 ||
-                  computedStyle.display === 'none' ||
-                  computedStyle.visibility === 'hidden' ||
-                  computedStyle.opacity === '0'
-                ) {
-                  return;
-                }
-
-                results.push({
-                  index,
-                  tagName: el.tagName,
-                  className: el.className || '',
-                  textContent: (el.textContent || '').slice(0, 30),
-                  width: rect.width,
-                  height: rect.height,
-                  isVisible: rect.width > 0 && rect.height > 0,
-                });
-              } catch (error) {
-                // Skip problematic elements
-                console.warn(`Skipping element ${index}:`, error);
+              // Skip hidden or zero-size elements
+              if (
+                rect.width === 0 ||
+                rect.height === 0 ||
+                computedStyle.display === 'none' ||
+                computedStyle.visibility === 'hidden' ||
+                computedStyle.opacity === '0'
+              ) {
+                continue;
               }
-            });
+
+              results.push({
+                index,
+                tagName: el.tagName,
+                className: el.className || '',
+                textContent: (el.textContent || '').slice(0, 30),
+                width: rect.width,
+                height: rect.height,
+                isVisible: rect.width > 0 && rect.height > 0,
+              });
+            } catch (error) {
+              // Skip problematic elements
+              console.warn(`Skipping element ${index}:`, error);
+            }
+          }
 
           return results;
         });
