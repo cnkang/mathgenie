@@ -146,6 +146,16 @@ describe('Browser Optimizations', () => {
   });
 
   describe('createPerformanceMonitor', () => {
+    const createSlowOperation = (durationMs = 15): (() => string) => {
+      return () => {
+        const start = Date.now();
+        while (Date.now() - start < durationMs) {
+          // Simulate slow operation
+        }
+        return 'result';
+      };
+    };
+
     test('measures DOM operations and returns result', () => {
       const monitor = createPerformanceMonitor();
       const testOperation = () => 'test result';
@@ -162,14 +172,7 @@ describe('Browser Optimizations', () => {
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const monitor = createPerformanceMonitor();
 
-      // Mock a slow operation
-      const slowOperation = () => {
-        const start = Date.now();
-        while (Date.now() - start < 15) {
-          // Simulate slow operation
-        }
-        return 'result';
-      };
+      const slowOperation = createSlowOperation();
 
       monitor.measureDOMOperation(slowOperation, 'slow operation');
 
@@ -188,13 +191,7 @@ describe('Browser Optimizations', () => {
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const monitor = createPerformanceMonitor();
 
-      const slowOperation = () => {
-        const start = Date.now();
-        while (Date.now() - start < 15) {
-          // Simulate slow operation
-        }
-        return 'result';
-      };
+      const slowOperation = createSlowOperation();
 
       monitor.measureDOMOperation(slowOperation, 'slow operation');
 
