@@ -5,6 +5,7 @@
 
 import { readFileSync } from 'fs';
 import { glob } from 'glob';
+import ts from 'typescript';
 
 // ANSI color codes
 const colors = {
@@ -16,6 +17,15 @@ const colors = {
   cyan: '\x1b[36m',
   bold: '\x1b[1m',
 };
+
+// Constants for priority levels and common strings to avoid duplication
+const PRIORITY_LEVELS = {
+  HIGH: 'HIGH' as const,
+  MEDIUM: 'MEDIUM' as const,
+  LOW: 'LOW' as const,
+} as const;
+
+const SONAR_SAFE_COMMENT = 'SONAR-SAFE';
 
 interface SonarIssue {
   file: string;
@@ -41,13 +51,13 @@ interface FunctionMetrics {
 }
 
 class SonarChecker {
-  private issues: SonarIssue[] = [];
-  private showOnlyHigh = false;
-  private verbose = false;
+  private readonly issues: SonarIssue[] = [];
+  private readonly showOnlyHigh: boolean;
+  private readonly verbose: boolean;
 
   constructor(options: { highOnly?: boolean; verbose?: boolean } = {}) {
-    this.showOnlyHigh = options.highOnly || false;
-    this.verbose = options.verbose || false;
+    this.showOnlyHigh = options.highOnly ?? false;
+    this.verbose = options.verbose ?? false;
   }
 
   async run(): Promise<void> {
@@ -92,6 +102,8 @@ class SonarChecker {
     // Check security patterns
     this.checkSecurityPatterns(filePath, content);
     this.checkIdenticalExpressions(filePath, content);
+    this.checkAccessibilityPatterns(filePath, content);
+    this.checkParameterThreshold(filePath, content);
   }
 
   private checkSecurityPatterns(filePath: string, content: string): void {
@@ -120,7 +132,10 @@ class SonarChecker {
 
         // Check if PATH is restricted or SONAR-SAFE comment is present
         const hasPathRestriction = /PATH:\s*\[/.test(context) || /PATH.*filter.*join/.test(context);
-        const hasSonarSafe = /SONAR-SAFE.*PATH|PATH.*SONAR-SAFE/i.test(context);
+        const hasSonarSafe = new RegExp(
+          `${SONAR_SAFE_COMMENT}.*PATH|PATH.*${SONAR_SAFE_COMMENT}`,
+          'i'
+        ).test(context);
         const isAbsolutePath = /\/usr\/|\.\/node_modules\/|pnpm exec|npx/.test(match[0]);
 
         if (!hasPathRestriction && !hasSonarSafe && !isAbsolutePath) {
@@ -130,7 +145,7 @@ class SonarChecker {
             'typescript:S4036',
             'Make sure the "PATH" variable only contains fixed, unwriteable directories. Searching OS commands in PATH is security-sensitive',
             'error',
-            'HIGH'
+            PRIORITY_LEVELS.HIGH
           );
         }
       }
@@ -153,7 +168,10 @@ class SonarChecker {
 
       // Check if PATH is restricted or SONAR-SAFE comment is present
       const hasPathRestriction = /PATH:\s*\[/.test(context) || /PATH.*filter.*join/.test(context);
-      const hasSonarSafe = /SONAR-SAFE.*PATH|PATH.*SONAR-SAFE/i.test(context);
+      const hasSonarSafe = new RegExp(
+        `${SONAR_SAFE_COMMENT}.*PATH|PATH.*${SONAR_SAFE_COMMENT}`,
+        'i'
+      ).test(context);
       const isAbsolutePath = /\/usr\/|\.\/node_modules\/|pnpm exec|npx/.test(match[0]);
 
       if (!hasPathRestriction && !hasSonarSafe && !isAbsolutePath) {
@@ -163,7 +181,7 @@ class SonarChecker {
           'typescript:S4036',
           'Make sure the "PATH" variable only contains fixed, unwriteable directories. Searching OS commands in PATH is security-sensitive',
           'error',
-          'HIGH'
+          PRIORITY_LEVELS.HIGH
         );
       }
     }
@@ -183,7 +201,10 @@ class SonarChecker {
       // Check if it's in a test file or has SONAR-SAFE comment
       const isTestFile =
         /\.(test|spec)\.(ts|tsx|js|jsx)$/.test(filePath) || /setupTests\.(ts|js)$/.test(filePath);
-      const hasSonarSafe = /SONAR-SAFE.*random|random.*SONAR-SAFE/i.test(context);
+      const hasSonarSafe = new RegExp(
+        `${SONAR_SAFE_COMMENT}.*random|random.*${SONAR_SAFE_COMMENT}`,
+        'i'
+      ).test(context);
       const hasSecurityComment = /not.*security|test.*purpose|UI.*animation|mock/i.test(context);
 
       if (!isTestFile && !hasSonarSafe && !hasSecurityComment) {
@@ -193,7 +214,7 @@ class SonarChecker {
           'typescript:S2245',
           'Make sure that using this pseudorandom number generator is safe here. Using pseudorandom number generators (PRNGs) is security-sensitive',
           'error',
-          'HIGH'
+          PRIORITY_LEVELS.HIGH
         );
       }
     }
@@ -233,6 +254,126 @@ class SonarChecker {
     // Implementation remains the same
   }
 
+  private checkAccessibilityPatterns(filePath: string, content: string): void {
+    const lines = content.split('\n');
+
+    lines.forEach((line, index) => {
+      const normalize = line.toLowerCase();
+
+      if (
+        (normalize.includes("role='group'") || normalize.includes('role="group"')) &&
+        !line.includes(SONAR_SAFE_COMMENT)
+      ) {
+        this.addIssue(
+          filePath,
+          index + 1,
+          'typescript:a11y-role-group',
+          'Avoid using role="group" when a semantic container such as <fieldset> or <details> is available.',
+          'warning',
+          PRIORITY_LEVELS.MEDIUM
+        );
+      }
+
+      if (
+        (normalize.includes('tabindex="0"') ||
+          normalize.includes("tabindex='0'") ||
+          normalize.includes('tabindex={0}')) &&
+        !normalize.includes('[tabindex')
+      ) {
+        // Check for SONAR-SAFE comment in current line or previous 3 lines
+        const contextLines = lines.slice(Math.max(0, index - 3), index + 1);
+        const hasContextSonarSafe = contextLines.some(contextLine =>
+          contextLine.includes(SONAR_SAFE_COMMENT)
+        );
+
+        if (!hasContextSonarSafe) {
+          this.addIssue(
+            filePath,
+            index + 1,
+            'typescript:a11y-tabindex',
+            'tabIndex="0" should be reserved for interactive elements; verify that the element is keyboard-focusable.',
+            'warning',
+            PRIORITY_LEVELS.MEDIUM
+          );
+        }
+      }
+
+      if (
+        (normalize.includes("role='status'") || normalize.includes('role="status"')) &&
+        !content.toLowerCase().includes('<output') &&
+        !line.includes(SONAR_SAFE_COMMENT)
+      ) {
+        this.addIssue(
+          filePath,
+          index + 1,
+          'typescript:a11y-status-role',
+          'Prefer semantic <output> elements or aria-live regions instead of role="status" on non-interactive elements.',
+          'warning',
+          PRIORITY_LEVELS.LOW
+        );
+      }
+    });
+  }
+
+  private checkParameterThreshold(filePath: string, content: string): void {
+    const sourceFile = ts.createSourceFile(
+      filePath,
+      content,
+      ts.ScriptTarget.Latest,
+      true,
+      ts.ScriptKind.TSX
+    );
+
+    const visit = (node: ts.Node): void => {
+      if (
+        ts.isFunctionDeclaration(node) ||
+        ts.isFunctionExpression(node) ||
+        ts.isArrowFunction(node) ||
+        ts.isMethodDeclaration(node)
+      ) {
+        const parameterCount = node.parameters.length;
+        if (parameterCount > 7) {
+          const { line } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
+          const functionName = this.resolveFunctionName(node, sourceFile);
+          this.addIssue(
+            filePath,
+            line + 1,
+            'typescript:S107',
+            `Function "${functionName}" has ${parameterCount} parameters (maximum allowed is 7).`,
+            'error',
+            PRIORITY_LEVELS.HIGH
+          );
+        }
+      }
+
+      ts.forEachChild(node, visit);
+    };
+
+    visit(sourceFile);
+  }
+
+  private resolveFunctionName(node: ts.Node, sourceFile: ts.SourceFile): string {
+    if (ts.isFunctionDeclaration(node) && node.name) {
+      return node.name.getText(sourceFile);
+    }
+
+    if (
+      (ts.isFunctionExpression(node) || ts.isArrowFunction(node)) &&
+      ts.isVariableDeclaration(node.parent)
+    ) {
+      const parentName = node.parent.name;
+      if (ts.isIdentifier(parentName)) {
+        return parentName.text;
+      }
+    }
+
+    if (ts.isMethodDeclaration(node) && ts.isIdentifier(node.name)) {
+      return node.name.text;
+    }
+
+    return '<anonymous>';
+  }
+
   private async checkUnusedVariables(): Promise<void> {
     // Implementation remains the same
   }
@@ -266,7 +407,7 @@ class SonarChecker {
     }
 
     const filteredIssues = this.showOnlyHigh
-      ? this.issues.filter(issue => issue.priority === 'HIGH')
+      ? this.issues.filter(issue => issue.priority === PRIORITY_LEVELS.HIGH)
       : this.issues;
 
     if (filteredIssues.length === 0) {
@@ -282,9 +423,9 @@ class SonarChecker {
     console.log(`  🟡 Warnings: ${warningCount}`);
 
     const priorityBreakdown = {
-      HIGH: filteredIssues.filter(issue => issue.priority === 'HIGH').length,
-      MEDIUM: filteredIssues.filter(issue => issue.priority === 'MEDIUM').length,
-      LOW: filteredIssues.filter(issue => issue.priority === 'LOW').length,
+      HIGH: filteredIssues.filter(issue => issue.priority === PRIORITY_LEVELS.HIGH).length,
+      MEDIUM: filteredIssues.filter(issue => issue.priority === PRIORITY_LEVELS.MEDIUM).length,
+      LOW: filteredIssues.filter(issue => issue.priority === PRIORITY_LEVELS.LOW).length,
     };
 
     console.log('\nPriority breakdown:');
@@ -299,9 +440,9 @@ class SonarChecker {
       for (const issue of issues) {
         const icon = issue.severity === 'error' ? '🔴' : '🟡';
         let priorityIcon = 'ℹ️';
-        if (issue.priority === 'HIGH') {
+        if (issue.priority === PRIORITY_LEVELS.HIGH) {
           priorityIcon = '🚨';
-        } else if (issue.priority === 'MEDIUM') {
+        } else if (issue.priority === PRIORITY_LEVELS.MEDIUM) {
           priorityIcon = '⚠️';
         }
         console.log(`  ${icon} ${priorityIcon} Line ${issue.line}: ${issue.message}`);
