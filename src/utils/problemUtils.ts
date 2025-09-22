@@ -3,16 +3,16 @@ import type { Settings } from '@/types';
 const getCrypto = (): Crypto => {
   // Prefer globalThis.crypto which is available in modern browsers and Node 22+
   if (typeof globalThis !== 'undefined') {
-    const maybeCrypto = (globalThis as unknown as { crypto?: Crypto }).crypto;
-    if (maybeCrypto && typeof maybeCrypto.getRandomValues === 'function') {
-      return maybeCrypto as Crypto;
+    const maybeCrypto = (globalThis as typeof globalThis & { crypto?: Crypto }).crypto;
+    if (typeof maybeCrypto?.getRandomValues === 'function') {
+      return maybeCrypto;
     }
   }
   // Legacy IE fallback (unlikely used):
   const w =
-    typeof window !== 'undefined' ? (window as unknown as { msCrypto?: Crypto }) : undefined;
-  if (w?.msCrypto?.getRandomValues) {
-    return w.msCrypto as Crypto;
+    typeof window !== 'undefined' ? (window as typeof window & { msCrypto?: Crypto }) : undefined;
+  if (typeof w?.msCrypto?.getRandomValues === 'function') {
+    return w.msCrypto;
   }
   throw new Error('Secure crypto.getRandomValues is not available');
 };
