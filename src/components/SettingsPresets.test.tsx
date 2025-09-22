@@ -22,7 +22,7 @@ function translate(key: string): string {
   return translationMap[key] ?? key;
 }
 
-function MockI18nProvider({ children }: { children: React.ReactNode }) {
+function MockI18nProvider({ children }: Readonly<{ children: React.ReactNode }>) {
   return <div>{children}</div>;
 }
 

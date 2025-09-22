@@ -95,7 +95,11 @@ describe('ErrorBoundary', () => {
     );
 
     const reloadButton = container.querySelector('.reload-button');
-    fireEvent.click(reloadButton!);
+    if (!reloadButton) {
+      throw new Error('Expected reload button to be present');
+    }
+
+    fireEvent.click(reloadButton);
 
     expect(mockReload).toHaveBeenCalled();
   });
@@ -110,10 +114,14 @@ describe('ErrorBoundary', () => {
     expect(container.querySelector('h2')?.textContent).toBe('🚨 Something went wrong');
 
     const retryButton = container.querySelector('.retry-button');
-    expect(retryButton).toBeDefined();
+    expect(retryButton).not.toBeNull();
+
+    if (!retryButton) {
+      throw new Error('Expected retry button to be present');
+    }
 
     // Just test that the button exists and can be clicked
-    fireEvent.click(retryButton!);
+    fireEvent.click(retryButton);
 
     // The error boundary should still show error state after retry click
     expect(container.querySelector('h2')?.textContent).toBe('🚨 Something went wrong');
