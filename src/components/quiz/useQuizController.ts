@@ -167,19 +167,38 @@ const useQuizNavigation = (
   return { goToPrevious, goToNext };
 };
 
-const useQuizActions = (
-  problems: Problem[],
-  quizProblems: Problem[],
-  t: Translator,
-  onQuizComplete: (result: QuizResult) => void,
-  setQuizProblems: Dispatch<SetStateAction<Problem[]>>,
-  setQuizResult: (value: QuizResult | null) => void,
-  setShowResults: (value: boolean) => void,
-  currentProblemIndex: number,
-  setCurrentProblemIndex: (value: number | ((prev: number) => number)) => void,
-  resetTimer: () => void
-) => {
-  const finishQuiz = useFinishQuiz(quizProblems, t, onQuizComplete, setQuizResult, setShowResults);
+type UseQuizActionsArgs = {
+  problems: Problem[];
+  quizProblems: Problem[];
+  translator: Translator;
+  onQuizComplete: (result: QuizResult) => void;
+  setQuizProblems: Dispatch<SetStateAction<Problem[]>>;
+  setQuizResult: (value: QuizResult | null) => void;
+  setShowResults: (value: boolean) => void;
+  currentProblemIndex: number;
+  setCurrentProblemIndex: (value: number | ((prev: number) => number)) => void;
+  resetTimer: () => void;
+};
+
+const useQuizActions = ({
+  problems,
+  quizProblems,
+  translator,
+  onQuizComplete,
+  setQuizProblems,
+  setQuizResult,
+  setShowResults,
+  currentProblemIndex,
+  setCurrentProblemIndex,
+  resetTimer,
+}: UseQuizActionsArgs) => {
+  const finishQuiz = useFinishQuiz(
+    quizProblems,
+    translator,
+    onQuizComplete,
+    setQuizResult,
+    setShowResults
+  );
 
   const handleAnswerSubmit = useAnswerSubmission({
     setQuizProblems,
@@ -209,18 +228,18 @@ export const useQuizController = (
     problemState.quizProblems.length
   );
 
-  const actions = useQuizActions(
+  const actions = useQuizActions({
     problems,
-    problemState.quizProblems,
-    t,
+    quizProblems: problemState.quizProblems,
+    translator: t,
     onQuizComplete,
-    problemState.setQuizProblems,
-    problemState.setQuizResult,
-    problemState.setShowResults,
-    problemState.currentProblemIndex,
-    problemState.setCurrentProblemIndex,
-    timerState.resetTimer
-  );
+    setQuizProblems: problemState.setQuizProblems,
+    setQuizResult: problemState.setQuizResult,
+    setShowResults: problemState.setShowResults,
+    currentProblemIndex: problemState.currentProblemIndex,
+    setCurrentProblemIndex: problemState.setCurrentProblemIndex,
+    resetTimer: timerState.resetTimer,
+  });
 
   const formatTime = useCallback((seconds: number): string => {
     const mins = Math.floor(seconds / 60);
