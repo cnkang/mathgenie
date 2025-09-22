@@ -19,9 +19,8 @@ const ProblemsSection: React.FC<ProblemsSectionProps> = ({ t, problems }) => {
               `Generated Problems (${problems.length})`}
           </h2>
         </div>
-        <div
+        <section
           className='problems-content'
-          role='region'
           aria-labelledby='results-title'
           aria-label={problemsListLabel}
           // SONAR-SAFE: Scrollable region must be focusable to satisfy WCAG 2.1.1 (scrollable-region-focusable).
@@ -39,7 +38,7 @@ const ProblemsSection: React.FC<ProblemsSectionProps> = ({ t, problems }) => {
               ))}
             </ol>
           )}
-        </div>
+        </section>
       </div>
     </section>
   );
