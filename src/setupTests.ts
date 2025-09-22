@@ -68,15 +68,16 @@ expect.extend({
     attribute: string,
     expectedValue?: string
   ): { pass: boolean; message: () => string } {
-    const element = received as Element;
-    if (!element || !element.hasAttribute) {
+    const element = received as Element | null | undefined;
+    if (!element?.hasAttribute) {
       return {
         message: () => 'expected element to be a valid DOM element',
         pass: false,
       };
     }
 
-    const hasAttribute = element.hasAttribute(attribute);
+    const targetElement = element as Element;
+    const hasAttribute = targetElement.hasAttribute(attribute);
     if (expectedValue === undefined) {
       return {
         message: () =>
@@ -85,7 +86,7 @@ expect.extend({
       };
     }
 
-    const actualValue = element.getAttribute(attribute);
+    const actualValue = targetElement.getAttribute(attribute);
     const pass = hasAttribute && actualValue === expectedValue;
     return {
       message: () =>

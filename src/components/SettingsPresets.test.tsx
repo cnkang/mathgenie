@@ -1,30 +1,113 @@
 import React from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { fireEvent, render, screen } from '../../tests/helpers/testUtils';
-import type { Operation, Settings } from '../types';
+import type { Operation } from '../types';
 import SettingsPresets from './SettingsPresets';
+
+const translationMap: Record<string, string> = {
+  'presets.title': 'Quick Presets',
+  'presets.beginner.name': 'Beginner (1-10)',
+  'presets.beginner.description': 'Simple addition and subtraction',
+  'presets.intermediate.name': 'Intermediate (1-50)',
+  'presets.intermediate.description': 'All operations with medium numbers',
+  'presets.advanced.name': 'Advanced (1-100)',
+  'presets.advanced.description': 'All operations including division',
+  'presets.multiplication.name': 'Multiplication Focus',
+  'presets.multiplication.description': 'Focus on multiplication tables',
+  'presets.apply': 'Apply',
+  'presets.clickToApply': 'Click to apply',
+};
+
+function translate(key: string): string {
+  return translationMap[key] ?? key;
+}
+
+function MockI18nProvider({ children }: { children: React.ReactNode }) {
+  return <div>{children}</div>;
+}
+
+function useMockTranslation() {
+  return { t: translate };
+}
+
+type TranslateFn = (key: string) => string | undefined;
+
+type PresetGridItem = {
+  name: string;
+  description: string;
+  settings: unknown;
+};
+
+type BuildPresetGridArgs = {
+  translate: TranslateFn;
+  presets: PresetGridItem[];
+  onApply: (settings: unknown) => void;
+  getButtonAriaLabel?: (preset: PresetGridItem) => string | undefined;
+};
+
+const buildPresetGrid = ({
+  translate: translateFn,
+  presets,
+  onApply,
+  getButtonAriaLabel,
+}: BuildPresetGridArgs): React.ReactElement => (
+  <div className='settings-presets'>
+    <h3>{translateFn('presets.title') ?? 'Quick Presets'}</h3>
+    <div className='presets-grid'>
+      {presets.map(preset => (
+        <div key={preset.name} className='preset-card'>
+          <h4>{preset.name}</h4>
+          <p>{preset.description}</p>
+          <button
+            onClick={() => onApply(preset.settings)}
+            className='preset-button'
+            aria-label={getButtonAriaLabel?.(preset) ?? undefined}
+          >
+            {translateFn('presets.apply') ?? 'Apply'}
+          </button>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const FallbackTranslationList: React.FC<{ translate: TranslateFn }> = ({
+  translate: translateFn,
+}) => (
+  <div>
+    <div data-testid='title'>{translateFn('presets.title') ?? 'Quick Presets'}</div>
+    <div data-testid='beginner-name'>
+      {translateFn('presets.beginner.name') ?? 'Beginner (1-10)'}
+    </div>
+    <div data-testid='beginner-desc'>
+      {translateFn('presets.beginner.description') ?? 'Simple addition and subtraction'}
+    </div>
+    <div data-testid='intermediate-name'>
+      {translateFn('presets.intermediate.name') ?? 'Intermediate (1-50)'}
+    </div>
+    <div data-testid='intermediate-desc'>
+      {translateFn('presets.intermediate.description') ?? 'All operations with medium numbers'}
+    </div>
+    <div data-testid='advanced-name'>
+      {translateFn('presets.advanced.name') ?? 'Advanced (1-100)'}
+    </div>
+    <div data-testid='advanced-desc'>
+      {translateFn('presets.advanced.description') ?? 'All operations including division'}
+    </div>
+    <div data-testid='multiplication-name'>
+      {translateFn('presets.multiplication.name') ?? 'Multiplication Tables'}
+    </div>
+    <div data-testid='multiplication-desc'>
+      {translateFn('presets.multiplication.description') ?? 'Focus on multiplication practice'}
+    </div>
+    <div data-testid='apply'>{translateFn('presets.apply') ?? 'Apply'}</div>
+  </div>
+);
 
 // Mock the i18n system
 vi.mock('../i18n', () => ({
-  I18nProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  useTranslation: () => ({
-    t: (key: string) => {
-      const translations: Record<string, string> = {
-        'presets.title': 'Quick Presets',
-        'presets.beginner.name': 'Beginner (1-10)',
-        'presets.beginner.description': 'Simple addition and subtraction',
-        'presets.intermediate.name': 'Intermediate (1-50)',
-        'presets.intermediate.description': 'All operations with medium numbers',
-        'presets.advanced.name': 'Advanced (1-100)',
-        'presets.advanced.description': 'All operations including division',
-        'presets.multiplication.name': 'Multiplication Focus',
-        'presets.multiplication.description': 'Focus on multiplication tables',
-        'presets.apply': 'Apply',
-        'presets.clickToApply': 'Click to apply',
-      };
-      return translations[key] || key;
-    },
-  }),
+  I18nProvider: MockI18nProvider,
+  useTranslation: useMockTranslation,
 }));
 
 describe('SettingsPresets', () => {
@@ -129,34 +212,23 @@ describe('SettingsPresets', () => {
   });
 
   test('renders with fallback text when translations return undefined', () => {
-    const handleApply = (settings: any) => mockOnApplyPreset(settings);
-    const mockT = (key: string) => key;
-    const presets = [
+    const identityTranslate: TranslateFn = key => key;
+    const presetsWithFallback: PresetGridItem[] = [
       {
-        name: mockT('presets.beginner.name') ?? 'Beginner (1-10)',
-        description: mockT('presets.beginner.description') ?? 'Simple addition and subtraction',
+        name: identityTranslate('presets.beginner.name') ?? 'Beginner (1-10)',
+        description:
+          identityTranslate('presets.beginner.description') ?? 'Simple addition and subtraction',
         settings: { operations: ['+', '-'] as Operation[], numProblems: 15 },
       },
     ];
 
-    const FallbackPresets = ({ onApply }: { onApply: (s: any) => void }) => (
-      <div className='settings-presets'>
-        <h3>{mockT('presets.title') ?? 'Quick Presets'}</h3>
-        <div className='presets-grid'>
-          {presets.map(preset => (
-            <div key={preset.name} className='preset-card'>
-              <h4>{preset.name}</h4>
-              <p>{preset.description}</p>
-              <button onClick={() => onApply(preset.settings)}>
-                {mockT('presets.apply') ?? 'Apply'}
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
+    render(
+      buildPresetGrid({
+        translate: identityTranslate,
+        presets: presetsWithFallback,
+        onApply: mockOnApplyPreset,
+      })
     );
-
-    render(<FallbackPresets onApply={handleApply} />);
 
     // Verify fallback values are used
     expect(screen.getByText('presets.title')).toBeDefined();
@@ -166,43 +238,9 @@ describe('SettingsPresets', () => {
   });
 
   test('covers all translation fallback branches', () => {
-    // Test each individual fallback branch
-    const TestFallbacks = () => {
-      const mockT = (_key: string) => undefined;
+    const undefinedTranslate: TranslateFn = () => undefined;
 
-      return (
-        <div>
-          <div data-testid='title'>{mockT('presets.title') ?? 'Quick Presets'}</div>
-          <div data-testid='beginner-name'>
-            {mockT('presets.beginner.name') ?? 'Beginner (1-10)'}
-          </div>
-          <div data-testid='beginner-desc'>
-            {mockT('presets.beginner.description') ?? 'Simple addition and subtraction'}
-          </div>
-          <div data-testid='intermediate-name'>
-            {mockT('presets.intermediate.name') ?? 'Intermediate (1-50)'}
-          </div>
-          <div data-testid='intermediate-desc'>
-            {mockT('presets.intermediate.description') ?? 'All operations with medium numbers'}
-          </div>
-          <div data-testid='advanced-name'>
-            {mockT('presets.advanced.name') ?? 'Advanced (1-100)'}
-          </div>
-          <div data-testid='advanced-desc'>
-            {mockT('presets.advanced.description') ?? 'All operations including division'}
-          </div>
-          <div data-testid='multiplication-name'>
-            {mockT('presets.multiplication.name') ?? 'Multiplication Tables'}
-          </div>
-          <div data-testid='multiplication-desc'>
-            {mockT('presets.multiplication.description') ?? 'Focus on multiplication practice'}
-          </div>
-          <div data-testid='apply'>{mockT('presets.apply') ?? 'Apply'}</div>
-        </div>
-      );
-    };
-
-    render(<TestFallbacks />);
+    render(<FallbackTranslationList translate={undefinedTranslate} />);
 
     // Test all fallback branches - use native DOM properties instead of jest-dom matchers
     expect(screen.getByTestId('title').textContent).toBe('Quick Presets');
@@ -245,13 +283,12 @@ describe('SettingsPresets', () => {
   });
 
   test('renders with mock translation provider that returns undefined', () => {
-    const mockT = (key: string) => key;
-    const handleApplyPreset = (settings: Settings) => mockOnApplyPreset(settings);
-
-    const presets = [
+    const identityTranslate: TranslateFn = key => key;
+    const presetOptions: PresetGridItem[] = [
       {
-        name: mockT('presets.beginner.name') ?? 'Beginner (1-10)',
-        description: mockT('presets.beginner.description') ?? 'Simple addition and subtraction',
+        name: identityTranslate('presets.beginner.name') ?? 'Beginner (1-10)',
+        description:
+          identityTranslate('presets.beginner.description') ?? 'Simple addition and subtraction',
         settings: {
           operations: ['+', '-'] as Operation[],
           numProblems: 15,
@@ -267,32 +304,14 @@ describe('SettingsPresets', () => {
       },
     ];
 
-    const TestSettingsPresetsWithFallbacks = ({
-      onApply: _onApply,
-    }: {
-      onApply: (s: Settings) => void;
-    }) => (
-      <div className='settings-presets'>
-        <h3>{mockT('presets.title') || 'Quick Presets'}</h3>
-        <div className='presets-grid'>
-          {presets.map(preset => (
-            <div key={preset.name} className='preset-card'>
-              <h4>{preset.name}</h4>
-              <p>{preset.description}</p>
-              <button
-                onClick={() => handleApplyPreset(preset.settings)}
-                className='preset-button'
-                aria-label={`Apply ${preset.name} preset`}
-              >
-                {mockT('presets.apply') ?? 'Apply'}
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
+    const { container } = render(
+      buildPresetGrid({
+        translate: identityTranslate,
+        presets: presetOptions,
+        onApply: mockOnApplyPreset,
+        getButtonAriaLabel: preset => `Apply ${preset.name} preset`,
+      })
     );
-
-    const { container } = render(<TestSettingsPresetsWithFallbacks onApply={mockOnApplyPreset} />);
 
     // Verify all fallback values are rendered using container queries to avoid duplicates - use native DOM properties
     expect(container.querySelector('h3')?.textContent).toBe('presets.title');
