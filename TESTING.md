@@ -317,7 +317,7 @@ describe('useProblemGenerator', () => {
 describe('useAppHandlers', () => {
   test('should handle validation feedback correctly', () => {
     // Test the composed behavior of useValidationFeedback
-    const { result } = renderHook(() => useAppHandlers(...));
+    const { result } = renderHook(() => useAppHandlers({ ...params }));
 
     act(() => {
       result.current.handleChange('numProblems', invalidValue);
@@ -328,7 +328,7 @@ describe('useAppHandlers', () => {
 
   test('should skip validation during loading', () => {
     // Test the composed behavior of useFieldValidation
-    const { result } = renderHook(() => useAppHandlers(..., true)); // isLoading
+    const { result } = renderHook(() => useAppHandlers({ ...params, isLoading: true }));
 
     act(() => {
       result.current.handleChange('numProblems', value);
@@ -339,7 +339,7 @@ describe('useAppHandlers', () => {
 
   test('should handle settings changes with proper validation', () => {
     // Test the composed behavior of useSettingsChangeHandler
-    const { result } = renderHook(() => useAppHandlers(...));
+    const { result } = renderHook(() => useAppHandlers({ ...params }));
 
     act(() => {
       result.current.handleChange('operations', ['+', '-']);
@@ -353,7 +353,7 @@ describe('useAppHandlers', () => {
 
   test('should handle preset application with success message', () => {
     // Test the composed behavior of usePresetHandler
-    const { result } = renderHook(() => useAppHandlers(...));
+    const { result } = renderHook(() => useAppHandlers({ ...params }));
     const presetSettings = { operations: ['*'], numProblems: 10 };
 
     act(() => {
@@ -369,7 +369,7 @@ describe('useAppHandlers', () => {
 
   test('should not show success message during loading state', () => {
     // Test loading state handling in preset application
-    const { result } = renderHook(() => useAppHandlers(..., true)); // isLoading
+    const { result } = renderHook(() => useAppHandlers({ ...params, isLoading: true }));
     const presetSettings = { operations: ['*'], numProblems: 10 };
 
     act(() => {
