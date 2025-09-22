@@ -40,7 +40,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
@@ -88,7 +88,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0 # Full history for better analysis
 
@@ -149,7 +149,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
@@ -216,7 +216,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
@@ -251,7 +251,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
@@ -318,7 +318,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
@@ -385,15 +385,17 @@ jobs:
 
           if [ "${#MISSING[@]}" -gt 0 ]; then
             echo "⚠️ Missing browsers detected: ${MISSING[*]}"
-            echo "📦 Installing required browsers with dependencies..."
-            pnpm exec playwright install "${MISSING[@]}" --with-deps
+            pnpm exec playwright install "${MISSING[@]}"
           else
-            echo "✅ All required browsers found in cache; skipping reinstall."
+            echo "✅ All required browsers found in cache; skipping browser download."
           fi
+
+          echo "🔧 Ensuring Playwright system dependencies are present..."
+          pnpm exec playwright install-deps "${BROWSERS[@]}"
 
           echo "🔍 Running Playwright dry-run validation..."
           if ! pnpm exec playwright install --dry-run "${BROWSERS[@]}"; then
-            echo "⚠️ Dry-run validation failed, forcing reinstall..."
+            echo "⚠️ Dry-run validation failed, forcing reinstall with dependencies..."
             pnpm exec playwright install "${BROWSERS[@]}" --with-deps
             pnpm exec playwright install --dry-run "${BROWSERS[@]}"
           fi
@@ -508,7 +510,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
@@ -568,15 +570,18 @@ jobs:
           done
 
           if [ "$FOUND" = false ]; then
-            echo "⚠️ Browser ${TARGET_BROWSER} missing from cache, installing with dependencies..."
-            pnpm exec playwright install "${TARGET_BROWSER}" --with-deps
+            echo "⚠️ Browser ${TARGET_BROWSER} missing from cache, downloading binary..."
+            pnpm exec playwright install "${TARGET_BROWSER}"
           else
-            echo "✅ Browser ${TARGET_BROWSER} found in cache; skipping reinstall."
+            echo "✅ Browser ${TARGET_BROWSER} found in cache; skipping browser download."
           fi
+
+          echo "🔧 Ensuring Playwright system dependencies are present..."
+          pnpm exec playwright install-deps "${TARGET_BROWSER}"
 
           echo "🔍 Running Playwright dry-run validation..."
           if ! pnpm exec playwright install --dry-run "${TARGET_BROWSER}"; then
-            echo "⚠️ Dry-run validation failed, forcing reinstall..."
+            echo "⚠️ Dry-run validation failed, forcing reinstall with dependencies..."
             pnpm exec playwright install "${TARGET_BROWSER}" --with-deps
             pnpm exec playwright install --dry-run "${TARGET_BROWSER}"
           fi
@@ -659,7 +664,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
@@ -769,7 +774,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
@@ -825,7 +830,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
