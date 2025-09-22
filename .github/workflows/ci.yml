@@ -358,21 +358,45 @@ jobs:
           echo "🎭 Installing Playwright browsers for accessibility testing..."
           echo "🎭 Cache status: ${{ steps.playwright-cache.outputs.cache-hit }}"
 
-          # Install only the browsers we need for accessibility testing
-          if [ "${{ steps.playwright-cache.outputs.cache-hit }}" != "true" ]; then
-            echo "📦 Installing browsers: chromium, firefox, webkit"
-            pnpm exec playwright install chromium firefox webkit --with-deps
+          CACHE_MATCHED_KEY="${{ steps.playwright-cache.outputs.cache-matched-key }}"
+          if [ -n "$CACHE_MATCHED_KEY" ]; then
+            echo "🎭 Matched cache key: $CACHE_MATCHED_KEY"
           else
-            echo "✅ Using cached browsers, verifying installation..."
-            # Verify browsers are available, install if missing
-            pnpm exec playwright install chromium firefox webkit --with-deps || {
-              echo "⚠️ Cache verification failed, reinstalling browsers..."
-              pnpm exec playwright install chromium firefox webkit --with-deps
-            }
+            echo "🎭 Matched cache key: none"
           fi
 
-          echo "🔍 Verifying browser installation..."
-          pnpm exec playwright install --dry-run chromium firefox webkit
+          BROWSERS=(chromium firefox webkit)
+          CACHE_LOCATIONS=("$HOME/.cache/ms-playwright" "node_modules/playwright-core/.local-browsers" "$HOME/.local/share/ms-playwright")
+          MISSING=()
+
+          for browser in "${BROWSERS[@]}"; do
+            FOUND=false
+            for location in "${CACHE_LOCATIONS[@]}"; do
+              if [ -d "$location" ] && compgen -G "$location/${browser}-*" > /dev/null; then
+                FOUND=true
+                break
+              fi
+            done
+
+            if [ "$FOUND" = false ]; then
+              MISSING+=("$browser")
+            fi
+          done
+
+          if [ "${#MISSING[@]}" -gt 0 ]; then
+            echo "⚠️ Missing browsers detected: ${MISSING[*]}"
+            echo "📦 Installing required browsers with dependencies..."
+            pnpm exec playwright install "${MISSING[@]}" --with-deps
+          else
+            echo "✅ All required browsers found in cache; skipping reinstall."
+          fi
+
+          echo "🔍 Running Playwright dry-run validation..."
+          if ! pnpm exec playwright install --dry-run "${BROWSERS[@]}"; then
+            echo "⚠️ Dry-run validation failed, forcing reinstall..."
+            pnpm exec playwright install "${BROWSERS[@]}" --with-deps
+            pnpm exec playwright install --dry-run "${BROWSERS[@]}"
+          fi
         timeout-minutes: 15
 
       - name: 🏗️ Build application
@@ -525,21 +549,37 @@ jobs:
           echo "📋 Project: ${{ matrix.project }}, Browser: ${{ matrix.browser }}"
           echo "🎭 Cache status: ${{ steps.playwright-cache.outputs.cache-hit }}"
 
-          # Install the specific browser needed for this matrix job
-          if [ "${{ steps.playwright-cache.outputs.cache-hit }}" != "true" ]; then
-            echo "📦 Installing browser: ${{ matrix.browser }}"
-            pnpm exec playwright install ${{ matrix.browser }} --with-deps
+          CACHE_MATCHED_KEY="${{ steps.playwright-cache.outputs.cache-matched-key }}"
+          if [ -n "$CACHE_MATCHED_KEY" ]; then
+            echo "🎭 Matched cache key: $CACHE_MATCHED_KEY"
           else
-            echo "✅ Using cached browsers, verifying installation..."
-            # Verify browser is available, install if missing
-            pnpm exec playwright install ${{ matrix.browser }} --with-deps || {
-              echo "⚠️ Cache verification failed, reinstalling browser..."
-              pnpm exec playwright install ${{ matrix.browser }} --with-deps
-            }
+            echo "🎭 Matched cache key: none"
           fi
 
-          echo "🔍 Verifying browser installation..."
-          pnpm exec playwright install --dry-run ${{ matrix.browser }}
+          TARGET_BROWSER="${{ matrix.browser }}"
+          CACHE_LOCATIONS=("$HOME/.cache/ms-playwright" "node_modules/playwright-core/.local-browsers" "$HOME/.local/share/ms-playwright")
+          FOUND=false
+
+          for location in "${CACHE_LOCATIONS[@]}"; do
+            if [ -d "$location" ] && compgen -G "$location/${TARGET_BROWSER}-*" > /dev/null; then
+              FOUND=true
+              break
+            fi
+          done
+
+          if [ "$FOUND" = false ]; then
+            echo "⚠️ Browser ${TARGET_BROWSER} missing from cache, installing with dependencies..."
+            pnpm exec playwright install "${TARGET_BROWSER}" --with-deps
+          else
+            echo "✅ Browser ${TARGET_BROWSER} found in cache; skipping reinstall."
+          fi
+
+          echo "🔍 Running Playwright dry-run validation..."
+          if ! pnpm exec playwright install --dry-run "${TARGET_BROWSER}"; then
+            echo "⚠️ Dry-run validation failed, forcing reinstall..."
+            pnpm exec playwright install "${TARGET_BROWSER}" --with-deps
+            pnpm exec playwright install --dry-run "${TARGET_BROWSER}"
+          fi
         timeout-minutes: 15
 
       - name: 🏗️ Build application
