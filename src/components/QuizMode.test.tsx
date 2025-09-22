@@ -75,6 +75,15 @@ const mockProblems: Problem[] = [
   { id: 3, text: '10 - 2 = ' },
 ];
 
+const getRequiredElement = <T extends Element>(root: Element, selector: string): T => {
+  const element = root.querySelector(selector);
+  if (!element) {
+    throw new Error(`Expected element matching selector "${selector}" to be present`);
+  }
+
+  return element as T;
+};
+
 describe('QuizMode', () => {
   const mockOnQuizComplete = vi.fn();
   const mockOnExitQuiz = vi.fn();
@@ -163,9 +172,9 @@ describe('QuizMode', () => {
         onExitQuiz={mockOnExitQuiz}
       />
     );
-    const exitButton = container.querySelector('.exit-quiz-btn-small');
-    expect(exitButton).toBeTruthy();
-    fireEvent.click(exitButton!);
+    const exitButton = getRequiredElement<HTMLButtonElement>(container, '.exit-quiz-btn-small');
+
+    fireEvent.click(exitButton);
     expect(mockOnExitQuiz).toHaveBeenCalledTimes(1);
   });
 
@@ -177,24 +186,21 @@ describe('QuizMode', () => {
         onExitQuiz={mockOnExitQuiz}
       />
     );
-    const nextButton = container.querySelector('.next-btn');
-    const prevButton = container.querySelector('.prev-btn');
-
-    expect(nextButton).toBeTruthy();
-    expect(prevButton).toBeTruthy();
+    const nextButton = getRequiredElement<HTMLButtonElement>(container, '.next-btn');
+    const prevButton = getRequiredElement<HTMLButtonElement>(container, '.prev-btn');
 
     // Initial state: previous disabled, next enabled
     expect(prevButton?.hasAttribute('disabled')).toBe(true);
     expect(nextButton?.hasAttribute('disabled')).toBe(false);
 
     // Navigate to next problem
-    fireEvent.click(nextButton!);
+    fireEvent.click(nextButton);
     expect(container.textContent).toContain('Problem 2');
     expect(container.textContent).toContain('2 / 3');
 
     // Navigate back to previous
-    const updatedPrevButton = container.querySelector('.prev-btn');
-    fireEvent.click(updatedPrevButton!);
+    const updatedPrevButton = getRequiredElement<HTMLButtonElement>(container, '.prev-btn');
+    fireEvent.click(updatedPrevButton);
     expect(container.textContent).toContain('Problem 1');
     expect(container.textContent).toContain('1 / 3');
   });
@@ -256,9 +262,11 @@ describe('QuizMode', () => {
     for (let i = 0; i < mockProblems.length; i++) {
       const problemId = mockProblems[i].id;
       // Use container.querySelector to get the first matching element
-      const submitButton = container.querySelector(`[data-testid="submit-${problemId}"]`);
-      expect(submitButton).toBeTruthy();
-      fireEvent.click(submitButton!);
+      const submitButton = getRequiredElement<HTMLButtonElement>(
+        container,
+        `[data-testid="submit-${problemId}"]`
+      );
+      fireEvent.click(submitButton);
 
       // Wait for auto-advance (except for the last problem)
       if (i < mockProblems.length - 1) {
@@ -300,9 +308,11 @@ describe('QuizMode', () => {
     for (let i = 0; i < mockProblems.length; i++) {
       const problemId = mockProblems[i].id;
       // Use container.querySelector to get the first matching element
-      const submitButton = container.querySelector(`[data-testid="submit-${problemId}"]`);
-      expect(submitButton).toBeTruthy();
-      fireEvent.click(submitButton!);
+      const submitButton = getRequiredElement<HTMLButtonElement>(
+        container,
+        `[data-testid="submit-${problemId}"]`
+      );
+      fireEvent.click(submitButton);
 
       // Wait for auto-advance (except for the last problem)
       if (i < mockProblems.length - 1) {
@@ -318,9 +328,8 @@ describe('QuizMode', () => {
     });
 
     // Click retry button - use container to avoid multiple elements
-    const retryButton = container.querySelector('.retry-quiz-btn');
-    expect(retryButton).toBeTruthy();
-    fireEvent.click(retryButton!);
+    const retryButton = getRequiredElement<HTMLButtonElement>(container, '.retry-quiz-btn');
+    fireEvent.click(retryButton);
 
     // Should return to quiz mode
     expect(container.textContent).toContain('Problem 1');
@@ -344,9 +353,11 @@ describe('QuizMode', () => {
     for (let i = 0; i < mockProblems.length; i++) {
       const problemId = mockProblems[i].id;
       // Use container.querySelector to get the first matching element
-      const submitButton = container.querySelector(`[data-testid="submit-${problemId}"]`);
-      expect(submitButton).toBeTruthy();
-      fireEvent.click(submitButton!);
+      const submitButton = getRequiredElement<HTMLButtonElement>(
+        container,
+        `[data-testid="submit-${problemId}"]`
+      );
+      fireEvent.click(submitButton);
 
       // Wait for auto-advance (except for the last problem)
       if (i < mockProblems.length - 1) {
@@ -362,9 +373,8 @@ describe('QuizMode', () => {
     });
 
     // Click exit from results - use container to avoid multiple elements
-    const exitButton = container.querySelector('.exit-quiz-btn');
-    expect(exitButton).toBeTruthy();
-    fireEvent.click(exitButton!);
+    const exitButton = getRequiredElement<HTMLButtonElement>(container, '.exit-quiz-btn');
+    fireEvent.click(exitButton);
 
     expect(mockOnExitQuiz).toHaveBeenCalledTimes(1);
   });
@@ -387,9 +397,11 @@ describe('QuizMode', () => {
     // Complete quiz manually
     for (let i = 0; i < gradeTestProblems.length; i++) {
       const currentProblemId = gradeTestProblems[i].id;
-      const submitButton = container.querySelector(`[data-testid="submit-${currentProblemId}"]`);
-      expect(submitButton).toBeTruthy();
-      fireEvent.click(submitButton!);
+      const submitButton = getRequiredElement<HTMLButtonElement>(
+        container,
+        `[data-testid="submit-${currentProblemId}"]`
+      );
+      fireEvent.click(submitButton);
 
       if (i < gradeTestProblems.length - 1) {
         act(() => {
@@ -476,9 +488,11 @@ describe('QuizMode', () => {
     for (let i = 0; i < mockProblems.length; i++) {
       const problemId = mockProblems[i].id;
       // Use container.querySelector to get the first matching element
-      const submitButton = container.querySelector(`[data-testid="submit-${problemId}"]`);
-      expect(submitButton).toBeTruthy();
-      fireEvent.click(submitButton!);
+      const submitButton = getRequiredElement<HTMLButtonElement>(
+        container,
+        `[data-testid="submit-${problemId}"]`
+      );
+      fireEvent.click(submitButton);
 
       // Wait for auto-advance (except for the last problem)
       if (i < mockProblems.length - 1) {
@@ -599,8 +613,11 @@ describe('QuizMode', () => {
     );
 
     // Answer the problem to complete the quiz
-    const submitButton = container.querySelector('[data-testid="submit-1"]');
-    fireEvent.click(submitButton!);
+    const submitButton = getRequiredElement<HTMLButtonElement>(
+      container,
+      '[data-testid="submit-1"]'
+    );
+    fireEvent.click(submitButton);
 
     // Wait for auto-finish
     act(() => {
