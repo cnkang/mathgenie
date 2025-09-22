@@ -191,9 +191,7 @@ const processElement = (element: HTMLElement, minSize: number): void => {
   let computedStyle: CSSStyleDeclaration | null = null;
 
   const getComputedStyleCached = (): CSSStyleDeclaration => {
-    if (!computedStyle) {
-      computedStyle = window.getComputedStyle(element);
-    }
+    computedStyle ??= window.getComputedStyle(element);
     return computedStyle;
   };
 

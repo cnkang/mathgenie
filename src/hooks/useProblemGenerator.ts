@@ -42,7 +42,7 @@ export const calculateExpression = (operands: number[], operators: string[]): nu
   return result;
 };
 
-const isResultNull = (result: number | null): boolean => result === null;
+const isResultNull = (result: number | null): result is null => result === null;
 
 const isResultOutOfRange = (result: number, settings: Settings): boolean => {
   const [minResult, maxResult] = settings.resultRange;
@@ -58,10 +58,7 @@ const isResultInvalid = (result: number | null, settings: Settings): boolean => 
     return true;
   }
 
-  const numResult = result as number;
-  return (
-    isResultOutOfRange(numResult, settings) || isResultNegativeWhenNotAllowed(numResult, settings)
-  );
+  return isResultOutOfRange(result, settings) || isResultNegativeWhenNotAllowed(result, settings);
 };
 
 const isAdditionOnlyInfeasible = (settings: Settings, numOperands: number): boolean => {
