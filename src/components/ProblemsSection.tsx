@@ -1,10 +1,9 @@
-import type { Problem, Settings } from '@/types';
+import type { Problem } from '@/types';
 import React from 'react';
 
 type ProblemsSectionProps = {
   t: (key: string, params?: Record<string, string | number>) => string;
   problems: Problem[];
-  settings: Settings;
 };
 
 const ProblemsSection: React.FC<ProblemsSectionProps> = ({ t, problems }) => {

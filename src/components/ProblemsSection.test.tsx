@@ -11,7 +11,7 @@ describe.sequential('ProblemsSection', () => {
   };
 
   test('renders empty state', () => {
-    render(<ProblemsSection t={t} problems={[]} settings={{} as any} />);
+    render(<ProblemsSection t={t} problems={[]} />);
 
     expect(screen.getByRole('heading', { name: /generated problems/i })).toBeInTheDocument();
     expect(screen.getByRole('status')).toHaveTextContent('results.noProblems');
@@ -23,7 +23,7 @@ describe.sequential('ProblemsSection', () => {
       { id: 1, text: '1 + 2 = ' },
       { id: 2, text: '3 + 4 = ' },
     ];
-    render(<ProblemsSection t={t} problems={problems as any} settings={{} as any} />);
+    render(<ProblemsSection t={t} problems={problems as any} />);
 
     expect(screen.getByRole('heading', { name: /generated problems \(2\)/i })).toBeInTheDocument();
     const items = screen.getAllByText(/=\s*$/);
