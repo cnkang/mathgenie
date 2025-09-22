@@ -24,13 +24,14 @@ const ActionCards: React.FC<ActionCardsProps> = ({
   onStartQuiz,
 }) => {
   const isEmpty = problemsCount === 0;
+  const legendId = React.useId();
+  const groupTitle = t('infoPanel.quickActions.title') || 'Quick Actions';
 
   return (
-    <div
-      className='action-cards-grid'
-      role='group'
-      aria-label={t('infoPanel.quickActions.title') || 'Quick Actions'}
-    >
+    <fieldset className='action-cards-grid' aria-labelledby={legendId}>
+      <legend id={legendId} className='sr-only'>
+        {groupTitle}
+      </legend>
       <button
         type={STR_BUTTON}
         className='action-card generate-card'
@@ -101,7 +102,7 @@ const ActionCards: React.FC<ActionCardsProps> = ({
           </div>
         </div>
       </button>
-    </div>
+    </fieldset>
   );
 };
 

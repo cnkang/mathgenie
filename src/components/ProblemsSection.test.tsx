@@ -15,6 +15,7 @@ describe.sequential('ProblemsSection', () => {
 
     expect(screen.getByRole('heading', { name: /generated problems/i })).toBeInTheDocument();
     expect(screen.getByRole('status')).toHaveTextContent('results.noProblems');
+    expect(screen.getByLabelText('accessibility.problemsList')).toHaveAttribute('tabindex', '0');
   });
 
   test('renders problems list', () => {
