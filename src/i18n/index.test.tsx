@@ -1,6 +1,7 @@
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen, waitFor } from '../../tests/helpers/testUtils';
+import { ConsoleMock } from '../../tests/helpers/consoleMock';
 import { I18nProvider, useTranslation } from './index';
 
 // Mock dynamic imports
@@ -249,14 +250,14 @@ describe.sequential('I18n System', () => {
       return <div>{t('test')}</div>;
     };
 
-    // Suppress console.error for this test
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleMock = new ConsoleMock();
+    consoleMock.mockConsole(['error']);
 
     expect(() => {
       render(<TestComponentWithoutProvider />);
     }).toThrow('useTranslation must be used within an I18nProvider');
 
-    consoleSpy.mockRestore();
+    consoleMock.restoreConsole();
   });
 
   it('uses browser language as default', async () => {
@@ -329,8 +330,8 @@ describe.sequential('I18n System', () => {
   });
 
   it('ignores invalid language change requests', async () => {
-    // Mock console.warn to suppress the expected warning
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const consoleMock = new ConsoleMock();
+    consoleMock.mockConsole(['warn']);
 
     // Clear localStorage to ensure we start with browser language
     localStorage.clear();
@@ -367,7 +368,7 @@ describe.sequential('I18n System', () => {
       expect(langEl?.textContent).toBe('en');
     });
 
-    warnSpy.mockRestore();
+    consoleMock.restoreConsole();
   });
 
   it('handles missing navigator.languages gracefully', async () => {
