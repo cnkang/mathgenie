@@ -215,15 +215,29 @@ jobs:
               body: '🤖 Enabling auto-merge for this safe dependency update. The PR will be automatically merged once all required checks pass.'
             });
 
-            // Enable auto-merge using GitHub's native functionality
+            // Enable auto-merge using GitHub's GraphQL API (more reliable)
             try {
-              await github.rest.pulls.enableAutoMerge({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: pr.number,
-                merge_method: 'squash',
-                commit_title: `${pr.title} (#${pr.number})`,
-                commit_message: 'Auto-merged by Dependabot workflow after successful CI checks'
+              const mutation = `
+                mutation($pullRequestId: ID!, $mergeMethod: PullRequestMergeMethod!) {
+                  enablePullRequestAutoMerge(input: {
+                    pullRequestId: $pullRequestId,
+                    mergeMethod: $mergeMethod,
+                    commitHeadline: "${pr.title} (#${pr.number})",
+                    commitBody: "Auto-merged by Dependabot workflow after successful CI checks"
+                  }) {
+                    pullRequest {
+                      autoMergeRequest {
+                        enabledAt
+                        mergeMethod
+                      }
+                    }
+                  }
+                }
+              `;
+              
+              await github.graphql(mutation, {
+                pullRequestId: pr.node_id,
+                mergeMethod: 'SQUASH'
               });
               
               console.log('✅ Auto-merge enabled successfully');
