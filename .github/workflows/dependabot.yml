@@ -27,117 +27,100 @@ jobs:
 
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+
+      - name: 🧾 Fetch Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 🔍 Analyze Dependabot PR
         id: analysis
         uses: actions/github-script@v7
+        env:
+          UPDATE_TYPE: ${{ steps.metadata.outputs.update-type }}
+          DEPENDENCY_TYPE: ${{ steps.metadata.outputs.dependency-type }}
+          PACKAGE_NAMES: ${{ steps.metadata.outputs.dependency-names }}
+          SECURITY_SEVERITY: ${{ steps.metadata.outputs.security-advisory-severity }}
+          SECURITY_ID: ${{ steps.metadata.outputs.security-advisory-id }}
+          ECOSYSTEM: ${{ steps.metadata.outputs.package-ecosystem }}
         with:
           script: |
+            const core = require('@actions/core');
             const pr = context.payload.pull_request;
-            const title = pr.title;
 
-            // Parse version information from Dependabot PR title
-            // Format: "build(deps): bump package-name from X.Y.Z to A.B.C"
-            const versionRegex = /from\s+(\d+\.\d+\.\d+(?:-[\w\.-]+)?)\s+to\s+(\d+\.\d+\.\d+(?:-[\w\.-]+)?)/i;
-            const match = title.match(versionRegex);
+            const updateTypeRaw = process.env.UPDATE_TYPE || 'unknown';
+            const dependencyType = process.env.DEPENDENCY_TYPE || 'unknown';
+            const dependencyNames = process.env.PACKAGE_NAMES || 'unknown';
+            const securitySeverity = process.env.SECURITY_SEVERITY || '';
+            const ecosystem = process.env.ECOSYSTEM || 'unknown';
 
-            let updateType = 'unknown';
-            let fromVersion = '';
-            let toVersion = '';
-            let packageName = '';
+            const updateType = updateTypeRaw.startsWith('version-update:semver-')
+              ? updateTypeRaw.replace('version-update:semver-', '')
+              : (updateTypeRaw || 'unknown');
 
-            if (match) {
-              fromVersion = match[1];
-              toVersion = match[2];
-              
-              // Extract package name
-              const packageMatch = title.match(/bump\s+([^\s]+)\s+from/i);
-              packageName = packageMatch ? packageMatch[1] : 'unknown';
+            const isDevDependency = dependencyType.includes('development');
+            const titleLower = (pr.title || '').toLowerCase();
 
-              // Parse semantic versions
-              const parseVersion = (version) => {
-                const parts = version.split('-')[0].split('.').map(Number);
-                return { major: parts[0] || 0, minor: parts[1] || 0, patch: parts[2] || 0 };
-              };
-
-              const from = parseVersion(fromVersion);
-              const to = parseVersion(toVersion);
-
-              // Determine update type based on semantic versioning
-              if (to.major > from.major) {
-                updateType = 'major';
-              } else if (to.minor > from.minor) {
-                updateType = 'minor';
-              } else if (to.patch > from.patch) {
-                updateType = 'patch';
-              } else {
-                updateType = 'patch'; // Default for pre-release or other updates
-              }
+            let autoMerge = false;
+            if (securitySeverity) {
+              autoMerge = true;
+            } else if (updateType === 'patch') {
+              autoMerge = true;
+            } else if (updateType === 'minor' && isDevDependency) {
+              autoMerge = true;
+            } else if (updateType === 'minor' && !titleLower.includes('breaking')) {
+              autoMerge = true;
             }
 
-            // Determine if this is a dev dependency
-            const isDevDependency = title.includes('deps-dev') || title.includes('devDependencies');
-
-            // Auto-merge criteria (more permissive for dev dependencies)
-            const autoMerge = updateType === 'patch' || 
-                             (updateType === 'minor' && isDevDependency) ||
-                             (updateType === 'minor' && !title.toLowerCase().includes('breaking'));
-
-            // Determine breaking change risk
             let breakingRisk = 'Low';
-            if (updateType === 'major') {
+            if (securitySeverity) {
+              breakingRisk = 'Security';
+            } else if (updateType === 'major') {
               breakingRisk = 'High';
             } else if (updateType === 'minor' && !isDevDependency) {
               breakingRisk = 'Medium';
             }
 
-            // Use environment file for outputs (GitHub Actions new method)
-            const fs = require('fs');
-            fs.appendFileSync(process.env.GITHUB_OUTPUT, `update_type=${updateType}\n`);
-            fs.appendFileSync(process.env.GITHUB_OUTPUT, `auto_merge=${autoMerge.toString()}\n`);
-
-            // Add labels
             const labels = ['dependencies', `${updateType}-update`];
             if (isDevDependency) labels.push('dev-dependency');
+            if (securitySeverity) labels.push('security-update');
             if (breakingRisk === 'High') labels.push('breaking-change-risk');
 
             await github.rest.issues.addLabels({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: pr.number,
-              labels: labels
+              labels
             });
 
-            // Add comment with detailed analysis
-            const comment = `
-            ## 🤖 Dependabot PR Analysis
+            const commentLines = [
+              '## 🤖 Dependabot PR Analysis',
+              `- **Ecosystem**: \`${ecosystem}\``,
+              `- **Package**: \`${dependencyNames}\``,
+              `- **Update Type**: ${updateTypeRaw || 'unknown'}`,
+              `- **Dependency Type**: ${dependencyType}`,
+              `- **Security Severity**: ${securitySeverity || 'N/A'}`,
+              `- **Breaking Change Risk**: ${breakingRisk}`,
+              `- **Auto-merge Eligible**: ${autoMerge ? '✅ Yes' : '❌ No'}`
+            ];
 
-            - **Package**: \`${packageName}\`
-            - **Update Type**: ${updateType} (${fromVersion} → ${toVersion})
-            - **Dependency Type**: ${isDevDependency ? 'Development' : 'Production'}
-            - **Breaking Change Risk**: ${breakingRisk}
-            - **Auto-merge Eligible**: ${autoMerge ? '✅ Yes' : '❌ No'}
-
-            ${autoMerge ? 
-              '✅ This PR is eligible for auto-merge and will be automatically merged when all required checks pass.' : 
-              `⚠️ This PR requires manual review due to ${updateType === 'major' ? 'major version update' : 'potential compatibility concerns'}.`
+            if (!autoMerge) {
+              commentLines.push('\n⚠️ This update needs manual review before merging.');
+            } else {
+              commentLines.push('\n✅ This update meets the auto-merge policy.');
             }
-
-            ${updateType === 'major' ? 
-              '📋 **Major Update**: Please review the changelog for breaking changes.' : 
-              updateType === 'minor' && !isDevDependency ? 
-              '📋 **Minor Update**: New features may have been added. Review for compatibility.' :
-              '📋 **Patch Update**: Bug fixes and security updates.'
-            }
-            `;
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: pr.number,
-              body: comment
+              body: commentLines.join('\n')
             });
+
+            core.setOutput('update_type', updateType);
+            core.setOutput('auto_merge', autoMerge.toString());
 
   # Job 2: Run CI for Dependabot PRs
   dependabot-ci:
@@ -151,10 +134,10 @@ jobs:
 
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 📦 Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '22'
 
@@ -164,7 +147,7 @@ jobs:
           corepack install
 
       - name: 📦 Setup pnpm cache
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '22'
           cache: 'pnpm'
@@ -206,11 +189,53 @@ jobs:
         with:
           script: |
             const pr = context.payload.pull_request;
+            const { owner, repo } = context.repo;
+
+            const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+            const WAIT_TIMEOUT_MS = 5 * 60 * 1000;
+            const POLL_INTERVAL_MS = 10_000;
+
+            const waitForStableMergeState = async () => {
+              const start = Date.now();
+              let lastState = 'unknown';
+              let lastMergeable = false;
+
+              while (Date.now() - start < WAIT_TIMEOUT_MS) {
+                const { data } = await github.rest.pulls.get({
+                  owner,
+                  repo,
+                  pull_number: pr.number
+                });
+
+                lastState = (data.mergeable_state || 'unknown').toLowerCase();
+                lastMergeable = Boolean(data.mergeable);
+                console.log(`mergeable_state=${lastState}, mergeable=${lastMergeable}`);
+
+                if (!['unknown', 'unstable'].includes(lastState)) {
+                  return { state: lastState, mergeable: lastMergeable };
+                }
+
+                await sleep(POLL_INTERVAL_MS);
+              }
+
+              throw new Error(`Timed out waiting for pull request to leave the unstable state (last state: ${lastState}).`);
+            };
+
+            let mergeState;
+            try {
+              mergeState = await waitForStableMergeState();
+            } catch (error) {
+              throw new Error(`Auto-merge readiness check failed: ${error.message}`);
+            }
+
+            if (!mergeState.mergeable || ['dirty', 'draft'].includes(mergeState.state)) {
+              throw new Error(`Pull request is not ready for auto-merge (current state: ${mergeState.state}).`);
+            }
 
             // Add a comment before enabling auto-merge
             await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
+              owner,
+              repo,
               issue_number: pr.number,
               body: '🤖 Enabling auto-merge for this safe dependency update. The PR will be automatically merged once all required checks pass.'
             });
@@ -234,25 +259,25 @@ jobs:
                   }
                 }
               `;
-              
+
               await github.graphql(mutation, {
                 pullRequestId: pr.node_id,
                 mergeMethod: 'SQUASH'
               });
-              
+
               console.log('✅ Auto-merge enabled successfully');
-              
+
               // Add success comment
               await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
+                owner,
+                repo,
                 issue_number: pr.number,
                 body: '✅ Auto-merge enabled! This PR will be automatically merged when all required status checks pass and any required reviews are approved.'
               });
-              
+
             } catch (error) {
               console.log('❌ Failed to enable auto-merge:', error.message);
-              
+
               // Provide detailed error information
               let errorMessage = '❌ Failed to enable auto-merge: ' + error.message + '\n\n**Possible reasons:**';
 
@@ -277,8 +302,8 @@ jobs:
               errorMessage += '\n\n**Manual merge:** You can safely merge this PR manually as it passed all CI checks and was identified as a safe dependency update.';
 
               await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
+                owner,
+                repo,
                 issue_number: pr.number,
                 body: errorMessage
               });
