@@ -120,7 +120,7 @@ jobs:
             - **Auto-merge Eligible**: ${autoMerge ? '✅ Yes' : '❌ No'}
 
             ${autoMerge ? 
-              '✅ This PR will be auto-merged after CI passes (no approval required for safe dependency updates).' : 
+              '✅ This PR is eligible for auto-merge and will be automatically merged when all required checks pass.' : 
               `⚠️ This PR requires manual review due to ${updateType === 'major' ? 'major version update' : 'potential compatibility concerns'}.`
             }
 
@@ -185,9 +185,9 @@ jobs:
         run: pnpm audit --audit-level moderate
         continue-on-error: true
 
-  # Job 3: Auto-merge eligible PRs
+  # Job 3: Enable auto-merge for eligible PRs
   dependabot-auto-merge:
-    name: 🔄 Auto-merge
+    name: 🔄 Enable Auto-merge
     runs-on: ubuntu-latest
     needs: [dependabot-analysis, dependabot-ci]
     if: |
@@ -201,23 +201,23 @@ jobs:
       issues: write
 
     steps:
-      - name: 🤖 Auto-merge PR
+      - name: 🤖 Enable Auto-merge
         uses: actions/github-script@v7
         with:
           script: |
             const pr = context.payload.pull_request;
 
-            // Add a comment before merging
+            // Add a comment before enabling auto-merge
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: pr.number,
-              body: '🤖 Auto-merging this PR after successful CI checks. This is a safe dependency update.'
+              body: '🤖 Enabling auto-merge for this safe dependency update. The PR will be automatically merged once all required checks pass.'
             });
 
-            // Merge the PR directly (no approval needed for auto-merge)
+            // Enable auto-merge using GitHub's native functionality
             try {
-              await github.rest.pulls.merge({
+              await github.rest.pulls.enableAutoMerge({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 pull_number: pr.number,
@@ -226,32 +226,55 @@ jobs:
                 commit_message: 'Auto-merged by Dependabot workflow after successful CI checks'
               });
               
-              console.log('✅ PR auto-merged successfully');
+              console.log('✅ Auto-merge enabled successfully');
               
               // Add success comment
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: pr.number,
-                body: '✅ Successfully auto-merged! All CI checks passed and this was identified as a safe dependency update.'
+                body: '✅ Auto-merge enabled! This PR will be automatically merged when all required status checks pass and any required reviews are approved.'
               });
               
             } catch (error) {
-              console.log('❌ Failed to auto-merge:', error.message);
+              console.log('❌ Failed to enable auto-merge:', error.message);
               
-              // Comment on failure with more details
+              // Provide detailed error information
+              let errorMessage = `❌ Failed to enable auto-merge: ${error.message}
+
+**Possible reasons:**`;
+
+              if (error.status === 422) {
+                errorMessage += `
+- Auto-merge is not enabled for this repository
+- Branch protection rules may prevent auto-merge
+- PR may have conflicts or failing checks
+- Repository settings may restrict auto-merge`;
+              } else if (error.status === 403) {
+                errorMessage += `
+- Insufficient permissions to enable auto-merge
+- Repository may not allow auto-merge for this user`;
+              } else {
+                errorMessage += `
+- Unexpected error occurred
+- Check repository settings and branch protection rules`;
+              }
+
+              errorMessage += `
+
+**Next steps:**
+1. Check if auto-merge is enabled in repository settings
+2. Verify branch protection rules allow auto-merge
+3. Ensure all required status checks are configured
+4. Consider manual merge if auto-merge is not available
+
+**Manual merge:** You can safely merge this PR manually as it passed all CI checks and was identified as a safe dependency update.`;
+
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: pr.number,
-                body: `❌ Auto-merge failed: ${error.message}
-
-**Possible reasons:**
-- Branch protection rules require manual approval
-- PR has conflicts that need resolution
-- Repository settings prevent auto-merge
-
-Please merge manually or check repository settings.`
+                body: errorMessage
               });
             }
 
