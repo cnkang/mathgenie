@@ -35,17 +35,62 @@ jobs:
         with:
           script: |
             const pr = context.payload.pull_request;
-            const title = pr.title.toLowerCase();
+            const title = pr.title;
 
-            // Determine update type
+            // Parse version information from Dependabot PR title
+            // Format: "build(deps): bump package-name from X.Y.Z to A.B.C"
+            const versionRegex = /from\s+(\d+\.\d+\.\d+(?:-[\w\.-]+)?)\s+to\s+(\d+\.\d+\.\d+(?:-[\w\.-]+)?)/i;
+            const match = title.match(versionRegex);
+
             let updateType = 'unknown';
-            if (title.includes('patch')) updateType = 'patch';
-            else if (title.includes('minor')) updateType = 'minor';
-            else if (title.includes('major')) updateType = 'major';
+            let fromVersion = '';
+            let toVersion = '';
+            let packageName = '';
 
-            // Auto-merge criteria
+            if (match) {
+              fromVersion = match[1];
+              toVersion = match[2];
+              
+              // Extract package name
+              const packageMatch = title.match(/bump\s+([^\s]+)\s+from/i);
+              packageName = packageMatch ? packageMatch[1] : 'unknown';
+
+              // Parse semantic versions
+              const parseVersion = (version) => {
+                const parts = version.split('-')[0].split('.').map(Number);
+                return { major: parts[0] || 0, minor: parts[1] || 0, patch: parts[2] || 0 };
+              };
+
+              const from = parseVersion(fromVersion);
+              const to = parseVersion(toVersion);
+
+              // Determine update type based on semantic versioning
+              if (to.major > from.major) {
+                updateType = 'major';
+              } else if (to.minor > from.minor) {
+                updateType = 'minor';
+              } else if (to.patch > from.patch) {
+                updateType = 'patch';
+              } else {
+                updateType = 'patch'; // Default for pre-release or other updates
+              }
+            }
+
+            // Determine if this is a dev dependency
+            const isDevDependency = title.includes('deps-dev') || title.includes('devDependencies');
+            
+            // Auto-merge criteria (more permissive for dev dependencies)
             const autoMerge = updateType === 'patch' || 
-                             (updateType === 'minor' && !title.includes('breaking'));
+                             (updateType === 'minor' && isDevDependency) ||
+                             (updateType === 'minor' && !title.toLowerCase().includes('breaking'));
+
+            // Determine breaking change risk
+            let breakingRisk = 'Low';
+            if (updateType === 'major') {
+              breakingRisk = 'High';
+            } else if (updateType === 'minor' && !isDevDependency) {
+              breakingRisk = 'Medium';
+            }
 
             // Use environment file for outputs (GitHub Actions new method)
             const fs = require('fs');
@@ -53,23 +98,37 @@ jobs:
             fs.appendFileSync(process.env.GITHUB_OUTPUT, `auto_merge=${autoMerge.toString()}\n`);
 
             // Add labels
+            const labels = ['dependencies', `${updateType}-update`];
+            if (isDevDependency) labels.push('dev-dependency');
+            if (breakingRisk === 'High') labels.push('breaking-change-risk');
+
             await github.rest.issues.addLabels({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: pr.number,
-              labels: ['dependencies', `${updateType}-update`]
+              labels: labels
             });
 
-            // Add comment with analysis
+            // Add comment with detailed analysis
             const comment = `
             ## 🤖 Dependabot PR Analysis
 
-            - **Update Type**: ${updateType}
+            - **Package**: \`${packageName}\`
+            - **Update Type**: ${updateType} (${fromVersion} → ${toVersion})
+            - **Dependency Type**: ${isDevDependency ? 'Development' : 'Production'}
+            - **Breaking Change Risk**: ${breakingRisk}
             - **Auto-merge Eligible**: ${autoMerge ? '✅ Yes' : '❌ No'}
 
             ${autoMerge ? 
               '✅ This PR will be auto-merged after CI passes.' : 
-              '⚠️ This PR requires manual review due to potential breaking changes.'
+              `⚠️ This PR requires manual review due to ${updateType === 'major' ? 'major version update' : 'potential compatibility concerns'}.`
+            }
+
+            ${updateType === 'major' ? 
+              '📋 **Major Update**: Please review the changelog for breaking changes.' : 
+              updateType === 'minor' && !isDevDependency ? 
+              '📋 **Minor Update**: New features may have been added. Review for compatibility.' :
+              '📋 **Patch Update**: Bug fixes and security updates.'
             }
             `;
 
@@ -227,6 +286,12 @@ jobs:
             }
 
             // Add comment
+            const reviewReason = updateType === 'major' ? 
+              'Major version update - may contain breaking changes' :
+              updateType === 'minor' ? 
+              'Minor version update for production dependency - may introduce new features' :
+              'Update requires manual verification';
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -236,11 +301,17 @@ jobs:
               
               This Dependabot PR requires manual review due to:
               - **Update Type**: ${updateType}
-              - **Potential Breaking Changes**: This update may introduce breaking changes
+              - **Review Reason**: ${reviewReason}
               
               Please review the changes carefully before merging.
               
               ✅ **CI Status**: All checks passed
+              
+              **Recommended Actions:**
+              ${updateType === 'major' ? 
+                '- Review the package changelog for breaking changes\n- Test the application thoroughly\n- Update any affected code' :
+                '- Review the package changelog for new features\n- Verify compatibility with existing code'
+              }
               `
             });
 
