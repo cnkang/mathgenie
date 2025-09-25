@@ -329,6 +329,9 @@ describe.sequential('I18n System', () => {
   });
 
   it('ignores invalid language change requests', async () => {
+    // Mock console.warn to suppress the expected warning
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
     // Clear localStorage to ensure we start with browser language
     localStorage.clear();
 
@@ -363,6 +366,8 @@ describe.sequential('I18n System', () => {
       const langEl = container.querySelector('[data-testid="current-language"]');
       expect(langEl?.textContent).toBe('en');
     });
+
+    warnSpy.mockRestore();
   });
 
   it('handles missing navigator.languages gracefully', async () => {
