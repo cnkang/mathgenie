@@ -11,7 +11,7 @@ export class ConsoleMock {
    */
   mockConsole(methods: Array<keyof Console> = ['warn', 'error']) {
     methods.forEach((method) => {
-      const spy = vi.spyOn(console, method).mockImplementation(() => {});
+      const spy = vi.spyOn(console, method as any).mockImplementation(() => {});
       this.spies.push({ method, spy });
     });
   }
