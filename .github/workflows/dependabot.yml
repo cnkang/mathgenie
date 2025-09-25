@@ -120,7 +120,7 @@ jobs:
             - **Auto-merge Eligible**: ${autoMerge ? '✅ Yes' : '❌ No'}
 
             ${autoMerge ? 
-              '✅ This PR will be auto-merged after CI passes.' : 
+              '✅ This PR will be auto-merged after CI passes (no approval required for safe dependency updates).' : 
               `⚠️ This PR requires manual review due to ${updateType === 'major' ? 'major version update' : 'potential compatibility concerns'}.`
             }
 
@@ -198,32 +198,24 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      issues: write
 
     steps:
-      - name: 🤖 Enable auto-merge
+      - name: 🤖 Auto-merge PR
         uses: actions/github-script@v7
         with:
           script: |
             const pr = context.payload.pull_request;
 
-            // Enable auto-merge
-            await github.rest.pulls.createReview({
+            // Add a comment before merging
+            await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              pull_number: pr.number,
-              event: 'APPROVE',
-              body: '🤖 Auto-approved by Dependabot workflow after successful CI checks.'
+              issue_number: pr.number,
+              body: '🤖 Auto-merging this PR after successful CI checks. This is a safe dependency update.'
             });
 
-            // Enable auto-merge with squash
-            await github.rest.pulls.createReview({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: pr.number,
-              event: 'APPROVE'
-            });
-
-            // Merge the PR
+            // Merge the PR directly (no approval needed for auto-merge)
             try {
               await github.rest.pulls.merge({
                 owner: context.repo.owner,
@@ -231,19 +223,35 @@ jobs:
                 pull_number: pr.number,
                 merge_method: 'squash',
                 commit_title: `${pr.title} (#${pr.number})`,
-                commit_message: 'Auto-merged by Dependabot workflow'
+                commit_message: 'Auto-merged by Dependabot workflow after successful CI checks'
               });
               
               console.log('✅ PR auto-merged successfully');
-            } catch (error) {
-              console.log('❌ Failed to auto-merge:', error.message);
               
-              // Comment on failure
+              // Add success comment
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: pr.number,
-                body: `❌ Auto-merge failed: ${error.message}\n\nPlease merge manually.`
+                body: '✅ Successfully auto-merged! All CI checks passed and this was identified as a safe dependency update.'
+              });
+              
+            } catch (error) {
+              console.log('❌ Failed to auto-merge:', error.message);
+              
+              // Comment on failure with more details
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: `❌ Auto-merge failed: ${error.message}
+
+**Possible reasons:**
+- Branch protection rules require manual approval
+- PR has conflicts that need resolution
+- Repository settings prevent auto-merge
+
+Please merge manually or check repository settings.`
               });
             }
 
