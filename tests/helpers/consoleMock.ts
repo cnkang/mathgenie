@@ -10,17 +10,19 @@ export class ConsoleMock {
    * Mock console methods to suppress output during tests
    */
   mockConsole(methods: Array<keyof Console> = ['warn', 'error']) {
-    methods.forEach((method) => {
+    for (const method of methods) {
       const spy = vi.spyOn(console, method as any).mockImplementation(() => {});
       this.spies.push({ method, spy });
-    });
+    }
   }
 
   /**
    * Restore all mocked console methods
    */
   restoreConsole() {
-    this.spies.forEach(({ spy }) => spy.mockRestore());
+    for (const { spy } of this.spies) {
+      spy.mockRestore();
+    }
     this.spies = [];
   }
 
