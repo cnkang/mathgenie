@@ -208,6 +208,15 @@ jobs:
             const WAIT_TIMEOUT_MS = parseInt(process.env.WAIT_TIMEOUT_MS || '300000', 10);
             const POLL_INTERVAL_MS = parseInt(process.env.POLL_INTERVAL_MS || '10000', 10);
 
+            if (
+              isNaN(WAIT_TIMEOUT_MS) || WAIT_TIMEOUT_MS <= 0 ||
+              isNaN(POLL_INTERVAL_MS) || POLL_INTERVAL_MS <= 0
+            ) {
+              throw new Error(
+                `Invalid WAIT_TIMEOUT_MS (${WAIT_TIMEOUT_MS}) or POLL_INTERVAL_MS (${POLL_INTERVAL_MS}). Both must be positive integers greater than zero.`
+              );
+            }
+
             const waitForStableMergeState = async () => {
               const start = Date.now();
               let lastState = 'unknown';
