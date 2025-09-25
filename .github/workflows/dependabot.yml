@@ -70,7 +70,15 @@ jobs:
 
             let autoMerge = false;
             if (securitySeverity) {
-              autoMerge = true;
+              // Only auto-merge low or moderate severity security updates without breaking changes
+              const severityLower = securitySeverity.toLowerCase();
+              if (
+                (severityLower === 'low' || severityLower === 'moderate') &&
+                !titleLower.includes('breaking')
+              ) {
+                autoMerge = true;
+              }
+              // For high or critical severity, require manual review (do not auto-merge)
             } else if (updateType === 'patch') {
               autoMerge = true;
             } else if (updateType === 'minor' && isDevDependency) {
