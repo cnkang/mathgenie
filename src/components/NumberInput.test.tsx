@@ -41,27 +41,31 @@ describe.sequential('NumberInput', () => {
     expect(label).not.toBeNull();
   });
 
-  test('calls onChange when value changes', () => {
+  test('calls onChange when value changes', async () => {
     const onChange = vi.fn();
     const { container } = render(<NumberInput {...defaultProps} onChange={onChange} />);
 
     const input = container.querySelector('input') as HTMLInputElement;
     expect(input).not.toBeNull();
 
-    fireEvent.change(input, { target: { value: '25' } });
+    await act(async () => {
+      fireEvent.change(input, { target: { value: '25' } });
+    });
 
     // The onChange should be called
     expect(onChange).toHaveBeenCalled();
   });
 
-  test('handles empty input', () => {
+  test('handles empty input', async () => {
     const onChange = vi.fn();
     const { container } = render(<NumberInput {...defaultProps} onChange={onChange} />);
 
     const input = container.querySelector('input') as HTMLInputElement;
     expect(input).not.toBeNull();
 
-    fireEvent.change(input, { target: { value: '' } });
+    await act(async () => {
+      fireEvent.change(input, { target: { value: '' } });
+    });
 
     expect(onChange).toHaveBeenCalledWith(1);
   });
@@ -94,7 +98,8 @@ describe.sequential('NumberInput', () => {
   });
 
   test('handles invalid number input', async () => {
-    const { container } = render(<NumberInput {...defaultProps} />);
+    const onChange = vi.fn();
+    const { container } = render(<NumberInput {...defaultProps} onChange={onChange} />);
     const input = container.querySelector('input') as HTMLInputElement;
 
     if (input) {
@@ -104,6 +109,8 @@ describe.sequential('NumberInput', () => {
 
       // Should handle gracefully - component should still exist
       expect(input).toBeDefined();
+      // For invalid input, the component falls back to empty string behavior which calls onChange with min value
+      expect(onChange).toHaveBeenCalledWith(1);
     }
   });
 

@@ -58,7 +58,8 @@ The auto-merge will wait for these checks to pass:
 1. **Check repository settings**: Ensure "Allow auto-merge" is enabled
 2. **Check branch protection**: Verify rules don't prevent auto-merge
 3. **Check required status checks**: Ensure all required checks are passing
-4. **Check permissions**: Ensure the workflow has sufficient permissions
+4. **Wait for other workflows**: GitHub reports an `unstable` state while it is still computing mergeability (for example, when the main `CI` workflow is running cross-browser tests). The Dependabot workflow now polls for a stable state, but if the error persists, confirm every required check has completed.
+5. **Check permissions**: Ensure the workflow has sufficient permissions
 
 ### Common Error Messages
 
