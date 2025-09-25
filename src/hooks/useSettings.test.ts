@@ -1,6 +1,7 @@
 import type { Settings } from '@/types';
 import { describe, expect, it, vi } from 'vitest';
 import { act, renderHook } from '../../tests/helpers/testUtils';
+import { ConsoleMock } from '../../tests/helpers/consoleMock';
 import { useSettings } from './useSettings';
 
 const localStorageMock = {
@@ -80,10 +81,13 @@ describe('useSettings', () => {
   });
 
   it('clears corrupted settings from storage', () => {
+    const consoleMock = new ConsoleMock();
+    consoleMock.mockConsole(['error']);
     localStorageMock.getItem.mockReturnValue('not-json');
     const { result } = renderHook(() => useSettings());
     expect(localStorageMock.removeItem).toHaveBeenCalledWith('mathgenie-settings');
     expect(result.current.settings.operations).toEqual(['+', '-']);
+    consoleMock.restoreConsole();
   });
 
   it('handles invalid operations array gracefully', () => {
@@ -109,21 +113,31 @@ describe('useSettings', () => {
 
   it('preserves valid operations array', () => {
     const validSettings = {
-      operations: ['×', '÷'],
+      operations: ['*', '/'],
       numProblems: 15,
-      numRange: [1, 10],
-      resultRange: [0, 20],
-      numOperandsRange: [2, 3],
-      allowNegative: false,
-      showAnswers: false,
-      fontSize: 16,
-      lineSpacing: 12,
+      numRange: [1, 20],
+      resultRange: [0, 50],
+      numOperandsRange: [2, 4],
+      allowNegative: true,
+      showAnswers: true,
+      fontSize: 14,
+      lineSpacing: 10,
       paperSize: 'a4',
     };
     localStorageMock.getItem.mockReturnValue(JSON.stringify(validSettings));
     const { result } = renderHook(() => useSettings());
-    // Should preserve valid operations
-    expect(result.current.settings.operations).toEqual(['×', '÷']);
+    // Should preserve valid operations from localStorage
+    expect(result.current.settings.operations).toEqual(['*', '/']);
     expect(result.current.settings.numProblems).toBe(15);
+  });
+
+  it('handles corrupted JSON gracefully', () => {
+    const consoleMock = new ConsoleMock();
+    consoleMock.mockConsole(['error']);
+    localStorageMock.getItem.mockReturnValue('not-json');
+    const { result } = renderHook(() => useSettings());
+    // Should fallback to default operations when localStorage has invalid JSON
+    expect(result.current.settings.operations).toEqual(['+', '-']);
+    consoleMock.restoreConsole();
   });
 });

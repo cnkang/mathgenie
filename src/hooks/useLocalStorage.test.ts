@@ -1,4 +1,5 @@
 import { act, renderHook } from '../../tests/helpers/testUtils';
+import { ConsoleMock } from '../../tests/helpers/consoleMock';
 import { useLocalStorage } from './useLocalStorage';
 
 // 使用全局 setupTests.ts 中的 localStorage mock
@@ -42,7 +43,8 @@ describe('useLocalStorage', () => {
   });
 
   test('should handle localStorage errors gracefully', () => {
-    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleMock = new ConsoleMock();
+    consoleMock.mockConsole(['warn']);
     localStorageMock.getItem.mockImplementation(() => {
       throw new Error('localStorage error');
     });
@@ -50,21 +52,23 @@ describe('useLocalStorage', () => {
     const { result } = renderHook(() => useLocalStorage('test-key', 'default'));
 
     expect(result.current[0]).toBe('default');
-    errSpy.mockRestore();
+    consoleMock.restoreConsole();
   });
 
   test('should handle JSON parse errors gracefully', () => {
-    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleMock = new ConsoleMock();
+    consoleMock.mockConsole(['warn']);
     localStorageMock.getItem.mockReturnValue('invalid-json');
 
     const { result } = renderHook(() => useLocalStorage('test-key', 'default'));
 
     expect(result.current[0]).toBe('default');
-    errSpy.mockRestore();
+    consoleMock.restoreConsole();
   });
 
   test('should handle setItem errors gracefully', () => {
-    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleMock = new ConsoleMock();
+    consoleMock.mockConsole(['warn']);
     localStorageMock.getItem.mockReturnValue(null);
     localStorageMock.setItem.mockImplementation(() => {
       throw new Error('setItem error');
@@ -78,7 +82,7 @@ describe('useLocalStorage', () => {
 
     // Should still update the state even if localStorage fails
     expect(result.current[0]).toBe('new-value');
-    errSpy.mockRestore();
+    consoleMock.restoreConsole();
   });
 
   test('should handle function updates', () => {
@@ -242,7 +246,8 @@ describe('useLocalStorage', () => {
 
   test('should handle JSON parse errors in storage events', () => {
     localStorageMock.getItem.mockReturnValue(JSON.stringify('initial'));
-    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const consoleMock = new ConsoleMock();
+    consoleMock.mockConsole(['warn']);
 
     const { result } = renderHook(() => useLocalStorage('test-key', 'default'));
 
@@ -259,12 +264,12 @@ describe('useLocalStorage', () => {
     });
 
     expect(result.current[0]).toBe('initial');
-    expect(consoleSpy).toHaveBeenCalledWith(
+    expect(consoleMock.getSpy('warn')).toHaveBeenCalledWith(
       'Error parsing localStorage change for key "test-key":',
       expect.any(Error)
     );
 
-    consoleSpy.mockRestore();
+    consoleMock.restoreConsole();
   });
 
   test('should clean up event listener on unmount', () => {
