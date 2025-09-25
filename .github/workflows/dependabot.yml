@@ -78,7 +78,7 @@ jobs:
 
             // Determine if this is a dev dependency
             const isDevDependency = title.includes('deps-dev') || title.includes('devDependencies');
-            
+
             // Auto-merge criteria (more permissive for dev dependencies)
             const autoMerge = updateType === 'patch' || 
                              (updateType === 'minor' && isDevDependency) ||
@@ -240,35 +240,27 @@ jobs:
               console.log('❌ Failed to enable auto-merge:', error.message);
               
               // Provide detailed error information
-              let errorMessage = `❌ Failed to enable auto-merge: ${error.message}
-
-**Possible reasons:**`;
+              let errorMessage = '❌ Failed to enable auto-merge: ' + error.message + '\n\n**Possible reasons:**';
 
               if (error.status === 422) {
-                errorMessage += `
-- Auto-merge is not enabled for this repository
-- Branch protection rules may prevent auto-merge
-- PR may have conflicts or failing checks
-- Repository settings may restrict auto-merge`;
+                errorMessage += '\n- Auto-merge is not enabled for this repository';
+                errorMessage += '\n- Branch protection rules may prevent auto-merge';
+                errorMessage += '\n- PR may have conflicts or failing checks';
+                errorMessage += '\n- Repository settings may restrict auto-merge';
               } else if (error.status === 403) {
-                errorMessage += `
-- Insufficient permissions to enable auto-merge
-- Repository may not allow auto-merge for this user`;
+                errorMessage += '\n- Insufficient permissions to enable auto-merge';
+                errorMessage += '\n- Repository may not allow auto-merge for this user';
               } else {
-                errorMessage += `
-- Unexpected error occurred
-- Check repository settings and branch protection rules`;
+                errorMessage += '\n- Unexpected error occurred';
+                errorMessage += '\n- Check repository settings and branch protection rules';
               }
 
-              errorMessage += `
-
-**Next steps:**
-1. Check if auto-merge is enabled in repository settings
-2. Verify branch protection rules allow auto-merge
-3. Ensure all required status checks are configured
-4. Consider manual merge if auto-merge is not available
-
-**Manual merge:** You can safely merge this PR manually as it passed all CI checks and was identified as a safe dependency update.`;
+              errorMessage += '\n\n**Next steps:**';
+              errorMessage += '\n1. Check if auto-merge is enabled in repository settings';
+              errorMessage += '\n2. Verify branch protection rules allow auto-merge';
+              errorMessage += '\n3. Ensure all required status checks are configured';
+              errorMessage += '\n4. Consider manual merge if auto-merge is not available';
+              errorMessage += '\n\n**Manual merge:** You can safely merge this PR manually as it passed all CI checks and was identified as a safe dependency update.';
 
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
