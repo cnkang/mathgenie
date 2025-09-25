@@ -123,6 +123,19 @@ pnpm test:unit:fast:ignore-errors
 # Alternatively, use Node 20.x LTS for fully stable runs
 ```
 
+### Playwright Browser Issues
+
+```bash
+# Debug browser installation problems
+pnpm playwright:debug
+
+# Manual browser installation
+pnpm playwright:install
+
+# CI-specific browser installation
+pnpm playwright:install:ci
+```
+
 ### Test Isolation Issues
 
 ```bash
@@ -363,7 +376,7 @@ describe('useAppHandlers', () => {
     expect(mockSetSettings).toHaveBeenCalledWith(presetSettings);
     expect(mockSetSuccessMessage).toHaveBeenCalledWith({
       key: 'messages.info.presetApplied',
-      params: { name: 'Preset' }
+      params: { name: 'Preset' },
     });
   });
 
@@ -902,6 +915,30 @@ pnpm test:e2e:error-handling   # Error handling and validation
 4. **Accessibility Updates**: Keep up with WCAG guideline changes
 
 ## 🔍 Troubleshooting Common Issues
+
+### Playwright Browser Installation Issues
+
+If you encounter browser installation or detection problems:
+
+```bash
+# Run comprehensive browser installation diagnostics
+pnpm playwright:debug
+```
+
+**What the debug script does:**
+
+- Shows environment information (OS, Node.js, pnpm, Playwright versions)
+- Checks Playwright cache directories and their contents
+- Verifies browser executables (Chromium, Firefox, WebKit)
+- Attempts to fix missing or corrupted browsers
+- Runs installation verification and triggers full reinstallation if needed
+
+**Common browser issues:**
+
+- **Missing browsers**: Script will attempt automatic installation
+- **Corrupted cache**: Script will detect and reinstall browsers
+- **Permission issues**: Check file permissions in cache directories
+- **CI/CD failures**: Use `pnpm playwright:install:ci` for clean installation
 
 ### Flaky Tests
 

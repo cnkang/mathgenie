@@ -77,6 +77,7 @@
     "playwright:install": "playwright install chromium firefox webkit --with-deps",
     "playwright:install:ci": "playwright install chromium firefox webkit --with-deps",
     "playwright:check": "tsx scripts/check-browsers.ts",
+    "playwright:debug": "./scripts/debug-playwright-browsers.sh",
     "playwright:cache:debug": "./scripts/debug-playwright-cache.sh",
     "pre-commit": "pnpm format && lint-staged",
     "pre-push": "pnpm type-check && pnpm i18n:check && pnpm test:unit && pnpm build",

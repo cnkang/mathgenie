@@ -345,60 +345,28 @@ jobs:
         with:
           path: |
             ~/.cache/ms-playwright
-            node_modules/playwright-core/.local-browsers
-            ~/.local/share/ms-playwright
-          key: ${{ runner.os }}-playwright-accessibility-${{ hashFiles('**/pnpm-lock.yaml', '**/package.json', '**/playwright*.config.ts') }}-v3
+          key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('**/pnpm-lock.yaml') }}-v4
           restore-keys: |
-            ${{ runner.os }}-playwright-accessibility-${{ hashFiles('**/pnpm-lock.yaml', '**/package.json', '**/playwright*.config.ts') }}-
-            ${{ runner.os }}-playwright-accessibility-
-            ${{ runner.os }}-playwright-
+            ${{ runner.os }}-playwright-browsers-
 
       - name: 🎭 Install Playwright browsers
         run: |
           echo "🎭 Installing Playwright browsers for accessibility testing..."
           echo "🎭 Cache status: ${{ steps.playwright-cache.outputs.cache-hit }}"
-
-          CACHE_MATCHED_KEY="${{ steps.playwright-cache.outputs.cache-matched-key }}"
-          if [ -n "$CACHE_MATCHED_KEY" ]; then
-            echo "🎭 Matched cache key: $CACHE_MATCHED_KEY"
-          else
-            echo "🎭 Matched cache key: none"
+          
+          # Always install browsers to ensure they're available
+          # The cache will speed up the process when browsers are already present
+          echo "🔧 Installing browsers and system dependencies..."
+          pnpm playwright:install:ci
+          
+          echo "🔍 Verifying browser installation..."
+          if ! pnpm exec playwright install --dry-run chromium firefox webkit; then
+            echo "❌ Browser verification failed, running debug script..."
+            pnpm playwright:debug
+            exit 1
           fi
-
-          BROWSERS=(chromium firefox webkit)
-          CACHE_LOCATIONS=("$HOME/.cache/ms-playwright" "node_modules/playwright-core/.local-browsers" "$HOME/.local/share/ms-playwright")
-          MISSING=()
-
-          for browser in "${BROWSERS[@]}"; do
-            FOUND=false
-            for location in "${CACHE_LOCATIONS[@]}"; do
-              if [ -d "$location" ] && compgen -G "$location/${browser}-*" > /dev/null; then
-                FOUND=true
-                break
-              fi
-            done
-
-            if [ "$FOUND" = false ]; then
-              MISSING+=("$browser")
-            fi
-          done
-
-          if [ "${#MISSING[@]}" -gt 0 ]; then
-            echo "⚠️ Missing browsers detected: ${MISSING[*]}"
-            pnpm exec playwright install "${MISSING[@]}"
-          else
-            echo "✅ All required browsers found in cache; skipping browser download."
-          fi
-
-          echo "🔧 Ensuring Playwright system dependencies are present..."
-          pnpm exec playwright install-deps "${BROWSERS[@]}"
-
-          echo "🔍 Running Playwright dry-run validation..."
-          if ! pnpm exec playwright install --dry-run "${BROWSERS[@]}"; then
-            echo "⚠️ Dry-run validation failed, forcing reinstall with dependencies..."
-            pnpm exec playwright install "${BROWSERS[@]}" --with-deps
-            pnpm exec playwright install --dry-run "${BROWSERS[@]}"
-          fi
+          
+          echo "✅ All browsers installed and verified successfully"
         timeout-minutes: 15
 
       - name: 🏗️ Build application
@@ -537,54 +505,29 @@ jobs:
         with:
           path: |
             ~/.cache/ms-playwright
-            node_modules/playwright-core/.local-browsers
-            ~/.local/share/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ matrix.browser }}-${{ hashFiles('**/pnpm-lock.yaml', '**/package.json', '**/playwright*.config.ts') }}-v3
+          key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('**/pnpm-lock.yaml') }}-v4
           restore-keys: |
-            ${{ runner.os }}-playwright-${{ matrix.browser }}-${{ hashFiles('**/pnpm-lock.yaml', '**/package.json', '**/playwright*.config.ts') }}-
-            ${{ runner.os }}-playwright-${{ matrix.browser }}-
-            ${{ runner.os }}-playwright-
+            ${{ runner.os }}-playwright-browsers-
 
       - name: 🎭 Install Playwright browsers
         run: |
           echo "🎭 Installing Playwright browsers for ${{ matrix.name }}..."
           echo "📋 Project: ${{ matrix.project }}, Browser: ${{ matrix.browser }}"
           echo "🎭 Cache status: ${{ steps.playwright-cache.outputs.cache-hit }}"
-
-          CACHE_MATCHED_KEY="${{ steps.playwright-cache.outputs.cache-matched-key }}"
-          if [ -n "$CACHE_MATCHED_KEY" ]; then
-            echo "🎭 Matched cache key: $CACHE_MATCHED_KEY"
-          else
-            echo "🎭 Matched cache key: none"
+          
+          # Always install browsers to ensure they're available
+          # The cache will speed up the process when browsers are already present
+          echo "🔧 Installing browsers and system dependencies..."
+          pnpm playwright:install:ci
+          
+          echo "🔍 Verifying browser installation..."
+          if ! pnpm exec playwright install --dry-run ${{ matrix.browser }}; then
+            echo "❌ Browser verification failed, running debug script..."
+            pnpm playwright:debug
+            exit 1
           fi
-
-          TARGET_BROWSER="${{ matrix.browser }}"
-          CACHE_LOCATIONS=("$HOME/.cache/ms-playwright" "node_modules/playwright-core/.local-browsers" "$HOME/.local/share/ms-playwright")
-          FOUND=false
-
-          for location in "${CACHE_LOCATIONS[@]}"; do
-            if [ -d "$location" ] && compgen -G "$location/${TARGET_BROWSER}-*" > /dev/null; then
-              FOUND=true
-              break
-            fi
-          done
-
-          if [ "$FOUND" = false ]; then
-            echo "⚠️ Browser ${TARGET_BROWSER} missing from cache, downloading binary..."
-            pnpm exec playwright install "${TARGET_BROWSER}"
-          else
-            echo "✅ Browser ${TARGET_BROWSER} found in cache; skipping browser download."
-          fi
-
-          echo "🔧 Ensuring Playwright system dependencies are present..."
-          pnpm exec playwright install-deps "${TARGET_BROWSER}"
-
-          echo "🔍 Running Playwright dry-run validation..."
-          if ! pnpm exec playwright install --dry-run "${TARGET_BROWSER}"; then
-            echo "⚠️ Dry-run validation failed, forcing reinstall with dependencies..."
-            pnpm exec playwright install "${TARGET_BROWSER}" --with-deps
-            pnpm exec playwright install --dry-run "${TARGET_BROWSER}"
-          fi
+          
+          echo "✅ Browser ${{ matrix.browser }} installed and verified successfully"
         timeout-minutes: 15
 
       - name: 🏗️ Build application
