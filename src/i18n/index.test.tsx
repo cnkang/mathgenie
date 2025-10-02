@@ -1,7 +1,7 @@
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, render, screen, waitFor } from '../../tests/helpers/testUtils';
 import { ConsoleMock } from '../../tests/helpers/consoleMock';
+import { act, render, screen, waitFor } from '../../tests/helpers/testUtils';
 import { I18nProvider, useTranslation } from './index';
 
 // Mock dynamic imports
@@ -401,6 +401,289 @@ describe.sequential('I18n System', () => {
       // Should default to English
       const langEl = container.querySelector('[data-testid="current-language"]');
       expect(langEl?.textContent).toBe('en');
+    });
+  });
+
+  it('handles language change with valid language', async () => {
+    const TestLanguageChangeComponent = () => {
+      const { currentLanguage, changeLanguage } = useTranslation();
+      return (
+        <div>
+          <div data-testid='current-language'>{currentLanguage}</div>
+          <button onClick={() => changeLanguage('zh')}>Change to Chinese</button>
+          <button onClick={() => changeLanguage('ja')}>Change to Japanese</button>
+          <button onClick={() => changeLanguage('fr')}>Change to French</button>
+        </div>
+      );
+    };
+
+    const { container } = render(
+      <I18nProvider>
+        <TestLanguageChangeComponent />
+      </I18nProvider>
+    );
+
+    // Initial state should be English
+    await waitFor(() => {
+      const langEl = container.querySelector('[data-testid="current-language"]');
+      expect(langEl?.textContent).toBe('en');
+    });
+
+    // Change to Chinese
+    const chineseButton = container.querySelector('button');
+    if (chineseButton) {
+      chineseButton.click();
+    }
+
+    await waitFor(() => {
+      const langEl = container.querySelector('[data-testid="current-language"]');
+      expect(langEl?.textContent).toBe('zh');
+    });
+
+    // Change to Japanese
+    const japaneseButton = container.querySelectorAll('button')[1];
+    if (japaneseButton) {
+      japaneseButton.click();
+    }
+
+    await waitFor(() => {
+      const langEl = container.querySelector('[data-testid="current-language"]');
+      expect(langEl?.textContent).toBe('ja');
+    });
+
+    // Change to French
+    const frenchButton = container.querySelectorAll('button')[2];
+    if (frenchButton) {
+      frenchButton.click();
+    }
+
+    await waitFor(() => {
+      const langEl = container.querySelector('[data-testid="current-language"]');
+      expect(langEl?.textContent).toBe('fr');
+    });
+  });
+
+  it('provides loading state during language changes', async () => {
+    const TestLoadingComponent = () => {
+      const { isLoading, changeLanguage } = useTranslation();
+      return (
+        <div>
+          <div data-testid='loading-state'>{isLoading ? 'Loading' : 'Loaded'}</div>
+          <button onClick={() => changeLanguage('es')}>Change to Spanish</button>
+        </div>
+      );
+    };
+
+    const { container } = render(
+      <I18nProvider>
+        <TestLoadingComponent />
+      </I18nProvider>
+    );
+
+    // Should eventually show loaded state
+    await waitFor(() => {
+      const loadingEl = container.querySelector('[data-testid="loading-state"]');
+      expect(loadingEl?.textContent).toBe('Loaded');
+    });
+
+    // Change language and check loading state
+    const button = container.querySelector('button');
+    if (button) {
+      button.click();
+    }
+
+    // Should eventually be loaded again
+    await waitFor(() => {
+      const loadingEl = container.querySelector('[data-testid="loading-state"]');
+      expect(loadingEl?.textContent).toBe('Loaded');
+    });
+  });
+
+  it('handles translation keys with nested objects', async () => {
+    const TestNestedComponent = () => {
+      const { t } = useTranslation();
+      return (
+        <div>
+          <div data-testid='nested-operations'>{t('operations.addition')}</div>
+          <div data-testid='nested-settings'>{t('settings.numProblems')}</div>
+          <div data-testid='nested-errors'>{t('errors.noOperations')}</div>
+        </div>
+      );
+    };
+
+    const { container } = render(
+      <I18nProvider>
+        <TestNestedComponent />
+      </I18nProvider>
+    );
+
+    await waitFor(() => {
+      const operationsEl = container.querySelector('[data-testid="nested-operations"]');
+      const settingsEl = container.querySelector('[data-testid="nested-settings"]');
+      const errorsEl = container.querySelector('[data-testid="nested-errors"]');
+
+      expect(operationsEl?.textContent).toBeTruthy();
+      expect(settingsEl?.textContent).toBeTruthy();
+      expect(errorsEl?.textContent).toBeTruthy();
+
+      // Should not be the raw keys
+      expect(operationsEl?.textContent).not.toBe('operations.addition');
+      expect(settingsEl?.textContent).not.toBe('settings.numProblems');
+      expect(errorsEl?.textContent).not.toBe('errors.noOperations');
+    });
+  });
+
+  it('handles browser language detection with language codes', async () => {
+    localStorage.clear();
+
+    // Test different language code formats
+    const testCases = [
+      { browserLang: 'en-US', expectedLang: 'en' },
+      { browserLang: 'zh-CN', expectedLang: 'zh' },
+      { browserLang: 'es-ES', expectedLang: 'es' },
+      { browserLang: 'fr-FR', expectedLang: 'fr' },
+      { browserLang: 'de-DE', expectedLang: 'de' },
+      { browserLang: 'ja-JP', expectedLang: 'ja' },
+    ];
+
+    for (const testCase of testCases) {
+      localStorage.clear();
+
+      Object.defineProperty(navigator, 'language', {
+        writable: true,
+        value: testCase.browserLang,
+      });
+
+      const TestBrowserLangComponent = () => {
+        const { currentLanguage } = useTranslation();
+        return <div data-testid='current-language'>{currentLanguage}</div>;
+      };
+
+      const { container, unmount } = render(
+        <I18nProvider>
+          <TestBrowserLangComponent />
+        </I18nProvider>
+      );
+
+      await waitFor(() => {
+        const langEl = container.querySelector('[data-testid="current-language"]');
+        expect(langEl?.textContent).toBe(testCase.expectedLang);
+      });
+
+      unmount();
+    }
+  });
+
+  it('persists language changes to localStorage', async () => {
+    localStorage.clear();
+
+    const TestPersistenceComponent = () => {
+      const { currentLanguage, changeLanguage } = useTranslation();
+      return (
+        <div>
+          <div data-testid='current-language'>{currentLanguage}</div>
+          <button onClick={() => changeLanguage('de')}>Change to German</button>
+        </div>
+      );
+    };
+
+    const { container } = render(
+      <I18nProvider>
+        <TestPersistenceComponent />
+      </I18nProvider>
+    );
+
+    // Change to German
+    const button = container.querySelector('button');
+    if (button) {
+      button.click();
+    }
+
+    await waitFor(() => {
+      const langEl = container.querySelector('[data-testid="current-language"]');
+      expect(langEl?.textContent).toBe('de');
+    });
+
+    // Check localStorage was updated
+    expect(localStorage.getItem('mathgenie-language')).toBe('de');
+  });
+
+  it('handles translation loading errors gracefully', async () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const TestErrorHandlingComponent = () => {
+      const { t, changeLanguage } = useTranslation();
+      return (
+        <div>
+          <div data-testid='test-text'>{t('common.hello')}</div>
+          <button onClick={() => changeLanguage('invalid' as any)}>Invalid Language</button>
+        </div>
+      );
+    };
+
+    const { container } = render(
+      <I18nProvider>
+        <TestErrorHandlingComponent />
+      </I18nProvider>
+    );
+
+    // Should render with fallback
+    await waitFor(() => {
+      const textEl = container.querySelector('[data-testid="test-text"]');
+      expect(textEl?.textContent).toBeTruthy();
+    });
+
+    // Try invalid language change
+    const button = container.querySelector('button');
+    if (button) {
+      button.click();
+    }
+
+    // Should still work with fallback
+    await waitFor(() => {
+      const textEl = container.querySelector('[data-testid="test-text"]');
+      expect(textEl?.textContent).toBeTruthy();
+    });
+
+    consoleSpy.mockRestore();
+  });
+
+  it('provides all required context values', async () => {
+    const TestContextComponent = () => {
+      const context = useTranslation();
+      return (
+        <div>
+          <div data-testid='has-t'>{typeof context.t === 'function' ? 'true' : 'false'}</div>
+          <div data-testid='has-language'>
+            {typeof context.currentLanguage === 'string' ? 'true' : 'false'}
+          </div>
+          <div data-testid='has-change-language'>
+            {typeof context.changeLanguage === 'function' ? 'true' : 'false'}
+          </div>
+          <div data-testid='has-loading'>
+            {typeof context.isLoading === 'boolean' ? 'true' : 'false'}
+          </div>
+          <div data-testid='has-languages'>
+            {typeof context.languages === 'object' ? 'true' : 'false'}
+          </div>
+        </div>
+      );
+    };
+
+    const { container } = render(
+      <I18nProvider>
+        <TestContextComponent />
+      </I18nProvider>
+    );
+
+    await waitFor(() => {
+      expect(container.querySelector('[data-testid="has-t"]')?.textContent).toBe('true');
+      expect(container.querySelector('[data-testid="has-language"]')?.textContent).toBe('true');
+      expect(container.querySelector('[data-testid="has-change-language"]')?.textContent).toBe(
+        'true'
+      );
+      expect(container.querySelector('[data-testid="has-loading"]')?.textContent).toBe('true');
+      expect(container.querySelector('[data-testid="has-languages"]')?.textContent).toBe('true');
     });
   });
 });

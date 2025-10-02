@@ -456,6 +456,41 @@
   }
 }
 
+/* Grouping styles */
+.grouping-info {
+  margin: 0;
+  font-size: var(--font-size-sm, 0.875rem);
+  color: var(--text-secondary, #64748b);
+  font-style: italic;
+}
+
+.problem-group {
+  margin-bottom: var(--space-xl, 2rem);
+}
+
+.problem-group:last-child {
+  margin-bottom: 0;
+}
+
+.group-title {
+  display: flex;
+  gap: var(--space-sm, 0.5rem);
+  align-items: center;
+  margin: 0 0 var(--space-md, 1rem) 0;
+  padding: var(--space-md, 1rem) var(--space-lg, 1.5rem);
+  font-size: var(--font-size-lg, 1.125rem);
+  font-weight: 600;
+  color: var(--text-primary, #1e293b);
+  background: var(--primary-light, #e0e7ff);
+  border: 1px solid var(--primary-color, #4f46e5);
+  border-radius: var(--radius-md, 0.5rem);
+}
+
+.group-title::before {
+  content: '📁';
+  font-size: var(--font-size-base, 1rem);
+}
+
 @keyframes fadeInSuccess {
   from {
     opacity: 0;
