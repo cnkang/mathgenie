@@ -11,7 +11,7 @@ if (typeof globalThis === 'undefined') {
 
 // Create a comprehensive window object that React DOM expects
 const createMockWindow = () => {
-  const mockWindow = {
+  return {
     // Copy all globalThis properties
     ...globalThis,
 
@@ -173,8 +173,6 @@ const createMockWindow = () => {
       return this;
     },
   };
-
-  return mockWindow;
 };
 
 // Only create window if it doesn't exist
