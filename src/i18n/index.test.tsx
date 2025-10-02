@@ -432,7 +432,9 @@ describe.sequential('I18n System', () => {
     // Change to Chinese
     const chineseButton = container.querySelector('button');
     if (chineseButton) {
-      chineseButton.click();
+      await act(async () => {
+        chineseButton.click();
+      });
     }
 
     await waitFor(() => {
@@ -443,7 +445,9 @@ describe.sequential('I18n System', () => {
     // Change to Japanese
     const japaneseButton = container.querySelectorAll('button')[1];
     if (japaneseButton) {
-      japaneseButton.click();
+      await act(async () => {
+        japaneseButton.click();
+      });
     }
 
     await waitFor(() => {
@@ -454,7 +458,9 @@ describe.sequential('I18n System', () => {
     // Change to French
     const frenchButton = container.querySelectorAll('button')[2];
     if (frenchButton) {
-      frenchButton.click();
+      await act(async () => {
+        frenchButton.click();
+      });
     }
 
     await waitFor(() => {
@@ -489,7 +495,9 @@ describe.sequential('I18n System', () => {
     // Change language and check loading state
     const button = container.querySelector('button');
     if (button) {
-      button.click();
+      await act(async () => {
+        button.click();
+      });
     }
 
     // Should eventually be loaded again
@@ -596,7 +604,9 @@ describe.sequential('I18n System', () => {
     // Change to German
     const button = container.querySelector('button');
     if (button) {
-      button.click();
+      await act(async () => {
+        button.click();
+      });
     }
 
     await waitFor(() => {
@@ -605,7 +615,9 @@ describe.sequential('I18n System', () => {
     });
 
     // Check localStorage was updated
-    expect(localStorage.getItem('mathgenie-language')).toBe('de');
+    await waitFor(() => {
+      expect(localStorage.getItem('mathgenie-language')).toBe('de');
+    });
   });
 
   it('handles translation loading errors gracefully', async () => {
