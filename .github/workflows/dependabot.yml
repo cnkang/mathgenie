@@ -11,8 +11,8 @@ concurrency:
 
 # Configurable inputs for timeout and polling
 env:
-  WAIT_TIMEOUT_MS: 300000  # 5 minutes
-  POLL_INTERVAL_MS: 10000   # 10 seconds
+  WAIT_TIMEOUT_MS: 300000 # 5 minutes
+  POLL_INTERVAL_MS: 10000 # 10 seconds
 
 jobs:
   # Job 1: Dependabot PR Analysis
@@ -52,7 +52,6 @@ jobs:
           ECOSYSTEM: ${{ steps.metadata.outputs.package-ecosystem }}
         with:
           script: |
-            const core = require('@actions/core');
             const pr = context.payload.pull_request;
 
             const updateTypeRaw = process.env.UPDATE_TYPE || 'unknown';
