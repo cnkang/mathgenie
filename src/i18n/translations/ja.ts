@@ -62,6 +62,8 @@ export default {
     title: '生成された問題 ({{count}}問)',
     noProblems: 'まだ問題が生成されていません',
     clickToStart: '「{{generateButton}}」をクリックして開始',
+    groupTitle: 'グループ {{number}}',
+    groupingInfo: '{{groups}}グループ、各{{perGroup}}問題',
   },
   errors: {
     noOperations: '続行するには少なくとも1つの数学演算を選択してください。',
