@@ -86,7 +86,7 @@ const generateGroupedProblems = (
 ): void => {
   const groups = splitProblemsIntoGroups(problems, settings);
 
-  groups.forEach((group, groupIndex) => {
+  for (const [groupIndex, group] of groups.entries()) {
     if (groupIndex > 0) {
       doc.addPage();
       resetColumns(columnState, config.marginTop);
@@ -106,11 +106,11 @@ const generateGroupedProblems = (
     doc.setFontSize(settings.fontSize);
 
     // Generate problems for current group
-    group.forEach((problem, localIndex) => {
+    for (const [localIndex, problem] of group.entries()) {
       const columnKey = getColumnKey(localIndex);
       renderProblem(doc, problem, columnKey, columnState, config);
-    });
-  });
+    }
+  }
 };
 
 /**
@@ -122,10 +122,10 @@ const generateContinuousProblems = (
   columnState: Record<'left' | 'right', number>,
   config: RenderConfig
 ): void => {
-  problems.forEach((problem, index) => {
+  for (const [index, problem] of problems.entries()) {
     const columnKey = getColumnKey(index);
     renderProblem(doc, problem, columnKey, columnState, config);
-  });
+  }
 };
 
 /**
