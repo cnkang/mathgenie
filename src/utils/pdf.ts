@@ -1,4 +1,5 @@
 import type { PaperSizeOptions, Problem, Settings } from '@/types';
+import { hasProblems, splitProblemsIntoGroups } from '@/utils/groupingUtils';
 import type { jsPDF } from 'jspdf';
 
 let jsPDFModule: typeof import('jspdf').default | null = null;
@@ -83,33 +84,33 @@ const generateGroupedProblems = (
   columnState: Record<'left' | 'right', number>,
   config: RenderConfig
 ): void => {
-  const totalGroups = settings.totalGroups || 1;
-  const problemsPerGroup = settings.problemsPerGroup || problems.length;
+  const groups = splitProblemsIntoGroups(problems, settings);
 
-  for (let groupIndex = 0; groupIndex < totalGroups; groupIndex++) {
+  groups.forEach((group, groupIndex) => {
     if (groupIndex > 0) {
       doc.addPage();
       resetColumns(columnState, config.marginTop);
     }
 
-    // Add group title
+    // Add group title - handle empty groups appropriately
     doc.setFontSize(settings.fontSize + 2);
-    doc.text(`Group ${groupIndex + 1}`, config.marginLeft, columnState.left);
-    columnState.left += config.lineSpacing + 5;
-    columnState.right = columnState.left;
+    if (hasProblems(group)) {
+      doc.text(`Group ${groupIndex + 1}`, config.marginLeft, columnState.left);
+      columnState.left += config.lineSpacing + 5;
+      columnState.right = columnState.left;
+    } else {
+      doc.text(`Group ${groupIndex + 1} (no problems)`, config.marginLeft, columnState.left);
+      columnState.left += config.lineSpacing + 5;
+      columnState.right = columnState.left;
+    }
     doc.setFontSize(settings.fontSize);
 
     // Generate problems for current group
-    const startIndex = groupIndex * problemsPerGroup;
-    const endIndex = Math.min(startIndex + problemsPerGroup, problems.length);
-
-    for (let i = startIndex; i < endIndex; i++) {
-      const problem = problems[i];
-      const localIndex = i - startIndex;
+    group.forEach((problem, localIndex) => {
       const columnKey = getColumnKey(localIndex);
       renderProblem(doc, problem, columnKey, columnState, config);
-    }
-  }
+    });
+  });
 };
 
 /**
@@ -138,6 +139,14 @@ export const generatePdf = async (
 ): Promise<void> => {
   const jsPDF = await loadJsPDF();
   const doc = new jsPDF({ format: paperSizes[settings.paperSize] });
+
+  // Handle empty problems array
+  if (!problems || problems.length === 0) {
+    doc.setFontSize(settings.fontSize);
+    doc.text('No problems are available.', 20, 30);
+    doc.save(filename);
+    return;
+  }
 
   doc.setFontSize(settings.fontSize);
   const pageHeight = doc.internal.pageSize.getHeight();
