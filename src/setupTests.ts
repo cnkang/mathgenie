@@ -1,6 +1,15 @@
 // Setup for testing environment with happy-dom only
 import { vi } from 'vitest';
 
+// Ensure window is available for React DOM operations
+if (typeof window === 'undefined') {
+  Object.defineProperty(globalThis, 'window', {
+    value: globalThis,
+    writable: true,
+    configurable: true,
+  });
+}
+
 // Custom matchers are declared in src/types/vitest.d.ts
 
 // Extend HTMLElement interface for testing
