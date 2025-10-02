@@ -252,15 +252,14 @@ const createGenerationOutcome = (params: {
   setProblems: Dispatch<SetStateAction<Problem[]>>;
 }) => {
   const { settings, showSuccessMessage, setProblems } = params;
-  const fallbackWarning = getLargeProblemWarning(settings.numProblems);
+  const targetCount = settings.enableGrouping
+    ? settings.problemsPerGroup * settings.totalGroups
+    : settings.numProblems;
+  const fallbackWarning = getLargeProblemWarning(targetCount);
 
   try {
     const generatedProblems = createProblemsArray(settings);
-    const messages = evaluateGeneratedProblems(
-      generatedProblems,
-      settings.numProblems,
-      showSuccessMessage
-    );
+    const messages = evaluateGeneratedProblems(generatedProblems, targetCount, showSuccessMessage);
 
     if (generatedProblems.length > 0) {
       setProblems(generatedProblems);
