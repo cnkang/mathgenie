@@ -39,11 +39,12 @@ const NumberInput: React.FC<ExtendedNumberInputProps> = ({
     const inputValue = e.target.value;
     const newValue = parseInt(inputValue, 10);
 
-    // Optimistically update the UI immediately
-    setOptimisticValue(inputValue);
-
-    // Then validate and update the actual state
+    // Use transition for both optimistic update and state change
     startTransition(() => {
+      // Optimistically update the UI immediately within transition
+      setOptimisticValue(inputValue);
+
+      // Then validate and update the actual state
       if (!isNaN(newValue) && newValue >= min && newValue <= max) {
         onChange(newValue);
       } else if (inputValue === '') {
