@@ -65,6 +65,9 @@ export default {
     groupTitle: 'グループ {{number}}',
     groupingInfo: '{{groups}}グループ、各{{perGroup}}問題',
   },
+  problems: {
+    emptyGroup: 'グループ {{group}} (問題なし)',
+  },
   errors: {
     noOperations: '続行するには少なくとも1つの数学演算を選択してください。',
     invalidProblemCount: '問題数は1から50,000の間である必要があります。',

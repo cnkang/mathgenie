@@ -67,6 +67,9 @@ export default {
     groupTitle: 'Groupe {{number}}',
     groupingInfo: '{{groups}} groupes, {{perGroup}} problèmes chacun',
   },
+  problems: {
+    emptyGroup: 'Groupe {{group}} (aucun problème)',
+  },
   errors: {
     noOperations: 'Veuillez sélectionner au moins une opération mathématique pour continuer.',
     invalidProblemCount: 'Le nombre de problèmes doit être entre 1 et 50 000.',
