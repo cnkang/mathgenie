@@ -49,7 +49,7 @@ const GroupedProblemsDisplay: React.FC<GroupedProblemsDisplayProps> = ({
             {getEmptyGroupText(groupIndex, t)}
           </div>
         );
-      })
+      })}
     </>
   );
 };
