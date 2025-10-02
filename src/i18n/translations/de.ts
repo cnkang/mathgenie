@@ -66,6 +66,9 @@ export default {
     groupTitle: 'Gruppe {{number}}',
     groupingInfo: '{{groups}} Gruppen, {{perGroup}} Aufgaben pro Gruppe',
   },
+  problems: {
+    emptyGroup: 'Gruppe {{group}} (keine Aufgaben)',
+  },
   errors: {
     noOperations: 'Bitte wählen Sie mindestens eine mathematische Operation aus, um fortzufahren.',
     invalidProblemCount: 'Die Anzahl der Aufgaben muss zwischen 1 und 50.000 liegen.',
