@@ -14,6 +14,9 @@ describe('useSettingsValidation', () => {
     fontSize: 12,
     lineSpacing: 1.5,
     paperSize: 'a4',
+    enableGrouping: false,
+    problemsPerGroup: 20,
+    totalGroups: 1,
   };
 
   it('should identify validation sensitive fields correctly', () => {
@@ -37,11 +40,11 @@ describe('useSettingsValidation', () => {
   it('should detect restrictive settings with small ranges and many problems', () => {
     const { checkRestrictiveSettings } = useSettingsValidation();
 
-    // Restrictive settings: small result range (< 10) and many problems (> 20)
+    // Restrictive settings: small result range (< 10) and many problems (> 50)
     const restrictiveSettings: Settings = {
       ...mockSettings,
       resultRange: [0, 5], // Range size = 5 (< 10)
-      numProblems: 25, // > 20
+      numProblems: 60, // > 50
     };
 
     expect(checkRestrictiveSettings(restrictiveSettings)).toBe(true);
@@ -50,11 +53,11 @@ describe('useSettingsValidation', () => {
   it('should detect restrictive settings with small num range and many problems', () => {
     const { checkRestrictiveSettings } = useSettingsValidation();
 
-    // Restrictive settings: small num range (< 5) and many problems (> 20)
+    // Restrictive settings: small num range (< 5) and many problems (> 50)
     const restrictiveSettings: Settings = {
       ...mockSettings,
       numRange: [1, 3], // Range size = 2 (< 5)
-      numProblems: 25, // > 20
+      numProblems: 60, // > 50
     };
 
     expect(checkRestrictiveSettings(restrictiveSettings)).toBe(true);

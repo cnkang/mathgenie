@@ -15,6 +15,10 @@ const defaultSettings: Settings = {
   fontSize: 16,
   lineSpacing: 12,
   paperSize: 'a4',
+  // 分组设置默认值
+  enableGrouping: false,
+  problemsPerGroup: 20,
+  totalGroups: 1,
 };
 
 const isValidArray = (value: unknown, expectedLength?: number): value is unknown[] => {
@@ -90,11 +94,32 @@ export const useSettings = (): UseSettingsResult => {
   }, [settings]);
 
   const validateSettings = useCallback((newSettings: Settings): string => {
+    // 计算实际题目总数
+    const actualTotalProblems = newSettings.enableGrouping
+      ? newSettings.problemsPerGroup * newSettings.totalGroups
+      : newSettings.numProblems;
+
     const validations = [
       { condition: newSettings.operations.length === 0, error: 'errors.noOperations' },
       {
-        condition: newSettings.numProblems <= 0 || newSettings.numProblems > 100,
+        condition: newSettings.numProblems <= 0 || newSettings.numProblems > 50000,
         error: 'errors.invalidProblemCount',
+      },
+      {
+        condition: actualTotalProblems > 50000,
+        error: 'errors.invalidTotalProblemCount',
+      },
+      {
+        condition:
+          newSettings.enableGrouping &&
+          (newSettings.problemsPerGroup <= 0 || newSettings.problemsPerGroup > 1000),
+        error: 'errors.invalidProblemsPerGroup',
+      },
+      {
+        condition:
+          newSettings.enableGrouping &&
+          (newSettings.totalGroups <= 0 || newSettings.totalGroups > 100),
+        error: 'errors.invalidTotalGroups',
       },
       {
         condition: newSettings.numRange[0] > newSettings.numRange[1],

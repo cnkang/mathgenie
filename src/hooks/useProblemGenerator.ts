@@ -199,7 +199,12 @@ const evaluateGeneratedProblems = (
 };
 
 const createProblemsArray = (settings: Settings): Problem[] => {
-  return Array.from({ length: settings.numProblems }, () => generateProblem(settings))
+  // 计算实际需要生成的题目数量
+  const totalProblems = settings.enableGrouping
+    ? settings.problemsPerGroup * settings.totalGroups
+    : settings.numProblems;
+
+  return Array.from({ length: totalProblems }, () => generateProblem(settings))
     .filter(problem => problem !== '')
     .map((problem, index) => ({ id: index, text: problem }));
 };
