@@ -103,7 +103,7 @@ describe('SettingsManager Component', () => {
     // Mock click method
     const clickSpy = vi.spyOn(fileInput, 'click').mockImplementation(() => {});
 
-    importButton?.click();
+    (importButton as HTMLButtonElement)?.click();
 
     expect(clickSpy).toHaveBeenCalled();
     clickSpy.mockRestore();
@@ -173,7 +173,7 @@ describe('SettingsManager Component', () => {
     expect(exportButton).toBeInTheDocument();
 
     // Test that clicking doesn't throw errors
-    expect(() => exportButton?.click()).not.toThrow();
+    expect(() => (exportButton as HTMLButtonElement)?.click()).not.toThrow();
   });
 
   it('verifies import functionality structure', () => {
