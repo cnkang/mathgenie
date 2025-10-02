@@ -23,6 +23,8 @@ class MockPerformanceObserver {
   }
 }
 
+// PerformanceMonitor tests - now working with React DOM 19.2.0 + happy-dom
+// Fixed window availability issues in setupTests.ts
 describe('PerformanceMonitor', () => {
   let originalPerformanceObserver: typeof PerformanceObserver;
   let consoleLogSpy: ReturnType<typeof vi.spyOn>;
@@ -31,15 +33,6 @@ describe('PerformanceMonitor', () => {
   useViteEnv();
 
   beforeEach(() => {
-    // Ensure window object exists for React DOM operations
-    if (typeof window === 'undefined') {
-      Object.defineProperty(globalThis, 'window', {
-        value: globalThis,
-        writable: true,
-        configurable: true,
-      });
-    }
-
     originalPerformanceObserver = global.PerformanceObserver;
     global.PerformanceObserver = MockPerformanceObserver as any;
 
