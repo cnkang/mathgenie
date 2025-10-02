@@ -210,6 +210,7 @@ export default defineConfig(({ mode }) => ({
         '**/src/i18n/translations/**',
         '**/src/types/**',
         '**/src/utils/serviceWorker.ts',
+        '**/src/utils/testUtils.ts',
         '**/lighthouserc.{js,ts,cjs}',
         '**/playwright-report/**',
         '**/test-results/**',
