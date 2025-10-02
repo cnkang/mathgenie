@@ -31,6 +31,9 @@ describe('Type Definitions', () => {
       fontSize: 12,
       lineSpacing: 14,
       paperSize: 'a4',
+      enableGrouping: false,
+      problemsPerGroup: 20,
+      totalGroups: 1,
     };
 
     expect(settings.operations).toEqual(['+', '-']);
