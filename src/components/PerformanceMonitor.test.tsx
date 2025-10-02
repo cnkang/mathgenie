@@ -31,6 +31,15 @@ describe('PerformanceMonitor', () => {
   useViteEnv();
 
   beforeEach(() => {
+    // Ensure window object exists for React DOM operations
+    if (typeof window === 'undefined') {
+      Object.defineProperty(globalThis, 'window', {
+        value: globalThis,
+        writable: true,
+        configurable: true,
+      });
+    }
+
     originalPerformanceObserver = global.PerformanceObserver;
     global.PerformanceObserver = MockPerformanceObserver as any;
 
