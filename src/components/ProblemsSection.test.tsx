@@ -112,6 +112,9 @@ describe.sequential('ProblemsSection', () => {
       if (key === 'results.groupingInfo') {
         return `${params?.groups} groups, ${params?.perGroup} problems each`;
       }
+      if (key === 'problems.emptyGroup') {
+        return `Group ${params?.group} (no problems)`;
+      }
       return key;
     };
 
@@ -119,9 +122,9 @@ describe.sequential('ProblemsSection', () => {
       <ProblemsSection t={tWithGrouping} problems={problems as any} settings={groupedSettings} />
     );
 
-    // Should show both group titles even if second group is empty
+    // Should show group title for non-empty group and placeholder for empty group
     expect(screen.getByText('Group 1')).toBeInTheDocument();
-    expect(screen.getByText('Group 2')).toBeInTheDocument();
+    expect(screen.getByText('Group 2 (no problems)')).toBeInTheDocument();
 
     // Should show the one problem
     expect(screen.getByText('1 + 2 =')).toBeInTheDocument();
