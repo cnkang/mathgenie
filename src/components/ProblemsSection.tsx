@@ -1,5 +1,6 @@
 import type { Problem, Settings } from '@/types';
 import React from 'react';
+import GroupedProblemsDisplay from './problems/GroupedProblemsDisplay';
 
 type ProblemsSectionProps = {
   t: (key: string, params?: Record<string, string | number>) => string;
@@ -10,29 +11,16 @@ type ProblemsSectionProps = {
 const ProblemsSection: React.FC<ProblemsSectionProps> = ({ t, problems, settings }) => {
   const problemsListLabel = t('accessibility.problemsList');
 
-  // 如果启用分组，将题目按组分割
+  // Render grouped problems using the dedicated component
   const renderGroupedProblems = () => {
-    const groups: Problem[][] = [];
-    for (let i = 0; i < settings.totalGroups; i++) {
-      const startIndex = i * settings.problemsPerGroup;
-      const endIndex = Math.min(startIndex + settings.problemsPerGroup, problems.length);
-      groups.push(problems.slice(startIndex, endIndex));
-    }
-
-    return groups.map((group, groupIndex) => (
-      <div key={groupIndex} className='problem-group'>
-        <h3 className='group-title'>
-          {t('results.groupTitle', { number: groupIndex + 1 }) || `Group ${groupIndex + 1}`}
-        </h3>
-        <ol className='problems-grid' start={groupIndex * settings.problemsPerGroup + 1}>
-          {group.map(p => (
-            <li key={p.id} className='problem-item'>
-              <span className='problem-text'>{p.text}</span>
-            </li>
-          ))}
-        </ol>
-      </div>
-    ));
+    return (
+      <GroupedProblemsDisplay
+        t={t}
+        problems={problems}
+        settings={settings}
+        problemsListLabel={problemsListLabel}
+      />
+    );
   };
 
   const renderProblemsContent = (): React.ReactElement => {
