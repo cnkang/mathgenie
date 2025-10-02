@@ -61,9 +61,9 @@ export const mockTranslation = (key: string, params?: Record<string, string | nu
   // Simple mock that returns the key with interpolated params
   if (params) {
     let result = key;
-    Object.entries(params).forEach(([paramKey, value]) => {
+    for (const [paramKey, value] of Object.entries(params)) {
       result = result.replace(`{{${paramKey}}}`, String(value));
-    });
+    }
     return result;
   }
   return key;
