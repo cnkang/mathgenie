@@ -1,4 +1,5 @@
 import type { Operation, Settings } from '@/types';
+import { calculateActualTotalProblems, isPositiveInteger } from '@/utils/groupingUtils';
 import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from 'react';
 
 // Constants to avoid duplicate strings
@@ -95,9 +96,7 @@ export const useSettings = (): UseSettingsResult => {
 
   const validateSettings = useCallback((newSettings: Settings): string => {
     // 计算实际题目总数
-    const actualTotalProblems = newSettings.enableGrouping
-      ? newSettings.problemsPerGroup * newSettings.totalGroups
-      : newSettings.numProblems;
+    const actualTotalProblems = calculateActualTotalProblems(newSettings);
 
     const validations = [
       { condition: newSettings.operations.length === 0, error: 'errors.noOperations' },
@@ -112,13 +111,17 @@ export const useSettings = (): UseSettingsResult => {
       {
         condition:
           newSettings.enableGrouping &&
-          (newSettings.problemsPerGroup <= 0 || newSettings.problemsPerGroup > 1000),
+          (newSettings.problemsPerGroup <= 0 ||
+            newSettings.problemsPerGroup > 1000 ||
+            !isPositiveInteger(newSettings.problemsPerGroup)),
         error: 'errors.invalidProblemsPerGroup',
       },
       {
         condition:
           newSettings.enableGrouping &&
-          (newSettings.totalGroups <= 0 || newSettings.totalGroups > 100),
+          (newSettings.totalGroups <= 0 ||
+            newSettings.totalGroups > 100 ||
+            !isPositiveInteger(newSettings.totalGroups)),
         error: 'errors.invalidTotalGroups',
       },
       {
