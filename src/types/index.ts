@@ -21,6 +21,10 @@ export interface Settings {
   fontSize: number;
   lineSpacing: number;
   paperSize: PaperSize;
+  // 分组设置
+  enableGrouping: boolean;
+  problemsPerGroup: number;
+  totalGroups: number;
 }
 
 export interface Problem {
