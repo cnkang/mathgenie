@@ -41,6 +41,14 @@ const getTextXPosition = (
   return column === 'left' ? marginLeft : marginLeft + colWidth + marginLeft;
 };
 
+interface RenderConfig {
+  marginLeft: number;
+  marginTop: number;
+  lineSpacing: number;
+  colWidth: number;
+  pageHeight: number;
+}
+
 /**
  * Renders a single problem to the PDF
  */
@@ -49,20 +57,20 @@ const renderProblem = (
   problem: Problem,
   columnKey: 'left' | 'right',
   columnState: Record<'left' | 'right', number>,
-  marginLeft: number,
-  marginTop: number,
-  lineSpacing: number,
-  colWidth: number,
-  pageHeight: number
+  config: RenderConfig
 ): void => {
-  if (shouldAddNewPage(columnState[columnKey], lineSpacing, pageHeight)) {
+  if (shouldAddNewPage(columnState[columnKey], config.lineSpacing, config.pageHeight)) {
     doc.addPage();
-    resetColumns(columnState, marginTop);
+    resetColumns(columnState, config.marginTop);
   }
 
   const yPosition = columnState[columnKey];
-  doc.text(problem.text, getTextXPosition(columnKey, marginLeft, colWidth), yPosition);
-  columnState[columnKey] = yPosition + lineSpacing;
+  doc.text(
+    problem.text,
+    getTextXPosition(columnKey, config.marginLeft, config.colWidth),
+    yPosition
+  );
+  columnState[columnKey] = yPosition + config.lineSpacing;
 };
 
 /**
@@ -73,11 +81,7 @@ const generateGroupedProblems = (
   problems: Problem[],
   settings: Settings,
   columnState: Record<'left' | 'right', number>,
-  marginLeft: number,
-  marginTop: number,
-  lineSpacing: number,
-  colWidth: number,
-  pageHeight: number
+  config: RenderConfig
 ): void => {
   const totalGroups = settings.totalGroups || 1;
   const problemsPerGroup = settings.problemsPerGroup || problems.length;
@@ -85,13 +89,13 @@ const generateGroupedProblems = (
   for (let groupIndex = 0; groupIndex < totalGroups; groupIndex++) {
     if (groupIndex > 0) {
       doc.addPage();
-      resetColumns(columnState, marginTop);
+      resetColumns(columnState, config.marginTop);
     }
 
     // Add group title
     doc.setFontSize(settings.fontSize + 2);
-    doc.text(`Group ${groupIndex + 1}`, marginLeft, columnState.left);
-    columnState.left += lineSpacing + 5;
+    doc.text(`Group ${groupIndex + 1}`, config.marginLeft, columnState.left);
+    columnState.left += config.lineSpacing + 5;
     columnState.right = columnState.left;
     doc.setFontSize(settings.fontSize);
 
@@ -103,17 +107,7 @@ const generateGroupedProblems = (
       const problem = problems[i];
       const localIndex = i - startIndex;
       const columnKey = getColumnKey(localIndex);
-      renderProblem(
-        doc,
-        problem,
-        columnKey,
-        columnState,
-        marginLeft,
-        marginTop,
-        lineSpacing,
-        colWidth,
-        pageHeight
-      );
+      renderProblem(doc, problem, columnKey, columnState, config);
     }
   }
 };
@@ -122,28 +116,14 @@ const generateGroupedProblems = (
  * Generates continuous problems without grouping
  */
 const generateContinuousProblems = (
+  doc: jsPDF,
   problems: Problem[],
   columnState: Record<'left' | 'right', number>,
-  marginLeft: number,
-  marginTop: number,
-  lineSpacing: number,
-  colWidth: number,
-  pageHeight: number,
-  doc: jsPDF
+  config: RenderConfig
 ): void => {
   problems.forEach((problem, index) => {
     const columnKey = getColumnKey(index);
-    renderProblem(
-      doc,
-      problem,
-      columnKey,
-      columnState,
-      marginLeft,
-      marginTop,
-      lineSpacing,
-      colWidth,
-      pageHeight
-    );
+    renderProblem(doc, problem, columnKey, columnState, config);
   });
 };
 
@@ -170,29 +150,18 @@ export const generatePdf = async (
 
   const columnState: Record<'left' | 'right', number> = { left: marginTop, right: marginTop };
 
+  const renderConfig: RenderConfig = {
+    marginLeft,
+    marginTop,
+    lineSpacing,
+    colWidth,
+    pageHeight,
+  };
+
   if (settings.enableGrouping) {
-    generateGroupedProblems(
-      doc,
-      problems,
-      settings,
-      columnState,
-      marginLeft,
-      marginTop,
-      lineSpacing,
-      colWidth,
-      pageHeight
-    );
+    generateGroupedProblems(doc, problems, settings, columnState, renderConfig);
   } else {
-    generateContinuousProblems(
-      problems,
-      columnState,
-      marginLeft,
-      marginTop,
-      lineSpacing,
-      colWidth,
-      pageHeight,
-      doc
-    );
+    generateContinuousProblems(doc, problems, columnState, renderConfig);
   }
 
   doc.save(filename);
