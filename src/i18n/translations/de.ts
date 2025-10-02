@@ -25,6 +25,16 @@ export default {
     advanced: 'Erweiterte Einstellungen',
     from: 'Von',
     to: 'bis',
+    // Gruppierungseinstellungen
+    enableGrouping: 'Gruppierungsmodus aktivieren',
+    problemsPerGroup: 'Aufgaben pro Gruppe',
+    totalGroups: 'Gesamtanzahl der Gruppen',
+    groupingHelp:
+      'Der Gruppierungsmodus teilt Aufgaben in mehrere Gruppen für Batch-Übung oder Tests auf',
+    totalProblemsCalculated: 'Gesamtaufgaben: {{total}}',
+    grouping: 'Gruppierungseinstellungen',
+    groupingEnabled: '✓ Aktiviert',
+    groupingDisabled: '○ Deaktiviert',
     manager: {
       title: 'Einstellungsmanager',
       export: 'Einstellungen exportieren',
@@ -56,8 +66,11 @@ export default {
   },
   errors: {
     noOperations: 'Bitte wählen Sie mindestens eine mathematische Operation aus, um fortzufahren.',
-    invalidProblemCount: 'Die Anzahl der Aufgaben muss zwischen 1 und 100 liegen.',
-    invalidProblemsCount: 'Die Anzahl der Aufgaben muss zwischen 1 und 100 liegen.',
+    invalidProblemCount: 'Die Anzahl der Aufgaben muss zwischen 1 und 50.000 liegen.',
+    invalidProblemsCount: 'Die Anzahl der Aufgaben muss zwischen 1 und 50.000 liegen.',
+    invalidTotalProblemCount: 'Die Gesamtzahl der Aufgaben darf 50.000 nicht überschreiten.',
+    invalidProblemsPerGroup: 'Die Anzahl der Aufgaben pro Gruppe muss zwischen 1 und 1.000 liegen.',
+    invalidTotalGroups: 'Die Gesamtzahl der Gruppen muss zwischen 1 und 100 liegen.',
     invalidNumberRange: 'Das Minimum des Zahlenbereichs kann nicht größer als das Maximum sein.',
     invalidResultRange: 'Das Minimum des Ergebnisbereichs kann nicht größer als das Maximum sein.',
     invalidOperandsRange:
@@ -106,6 +119,9 @@ export default {
   accessibility: {
     selectOperations: 'Mathematische Operationen zum Einschließen auswählen',
     numProblemsInput: 'Anzahl der zu generierenden Aufgaben',
+    enableGroupingLabel: 'Gruppierungsmodus aktivieren',
+    problemsPerGroupInput: 'Anzahl der Aufgaben pro Gruppe',
+    totalGroupsInput: 'Gesamtanzahl der Gruppen',
     minNumber: 'Mindestzahl für Operanden',
     maxNumber: 'Höchstzahl für Operanden',
     minResult: 'Minimaler Ergebniswert',

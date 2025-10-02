@@ -25,6 +25,15 @@ export default {
     advanced: '詳細設定',
     from: 'から',
     to: 'まで',
+    // グループ化設定
+    enableGrouping: 'グループ化モードを有効にする',
+    problemsPerGroup: 'グループあたりの問題数',
+    totalGroups: '総グループ数',
+    groupingHelp: 'グループ化モードは問題を複数のグループに分けて、バッチ練習やテストに使用します',
+    totalProblemsCalculated: '総問題数：{{total}}',
+    grouping: 'グループ化設定',
+    groupingEnabled: '✓ 有効',
+    groupingDisabled: '○ 無効',
     manager: {
       title: '設定マネージャー',
       export: '設定をエクスポート',
@@ -56,8 +65,11 @@ export default {
   },
   errors: {
     noOperations: '続行するには少なくとも1つの数学演算を選択してください。',
-    invalidProblemCount: '問題数は1から100の間である必要があります。',
-    invalidProblemsCount: '問題数は1から100の間である必要があります。',
+    invalidProblemCount: '問題数は1から50,000の間である必要があります。',
+    invalidProblemsCount: '問題数は1から50,000の間である必要があります。',
+    invalidTotalProblemCount: '総問題数は50,000を超えることはできません。',
+    invalidProblemsPerGroup: 'グループあたりの問題数は1から1,000の間である必要があります。',
+    invalidTotalGroups: '総グループ数は1から100の間である必要があります。',
     invalidNumberRange: '数値範囲の最小値は最大値より大きくできません。',
     invalidResultRange: '結果範囲の最小値は最大値より大きくできません。',
     invalidOperandsRange:
@@ -100,6 +112,9 @@ export default {
   accessibility: {
     selectOperations: '含める数学演算を選択',
     numProblemsInput: '生成する問題数',
+    enableGroupingLabel: 'グループ化モードを有効にする',
+    problemsPerGroupInput: 'グループあたりの問題数',
+    totalGroupsInput: '総グループ数',
     minNumber: 'オペランドの最小値',
     maxNumber: 'オペランドの最大値',
     minResult: '結果の最小値',
