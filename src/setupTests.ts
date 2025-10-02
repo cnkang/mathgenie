@@ -2,12 +2,268 @@
 import { vi } from 'vitest';
 
 // Ensure window is available for React DOM operations
+// This is critical for React 19.2.0 + happy-dom 19.0.2 compatibility
+
+// First, ensure we have a proper global object
+if (typeof globalThis === 'undefined') {
+  (global as any).globalThis = global;
+}
+
+// Create a comprehensive window object that React DOM expects
+const createMockWindow = () => {
+  const mockWindow = {
+    // Copy all globalThis properties
+    ...globalThis,
+
+    // Essential browser APIs
+    document: globalThis.document || {},
+    location: globalThis.location || {
+      href: 'http://localhost:3000',
+      origin: 'http://localhost:3000',
+      protocol: 'http:',
+      host: 'localhost:3000',
+      hostname: 'localhost',
+      port: '3000',
+      pathname: '/',
+      search: '',
+      hash: '',
+    },
+    navigator: globalThis.navigator || {
+      userAgent: 'Mozilla/5.0 (Node.js) Test Environment',
+      language: 'en-US',
+      languages: ['en-US', 'en'],
+    },
+    history: globalThis.history || {
+      pushState: vi.fn(),
+      replaceState: vi.fn(),
+      back: vi.fn(),
+      forward: vi.fn(),
+      go: vi.fn(),
+      length: 1,
+      state: null,
+    },
+
+    // Event handling
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+
+    // Animation and timing
+    requestAnimationFrame: vi.fn((cb: FrameRequestCallback) => setTimeout(cb, 16)),
+    cancelAnimationFrame: vi.fn(),
+    requestIdleCallback: vi.fn((cb: IdleRequestCallback) => setTimeout(cb, 0)),
+    cancelIdleCallback: vi.fn(),
+
+    // Timers (use globalThis versions)
+    setTimeout: globalThis.setTimeout,
+    clearTimeout: globalThis.clearTimeout,
+    setInterval: globalThis.setInterval,
+    clearInterval: globalThis.clearInterval,
+
+    // Event constructors
+    Event:
+      globalThis.Event ||
+      class Event {
+        constructor(
+          public type: string,
+          public eventInitDict?: EventInit
+        ) {}
+        preventDefault = vi.fn();
+        stopPropagation = vi.fn();
+        stopImmediatePropagation = vi.fn();
+        bubbles = false;
+        cancelable = false;
+        composed = false;
+        currentTarget = null;
+        defaultPrevented = false;
+        eventPhase = 0;
+        isTrusted = false;
+        target = null;
+        timeStamp = Date.now();
+      },
+    CustomEvent:
+      globalThis.CustomEvent ||
+      class CustomEvent extends Event {
+        constructor(type: string, eventInitDict?: CustomEventInit) {
+          super(type, eventInitDict);
+          this.detail = eventInitDict?.detail;
+        }
+        detail: any;
+      },
+
+    // Console (use globalThis version)
+    console: globalThis.console,
+
+    // Performance API
+    performance: globalThis.performance || {
+      now: () => Date.now(),
+      mark: vi.fn(),
+      measure: vi.fn(),
+      getEntriesByName: vi.fn(() => []),
+      getEntriesByType: vi.fn(() => []),
+      clearMarks: vi.fn(),
+      clearMeasures: vi.fn(),
+      timeOrigin: Date.now(),
+    },
+
+    // Screen information
+    screen: {
+      width: 1024,
+      height: 768,
+      availWidth: 1024,
+      availHeight: 768,
+      colorDepth: 24,
+      pixelDepth: 24,
+    },
+
+    // Window dimensions
+    innerWidth: 1024,
+    innerHeight: 768,
+    outerWidth: 1024,
+    outerHeight: 768,
+    screenX: 0,
+    screenY: 0,
+    scrollX: 0,
+    scrollY: 0,
+
+    // Window methods
+    alert: vi.fn(),
+    confirm: vi.fn(() => true),
+    prompt: vi.fn(() => ''),
+    open: vi.fn(),
+    close: vi.fn(),
+    focus: vi.fn(),
+    blur: vi.fn(),
+    scroll: vi.fn(),
+    scrollTo: vi.fn(),
+    scrollBy: vi.fn(),
+
+    // Storage
+    localStorage: globalThis.localStorage || {
+      getItem: vi.fn(),
+      setItem: vi.fn(),
+      removeItem: vi.fn(),
+      clear: vi.fn(),
+      length: 0,
+      key: vi.fn(),
+    },
+    sessionStorage: globalThis.sessionStorage || {
+      getItem: vi.fn(),
+      setItem: vi.fn(),
+      removeItem: vi.fn(),
+      clear: vi.fn(),
+      length: 0,
+      key: vi.fn(),
+    },
+
+    // Self-references (important for React DOM)
+    get window(): any {
+      return this;
+    },
+    get self(): any {
+      return this;
+    },
+    get top(): any {
+      return this;
+    },
+    get parent(): any {
+      return this;
+    },
+    get frames(): any {
+      return this;
+    },
+  };
+
+  return mockWindow;
+};
+
+// Only create window if it doesn't exist
 if (typeof window === 'undefined') {
+  const mockWindow = createMockWindow();
+
+  // Set window on globalThis
   Object.defineProperty(globalThis, 'window', {
-    value: globalThis,
+    value: mockWindow,
     writable: true,
     configurable: true,
   });
+
+  // Also set it as a global variable for React DOM
+  (global as any).window = mockWindow;
+
+  // Ensure window is also available as a direct global
+  Object.defineProperty(global, 'window', {
+    value: mockWindow,
+    writable: true,
+    configurable: true,
+  });
+}
+
+// Ensure window has all necessary properties for React DOM
+if (typeof window !== 'undefined') {
+  // Performance API
+  if (!window.performance) {
+    Object.defineProperty(window, 'performance', {
+      value: {
+        now: () => Date.now(),
+        mark: vi.fn(),
+        measure: vi.fn(),
+        getEntriesByName: vi.fn(() => []),
+        getEntriesByType: vi.fn(() => []),
+      },
+      writable: true,
+      configurable: true,
+    });
+  }
+
+  // Ensure essential window properties exist
+  if (!window.document) {
+    Object.defineProperty(window, 'document', {
+      value: globalThis.document || {},
+      writable: true,
+      configurable: true,
+    });
+  }
+
+  if (!window.requestAnimationFrame) {
+    Object.defineProperty(window, 'requestAnimationFrame', {
+      value: vi.fn((cb: FrameRequestCallback) => setTimeout(cb, 16)),
+      writable: true,
+      configurable: true,
+    });
+  }
+
+  if (!window.cancelAnimationFrame) {
+    Object.defineProperty(window, 'cancelAnimationFrame', {
+      value: vi.fn(),
+      writable: true,
+      configurable: true,
+    });
+  }
+
+  if (!window.addEventListener) {
+    Object.defineProperty(window, 'addEventListener', {
+      value: vi.fn(),
+      writable: true,
+      configurable: true,
+    });
+  }
+
+  if (!window.removeEventListener) {
+    Object.defineProperty(window, 'removeEventListener', {
+      value: vi.fn(),
+      writable: true,
+      configurable: true,
+    });
+  }
+
+  if (!window.dispatchEvent) {
+    Object.defineProperty(window, 'dispatchEvent', {
+      value: vi.fn(),
+      writable: true,
+      configurable: true,
+    });
+  }
 }
 
 // Custom matchers are declared in src/types/vitest.d.ts
@@ -195,7 +451,22 @@ import { afterEach, beforeEach } from 'vitest';
 //   log: console.log,
 // };
 
+// Ensure window is always available for React DOM operations
+const ensureWindow = () => {
+  if (typeof window === 'undefined') {
+    const mockWindow = createMockWindow();
+    Object.defineProperty(globalThis, 'window', {
+      value: mockWindow,
+      writable: true,
+      configurable: true,
+    });
+    (global as any).window = mockWindow;
+  }
+};
+
 // Mock window APIs once at startup
+ensureWindow();
+
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation(query => ({
@@ -224,10 +495,12 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
 
 // 简化清理逻辑
 beforeEach(() => {
+  ensureWindow(); // Ensure window is available before each test
   mockStore = {};
 });
 
 afterEach(() => {
+  ensureWindow(); // Ensure window is available during cleanup
   cleanup();
   mockStore = {};
 });
