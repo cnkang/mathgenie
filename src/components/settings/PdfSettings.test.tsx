@@ -22,7 +22,10 @@ describe.sequential('PdfSettings', () => {
   const settings = {
     fontSize: 12,
     lineSpacing: 10,
-    paperSize: 'a4',
+    paperSize: 'a4' as const,
+    enableGrouping: false,
+    problemsPerGroup: 20,
+    totalGroups: 1,
   } as any;
 
   const paperSizeOptions = { a4: 'A4', letter: 'Letter' };

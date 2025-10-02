@@ -279,6 +279,9 @@ describe('SettingsPresets', () => {
       fontSize: 18,
       lineSpacing: 16,
       paperSize: 'a4' as const,
+      enableGrouping: false,
+      problemsPerGroup: 20,
+      totalGroups: 1,
     });
   });
 
@@ -300,6 +303,9 @@ describe('SettingsPresets', () => {
           fontSize: 18,
           lineSpacing: 16,
           paperSize: 'a4' as const,
+          enableGrouping: false,
+          problemsPerGroup: 20,
+          totalGroups: 1,
         },
       },
     ];
@@ -353,6 +359,9 @@ describe('SettingsPresets', () => {
         fontSize: 18,
         lineSpacing: 16,
         paperSize: 'a4' as const,
+        enableGrouping: false,
+        problemsPerGroup: 20,
+        totalGroups: 1,
       },
       {
         operations: ['+', '-', '*'] as Operation[],
@@ -365,6 +374,9 @@ describe('SettingsPresets', () => {
         fontSize: 16,
         lineSpacing: 14,
         paperSize: 'a4' as const,
+        enableGrouping: false,
+        problemsPerGroup: 20,
+        totalGroups: 1,
       },
       {
         operations: ['+', '-', '*', '/'] as Operation[],
@@ -377,6 +389,9 @@ describe('SettingsPresets', () => {
         fontSize: 14,
         lineSpacing: 12,
         paperSize: 'a4' as const,
+        enableGrouping: false,
+        problemsPerGroup: 20,
+        totalGroups: 1,
       },
       {
         operations: ['*'] as Operation[],
@@ -389,6 +404,9 @@ describe('SettingsPresets', () => {
         fontSize: 16,
         lineSpacing: 14,
         paperSize: 'a4' as const,
+        enableGrouping: false,
+        problemsPerGroup: 20,
+        totalGroups: 1,
       },
     ];
 
