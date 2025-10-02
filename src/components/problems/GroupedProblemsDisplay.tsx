@@ -26,7 +26,7 @@ const GroupedProblemsDisplay: React.FC<GroupedProblemsDisplayProps> = ({
     <>
       {groups.map((group, groupIndex) =>
         hasProblems(group) ? (
-          <div key={groupIndex} className='problem-group'>
+          <div key={`group-${groupIndex}`} className='problem-group'>
             <h3 className='group-title'>{getGroupTitle(groupIndex, t)}</h3>
             <ol
               className='problems-grid'
@@ -41,7 +41,7 @@ const GroupedProblemsDisplay: React.FC<GroupedProblemsDisplayProps> = ({
             </ol>
           </div>
         ) : (
-          <div key={groupIndex} className='empty-group-placeholder'>
+          <div key={`empty-group-${groupIndex}`} className='empty-group-placeholder'>
             {getEmptyGroupText(groupIndex, t)}
           </div>
         )
