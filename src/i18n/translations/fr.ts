@@ -64,6 +64,8 @@ export default {
     title: 'Problèmes générés ({{count}})',
     noProblems: 'Aucun problème généré pour le moment',
     clickToStart: 'Cliquez sur "{{generateButton}}" pour commencer',
+    groupTitle: 'Groupe {{number}}',
+    groupingInfo: '{{groups}} groupes, {{perGroup}} problèmes chacun',
   },
   errors: {
     noOperations: 'Veuillez sélectionner au moins une opération mathématique pour continuer.',

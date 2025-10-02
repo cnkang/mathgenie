@@ -63,6 +63,8 @@ export default {
     title: 'Generierte Aufgaben ({{count}})',
     noProblems: 'Noch keine Aufgaben generiert',
     clickToStart: 'Klicken Sie auf "{{generateButton}}", um zu beginnen',
+    groupTitle: 'Gruppe {{number}}',
+    groupingInfo: '{{groups}} Gruppen, {{perGroup}} Aufgaben pro Gruppe',
   },
   errors: {
     noOperations: 'Bitte wählen Sie mindestens eine mathematische Operation aus, um fortzufahren.',
