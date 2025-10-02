@@ -65,6 +65,9 @@ export default {
     groupTitle: '第 {{number}} 组',
     groupingInfo: '共 {{groups}} 组，每组 {{perGroup}} 道题目',
   },
+  problems: {
+    emptyGroup: '第 {{group}} 组 (无题目)',
+  },
   errors: {
     noOperations: '请至少选择一种数学运算才能继续。',
     invalidProblemCount: '题目数量必须在 1 到 50,000 之间。',
