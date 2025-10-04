@@ -12,7 +12,7 @@ concurrency:
 # Configurable inputs for timeout and polling
 env:
   NODE_VERSION: "22"
-  PNPM_VERSION: "10.15.1"
+  PNPM_VERSION: "10.18.0"
   WAIT_TIMEOUT_MS: 300000 # 5 minutes
   POLL_INTERVAL_MS: 10000 # 10 seconds
 
