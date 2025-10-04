@@ -1,4 +1,5 @@
 import type { Operation, Settings } from '@/types';
+import { calculateActualTotalProblems, isPositiveInteger } from '@/utils/groupingUtils';
 import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from 'react';
 
 // Constants to avoid duplicate strings
@@ -15,6 +16,10 @@ const defaultSettings: Settings = {
   fontSize: 16,
   lineSpacing: 12,
   paperSize: 'a4',
+  // 分组设置默认值
+  enableGrouping: false,
+  problemsPerGroup: 20,
+  totalGroups: 1,
 };
 
 const isValidArray = (value: unknown, expectedLength?: number): value is unknown[] => {
@@ -90,11 +95,34 @@ export const useSettings = (): UseSettingsResult => {
   }, [settings]);
 
   const validateSettings = useCallback((newSettings: Settings): string => {
+    // 计算实际题目总数
+    const actualTotalProblems = calculateActualTotalProblems(newSettings);
+
     const validations = [
       { condition: newSettings.operations.length === 0, error: 'errors.noOperations' },
       {
-        condition: newSettings.numProblems <= 0 || newSettings.numProblems > 100,
+        condition: newSettings.numProblems <= 0 || newSettings.numProblems > 50000,
         error: 'errors.invalidProblemCount',
+      },
+      {
+        condition: actualTotalProblems > 50000,
+        error: 'errors.invalidTotalProblemCount',
+      },
+      {
+        condition:
+          newSettings.enableGrouping &&
+          (newSettings.problemsPerGroup <= 0 ||
+            newSettings.problemsPerGroup > 1000 ||
+            !isPositiveInteger(newSettings.problemsPerGroup)),
+        error: 'errors.invalidProblemsPerGroup',
+      },
+      {
+        condition:
+          newSettings.enableGrouping &&
+          (newSettings.totalGroups <= 0 ||
+            newSettings.totalGroups > 100 ||
+            !isPositiveInteger(newSettings.totalGroups)),
+        error: 'errors.invalidTotalGroups',
       },
       {
         condition: newSettings.numRange[0] > newSettings.numRange[1],

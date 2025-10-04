@@ -23,6 +23,8 @@ class MockPerformanceObserver {
   }
 }
 
+// PerformanceMonitor tests - now working with React DOM 19.2.0 + happy-dom
+// Fixed window availability issues in setupTests.ts
 describe('PerformanceMonitor', () => {
   let originalPerformanceObserver: typeof PerformanceObserver;
   let consoleLogSpy: ReturnType<typeof vi.spyOn>;

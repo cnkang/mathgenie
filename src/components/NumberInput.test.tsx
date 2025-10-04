@@ -48,8 +48,11 @@ describe.sequential('NumberInput', () => {
     const input = container.querySelector('input') as HTMLInputElement;
     expect(input).not.toBeNull();
 
+    // Use React.startTransition to wrap the state update
     await act(async () => {
-      fireEvent.change(input, { target: { value: '25' } });
+      React.startTransition(() => {
+        fireEvent.change(input, { target: { value: '25' } });
+      });
     });
 
     // The onChange should be called
@@ -64,7 +67,9 @@ describe.sequential('NumberInput', () => {
     expect(input).not.toBeNull();
 
     await act(async () => {
-      fireEvent.change(input, { target: { value: '' } });
+      React.startTransition(() => {
+        fireEvent.change(input, { target: { value: '' } });
+      });
     });
 
     expect(onChange).toHaveBeenCalledWith(1);
@@ -104,7 +109,9 @@ describe.sequential('NumberInput', () => {
 
     if (input) {
       await act(async () => {
-        fireEvent.change(input, { target: { value: 'abc' } });
+        React.startTransition(() => {
+          fireEvent.change(input, { target: { value: 'abc' } });
+        });
       });
 
       // Should handle gracefully - component should still exist

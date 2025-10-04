@@ -22,6 +22,9 @@ describe('Settings Manager Utils', () => {
     fontSize: 12,
     lineSpacing: 18,
     paperSize: 'a4',
+    enableGrouping: false,
+    problemsPerGroup: 20,
+    totalGroups: 1,
   };
 
   it('creates settings data with correct structure', () => {

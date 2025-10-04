@@ -1,14 +1,15 @@
-import React from 'react';
 import type { Settings } from '@/types';
+import React from 'react';
 import SettingsPresets from './SettingsPresets';
-import PdfSettings from './settings/PdfSettings';
-import AdvancedSettings from './settings/AdvancedSettings';
-import RangeInput from './form/RangeInput';
 import './SettingsSection.css';
+import RangeInput from './form/RangeInput';
+import AdvancedSettings from './settings/AdvancedSettings';
+import GroupingSettings from './settings/GroupingSettings';
+import PdfSettings from './settings/PdfSettings';
+import ProblemCountSettings from './settings/ProblemCountSettings';
 
 // Do not edit manually.
 const STR_OPERATIONS = 'operations' as const;
-const STR_NUMPROBLEMS = 'numProblems' as const;
 
 const STR_FROM = 'From' as const;
 const STR_TO = 'To' as const;
@@ -59,21 +60,8 @@ const SettingsSection: React.FC<SettingsSectionProps> = ({
         <small className='field-help'>{t('operations.help')}</small>
       </div>
 
-      <div className='field'>
-        <label htmlFor={STR_NUMPROBLEMS} className='field-label'>
-          {t('settings.numProblems')}
-        </label>
-        <input
-          id={STR_NUMPROBLEMS}
-          type='number'
-          inputMode='numeric'
-          value={settings.numProblems}
-          onChange={e => onChange(STR_NUMPROBLEMS, Number(e.target.value))}
-          aria-label={t('accessibility.numProblemsInput')}
-          min={1}
-          max={100}
-        />
-      </div>
+      <GroupingSettings t={t} settings={settings} onChange={onChange} />
+      <ProblemCountSettings t={t} settings={settings} onChange={onChange} />
 
       <RangeInput
         id='numRange'

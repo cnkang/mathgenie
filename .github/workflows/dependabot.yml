@@ -54,7 +54,6 @@ jobs:
           ECOSYSTEM: ${{ steps.metadata.outputs.package-ecosystem }}
         with:
           script: |
-            const core = require('@actions/core');
             const pr = context.payload.pull_request;
 
             const updateTypeRaw = process.env.UPDATE_TYPE || 'unknown';
