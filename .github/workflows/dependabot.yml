@@ -155,25 +155,22 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: 📦 Enable pnpm via Corepack
         run: |
           echo "🔧 Enabling pnpm via Corepack..."
           corepack enable
-          corepack install
 
-          echo "🔍 Verifying pnpm installation..."
-          if ! which pnpm > /dev/null 2>&1; then
-            echo "❌ pnpm not found in PATH after corepack install"
-            echo "🔧 Attempting alternative pnpm installation..."
-            npm install -g pnpm@${{ env.PNPM_VERSION }}
-          fi
+          echo "🔍 Pinning and activating pnpm version via Corepack..."
+          corepack prepare pnpm@${{ env.PNPM_VERSION }} --activate
 
           echo "📋 Final pnpm verification:"
-          which pnpm
+          if ! which pnpm > /dev/null 2>&1; then
+            echo "❌ pnpm not found in PATH after installation attempts"
+            exit 1
+          fi
           pnpm --version
-
           echo "✅ pnpm setup completed successfully"
 
       - name: 📋 Install dependencies
