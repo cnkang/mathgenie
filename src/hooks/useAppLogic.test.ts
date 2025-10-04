@@ -22,6 +22,9 @@ describe('useAppLogic', () => {
     fontSize: 16,
     lineSpacing: 12,
     paperSize: 'a4',
+    enableGrouping: false,
+    problemsPerGroup: 20,
+    totalGroups: 1,
   };
 
   const mockProblems: Problem[] = [

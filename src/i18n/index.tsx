@@ -149,7 +149,10 @@ const createSettingsFallbacks = (): Record<string, string> => ({
 
 const createErrorFallbacks = (): Record<string, string> => ({
   'errors.noOperations': 'Please select at least one operation.',
-  'errors.invalidProblemCount': 'Number of problems must be between 1 and 100.',
+  'errors.invalidProblemCount': 'Number of problems must be between 1 and 50,000.',
+  'errors.invalidTotalProblemCount': 'Total number of problems cannot exceed 50,000.',
+  'errors.invalidProblemsPerGroup': 'Problems per group must be between 1 and 1,000.',
+  'errors.invalidTotalGroups': 'Total groups must be between 1 and 100.',
   'errors.invalidNumberRange': 'Number range minimum cannot be greater than maximum.',
   'errors.invalidResultRange': 'Result range minimum cannot be greater than maximum.',
   'errors.invalidOperandsRange':

@@ -26,6 +26,16 @@ export default {
     advanced: 'Paramètres Avancés',
     from: 'De',
     to: 'à',
+    // Paramètres de groupement
+    enableGrouping: 'Activer le mode de groupement',
+    problemsPerGroup: 'Problèmes par groupe',
+    totalGroups: 'Nombre total de groupes',
+    groupingHelp:
+      'Le mode de groupement divise les problèmes en plusieurs groupes pour la pratique ou les tests par lots',
+    totalProblemsCalculated: 'Total des problèmes : {{total}}',
+    grouping: 'Paramètres de groupement',
+    groupingEnabled: '✓ Activé',
+    groupingDisabled: '○ Désactivé',
     manager: {
       title: 'Gestionnaire de paramètres',
       export: 'Exporter les paramètres',
@@ -54,11 +64,19 @@ export default {
     title: 'Problèmes générés ({{count}})',
     noProblems: 'Aucun problème généré pour le moment',
     clickToStart: 'Cliquez sur "{{generateButton}}" pour commencer',
+    groupTitle: 'Groupe {{number}}',
+    groupingInfo: '{{groups}} groupes, {{perGroup}} problèmes chacun',
+  },
+  problems: {
+    emptyGroup: 'Groupe {{group}} (aucun problème)',
   },
   errors: {
     noOperations: 'Veuillez sélectionner au moins une opération mathématique pour continuer.',
-    invalidProblemCount: 'Le nombre de problèmes doit être entre 1 et 100.',
-    invalidProblemsCount: 'Le nombre de problèmes doit être entre 1 et 100.',
+    invalidProblemCount: 'Le nombre de problèmes doit être entre 1 et 50 000.',
+    invalidProblemsCount: 'Le nombre de problèmes doit être entre 1 et 50 000.',
+    invalidTotalProblemCount: 'Le nombre total de problèmes ne peut pas dépasser 50 000.',
+    invalidProblemsPerGroup: 'Le nombre de problèmes par groupe doit être entre 1 et 1 000.',
+    invalidTotalGroups: 'Le nombre total de groupes doit être entre 1 et 100.',
     invalidNumberRange: 'Le minimum de la plage de nombres ne peut pas être supérieur au maximum.',
     invalidResultRange:
       'Le minimum de la plage de résultats ne peut pas être supérieur au maximum.',
@@ -110,6 +128,9 @@ export default {
   accessibility: {
     selectOperations: 'Sélectionner les opérations mathématiques à inclure',
     numProblemsInput: 'Nombre de problèmes à générer',
+    enableGroupingLabel: 'Activer le mode de groupement',
+    problemsPerGroupInput: 'Nombre de problèmes par groupe',
+    totalGroupsInput: 'Nombre total de groupes',
     minNumber: 'Nombre minimum pour les opérandes',
     maxNumber: 'Nombre maximum pour les opérandes',
     minResult: 'Valeur minimale du résultat',
