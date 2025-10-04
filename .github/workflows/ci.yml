@@ -1,885 +1,874 @@
 name: 🚀 CI/CD Pipeline
 
 on:
-    push:
-        branches: [main, develop]
-    pull_request:
-        branches: [main, develop]
-    workflow_dispatch:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
 
 permissions:
-    contents: read
-    security-events: write
-    actions: read
-    pull-requests: write
+  contents: read
+  security-events: write
+  actions: read
+  pull-requests: write
 
 # Cancel previous runs if a new one is triggered
 concurrency:
-    group: ${{ github.workflow }}-${{ github.ref }}
-    cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
-    NODE_VERSION: "22"
-    PNPM_VERSION: "10.18.0"
-    NODE_OPTIONS: "--max-old-space-size=4096"
-    # Let Playwright use default cache paths for better caching
-    # PLAYWRIGHT_BROWSERS_PATH: 0  # Removed - this prevents proper caching
-    # Disable color output for CI consistency (FORCE_COLOR takes precedence over NO_COLOR)
-    FORCE_COLOR: 0
-    CI: true
-    # Playwright optimizations
-    PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 0
-    PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS: true
+  NODE_VERSION: "22"
+  NODE_OPTIONS: "--max-old-space-size=4096"
+  # Let Playwright use default cache paths for better caching
+  # PLAYWRIGHT_BROWSERS_PATH: 0  # Removed - this prevents proper caching
+  # Disable color output for CI consistency (FORCE_COLOR takes precedence over NO_COLOR)
+  FORCE_COLOR: 0
+  CI: true
+  # Playwright optimizations
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 0
+  PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS: true
 
 jobs:
-    # Job 0: Quick Check (fast feedback)
-    quick-check:
-        name: ⚡ Quick Check
-        runs-on: ubuntu-latest
-        timeout-minutes: 5
-
-        steps:
-            - name: 📥 Checkout code
-              uses: actions/checkout@v5
-
-            - name: 📦 Setup pnpm
-              uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
-              with:
-                  version: ${{ env.PNPM_VERSION }}
-                  run_install: false
-
-            - name: 📦 Setup Node.js
-              uses: actions/setup-node@v5
-              with:
-                  node-version: ${{ env.NODE_VERSION }}
-                  cache: "pnpm"
-
-            - name: 📋 Install dependencies
-              run: pnpm install --frozen-lockfile
-
-            - name: 🗂️ Cache TypeScript
-              uses: actions/cache@v4.2.4
-              with:
-                  path: |
-                      .tsbuildinfo
-                      node_modules/.cache/typescript
-                  key: ${{ runner.os }}-typescript-${{ hashFiles('**/tsconfig*.json', 'src/**/*.ts', 'src/**/*.tsx') }}
-                  restore-keys: |
-                      ${{ runner.os }}-typescript-
-
-            - name: 🔍 Quick lint check
-              run: pnpm lint --max-warnings 0
-
-            - name: 🏗️ Type check
-              run: pnpm type-check
-
-            - name: 🧪 Quick test
-              run: pnpm test:unit --reporter=basic
-
-    # Job 1: Code Quality & Linting (runs in parallel)
-    code-quality:
-        name: 🔍 Code Quality
-        runs-on: ubuntu-latest
-        timeout-minutes: 10
-
-        steps:
-            - name: 📥 Checkout code
-              uses: actions/checkout@v5
-              with:
-                  fetch-depth: 0 # Full history for better analysis
-
-            - name: 📦 Setup pnpm
-              uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
-              with:
-                  version: ${{ env.PNPM_VERSION }}
-                  run_install: false
-
-            - name: 📦 Setup Node.js
-              uses: actions/setup-node@v5
-              with:
-                  node-version: ${{ env.NODE_VERSION }}
-                  cache: "pnpm"
-
-            - name: 📋 Install dependencies
-              run: pnpm install --frozen-lockfile
-
-            - name: 🗂️ Cache ESLint
-              uses: actions/cache@v4.2.4
-              with:
-                  path: .eslintcache
-                  key: ${{ runner.os }}-eslint-${{ hashFiles('**/.eslintrc*', '**/eslint.config.*') }}
-                  restore-keys: |
-                      ${{ runner.os }}-eslint-
-
-            - name: 🔍 Run ESLint
-              run: |
-                  pnpm lint --format=json --output-file=eslint-report.json || true
-                  # Ensure the file exists even if ESLint passes
-                  if [ ! -f eslint-report.json ]; then
-                    echo '[]' > eslint-report.json
-                  fi
-
-            - name: 📊 Upload ESLint results
-              uses: actions/upload-artifact@v4
-              if: always()
-              with:
-                  name: eslint-report
-                  path: eslint-report.json
-
-            - name: 🎨 Check code formatting
-              run: |
-                  if ! pnpm format --check; then
-                    echo "❌ Code formatting issues found. Run 'pnpm format' to fix."
-                    exit 1
-                  fi
-
-    # Job 2: Testing (runs in parallel)
-    test:
-        name: 🧪 Tests
-        runs-on: ubuntu-latest
-        timeout-minutes: 15
-
-        steps:
-            - name: 📥 Checkout code
-              uses: actions/checkout@v5
-
-            - name: 📦 Setup pnpm
-              uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
-              with:
-                  version: ${{ env.PNPM_VERSION }}
-                  run_install: false
-
-            - name: 📦 Setup Node.js
-              uses: actions/setup-node@v5
-              with:
-                  node-version: ${{ env.NODE_VERSION }}
-                  cache: "pnpm"
-
-            - name: 📋 Install dependencies
-              run: pnpm install --frozen-lockfile
-
-            - name: 🗂️ Cache Vitest
-              uses: actions/cache@v4.2.4
-              with:
-                  path: |
-                      node_modules/.vitest
-                      coverage
-                  key: ${{ runner.os }}-vitest-${{ hashFiles('**/vitest.config.*', 'src/**/*.test.*', 'src/**/*.spec.*') }}
-                  restore-keys: |
-                      ${{ runner.os }}-vitest-
-
-            - name: 🔧 Set Node.js binary path for secure execution
-              run: |
-                  NODE_BIN_PATH=$(dirname $(which node))
-                  echo "NODE_BIN_PATH=$NODE_BIN_PATH" >> $GITHUB_ENV
-                  echo "Node.js binary path: $NODE_BIN_PATH"
-
-            - name: 🧪 Run unit tests with coverage
-              run: pnpm test:unit
-              env:
-                  CI: true
-                  NODE_BIN_PATH: ${{ env.NODE_BIN_PATH }}
-
-            - name: 📊 Upload coverage to Codecov
-              uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
-              with:
-                  files: ./coverage/lcov.info
-                  flags: unit-tests
-                  name: codecov-unit
-                  fail_ci_if_error: false
-
-            - name: 📋 Upload test results
-              uses: actions/upload-artifact@v4
-              if: always()
-              with:
-                  name: test-results-unit
-                  path: |
-                      coverage/
-
-    # Job 3: Security Scanning (runs in parallel)
-    security:
-        name: 🔒 Security Scan
-        runs-on: ubuntu-latest
-        timeout-minutes: 10
-
-        steps:
-            - name: 📥 Checkout code
-              uses: actions/checkout@v5
-
-            - name: 📦 Setup pnpm
-              uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
-              with:
-                  version: ${{ env.PNPM_VERSION }}
-                  run_install: false
-
-            - name: 📦 Setup Node.js
-              uses: actions/setup-node@v5
-              with:
-                  node-version: ${{ env.NODE_VERSION }}
-                  cache: "pnpm"
-
-            - name: 📋 Install dependencies
-              run: pnpm install --frozen-lockfile
-
-            - name: 🔍 Run security audit
-              run: pnpm audit --audit-level moderate
-              continue-on-error: true
-
-            # CodeQL analysis removed - using GitHub's default setup instead
-
-    # Job 4: Build & Performance (runs in parallel)
-    build:
-        name: 🏗️ Build & Performance
-        runs-on: ubuntu-latest
-        timeout-minutes: 15
-
-        steps:
-            - name: 📥 Checkout code
-              uses: actions/checkout@v5
-
-            - name: 📦 Setup pnpm
-              uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
-              with:
-                  version: ${{ env.PNPM_VERSION }}
-                  run_install: false
-
-            - name: 📦 Setup Node.js
-              uses: actions/setup-node@v5
-              with:
-                  node-version: ${{ env.NODE_VERSION }}
-                  cache: "pnpm"
-
-            - name: 📋 Install dependencies
-              run: pnpm install --frozen-lockfile
-
-            - name: 🗂️ Cache build output
-              uses: actions/cache@v4.2.4
-              with:
-                  path: |
-                      dist
-                      .vite
-                  key: ${{ runner.os }}-build-${{ hashFiles('src/**/*', 'public/**/*', 'vite.config.ts', 'tsconfig.json') }}
-                  restore-keys: |
-                      ${{ runner.os }}-build-
-
-            - name: 🏗️ Build application
-              run: pnpm build
-              env:
-                  NODE_ENV: production
-                  CI: true
-
-            - name: 📊 Analyze bundle size
-              run: |
-                  echo "## 📦 Bundle Analysis" >> $GITHUB_STEP_SUMMARY
-                  echo "| File | Size | Gzipped |" >> $GITHUB_STEP_SUMMARY
-                  echo "|------|------|---------|" >> $GITHUB_STEP_SUMMARY
-
-                  for file in dist/assets/*.js; do
-                    if [ -f "$file" ]; then
-                      size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file")
-                      gzipped=$(gzip -c "$file" | wc -c)
-                      filename=$(basename "$file")
-                      echo "| $filename | $(numfmt --to=iec $size) | $(numfmt --to=iec $gzipped) |" >> $GITHUB_STEP_SUMMARY
-                    fi
-                  done
-
-            - name: 🚀 Upload build artifacts
-              uses: actions/upload-artifact@v4
-              with:
-                  name: build-production
-                  path: dist/
-                  retention-days: 7
-
-    # Job 5: Accessibility Testing (integrated with Playwright)
-    accessibility:
-        name: ♿ Accessibility
-        runs-on: ubuntu-latest
-        timeout-minutes: 25
-
-        steps:
-            - name: 📥 Checkout code
-              uses: actions/checkout@v5
-
-            - name: 📦 Setup pnpm
-              uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
-              with:
-                  version: ${{ env.PNPM_VERSION }}
-                  run_install: false
-
-            - name: 📦 Setup Node.js
-              uses: actions/setup-node@v5
-              with:
-                  node-version: ${{ env.NODE_VERSION }}
-                  cache: "pnpm"
-
-            - name: 📋 Install dependencies
-              run: pnpm install --frozen-lockfile
-
-            - name: 🎭 Cache Playwright browsers
-              uses: actions/cache@v4.2.4
-              id: playwright-cache
-              with:
-                  path: |
-                      ~/.cache/ms-playwright
-                  key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('**/pnpm-lock.yaml') }}-v4
-                  restore-keys: |
-                      ${{ runner.os }}-playwright-browsers-
-
-            - name: 🎭 Install Playwright browsers
-              run: |
-                  echo "🎭 Installing Playwright browsers for accessibility testing..."
-                  echo "🎭 Cache status: ${{ steps.playwright-cache.outputs.cache-hit }}"
-                  
-                  # Always install browsers to ensure they're available
-                  # The cache will speed up the process when browsers are already present
-                  echo "🔧 Installing browsers and system dependencies..."
-                  pnpm playwright:install:ci
-                  
-                  echo "🔍 Verifying browser installation..."
-                  if ! pnpm exec playwright install --dry-run chromium firefox webkit; then
-                    echo "❌ Browser verification failed, running debug script..."
-                    pnpm playwright:debug
-                    exit 1
-                  fi
-                  
-                  echo "✅ All browsers installed and verified successfully"
-              timeout-minutes: 15
-
-            - name: 🏗️ Build application
-              run: pnpm build
-
-            - name: ♿ Run accessibility tests
-              run: |
-                  echo "Running comprehensive accessibility tests..."
-                  
-                  # Create output directories
-                  mkdir -p playwright-report
-                  
-                  # Run tests on all three browser engines for comprehensive coverage
-                  set +e
-                  
-                  echo "🔍 Running accessibility tests on Chromium (Desktop/Android simulation)..."
-                  JSON_REPORT_FILE=accessibility-report-chromium.json pnpm exec playwright test tests/e2e/accessibility-unified.spec.ts --config=playwright.config.ts --project=chromium
-                  CHROMIUM_EXIT_CODE=$?
-                  
-                  echo "🦊 Running accessibility tests on Firefox (Gecko engine)..."
-                  JSON_REPORT_FILE=accessibility-report-firefox.json pnpm exec playwright test tests/e2e/accessibility-unified.spec.ts --config=playwright.config.ts --project=firefox
-                  FIREFOX_EXIT_CODE=$?
-
-                  echo "🍎 Running accessibility tests on WebKit (iOS/Safari simulation)..."
-                  JSON_REPORT_FILE=accessibility-report-webkit.json pnpm exec playwright test tests/e2e/accessibility-unified.spec.ts --config=playwright.config.ts --project=webkit
-                  WEBKIT_EXIT_CODE=$?
-
-                  set -e
-
-                  # Ensure JSON reports exist
-                  if [ ! -f "accessibility-report-chromium.json" ]; then
-                    echo '{"stats":{"total":0,"passed":0,"failed":0},"suites":[]}' > accessibility-report-chromium.json
-                  fi
-                  if [ ! -f "accessibility-report-firefox.json" ]; then
-                    echo '{"stats":{"total":0,"passed":0,"failed":0},"suites":[]}' > accessibility-report-firefox.json
-                  fi
-                  if [ ! -f "accessibility-report-webkit.json" ]; then
-                    echo '{"stats":{"total":0,"passed":0,"failed":0},"suites":[]}' > accessibility-report-webkit.json
-                  fi
-
-                  # Combine reports for summary
-                  echo "## ♿ Accessibility Test Results" >> $GITHUB_STEP_SUMMARY
-                  echo "Comprehensive accessibility tests completed using Playwright with axe-core integration." >> $GITHUB_STEP_SUMMARY
-                  echo "Tests include WCAG 2.2 AAA compliance checks for light theme, dark theme, form interactions, and error states." >> $GITHUB_STEP_SUMMARY
-                  echo "" >> $GITHUB_STEP_SUMMARY
-                  echo "| Browser Engine | Status |" >> $GITHUB_STEP_SUMMARY
-                  echo "|----------------|--------|" >> $GITHUB_STEP_SUMMARY
-                  echo "| Chromium (Desktop/Android) | $( [ $CHROMIUM_EXIT_CODE -eq 0 ] && echo '✅ Passed' || echo '❌ Failed' ) |" >> $GITHUB_STEP_SUMMARY
-                  echo "| Firefox (Gecko) | $( [ $FIREFOX_EXIT_CODE -eq 0 ] && echo '✅ Passed' || echo '❌ Failed' ) |" >> $GITHUB_STEP_SUMMARY
-                  echo "| WebKit (iOS/Safari) | $( [ $WEBKIT_EXIT_CODE -eq 0 ] && echo '✅ Passed' || echo '❌ Failed' ) |" >> $GITHUB_STEP_SUMMARY
-
-                  # Exit with failure if any test failed
-                  if [ $CHROMIUM_EXIT_CODE -ne 0 ] || [ $FIREFOX_EXIT_CODE -ne 0 ] || [ $WEBKIT_EXIT_CODE -ne 0 ]; then
-                    echo "⚠️ Some accessibility tests failed. Check detailed reports for specific issues." >> $GITHUB_STEP_SUMMARY
-                    exit 1
-                  fi
-
-            - name: 📊 Upload accessibility report
-              uses: actions/upload-artifact@v4
-              if: always()
-              with:
-                  name: accessibility-report
-                  path: |
-                      accessibility-report-chromium.json
-                      accessibility-report-firefox.json
-                      accessibility-report-webkit.json
-                  retention-days: 30
-
-            - name: 📊 Upload accessibility HTML report
-              uses: actions/upload-artifact@v4
-              if: always() && hashFiles('playwright-report/**/*') != ''
-              with:
-                  name: accessibility-html-report
-                  path: playwright-report/
-                  retention-days: 30
-
-    # Job 6: Cross-browser & Mobile Testing (runs in parallel)
-    cross-browser:
-        name: 🌐 Cross-browser & Mobile
-        runs-on: ubuntu-latest
-        timeout-minutes: 45
-
-        strategy:
-            fail-fast: false
-            matrix:
-                include:
-                    - browser: chromium
-                      project: chromium
-                      name: "Desktop Chrome"
-                    - browser: firefox
-                      project: firefox
-                      name: "Desktop Firefox"
-                    - browser: webkit
-                      project: mobile-iphone
-                      name: "iPhone 16 Pro"
-                      mobile: true
-                    - browser: chromium
-                      project: mobile-android
-                      name: "Galaxy S24"
-                      mobile: true
-                    - browser: webkit
-                      project: mobile-ipad
-                      name: "Large iPad Landscape"
-                      mobile: true
-                    - browser: chromium
-                      project: mobile-android-tablet
-                      name: "Galaxy Tab S9 Landscape"
-                      mobile: true
-
-        steps:
-            - name: 📥 Checkout code
-              uses: actions/checkout@v5
-
-            - name: 📦 Setup pnpm
-              uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
-              with:
-                  version: ${{ env.PNPM_VERSION }}
-                  run_install: false
-
-            - name: 📦 Setup Node.js
-              uses: actions/setup-node@v5
-              with:
-                  node-version: ${{ env.NODE_VERSION }}
-                  cache: "pnpm"
-
-            - name: 📋 Install dependencies
-              run: pnpm install --frozen-lockfile
-
-            - name: 🎭 Cache Playwright browsers
-              uses: actions/cache@v4.2.4
-              id: playwright-cache
-              with:
-                  path: |
-                      ~/.cache/ms-playwright
-                  key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('**/pnpm-lock.yaml') }}-v4
-                  restore-keys: |
-                      ${{ runner.os }}-playwright-browsers-
-
-            - name: 🎭 Install Playwright browsers
-              run: |
-                  echo "🎭 Installing Playwright browsers for ${{ matrix.name }}..."
-                  echo "📋 Project: ${{ matrix.project }}, Browser: ${{ matrix.browser }}"
-                  echo "🎭 Cache status: ${{ steps.playwright-cache.outputs.cache-hit }}"
-
-                  # Always install browsers to ensure they're available
-                  # The cache will speed up the process when browsers are already present
-                  echo "🔧 Installing browsers and system dependencies..."
-                  pnpm playwright:install:ci
-
-                  echo "🔍 Verifying browser installation..."
-                  if ! pnpm exec playwright install --dry-run ${{ matrix.browser }}; then
-                    echo "❌ Browser verification failed, running debug script..."
-                    pnpm playwright:debug
-                    exit 1
-                  fi
-
-                  echo "✅ Browser ${{ matrix.browser }} installed and verified successfully"
-              timeout-minutes: 15
-
-            - name: 🏗️ Build application
-              run: pnpm build
-
-            - name: 🎭 Run Playwright tests
-              run: |
-                  # Create output directories
-                  mkdir -p test-results-${{ matrix.project }}
-                  mkdir -p playwright-report
-
-                  # Set environment variable for mobile tests if needed
-                  if [ "${{ matrix.mobile }}" = "true" ]; then
-                    export MOBILE_TESTS=true
-                    echo "🔧 Running mobile tests for ${{ matrix.name }}"
-                  else
-                    echo "🔧 Running desktop tests for ${{ matrix.name }}"
-                  fi
-
-                  # Run tests with Playwright's built-in webServer
-                  # This will automatically start and stop the server
-                  set +e
-
-                  # Add extra debugging for Large iPad tests
-                  if [[ "${{ matrix.project }}" == "mobile-ipad" ]]; then
-                    echo "🍎 Running Large iPad tests with WebKit engine..."
-                    echo "📋 Available browsers:"
-                    pnpm exec playwright install --dry-run || true
-                    echo "🔍 WebKit browser check:"
-                    find ~/.cache/ms-playwright -name "*webkit*" -type d || echo "No WebKit in cache"
-                    find node_modules/playwright-core/.local-browsers -name "*webkit*" -type d || echo "No WebKit in local"
-                  fi
-
-                  JSON_REPORT_FILE=test-results-${{ matrix.project }}.json \
-                  pnpm exec playwright test \
-                    --config=playwright.config.ts \
-                    --project=${{ matrix.project }} \
-                    --reporter=html \
-                    --reporter=json
-                  TEST_EXIT_CODE=$?
-                  set -e
-
-                  # Ensure JSON report exists
-                  if [ ! -f "test-results-${{ matrix.project }}.json" ]; then
-                    echo '{"stats":{"total":0,"passed":0,"failed":0},"suites":[]}' > test-results-${{ matrix.project }}.json
-                  fi
-
-                  # Exit with the test result
-                  exit $TEST_EXIT_CODE
-              env:
-                  PLAYWRIGHT_OUTPUT_DIR: test-results-${{ matrix.project }}
-
-            - name: 📊 Upload test results
-              uses: actions/upload-artifact@v4
-              if: always()
-              with:
-                  name: playwright-results-${{ matrix.project }}
-                  path: |
-                      test-results-${{ matrix.project }}/
-                      test-results-${{ matrix.project }}.json
-                  retention-days: 30
-
-            - name: 📊 Upload Playwright HTML Report
-              uses: actions/upload-artifact@v4
-              if: always() && hashFiles('playwright-report/**/*') != ''
-              with:
-                  name: playwright-report-${{ matrix.project }}
-                  path: playwright-report/
-                  retention-days: 30
-
-    # Job 7: Performance Testing (runs after build)
-    performance:
-        name: ⚡ Performance
-        runs-on: ubuntu-latest
-        needs: build
-        timeout-minutes: 15
-
-        steps:
-            - name: 📥 Checkout code
-              uses: actions/checkout@v5
-
-            - name: 📦 Setup pnpm
-              uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
-              with:
-                  version: ${{ env.PNPM_VERSION }}
-                  run_install: false
-
-            - name: 📦 Setup Node.js
-              uses: actions/setup-node@v5
-              with:
-                  node-version: ${{ env.NODE_VERSION }}
-                  cache: "pnpm"
-
-            - name: 📋 Install dependencies
-              run: pnpm install --frozen-lockfile
-
-            - name: 📋 Download build artifacts
-              uses: actions/download-artifact@v4
-              with:
-                  name: build-production
-                  path: dist/
-
-            - name: 🚀 Run Lighthouse CI
-              run: |
-                  # Create directory if it doesn't exist
-                  mkdir -p .lighthouseci
-
-                  echo "🚀 Running Lighthouse CI performance tests..."
-
-                  # Run Lighthouse CI collect first to generate local files
-                  set +e
-                  echo "📊 Collecting Lighthouse data..."
-                  pnpm lighthouse:collect
-                  COLLECT_EXIT_CODE=$?
-
-                  echo "📋 Asserting Lighthouse thresholds..."
-                  pnpm lighthouse:assert
-                  ASSERT_EXIT_CODE=$?
-
-                  echo "☁️ Uploading Lighthouse results..."
-                  pnpm lighthouse:upload
-                  UPLOAD_EXIT_CODE=$?
-
-                  # Overall exit code (prioritize assertion failures)
-                  if [ $ASSERT_EXIT_CODE -ne 0 ]; then
-                    LIGHTHOUSE_EXIT_CODE=$ASSERT_EXIT_CODE
-                  elif [ $COLLECT_EXIT_CODE -ne 0 ]; then
-                    LIGHTHOUSE_EXIT_CODE=$COLLECT_EXIT_CODE
-                  else
-                    LIGHTHOUSE_EXIT_CODE=$UPLOAD_EXIT_CODE
-                  fi
-                  set -e
-
-                  # Create a summary report regardless of success/failure
-                  echo "## ⚡ Lighthouse CI Performance Results" >> $GITHUB_STEP_SUMMARY
-
-                  if [ $LIGHTHOUSE_EXIT_CODE -eq 0 ]; then
-                    echo "✅ Lighthouse CI completed successfully" >> $GITHUB_STEP_SUMMARY
-                    echo "📊 Performance metrics meet the configured thresholds" >> $GITHUB_STEP_SUMMARY
-                  else
-                    echo "⚠️ Lighthouse CI found performance issues" >> $GITHUB_STEP_SUMMARY
-                    echo "📊 Some performance metrics did not meet the configured thresholds" >> $GITHUB_STEP_SUMMARY
-                    echo "💡 Check the detailed Lighthouse report for specific recommendations" >> $GITHUB_STEP_SUMMARY
-                  fi
-
-                  # List generated files for debugging
-                  echo "📁 Generated Lighthouse files:" >> $GITHUB_STEP_SUMMARY
-                  if [ -d ".lighthouseci" ] && [ "$(ls -A .lighthouseci 2>/dev/null)" ]; then
-                    echo "Files found in .lighthouseci directory:" >> $GITHUB_STEP_SUMMARY
-                    ls -la .lighthouseci/ >> $GITHUB_STEP_SUMMARY 2>/dev/null || echo "Error listing files" >> $GITHUB_STEP_SUMMARY
-                  else
-                    echo "No .lighthouseci directory or files found" >> $GITHUB_STEP_SUMMARY
-                    # Create a placeholder file to ensure artifact upload works
-                    mkdir -p .lighthouseci
-                    echo "Lighthouse CI run completed at $(date)" > .lighthouseci/lighthouse-summary.txt
-                    echo "Created placeholder file: lighthouse-summary.txt" >> $GITHUB_STEP_SUMMARY
-                  fi
-
-                  # Also try to collect any JSON reports that might have been generated
-                  if find . -name "*.report.json" -type f 2>/dev/null | head -1 | grep -q .; then
-                    echo "Found JSON reports, copying to .lighthouseci/" >> $GITHUB_STEP_SUMMARY
-                    find . -name "*.report.json" -type f -exec cp {} .lighthouseci/ \; 2>/dev/null || true
-                  fi
-
-                  # Don't fail the job for performance issues, just report them
-                  exit 0
-              env:
-                  LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
-
-            - name: 📊 Upload Lighthouse results
-              uses: actions/upload-artifact@v4
-              if: always()
-              with:
-                  name: lighthouse-results
-                  path: .lighthouseci/
-                  if-no-files-found: warn
-
-    # Job 8: i18n Translation Check (runs in parallel)
-    i18n-check:
-        name: 🌐 i18n Check
-        runs-on: ubuntu-latest
-        timeout-minutes: 5
-
-        steps:
-            - name: 📥 Checkout code
-              uses: actions/checkout@v5
-
-            - name: 📦 Setup pnpm
-              uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
-              with:
-                  version: ${{ env.PNPM_VERSION }}
-                  run_install: false
-
-            - name: 📦 Setup Node.js
-              uses: actions/setup-node@v5
-              with:
-                  node-version: ${{ env.NODE_VERSION }}
-                  cache: "pnpm"
-
-            - name: 📋 Install dependencies
-              run: pnpm install --frozen-lockfile
-
-            - name: 🌐 Check translation completeness
-              run: |
-                  echo "🌐 Validating i18n translation files..."
-                  pnpm i18n:check
-              continue-on-error: false
-
-            - name: 📊 Upload i18n report
-              uses: actions/upload-artifact@v4
-              if: always()
-              with:
-                  name: i18n-report
-                  path: |
-                      i18n-report.md
-                      i18n-report.json
-                  retention-days: 30
-
-            - name: 📋 Add i18n summary to job
-              if: always()
-              run: |
-                  if [ -f "i18n-report.md" ]; then
-                    echo "## 🌐 i18n Translation Report" >> $GITHUB_STEP_SUMMARY
-                    cat i18n-report.md >> $GITHUB_STEP_SUMMARY
-                  else
-                    echo "## 🌐 i18n Translation Report" >> $GITHUB_STEP_SUMMARY
-                    echo "✅ All translations are complete and consistent!" >> $GITHUB_STEP_SUMMARY
-                  fi
-
-    # Job 9: Dependency Analysis (runs in parallel)
-    dependencies:
-        name: 📦 Dependencies
-        runs-on: ubuntu-latest
-        timeout-minutes: 10
-
-        steps:
-            - name: 📥 Checkout code
-              uses: actions/checkout@v5
-
-            - name: 📦 Setup pnpm
-              uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
-              with:
-                  version: ${{ env.PNPM_VERSION }}
-                  run_install: false
-
-            - name: 📦 Setup Node.js
-              uses: actions/setup-node@v5
-              with:
-                  node-version: ${{ env.NODE_VERSION }}
-                  cache: "pnpm"
-
-            - name: 📋 Install dependencies
-              run: pnpm install --frozen-lockfile
-
-            - name: 🔍 Check for outdated dependencies
-              run: |
-                  echo "## 📦 Dependency Status" >> $GITHUB_STEP_SUMMARY
-                  echo "🔍 Checking for outdated dependencies..."
-
-                  # Generate clean, readable output without ANSI codes
-                  pnpm --silent outdated --no-color --format table > outdated.txt 2>/dev/null || true
-
-                  # Ensure file exists even if empty
-                  touch outdated.txt
-
-                  if [ -s outdated.txt ]; then
-                    echo "⚠️ Found outdated dependencies"
-                    echo "⚠️ Outdated dependencies found:" >> $GITHUB_STEP_SUMMARY
-                    echo "" >> $GITHUB_STEP_SUMMARY
-                    echo "| Package | Current | Latest | Type |" >> $GITHUB_STEP_SUMMARY
-                    echo "|---------|---------|--------|------|" >> $GITHUB_STEP_SUMMARY
-                    
-                    # Parse the table output and convert to markdown
-                    tail -n +3 outdated.txt | while IFS= read -r line; do
-                      if [[ -n "$line" && "$line" != *"─"* ]]; then
-                        # Clean up the line and extract package info
-                        clean_line=$(echo "$line" | sed 's/│/|/g' | sed 's/^ *|/|/' | sed 's/| *$/|/')
-                        if [[ "$clean_line" == \|*\|*\|*\| ]]; then
-                          echo "$clean_line" >> $GITHUB_STEP_SUMMARY
-                        fi
-                      fi
-                    done
-                    
-                    echo "" >> $GITHUB_STEP_SUMMARY
-                    echo "💡 **Tip**: Run \`pnpm update\` to update dependencies, or \`pnpm update --latest\` for major version updates." >> $GITHUB_STEP_SUMMARY
-                    
-                    # Also show a clean summary in console
-                    echo ""
-                    echo "📋 Summary of outdated dependencies:"
-                    grep -v "─\|┌\|┐\|└\|┘\|├\|┤\|┬\|┴\|┼" outdated.txt | grep -v "^$" | head -20
-                  else
-                    echo "✅ All dependencies are up to date!"
-                    echo "✅ All dependencies are up to date!" >> $GITHUB_STEP_SUMMARY
-                  fi
-
-            - name: 📊 Analyze bundle composition
-              run: pnpm analyze
-
-            - name: 📊 Upload dependency analysis
-              uses: actions/upload-artifact@v4
-              if: always()
-              with:
-                  name: dependency-analysis
-                  path: |
-                      outdated.txt
-                  retention-days: 7
-
-            - name: 📊 Upload bundle analysis
-              uses: actions/upload-artifact@v4
-              if: always() && hashFiles('bundle-report.html') != ''
-              with:
-                  name: bundle-analysis
-                  path: bundle-report.html
-                  retention-days: 7
-
-    # Job 10: Quality Gate (runs after all checks)
-    quality-gate:
-        name: 🚪 Quality Gate
-        runs-on: ubuntu-latest
-        needs:
-            [
-                code-quality,
-                test,
-                security,
-                build,
-                accessibility,
-                cross-browser,
-                i18n-check,
-            ]
+  # Job 0: Quick Check (fast feedback)
+  quick-check:
+    name: ⚡ Quick Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v5
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          run_install: false
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: 📋 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🗂️ Cache TypeScript
+        uses: actions/cache@v4.2.4
+        with:
+          path: |
+            .tsbuildinfo
+            node_modules/.cache/typescript
+          key: ${{ runner.os }}-typescript-${{ hashFiles('**/tsconfig*.json', 'src/**/*.ts', 'src/**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-typescript-
+
+      - name: 🔍 Quick lint check
+        run: pnpm lint --max-warnings 0
+
+      - name: 🏗️ Type check
+        run: pnpm type-check
+
+      - name: 🧪 Quick test
+        run: pnpm test:unit --reporter=basic
+
+  # Job 1: Code Quality & Linting (runs in parallel)
+  code-quality:
+    name: 🔍 Code Quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # Full history for better analysis
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          run_install: false
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: 📋 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🗂️ Cache ESLint
+        uses: actions/cache@v4.2.4
+        with:
+          path: .eslintcache
+          key: ${{ runner.os }}-eslint-${{ hashFiles('**/.eslintrc*', '**/eslint.config.*') }}
+          restore-keys: |
+            ${{ runner.os }}-eslint-
+
+      - name: 🔍 Run ESLint
+        run: |
+          pnpm lint --format=json --output-file=eslint-report.json || true
+          # Ensure the file exists even if ESLint passes
+          if [ ! -f eslint-report.json ]; then
+            echo '[]' > eslint-report.json
+          fi
+
+      - name: 📊 Upload ESLint results
+        uses: actions/upload-artifact@v4
         if: always()
-        timeout-minutes: 5
+        with:
+          name: eslint-report
+          path: eslint-report.json
 
-        steps:
-            - name: 📊 Check job results
-              run: |
-                  echo "## 🚪 Quality Gate Results" >> $GITHUB_STEP_SUMMARY
-                  echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
-                  echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
-                  echo "| Code Quality | ${{ needs.code-quality.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-                  echo "| Tests | ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-                  echo "| Security | ${{ needs.security.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-                  echo "| Build | ${{ needs.build.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-                  echo "| Cross-browser & Mobile | ${{ needs.cross-browser.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-                  echo "| i18n Check | ${{ needs.i18n-check.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-                  echo "| Accessibility | ${{ needs.accessibility.result == 'success' && '✅ Passed' || '⚠️ Issues Found' }} |" >> $GITHUB_STEP_SUMMARY
-                  echo "" >> $GITHUB_STEP_SUMMARY
+      - name: 🎨 Check code formatting
+        run: |
+          if ! pnpm format --check; then
+            echo "❌ Code formatting issues found. Run 'pnpm format' to fix."
+            exit 1
+          fi
 
-                  # Test coverage details
-                  echo "### 📋 Test Coverage Details" >> $GITHUB_STEP_SUMMARY
-                  echo "**Cross-browser & Mobile Testing includes:**" >> $GITHUB_STEP_SUMMARY
-                  echo "- 🖥️ Desktop: Chrome, Firefox" >> $GITHUB_STEP_SUMMARY
-                  echo "- 📱 Mobile: iPhone 16 Pro (portrait), Galaxy S24 (portrait)" >> $GITHUB_STEP_SUMMARY
-                  echo "- 📱 Tablet: Large iPad (landscape), Galaxy Tab S9 (landscape)" >> $GITHUB_STEP_SUMMARY
-                  echo "" >> $GITHUB_STEP_SUMMARY
-                  echo "**Accessibility tests** run in both light and dark modes. Even if issues are found, deployment won't be blocked, but detailed reports will be generated for reference." >> $GITHUB_STEP_SUMMARY
-                  echo "" >> $GITHUB_STEP_SUMMARY
+  # Job 2: Testing (runs in parallel)
+  test:
+    name: 🧪 Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
 
-                  # Fail if any critical job failed (excluding accessibility, as it may have warnings but shouldn't block deployment)
-                  if [[ "${{ needs.code-quality.result }}" != "success" ]] || \
-                     [[ "${{ needs.test.result }}" != "success" ]] || \
-                     [[ "${{ needs.build.result }}" != "success" ]] || \
-                     [[ "${{ needs.cross-browser.result }}" != "success" ]] || \
-                     [[ "${{ needs.i18n-check.result }}" != "success" ]]; then
-                    echo "❌ Quality gate failed! Critical checks did not pass." >> $GITHUB_STEP_SUMMARY
-                    exit 1
-                  fi
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v5
 
-                  # Check accessibility test status (warning but not failure)
-                  if [[ "${{ needs.accessibility.result }}" != "success" ]]; then
-                    echo "⚠️ Note: Accessibility tests found some issues, please check the detailed report for fixes." >> $GITHUB_STEP_SUMMARY
-                  fi
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          run_install: false
 
-                  echo "✅ Quality gate passed!"
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
 
-            - name: 🎉 Success notification
-              if: success()
-              run: |
-                  echo "🎉 All quality checks passed! Vercel will handle deployment automatically." >> $GITHUB_STEP_SUMMARY
-                  echo "" >> $GITHUB_STEP_SUMMARY
-                  echo "### 🚀 Next Steps" >> $GITHUB_STEP_SUMMARY
-                  echo "- Vercel webhook will trigger deployment automatically" >> $GITHUB_STEP_SUMMARY
-                  echo "- Monitor deployment status in Vercel dashboard" >> $GITHUB_STEP_SUMMARY
-                  echo "- Check live site after deployment completes" >> $GITHUB_STEP_SUMMARY
+      - name: 📋 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🗂️ Cache Vitest
+        uses: actions/cache@v4.2.4
+        with:
+          path: |
+            node_modules/.vitest
+            coverage
+          key: ${{ runner.os }}-vitest-${{ hashFiles('**/vitest.config.*', 'src/**/*.test.*', 'src/**/*.spec.*') }}
+          restore-keys: |
+            ${{ runner.os }}-vitest-
+
+      - name: 🔧 Set Node.js binary path for secure execution
+        run: |
+          NODE_BIN_PATH=$(dirname $(which node))
+          echo "NODE_BIN_PATH=$NODE_BIN_PATH" >> $GITHUB_ENV
+          echo "Node.js binary path: $NODE_BIN_PATH"
+
+      - name: 🧪 Run unit tests with coverage
+        run: pnpm test:unit
+        env:
+          CI: true
+          NODE_BIN_PATH: ${{ env.NODE_BIN_PATH }}
+
+      - name: 📊 Upload coverage to Codecov
+        uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
+        with:
+          files: ./coverage/lcov.info
+          flags: unit-tests
+          name: codecov-unit
+          fail_ci_if_error: false
+
+      - name: 📋 Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-unit
+          path: |
+            coverage/
+
+  # Job 3: Security Scanning (runs in parallel)
+  security:
+    name: 🔒 Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v5
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          run_install: false
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: 📋 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔍 Run security audit
+        run: pnpm audit --audit-level moderate
+        continue-on-error: true
+
+      # CodeQL analysis removed - using GitHub's default setup instead
+
+  # Job 4: Build & Performance (runs in parallel)
+  build:
+    name: 🏗️ Build & Performance
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v5
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          run_install: false
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: 📋 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🗂️ Cache build output
+        uses: actions/cache@v4.2.4
+        with:
+          path: |
+            dist
+            .vite
+          key: ${{ runner.os }}-build-${{ hashFiles('src/**/*', 'public/**/*', 'vite.config.ts', 'tsconfig.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+
+      - name: 🏗️ Build application
+        run: pnpm build
+        env:
+          NODE_ENV: production
+          CI: true
+
+      - name: 📊 Analyze bundle size
+        run: |
+          echo "## 📦 Bundle Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "| File | Size | Gzipped |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|------|---------|" >> $GITHUB_STEP_SUMMARY
+
+          for file in dist/assets/*.js; do
+            if [ -f "$file" ]; then
+              size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file")
+              gzipped=$(gzip -c "$file" | wc -c)
+              filename=$(basename "$file")
+              echo "| $filename | $(numfmt --to=iec $size) | $(numfmt --to=iec $gzipped) |" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+
+      - name: 🚀 Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-production
+          path: dist/
+          retention-days: 7
+
+  # Job 5: Accessibility Testing (integrated with Playwright)
+  accessibility:
+    name: ♿ Accessibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v5
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          run_install: false
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: 📋 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🎭 Cache Playwright browsers
+        uses: actions/cache@v4.2.4
+        id: playwright-cache
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('**/pnpm-lock.yaml') }}-v4
+          restore-keys: |
+            ${{ runner.os }}-playwright-browsers-
+
+      - name: 🎭 Install Playwright browsers
+        run: |
+          echo "🎭 Installing Playwright browsers for accessibility testing..."
+          echo "🎭 Cache status: ${{ steps.playwright-cache.outputs.cache-hit }}"
+
+          # Always install browsers to ensure they're available
+          # The cache will speed up the process when browsers are already present
+          echo "🔧 Installing browsers and system dependencies..."
+          pnpm playwright:install:ci
+
+          echo "🔍 Verifying browser installation..."
+          if ! pnpm exec playwright install --dry-run chromium firefox webkit; then
+            echo "❌ Browser verification failed, running debug script..."
+            pnpm playwright:debug
+            exit 1
+          fi
+
+          echo "✅ All browsers installed and verified successfully"
+        timeout-minutes: 15
+
+      - name: 🏗️ Build application
+        run: pnpm build
+
+      - name: ♿ Run accessibility tests
+        run: |
+          echo "Running comprehensive accessibility tests..."
+
+          # Create output directories
+          mkdir -p playwright-report
+
+          # Run tests on all three browser engines for comprehensive coverage
+          set +e
+
+          echo "🔍 Running accessibility tests on Chromium (Desktop/Android simulation)..."
+          JSON_REPORT_FILE=accessibility-report-chromium.json pnpm exec playwright test tests/e2e/accessibility-unified.spec.ts --config=playwright.config.ts --project=chromium
+          CHROMIUM_EXIT_CODE=$?
+
+          echo "🦊 Running accessibility tests on Firefox (Gecko engine)..."
+          JSON_REPORT_FILE=accessibility-report-firefox.json pnpm exec playwright test tests/e2e/accessibility-unified.spec.ts --config=playwright.config.ts --project=firefox
+          FIREFOX_EXIT_CODE=$?
+
+          echo "🍎 Running accessibility tests on WebKit (iOS/Safari simulation)..."
+          JSON_REPORT_FILE=accessibility-report-webkit.json pnpm exec playwright test tests/e2e/accessibility-unified.spec.ts --config=playwright.config.ts --project=webkit
+          WEBKIT_EXIT_CODE=$?
+
+          set -e
+
+          # Ensure JSON reports exist
+          if [ ! -f "accessibility-report-chromium.json" ]; then
+            echo '{"stats":{"total":0,"passed":0,"failed":0},"suites":[]}' > accessibility-report-chromium.json
+          fi
+          if [ ! -f "accessibility-report-firefox.json" ]; then
+            echo '{"stats":{"total":0,"passed":0,"failed":0},"suites":[]}' > accessibility-report-firefox.json
+          fi
+          if [ ! -f "accessibility-report-webkit.json" ]; then
+            echo '{"stats":{"total":0,"passed":0,"failed":0},"suites":[]}' > accessibility-report-webkit.json
+          fi
+
+          # Combine reports for summary
+          echo "## ♿ Accessibility Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "Comprehensive accessibility tests completed using Playwright with axe-core integration." >> $GITHUB_STEP_SUMMARY
+          echo "Tests include WCAG 2.2 AAA compliance checks for light theme, dark theme, form interactions, and error states." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Browser Engine | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Chromium (Desktop/Android) | $( [ $CHROMIUM_EXIT_CODE -eq 0 ] && echo '✅ Passed' || echo '❌ Failed' ) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Firefox (Gecko) | $( [ $FIREFOX_EXIT_CODE -eq 0 ] && echo '✅ Passed' || echo '❌ Failed' ) |" >> $GITHUB_STEP_SUMMARY
+          echo "| WebKit (iOS/Safari) | $( [ $WEBKIT_EXIT_CODE -eq 0 ] && echo '✅ Passed' || echo '❌ Failed' ) |" >> $GITHUB_STEP_SUMMARY
+
+          # Exit with failure if any test failed
+          if [ $CHROMIUM_EXIT_CODE -ne 0 ] || [ $FIREFOX_EXIT_CODE -ne 0 ] || [ $WEBKIT_EXIT_CODE -ne 0 ]; then
+            echo "⚠️ Some accessibility tests failed. Check detailed reports for specific issues." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+      - name: 📊 Upload accessibility report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: accessibility-report
+          path: |
+            accessibility-report-chromium.json
+            accessibility-report-firefox.json
+            accessibility-report-webkit.json
+          retention-days: 30
+
+      - name: 📊 Upload accessibility HTML report
+        uses: actions/upload-artifact@v4
+        if: always() && hashFiles('playwright-report/**/*') != ''
+        with:
+          name: accessibility-html-report
+          path: playwright-report/
+          retention-days: 30
+
+  # Job 6: Cross-browser & Mobile Testing (runs in parallel)
+  cross-browser:
+    name: 🌐 Cross-browser & Mobile
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - browser: chromium
+            project: chromium
+            name: "Desktop Chrome"
+          - browser: firefox
+            project: firefox
+            name: "Desktop Firefox"
+          - browser: webkit
+            project: mobile-iphone
+            name: "iPhone 16 Pro"
+            mobile: true
+          - browser: chromium
+            project: mobile-android
+            name: "Galaxy S24"
+            mobile: true
+          - browser: webkit
+            project: mobile-ipad
+            name: "Large iPad Landscape"
+            mobile: true
+          - browser: chromium
+            project: mobile-android-tablet
+            name: "Galaxy Tab S9 Landscape"
+            mobile: true
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v5
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          run_install: false
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: 📋 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🎭 Cache Playwright browsers
+        uses: actions/cache@v4.2.4
+        id: playwright-cache
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('**/pnpm-lock.yaml') }}-v4
+          restore-keys: |
+            ${{ runner.os }}-playwright-browsers-
+
+      - name: 🎭 Install Playwright browsers
+        run: |
+          echo "🎭 Installing Playwright browsers for ${{ matrix.name }}..."
+          echo "📋 Project: ${{ matrix.project }}, Browser: ${{ matrix.browser }}"
+          echo "🎭 Cache status: ${{ steps.playwright-cache.outputs.cache-hit }}"
+
+          # Always install browsers to ensure they're available
+          # The cache will speed up the process when browsers are already present
+          echo "🔧 Installing browsers and system dependencies..."
+          pnpm playwright:install:ci
+
+          echo "🔍 Verifying browser installation..."
+          if ! pnpm exec playwright install --dry-run ${{ matrix.browser }}; then
+            echo "❌ Browser verification failed, running debug script..."
+            pnpm playwright:debug
+            exit 1
+          fi
+
+          echo "✅ Browser ${{ matrix.browser }} installed and verified successfully"
+        timeout-minutes: 15
+
+      - name: 🏗️ Build application
+        run: pnpm build
+
+      - name: 🎭 Run Playwright tests
+        run: |
+          # Create output directories
+          mkdir -p test-results-${{ matrix.project }}
+          mkdir -p playwright-report
+
+          # Set environment variable for mobile tests if needed
+          if [ "${{ matrix.mobile }}" = "true" ]; then
+            export MOBILE_TESTS=true
+            echo "🔧 Running mobile tests for ${{ matrix.name }}"
+          else
+            echo "🔧 Running desktop tests for ${{ matrix.name }}"
+          fi
+
+          # Run tests with Playwright's built-in webServer
+          # This will automatically start and stop the server
+          set +e
+
+          # Add extra debugging for Large iPad tests
+          if [[ "${{ matrix.project }}" == "mobile-ipad" ]]; then
+            echo "🍎 Running Large iPad tests with WebKit engine..."
+            echo "📋 Available browsers:"
+            pnpm exec playwright install --dry-run || true
+            echo "🔍 WebKit browser check:"
+            find ~/.cache/ms-playwright -name "*webkit*" -type d || echo "No WebKit in cache"
+            find node_modules/playwright-core/.local-browsers -name "*webkit*" -type d || echo "No WebKit in local"
+          fi
+
+          JSON_REPORT_FILE=test-results-${{ matrix.project }}.json \
+          pnpm exec playwright test \
+            --config=playwright.config.ts \
+            --project=${{ matrix.project }} \
+            --reporter=html \
+            --reporter=json
+          TEST_EXIT_CODE=$?
+          set -e
+
+          # Ensure JSON report exists
+          if [ ! -f "test-results-${{ matrix.project }}.json" ]; then
+            echo '{"stats":{"total":0,"passed":0,"failed":0},"suites":[]}' > test-results-${{ matrix.project }}.json
+          fi
+
+          # Exit with the test result
+          exit $TEST_EXIT_CODE
+        env:
+          PLAYWRIGHT_OUTPUT_DIR: test-results-${{ matrix.project }}
+
+      - name: 📊 Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-results-${{ matrix.project }}
+          path: |
+            test-results-${{ matrix.project }}/
+            test-results-${{ matrix.project }}.json
+          retention-days: 30
+
+      - name: 📊 Upload Playwright HTML Report
+        uses: actions/upload-artifact@v4
+        if: always() && hashFiles('playwright-report/**/*') != ''
+        with:
+          name: playwright-report-${{ matrix.project }}
+          path: playwright-report/
+          retention-days: 30
+
+  # Job 7: Performance Testing (runs after build)
+  performance:
+    name: ⚡ Performance
+    runs-on: ubuntu-latest
+    needs: build
+    timeout-minutes: 15
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v5
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          run_install: false
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: 📋 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 📋 Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-production
+          path: dist/
+
+      - name: 🚀 Run Lighthouse CI
+        run: |
+          # Create directory if it doesn't exist
+          mkdir -p .lighthouseci
+
+          echo "🚀 Running Lighthouse CI performance tests..."
+
+          # Run Lighthouse CI collect first to generate local files
+          set +e
+          echo "📊 Collecting Lighthouse data..."
+          pnpm lighthouse:collect
+          COLLECT_EXIT_CODE=$?
+
+          echo "📋 Asserting Lighthouse thresholds..."
+          pnpm lighthouse:assert
+          ASSERT_EXIT_CODE=$?
+
+          echo "☁️ Uploading Lighthouse results..."
+          pnpm lighthouse:upload
+          UPLOAD_EXIT_CODE=$?
+
+          # Overall exit code (prioritize assertion failures)
+          if [ $ASSERT_EXIT_CODE -ne 0 ]; then
+            LIGHTHOUSE_EXIT_CODE=$ASSERT_EXIT_CODE
+          elif [ $COLLECT_EXIT_CODE -ne 0 ]; then
+            LIGHTHOUSE_EXIT_CODE=$COLLECT_EXIT_CODE
+          else
+            LIGHTHOUSE_EXIT_CODE=$UPLOAD_EXIT_CODE
+          fi
+          set -e
+
+          # Create a summary report regardless of success/failure
+          echo "## ⚡ Lighthouse CI Performance Results" >> $GITHUB_STEP_SUMMARY
+
+          if [ $LIGHTHOUSE_EXIT_CODE -eq 0 ]; then
+            echo "✅ Lighthouse CI completed successfully" >> $GITHUB_STEP_SUMMARY
+            echo "📊 Performance metrics meet the configured thresholds" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Lighthouse CI found performance issues" >> $GITHUB_STEP_SUMMARY
+            echo "📊 Some performance metrics did not meet the configured thresholds" >> $GITHUB_STEP_SUMMARY
+            echo "💡 Check the detailed Lighthouse report for specific recommendations" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # List generated files for debugging
+          echo "📁 Generated Lighthouse files:" >> $GITHUB_STEP_SUMMARY
+          if [ -d ".lighthouseci" ] && [ "$(ls -A .lighthouseci 2>/dev/null)" ]; then
+            echo "Files found in .lighthouseci directory:" >> $GITHUB_STEP_SUMMARY
+            ls -la .lighthouseci/ >> $GITHUB_STEP_SUMMARY 2>/dev/null || echo "Error listing files" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No .lighthouseci directory or files found" >> $GITHUB_STEP_SUMMARY
+            # Create a placeholder file to ensure artifact upload works
+            mkdir -p .lighthouseci
+            echo "Lighthouse CI run completed at $(date)" > .lighthouseci/lighthouse-summary.txt
+            echo "Created placeholder file: lighthouse-summary.txt" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Also try to collect any JSON reports that might have been generated
+          if find . -name "*.report.json" -type f 2>/dev/null | head -1 | grep -q .; then
+            echo "Found JSON reports, copying to .lighthouseci/" >> $GITHUB_STEP_SUMMARY
+            find . -name "*.report.json" -type f -exec cp {} .lighthouseci/ \; 2>/dev/null || true
+          fi
+
+          # Don't fail the job for performance issues, just report them
+          exit 0
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: 📊 Upload Lighthouse results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-results
+          path: .lighthouseci/
+          if-no-files-found: warn
+
+  # Job 8: i18n Translation Check (runs in parallel)
+  i18n-check:
+    name: 🌐 i18n Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v5
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          run_install: false
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: 📋 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🌐 Check translation completeness
+        run: |
+          echo "🌐 Validating i18n translation files..."
+          pnpm i18n:check
+        continue-on-error: false
+
+      - name: 📊 Upload i18n report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: i18n-report
+          path: |
+            i18n-report.md
+            i18n-report.json
+          retention-days: 30
+
+      - name: 📋 Add i18n summary to job
+        if: always()
+        run: |
+          if [ -f "i18n-report.md" ]; then
+            echo "## 🌐 i18n Translation Report" >> $GITHUB_STEP_SUMMARY
+            cat i18n-report.md >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## 🌐 i18n Translation Report" >> $GITHUB_STEP_SUMMARY
+            echo "✅ All translations are complete and consistent!" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  # Job 9: Dependency Analysis (runs in parallel)
+  dependencies:
+    name: 📦 Dependencies
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v5
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          run_install: false
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - name: 📋 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔍 Check for outdated dependencies
+        run: |
+          echo "## 📦 Dependency Status" >> $GITHUB_STEP_SUMMARY
+          echo "🔍 Checking for outdated dependencies..."
+
+          # Generate clean, readable output without ANSI codes
+          pnpm --silent outdated --no-color --format table > outdated.txt 2>/dev/null || true
+
+          # Ensure file exists even if empty
+          touch outdated.txt
+
+          if [ -s outdated.txt ]; then
+            echo "⚠️ Found outdated dependencies"
+            echo "⚠️ Outdated dependencies found:" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Package | Current | Latest | Type |" >> $GITHUB_STEP_SUMMARY
+            echo "|---------|---------|--------|------|" >> $GITHUB_STEP_SUMMARY
+            
+            # Parse the table output and convert to markdown
+            tail -n +3 outdated.txt | while IFS= read -r line; do
+              if [[ -n "$line" && "$line" != *"─"* ]]; then
+                # Clean up the line and extract package info
+                clean_line=$(echo "$line" | sed 's/│/|/g' | sed 's/^ *|/|/' | sed 's/| *$/|/')
+                if [[ "$clean_line" == \|*\|*\|*\| ]]; then
+                  echo "$clean_line" >> $GITHUB_STEP_SUMMARY
+                fi
+              fi
+            done
+            
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "💡 **Tip**: Run \`pnpm update\` to update dependencies, or \`pnpm update --latest\` for major version updates." >> $GITHUB_STEP_SUMMARY
+            
+            # Also show a clean summary in console
+            echo ""
+            echo "📋 Summary of outdated dependencies:"
+            grep -v "─\|┌\|┐\|└\|┘\|├\|┤\|┬\|┴\|┼" outdated.txt | grep -v "^$" | head -20
+          else
+            echo "✅ All dependencies are up to date!"
+            echo "✅ All dependencies are up to date!" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: 📊 Analyze bundle composition
+        run: pnpm analyze
+
+      - name: 📊 Upload dependency analysis
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dependency-analysis
+          path: |
+            outdated.txt
+          retention-days: 7
+
+      - name: 📊 Upload bundle analysis
+        uses: actions/upload-artifact@v4
+        if: always() && hashFiles('bundle-report.html') != ''
+        with:
+          name: bundle-analysis
+          path: bundle-report.html
+          retention-days: 7
+
+  # Job 10: Quality Gate (runs after all checks)
+  quality-gate:
+    name: 🚪 Quality Gate
+    runs-on: ubuntu-latest
+    needs:
+      [
+        code-quality,
+        test,
+        security,
+        build,
+        accessibility,
+        cross-browser,
+        i18n-check,
+      ]
+    if: always()
+    timeout-minutes: 5
+
+    steps:
+      - name: 📊 Check job results
+        run: |
+          echo "## 🚪 Quality Gate Results" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Code Quality | ${{ needs.code-quality.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tests | ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security | ${{ needs.security.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build | ${{ needs.build.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Cross-browser & Mobile | ${{ needs.cross-browser.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| i18n Check | ${{ needs.i18n-check.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Accessibility | ${{ needs.accessibility.result == 'success' && '✅ Passed' || '⚠️ Issues Found' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Test coverage details
+          echo "### 📋 Test Coverage Details" >> $GITHUB_STEP_SUMMARY
+          echo "**Cross-browser & Mobile Testing includes:**" >> $GITHUB_STEP_SUMMARY
+          echo "- 🖥️ Desktop: Chrome, Firefox" >> $GITHUB_STEP_SUMMARY
+          echo "- 📱 Mobile: iPhone 16 Pro (portrait), Galaxy S24 (portrait)" >> $GITHUB_STEP_SUMMARY
+          echo "- 📱 Tablet: Large iPad (landscape), Galaxy Tab S9 (landscape)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Accessibility tests** run in both light and dark modes. Even if issues are found, deployment won't be blocked, but detailed reports will be generated for reference." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Fail if any critical job failed (excluding accessibility, as it may have warnings but shouldn't block deployment)
+          if [[ "${{ needs.code-quality.result }}" != "success" ]] || \
+             [[ "${{ needs.test.result }}" != "success" ]] || \
+             [[ "${{ needs.build.result }}" != "success" ]] || \
+             [[ "${{ needs.cross-browser.result }}" != "success" ]] || \
+             [[ "${{ needs.i18n-check.result }}" != "success" ]]; then
+            echo "❌ Quality gate failed! Critical checks did not pass." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+          # Check accessibility test status (warning but not failure)
+          if [[ "${{ needs.accessibility.result }}" != "success" ]]; then
+            echo "⚠️ Note: Accessibility tests found some issues, please check the detailed report for fixes." >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "✅ Quality gate passed!"
+
+      - name: 🎉 Success notification
+        if: success()
+        run: |
+          echo "🎉 All quality checks passed! Vercel will handle deployment automatically." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🚀 Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "- Vercel webhook will trigger deployment automatically" >> $GITHUB_STEP_SUMMARY
+          echo "- Monitor deployment status in Vercel dashboard" >> $GITHUB_STEP_SUMMARY
+          echo "- Check live site after deployment completes" >> $GITHUB_STEP_SUMMARY
