@@ -30,7 +30,7 @@ Problem to Solve → Choose Approach → Try It → Evaluate Result
 ### Prerequisites
 
 - **Node.js 22.19.0** or higher
-- **pnpm 10.15.1** or higher
+- **pnpm 10.18.0** or higher
 - **Git** for version control
 - **TypeScript 5.9** knowledge
 
@@ -98,18 +98,21 @@ Problem to Solve → Choose Approach → Try It → Evaluate Result
 #### 🎯 Goal Preservation Principle (Critical)
 
 **Before choosing any "simpler" approach, always ask:**
+
 - Will this approach still achieve the original objective?
 - Are we solving the problem or just avoiding it?
 - What functionality or quality might we be sacrificing?
 - Is there a way to simplify the method without compromising the goal?
 
 **❌ Destructive Simplification (Never Do)**:
+
 - Delete failing tests instead of fixing code
 - Remove error-prone features instead of debugging
 - Disable quality checks instead of improving code
 - Cut requirements instead of improving implementation
 
 **✅ Constructive Simplification (Always Do)**:
+
 - Simplify implementation while preserving functionality
 - Use different tools while maintaining quality standards
 - Optimize processes without skipping essential steps
