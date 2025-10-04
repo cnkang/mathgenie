@@ -42,21 +42,16 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v5
 
-      - name: 📦 Setup Node.js
+      - name: 📦 Setup Node.js & pnpm
         uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
 
       - name: 📦 Enable pnpm via Corepack
         run: |
           corepack enable
           corepack install
-
-      - name: 📦 Setup pnpm cache
-        uses: actions/setup-node@v5
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -92,21 +87,16 @@ jobs:
         with:
           fetch-depth: 0 # Full history for better analysis
 
-      - name: 📦 Setup Node.js
+      - name: 📦 Setup Node.js & pnpm
         uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
 
       - name: 📦 Enable pnpm via Corepack
         run: |
           corepack enable
           corepack install
-
-      - name: 📦 Setup pnpm cache
-        uses: actions/setup-node@v5
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -151,21 +141,16 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v5
 
-      - name: 📦 Setup Node.js
+      - name: 📦 Setup Node.js & pnpm
         uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
 
       - name: 📦 Enable pnpm via Corepack
         run: |
           corepack enable
           corepack install
-
-      - name: 📦 Setup pnpm cache
-        uses: actions/setup-node@v5
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -218,21 +203,16 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v5
 
-      - name: 📦 Setup Node.js
+      - name: 📦 Setup Node.js & pnpm
         uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
 
       - name: 📦 Enable pnpm via Corepack
         run: |
           corepack enable
           corepack install
-
-      - name: 📦 Setup pnpm cache
-        uses: actions/setup-node@v5
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -253,21 +233,16 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v5
 
-      - name: 📦 Setup Node.js
+      - name: 📦 Setup Node.js & pnpm
         uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
 
       - name: 📦 Enable pnpm via Corepack
         run: |
           corepack enable
           corepack install
-
-      - name: 📦 Setup pnpm cache
-        uses: actions/setup-node@v5
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -320,21 +295,16 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v5
 
-      - name: 📦 Setup Node.js
+      - name: 📦 Setup Node.js & pnpm
         uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
 
       - name: 📦 Enable pnpm via Corepack
         run: |
           corepack enable
           corepack install
-
-      - name: 📦 Setup pnpm cache
-        uses: actions/setup-node@v5
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -480,21 +450,16 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v5
 
-      - name: 📦 Setup Node.js
+      - name: 📦 Setup Node.js & pnpm
         uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
 
       - name: 📦 Enable pnpm via Corepack
         run: |
           corepack enable
           corepack install
-
-      - name: 📦 Setup pnpm cache
-        uses: actions/setup-node@v5
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -609,21 +574,16 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v5
 
-      - name: 📦 Setup Node.js
+      - name: 📦 Setup Node.js & pnpm
         uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
 
       - name: 📦 Enable pnpm via Corepack
         run: |
           corepack enable
           corepack install
-
-      - name: 📦 Setup pnpm cache
-        uses: actions/setup-node@v5
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -719,21 +679,16 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v5
 
-      - name: 📦 Setup Node.js
+      - name: 📦 Setup Node.js & pnpm
         uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
 
       - name: 📦 Enable pnpm via Corepack
         run: |
           corepack enable
           corepack install
-
-      - name: 📦 Setup pnpm cache
-        uses: actions/setup-node@v5
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -775,21 +730,16 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v5
 
-      - name: 📦 Setup Node.js
+      - name: 📦 Setup Node.js & pnpm
         uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
 
       - name: 📦 Enable pnpm via Corepack
         run: |
           corepack enable
           corepack install
-
-      - name: 📦 Setup pnpm cache
-        uses: actions/setup-node@v5
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile

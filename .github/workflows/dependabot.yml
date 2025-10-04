@@ -151,10 +151,11 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v5
 
-      - name: 📦 Setup Node.js
+      - name: 📦 Setup Node.js & pnpm
         uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
 
       - name: 📦 Enable pnpm via Corepack
         run: |
@@ -174,12 +175,6 @@ jobs:
           pnpm --version
 
           echo "✅ pnpm setup completed successfully"
-
-      - name: 📦 Setup pnpm cache
-        uses: actions/setup-node@v5
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
