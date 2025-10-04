@@ -11,8 +11,10 @@ concurrency:
 
 # Configurable inputs for timeout and polling
 env:
-  WAIT_TIMEOUT_MS: 300000  # 5 minutes
-  POLL_INTERVAL_MS: 10000   # 10 seconds
+  NODE_VERSION: "22"
+  PNPM_VERSION: "10.15.1"
+  WAIT_TIMEOUT_MS: 300000 # 5 minutes
+  POLL_INTERVAL_MS: 10000 # 10 seconds
 
 jobs:
   # Job 1: Dependabot PR Analysis
@@ -150,20 +152,34 @@ jobs:
         uses: actions/checkout@v5
 
       - name: 📦 Setup Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: 📦 Enable pnpm via Corepack
         run: |
+          echo "🔧 Enabling pnpm via Corepack..."
           corepack enable
           corepack install
 
+          echo "🔍 Verifying pnpm installation..."
+          if ! which pnpm > /dev/null 2>&1; then
+            echo "❌ pnpm not found in PATH after corepack install"
+            echo "🔧 Attempting alternative pnpm installation..."
+            npm install -g pnpm@${{ env.PNPM_VERSION }}
+          fi
+
+          echo "📋 Final pnpm verification:"
+          which pnpm
+          pnpm --version
+
+          echo "✅ pnpm setup completed successfully"
+
       - name: 📦 Setup pnpm cache
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          cache: 'pnpm'
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
