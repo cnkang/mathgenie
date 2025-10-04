@@ -573,7 +573,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
   test.describe('Form Validation', () => {
     test('should provide clear validation feedback', async ({ page }: { page: Page }) => {
       const validationTests = [
-        { type: 'count' as const, expectedText: 'between 1 and 100' },
+        { type: 'count' as const, expectedText: 'between 1 and 50,000' },
         { type: 'range' as const, expectedText: 'minimum cannot be greater than maximum' },
         { type: 'operations' as const, expectedText: 'select at least one' },
       ];

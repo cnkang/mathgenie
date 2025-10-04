@@ -112,7 +112,7 @@ const MainContent: React.FC<MainContentProps> = ({
           onStartQuiz={onStartQuiz}
         />
 
-        <ProblemsSection t={t} problems={problems} />
+        <ProblemsSection t={t} problems={problems} settings={settings} />
 
         <InfoPanel
           problems={problems}

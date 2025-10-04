@@ -46,6 +46,9 @@ describe('useProblemGenerator utilities', () => {
       fontSize: 16,
       lineSpacing: 12,
       paperSize: 'a4',
+      enableGrouping: false,
+      problemsPerGroup: 20,
+      totalGroups: 1,
     };
     const problem = generateProblem(settings);
     expect(problem).toMatch(/^\d+ \+ \d+ = \d+$/);
@@ -69,6 +72,9 @@ describe('useProblemGenerator hook', () => {
     fontSize: 16,
     lineSpacing: 12,
     paperSize: 'a4',
+    enableGrouping: false,
+    problemsPerGroup: 20,
+    totalGroups: 1,
   };
 
   it('generates problems and returns success message', () => {

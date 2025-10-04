@@ -25,6 +25,9 @@ const SettingsPresets: React.FC<SettingsPresetsProps> = ({ onApplyPreset }) => {
         fontSize: 18,
         lineSpacing: 16,
         paperSize: 'a4',
+        enableGrouping: false,
+        problemsPerGroup: 20,
+        totalGroups: 1,
       },
     },
     {
@@ -41,6 +44,9 @@ const SettingsPresets: React.FC<SettingsPresetsProps> = ({ onApplyPreset }) => {
         fontSize: 16,
         lineSpacing: 14,
         paperSize: 'a4',
+        enableGrouping: false,
+        problemsPerGroup: 20,
+        totalGroups: 1,
       },
     },
     {
@@ -57,6 +63,9 @@ const SettingsPresets: React.FC<SettingsPresetsProps> = ({ onApplyPreset }) => {
         fontSize: 14,
         lineSpacing: 12,
         paperSize: 'a4',
+        enableGrouping: false,
+        problemsPerGroup: 20,
+        totalGroups: 1,
       },
     },
     {
@@ -73,6 +82,9 @@ const SettingsPresets: React.FC<SettingsPresetsProps> = ({ onApplyPreset }) => {
         fontSize: 16,
         lineSpacing: 14,
         paperSize: 'a4',
+        enableGrouping: false,
+        problemsPerGroup: 20,
+        totalGroups: 1,
       },
     },
   ];

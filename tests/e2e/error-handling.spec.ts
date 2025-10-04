@@ -47,7 +47,7 @@ test.describe('Error Handling and Validation', () => {
 
     // Verify error message content
     const errorMessage = await page.locator('.error-message').textContent();
-    expect(errorMessage).toContain('between 1 and 100');
+    expect(errorMessage).toContain('between 1 and 50,000');
   });
 
   test('should display error message for invalid number range', async ({
@@ -143,16 +143,20 @@ test.describe('Error Handling and Validation', () => {
 
     // Verify error message content (should be about invalid problem count)
     const errorMessage = await page.locator('.error-message').textContent();
-    expect(errorMessage).toContain('between 1 and 100');
+    expect(errorMessage).toContain('between 1 and 50,000');
   });
 
   test('should handle extreme values gracefully', async ({ page }: { page: Page }) => {
-    // Test with very large problem count
-    await page.fill('#numProblems', '999');
+    // Test with very large problem count (exceeding maximum)
+    await page.fill('#numProblems', '60000');
     await page.locator('#numProblems').blur();
 
     // Should show error for exceeding maximum
     await expect(page.locator('.error-message')).toBeVisible({ timeout: 5000 });
+
+    // Verify error message content
+    const errorMessage1 = await page.locator('.error-message').textContent();
+    expect(errorMessage1).toContain('between 1 and 50,000');
 
     // Test with negative values
     await page.fill('#numProblems', '-5');
@@ -160,6 +164,10 @@ test.describe('Error Handling and Validation', () => {
 
     // Should show error for negative values
     await expect(page.locator('.error-message')).toBeVisible({ timeout: 5000 });
+
+    // Verify error message content
+    const errorMessage2 = await page.locator('.error-message').textContent();
+    expect(errorMessage2).toContain('between 1 and 50,000');
   });
 
   test('should validate multiple errors simultaneously', async ({ page }: { page: Page }) => {

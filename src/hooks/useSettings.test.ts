@@ -74,6 +74,9 @@ describe('useSettings', () => {
       fontSize: 18,
       lineSpacing: 14,
       paperSize: 'letter',
+      enableGrouping: false,
+      problemsPerGroup: 20,
+      totalGroups: 1,
     };
     localStorageMock.getItem.mockReturnValue(JSON.stringify(saved));
     const { result } = renderHook(() => useSettings());
@@ -102,6 +105,9 @@ describe('useSettings', () => {
       fontSize: 16,
       lineSpacing: 12,
       paperSize: 'a4',
+      enableGrouping: false,
+      problemsPerGroup: 20,
+      totalGroups: 1,
     };
     localStorageMock.getItem.mockReturnValue(JSON.stringify(invalidSettings));
     const { result } = renderHook(() => useSettings());
@@ -123,6 +129,9 @@ describe('useSettings', () => {
       fontSize: 14,
       lineSpacing: 10,
       paperSize: 'a4',
+      enableGrouping: false,
+      problemsPerGroup: 20,
+      totalGroups: 1,
     };
     localStorageMock.getItem.mockReturnValue(JSON.stringify(validSettings));
     const { result } = renderHook(() => useSettings());

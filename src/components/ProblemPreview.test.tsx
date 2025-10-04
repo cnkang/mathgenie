@@ -30,6 +30,9 @@ const mockSettings: Settings = {
   fontSize: 12,
   lineSpacing: 1.5,
   paperSize: 'a4' as const,
+  enableGrouping: false,
+  problemsPerGroup: 20,
+  totalGroups: 1,
 };
 
 const mockGenerateSampleProblem = vi.fn(() => '2 + 3 = 5');
