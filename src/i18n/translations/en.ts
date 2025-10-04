@@ -25,6 +25,16 @@ export default {
     advanced: 'Advanced Settings',
     from: 'From',
     to: 'to',
+    // Grouping settings
+    enableGrouping: 'Enable Grouping Mode',
+    problemsPerGroup: 'Problems per Group',
+    totalGroups: 'Total Groups',
+    groupingHelp:
+      'Grouping mode divides problems into multiple groups for batch practice or testing',
+    totalProblemsCalculated: 'Total Problems: {{total}}',
+    grouping: 'Grouping Settings',
+    groupingEnabled: '✓ Enabled',
+    groupingDisabled: '○ Disabled',
     manager: {
       title: 'Settings Manager',
       export: 'Export Settings',
@@ -53,11 +63,19 @@ export default {
     title: 'Generated Problems ({{count}})',
     noProblems: 'No problems generated yet',
     clickToStart: 'Click "{{generateButton}}" to start',
+    groupTitle: 'Group {{number}}',
+    groupingInfo: '{{groups}} groups, {{perGroup}} problems each',
+  },
+  problems: {
+    emptyGroup: 'Group {{group}} (no problems)',
   },
   errors: {
     noOperations: 'Please select at least one mathematical operation to continue.',
-    invalidProblemCount: 'Number of problems must be between 1 and 100.',
-    invalidProblemsCount: 'Number of problems must be between 1 and 100.',
+    invalidProblemCount: 'Number of problems must be between 1 and 50,000.',
+    invalidProblemsCount: 'Number of problems must be between 1 and 50,000.',
+    invalidTotalProblemCount: 'Total number of problems cannot exceed 50,000.',
+    invalidProblemsPerGroup: 'Problems per group must be between 1 and 1,000.',
+    invalidTotalGroups: 'Total groups must be between 1 and 100.',
     invalidNumberRange: 'Number range minimum cannot be greater than maximum.',
     invalidResultRange: 'Result range minimum cannot be greater than maximum.',
     invalidOperandsRange:
@@ -101,6 +119,9 @@ export default {
   accessibility: {
     selectOperations: 'Select mathematical operations to include',
     numProblemsInput: 'Number of problems to generate',
+    enableGroupingLabel: 'Enable grouping mode',
+    problemsPerGroupInput: 'Number of problems per group',
+    totalGroupsInput: 'Total number of groups',
     minNumber: 'Minimum number for operands',
     maxNumber: 'Maximum number for operands',
     minResult: 'Minimum result value',

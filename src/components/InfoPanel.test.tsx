@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from 'vitest';
-import { render, screen, fireEvent } from '../../tests/helpers/testUtils';
+import { fireEvent, render, screen } from '../../tests/helpers/testUtils';
 import type { Settings } from '../types';
 import InfoPanel from './InfoPanel';
 
@@ -68,6 +68,9 @@ describe.sequential('InfoPanel', () => {
     fontSize: 12,
     lineSpacing: 1.5,
     paperSize: 'a4' as const,
+    enableGrouping: false,
+    problemsPerGroup: 20,
+    totalGroups: 1,
   };
 
   test('renders with proper structure and content', () => {

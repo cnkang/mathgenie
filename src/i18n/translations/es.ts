@@ -25,6 +25,16 @@ export default {
     advanced: 'Configuración Avanzada',
     from: 'Desde',
     to: 'hasta',
+    // Configuración de agrupación
+    enableGrouping: 'Habilitar modo de agrupación',
+    problemsPerGroup: 'Problemas por grupo',
+    totalGroups: 'Total de grupos',
+    groupingHelp:
+      'El modo de agrupación divide los problemas en múltiples grupos para práctica o pruebas por lotes',
+    totalProblemsCalculated: 'Total de problemas: {{total}}',
+    grouping: 'Configuración de agrupación',
+    groupingEnabled: '✓ Habilitado',
+    groupingDisabled: '○ Deshabilitado',
     manager: {
       title: 'Gestor de Configuración',
       export: 'Exportar Configuración',
@@ -53,11 +63,19 @@ export default {
     title: 'Problemas Generados ({{count}})',
     noProblems: 'Aún no se han generado problemas',
     clickToStart: 'Haz clic en "{{generateButton}}" para comenzar',
+    groupTitle: 'Grupo {{number}}',
+    groupingInfo: '{{groups}} grupos, {{perGroup}} problemas cada uno',
+  },
+  problems: {
+    emptyGroup: 'Grupo {{group}} (sin problemas)',
   },
   errors: {
     noOperations: 'Por favor selecciona al menos una operación matemática para continuar.',
-    invalidProblemCount: 'El número de problemas debe estar entre 1 y 100.',
-    invalidProblemsCount: 'El número de problemas debe estar entre 1 y 100.',
+    invalidProblemCount: 'El número de problemas debe estar entre 1 y 50.000.',
+    invalidProblemsCount: 'El número de problemas debe estar entre 1 y 50.000.',
+    invalidTotalProblemCount: 'El número total de problemas no puede exceder 50.000.',
+    invalidProblemsPerGroup: 'El número de problemas por grupo debe estar entre 1 y 1.000.',
+    invalidTotalGroups: 'El número total de grupos debe estar entre 1 y 100.',
     invalidNumberRange: 'El mínimo del rango de números no puede ser mayor que el máximo.',
     invalidResultRange: 'El mínimo del rango de resultados no puede ser mayor que el máximo.',
     invalidOperandsRange:
@@ -106,6 +124,9 @@ export default {
   accessibility: {
     selectOperations: 'Seleccionar operaciones matemáticas a incluir',
     numProblemsInput: 'Número de problemas a generar',
+    enableGroupingLabel: 'Habilitar modo de agrupación',
+    problemsPerGroupInput: 'Número de problemas por grupo',
+    totalGroupsInput: 'Número total de grupos',
     minNumber: 'Número mínimo para operandos',
     maxNumber: 'Número máximo para operandos',
     minResult: 'Valor mínimo del resultado',

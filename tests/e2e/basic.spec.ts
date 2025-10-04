@@ -126,7 +126,7 @@ test.describe('MathGenie Basic Functionality', () => {
 
     // Verify error message content
     const errorMessage = await page.locator('.error-message').textContent();
-    expect(errorMessage).toContain('between 1 and 100');
+    expect(errorMessage).toContain('between 1 and 50,000');
   });
 
   test('should use deferred values for performance', async ({ page }: { page: Page }) => {

@@ -199,7 +199,12 @@ const evaluateGeneratedProblems = (
 };
 
 const createProblemsArray = (settings: Settings): Problem[] => {
-  return Array.from({ length: settings.numProblems }, () => generateProblem(settings))
+  // 计算实际需要生成的题目数量
+  const totalProblems = settings.enableGrouping
+    ? settings.problemsPerGroup * settings.totalGroups
+    : settings.numProblems;
+
+  return Array.from({ length: totalProblems }, () => generateProblem(settings))
     .filter(problem => problem !== '')
     .map((problem, index) => ({ id: index, text: problem }));
 };
@@ -247,15 +252,14 @@ const createGenerationOutcome = (params: {
   setProblems: Dispatch<SetStateAction<Problem[]>>;
 }) => {
   const { settings, showSuccessMessage, setProblems } = params;
-  const fallbackWarning = getLargeProblemWarning(settings.numProblems);
+  const targetCount = settings.enableGrouping
+    ? settings.problemsPerGroup * settings.totalGroups
+    : settings.numProblems;
+  const fallbackWarning = getLargeProblemWarning(targetCount);
 
   try {
     const generatedProblems = createProblemsArray(settings);
-    const messages = evaluateGeneratedProblems(
-      generatedProblems,
-      settings.numProblems,
-      showSuccessMessage
-    );
+    const messages = evaluateGeneratedProblems(generatedProblems, targetCount, showSuccessMessage);
 
     if (generatedProblems.length > 0) {
       setProblems(generatedProblems);
