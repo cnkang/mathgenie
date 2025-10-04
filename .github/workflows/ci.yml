@@ -1,294 +1,289 @@
 name: 🚀 CI/CD Pipeline
 
 on:
-    push:
-        branches: [main, develop]
-    pull_request:
-        branches: [main, develop]
-    workflow_dispatch:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
 
 permissions:
-    contents: read
-    security-events: write
-    actions: read
-    pull-requests: write
+  contents: read
+  security-events: write
+  actions: read
+  pull-requests: write
 
 # Cancel previous runs if a new one is triggered
 concurrency:
-    group: ${{ github.workflow }}-${{ github.ref }}
-    cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
-    NODE_VERSION: "22"
-    PNPM_VERSION: "10.18.0"
-    NODE_OPTIONS: "--max-old-space-size=4096"
-    # Let Playwright use default cache paths for better caching
-    # PLAYWRIGHT_BROWSERS_PATH: 0  # Removed - this prevents proper caching
-    # Disable color output for CI consistency (FORCE_COLOR takes precedence over NO_COLOR)
-    FORCE_COLOR: 0
-    CI: true
-    # Playwright optimizations
-    PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 0
-    PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS: true
+  NODE_VERSION: "22"
+  NODE_OPTIONS: "--max-old-space-size=4096"
+  # Let Playwright use default cache paths for better caching
+  # PLAYWRIGHT_BROWSERS_PATH: 0  # Removed - this prevents proper caching
+  # Disable color output for CI consistency (FORCE_COLOR takes precedence over NO_COLOR)
+  FORCE_COLOR: 0
+  CI: true
+  # Playwright optimizations
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 0
+  PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS: true
 
 jobs:
-    # Job 0: Quick Check (fast feedback)
-    quick-check:
-        name: ⚡ Quick Check
-        runs-on: ubuntu-latest
-        timeout-minutes: 5
+  # Job 0: Quick Check (fast feedback)
+  quick-check:
+    name: ⚡ Quick Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
 
-        steps:
-            - name: 📥 Checkout code
-              uses: actions/checkout@v5
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v5
 
-            - name: 📦 Setup pnpm
-              uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
-              with:
-                  version: ${{ env.PNPM_VERSION }}
-                  run_install: false
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          run_install: false
 
-            - name: 📦 Setup Node.js
-              uses: actions/setup-node@v5
-              with:
-                  node-version: ${{ env.NODE_VERSION }}
-                  cache: "pnpm"
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
 
-            - name: 📋 Install dependencies
-              run: pnpm install --frozen-lockfile
+      - name: 📋 Install dependencies
+        run: pnpm install --frozen-lockfile
 
-            - name: 🗂️ Cache TypeScript
-              uses: actions/cache@v4.2.4
-              with:
-                  path: |
-                      .tsbuildinfo
-                      node_modules/.cache/typescript
-                  key: ${{ runner.os }}-typescript-${{ hashFiles('**/tsconfig*.json', 'src/**/*.ts', 'src/**/*.tsx') }}
-                  restore-keys: |
-                      ${{ runner.os }}-typescript-
+      - name: 🗂️ Cache TypeScript
+        uses: actions/cache@v4.2.4
+        with:
+          path: |
+            .tsbuildinfo
+            node_modules/.cache/typescript
+          key: ${{ runner.os }}-typescript-${{ hashFiles('**/tsconfig*.json', 'src/**/*.ts', 'src/**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-typescript-
 
-            - name: 🔍 Quick lint check
-              run: pnpm lint --max-warnings 0
+      - name: 🔍 Quick lint check
+        run: pnpm lint --max-warnings 0
 
-            - name: 🏗️ Type check
-              run: pnpm type-check
+      - name: 🏗️ Type check
+        run: pnpm type-check
 
-            - name: 🧪 Quick test
-              run: pnpm test:unit --reporter=basic
+      - name: 🧪 Quick test
+        run: pnpm test:unit --reporter=basic
 
-    # Job 1: Code Quality & Linting (runs in parallel)
-    code-quality:
-        name: 🔍 Code Quality
-        runs-on: ubuntu-latest
-        timeout-minutes: 10
+  # Job 1: Code Quality & Linting (runs in parallel)
+  code-quality:
+    name: 🔍 Code Quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
 
-        steps:
-            - name: 📥 Checkout code
-              uses: actions/checkout@v5
-              with:
-                  fetch-depth: 0 # Full history for better analysis
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # Full history for better analysis
 
-            - name: 📦 Setup pnpm
-              uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
-              with:
-                  version: ${{ env.PNPM_VERSION }}
-                  run_install: false
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          run_install: false
 
-            - name: 📦 Setup Node.js
-              uses: actions/setup-node@v5
-              with:
-                  node-version: ${{ env.NODE_VERSION }}
-                  cache: "pnpm"
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
 
-            - name: 📋 Install dependencies
-              run: pnpm install --frozen-lockfile
+      - name: 📋 Install dependencies
+        run: pnpm install --frozen-lockfile
 
-            - name: 🗂️ Cache ESLint
-              uses: actions/cache@v4.2.4
-              with:
-                  path: .eslintcache
-                  key: ${{ runner.os }}-eslint-${{ hashFiles('**/.eslintrc*', '**/eslint.config.*') }}
-                  restore-keys: |
-                      ${{ runner.os }}-eslint-
+      - name: 🗂️ Cache ESLint
+        uses: actions/cache@v4.2.4
+        with:
+          path: .eslintcache
+          key: ${{ runner.os }}-eslint-${{ hashFiles('**/.eslintrc*', '**/eslint.config.*') }}
+          restore-keys: |
+            ${{ runner.os }}-eslint-
 
-            - name: 🔍 Run ESLint
-              run: |
-                  pnpm lint --format=json --output-file=eslint-report.json || true
-                  # Ensure the file exists even if ESLint passes
-                  if [ ! -f eslint-report.json ]; then
-                    echo '[]' > eslint-report.json
-                  fi
+      - name: 🔍 Run ESLint
+        run: |
+          pnpm lint --format=json --output-file=eslint-report.json || true
+          # Ensure the file exists even if ESLint passes
+          if [ ! -f eslint-report.json ]; then
+            echo '[]' > eslint-report.json
+          fi
 
-            - name: 📊 Upload ESLint results
-              uses: actions/upload-artifact@v4
-              if: always()
-              with:
-                  name: eslint-report
-                  path: eslint-report.json
+      - name: 📊 Upload ESLint results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eslint-report
+          path: eslint-report.json
 
-            - name: 🎨 Check code formatting
-              run: |
-                  if ! pnpm format --check; then
-                    echo "❌ Code formatting issues found. Run 'pnpm format' to fix."
-                    exit 1
-                  fi
+      - name: 🎨 Check code formatting
+        run: |
+          if ! pnpm format --check; then
+            echo "❌ Code formatting issues found. Run 'pnpm format' to fix."
+            exit 1
+          fi
 
-    # Job 2: Testing (runs in parallel)
-    test:
-        name: 🧪 Tests
-        runs-on: ubuntu-latest
-        timeout-minutes: 15
+  # Job 2: Testing (runs in parallel)
+  test:
+    name: 🧪 Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
 
-        steps:
-            - name: 📥 Checkout code
-              uses: actions/checkout@v5
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v5
 
-            - name: 📦 Setup pnpm
-              uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
-              with:
-                  version: ${{ env.PNPM_VERSION }}
-                  run_install: false
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          run_install: false
 
-            - name: 📦 Setup Node.js
-              uses: actions/setup-node@v5
-              with:
-                  node-version: ${{ env.NODE_VERSION }}
-                  cache: "pnpm"
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
 
-            - name: 📋 Install dependencies
-              run: pnpm install --frozen-lockfile
+      - name: 📋 Install dependencies
+        run: pnpm install --frozen-lockfile
 
-            - name: 🗂️ Cache Vitest
-              uses: actions/cache@v4.2.4
-              with:
-                  path: |
-                      node_modules/.vitest
-                      coverage
-                  key: ${{ runner.os }}-vitest-${{ hashFiles('**/vitest.config.*', 'src/**/*.test.*', 'src/**/*.spec.*') }}
-                  restore-keys: |
-                      ${{ runner.os }}-vitest-
+      - name: 🗂️ Cache Vitest
+        uses: actions/cache@v4.2.4
+        with:
+          path: |
+            node_modules/.vitest
+            coverage
+          key: ${{ runner.os }}-vitest-${{ hashFiles('**/vitest.config.*', 'src/**/*.test.*', 'src/**/*.spec.*') }}
+          restore-keys: |
+            ${{ runner.os }}-vitest-
 
-            - name: 🔧 Set Node.js binary path for secure execution
-              run: |
-                  NODE_BIN_PATH=$(dirname $(which node))
-                  echo "NODE_BIN_PATH=$NODE_BIN_PATH" >> $GITHUB_ENV
-                  echo "Node.js binary path: $NODE_BIN_PATH"
+      - name: 🔧 Set Node.js binary path for secure execution
+        run: |
+          NODE_BIN_PATH=$(dirname $(which node))
+          echo "NODE_BIN_PATH=$NODE_BIN_PATH" >> $GITHUB_ENV
+          echo "Node.js binary path: $NODE_BIN_PATH"
 
-            - name: 🧪 Run unit tests with coverage
-              run: pnpm test:unit
-              env:
-                  CI: true
-                  NODE_BIN_PATH: ${{ env.NODE_BIN_PATH }}
+      - name: 🧪 Run unit tests with coverage
+        run: pnpm test:unit
+        env:
+          CI: true
+          NODE_BIN_PATH: ${{ env.NODE_BIN_PATH }}
 
-            - name: 📊 Upload coverage to Codecov
-              uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
-              with:
-                  files: ./coverage/lcov.info
-                  flags: unit-tests
-                  name: codecov-unit
-                  fail_ci_if_error: false
+      - name: 📊 Upload coverage to Codecov
+        uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
+        with:
+          files: ./coverage/lcov.info
+          flags: unit-tests
+          name: codecov-unit
+          fail_ci_if_error: false
 
-            - name: 📋 Upload test results
-              uses: actions/upload-artifact@v4
-              if: always()
-              with:
-                  name: test-results-unit
-                  path: |
-                      coverage/
+      - name: 📋 Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-unit
+          path: |
+            coverage/
 
-    # Job 3: Security Scanning (runs in parallel)
-    security:
-        name: 🔒 Security Scan
-        runs-on: ubuntu-latest
-        timeout-minutes: 10
+  # Job 3: Security Scanning (runs in parallel)
+  security:
+    name: 🔒 Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
 
-        steps:
-            - name: 📥 Checkout code
-              uses: actions/checkout@v5
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v5
 
-            - name: 📦 Setup pnpm
-              uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
-              with:
-                  version: ${{ env.PNPM_VERSION }}
-                  run_install: false
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          run_install: false
 
-            - name: 📦 Setup Node.js
-              uses: actions/setup-node@v5
-              with:
-                  node-version: ${{ env.NODE_VERSION }}
-                  cache: "pnpm"
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
 
-            - name: 📋 Install dependencies
-              run: pnpm install --frozen-lockfile
+      - name: 📋 Install dependencies
+        run: pnpm install --frozen-lockfile
 
-            - name: 🔍 Run security audit
-              run: pnpm audit --audit-level moderate
-              continue-on-error: true
+      - name: 🔍 Run security audit
+        run: pnpm audit --audit-level moderate
+        continue-on-error: true
 
-            # CodeQL analysis removed - using GitHub's default setup instead
+      # CodeQL analysis removed - using GitHub's default setup instead
 
-    # Job 4: Build & Performance (runs in parallel)
-    build:
-        name: 🏗️ Build & Performance
-        runs-on: ubuntu-latest
-        timeout-minutes: 15
+  # Job 4: Build & Performance (runs in parallel)
+  build:
+    name: 🏗️ Build & Performance
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
 
-        steps:
-            - name: 📥 Checkout code
-              uses: actions/checkout@v5
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v5
 
-            - name: 📦 Setup pnpm
-              uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
-              with:
-                  version: ${{ env.PNPM_VERSION }}
-                  run_install: false
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          run_install: false
 
-            - name: 📦 Setup Node.js
-              uses: actions/setup-node@v5
-              with:
-                  node-version: ${{ env.NODE_VERSION }}
-                  cache: "pnpm"
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
 
-            - name: 📋 Install dependencies
-              run: pnpm install --frozen-lockfile
+      - name: 📋 Install dependencies
+        run: pnpm install --frozen-lockfile
 
-            - name: 🗂️ Cache build output
-              uses: actions/cache@v4.2.4
-              with:
-                  path: |
-                      dist
-                      .vite
-                  key: ${{ runner.os }}-build-${{ hashFiles('src/**/*', 'public/**/*', 'vite.config.ts', 'tsconfig.json') }}
-                  restore-keys: |
-                      ${{ runner.os }}-build-
+      - name: 🗂️ Cache build output
+        uses: actions/cache@v4.2.4
+        with:
+          path: |
+            dist
+            .vite
+          key: ${{ runner.os }}-build-${{ hashFiles('src/**/*', 'public/**/*', 'vite.config.ts', 'tsconfig.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
 
-            - name: 🏗️ Build application
-              run: pnpm build
-              env:
-                  NODE_ENV: production
-                  CI: true
+      - name: 🏗️ Build application
+        run: pnpm build
+        env:
+          NODE_ENV: production
+          CI: true
 
-            - name: 📊 Analyze bundle size
-              run: |
-                  echo "## 📦 Bundle Analysis" >> $GITHUB_STEP_SUMMARY
-                  echo "| File | Size | Gzipped |" >> $GITHUB_STEP_SUMMARY
-                  echo "|------|------|---------|" >> $GITHUB_STEP_SUMMARY
+      - name: 📊 Analyze bundle size
+        run: |
+          echo "## 📦 Bundle Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "| File | Size | Gzipped |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|------|---------|" >> $GITHUB_STEP_SUMMARY
 
-                  for file in dist/assets/*.js; do
-                    if [ -f "$file" ]; then
-                      size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file")
-                      gzipped=$(gzip -c "$file" | wc -c)
-                      filename=$(basename "$file")
-                      echo "| $filename | $(numfmt --to=iec $size) | $(numfmt --to=iec $gzipped) |" >> $GITHUB_STEP_SUMMARY
-                    fi
-                  done
+          for file in dist/assets/*.js; do
+            if [ -f "$file" ]; then
+              size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file")
+              gzipped=$(gzip -c "$file" | wc -c)
+              filename=$(basename "$file")
+              echo "| $filename | $(numfmt --to=iec $size) | $(numfmt --to=iec $gzipped) |" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
 
-            - name: 🚀 Upload build artifacts
-              uses: actions/upload-artifact@v4
-              with:
-                  name: build-production
-                  path: dist/
-                  retention-days: 7
+      - name: 🚀 Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-production
+          path: dist/
+          retention-days: 7
+
   # Job 5: Accessibility Testing (integrated with Playwright)
   accessibility:
     name: ♿ Accessibility
@@ -302,7 +297,6 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
         with:
-          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: 📦 Setup Node.js
@@ -458,7 +452,6 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
         with:
-          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: 📦 Setup Node.js
@@ -583,7 +576,6 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
         with:
-          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: 📦 Setup Node.js
@@ -689,7 +681,6 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
         with:
-          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: 📦 Setup Node.js
@@ -741,7 +732,6 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
         with:
-          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: 📦 Setup Node.js
