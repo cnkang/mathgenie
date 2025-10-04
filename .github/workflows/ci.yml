@@ -51,7 +51,7 @@ jobs:
       - name: 📦 Enable pnpm via Corepack
         run: |
           corepack enable
-          corepack install
+          corepack prepare pnpm@${{ env.PNPM_VERSION }} --activate
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -96,7 +96,7 @@ jobs:
       - name: 📦 Enable pnpm via Corepack
         run: |
           corepack enable
-          corepack install
+          corepack prepare pnpm@${{ env.PNPM_VERSION }} --activate
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -150,7 +150,7 @@ jobs:
       - name: 📦 Enable pnpm via Corepack
         run: |
           corepack enable
-          corepack install
+          corepack prepare pnpm@${{ env.PNPM_VERSION }} --activate
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -212,7 +212,7 @@ jobs:
       - name: 📦 Enable pnpm via Corepack
         run: |
           corepack enable
-          corepack install
+          corepack prepare pnpm@${{ env.PNPM_VERSION }} --activate
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -242,7 +242,7 @@ jobs:
       - name: 📦 Enable pnpm via Corepack
         run: |
           corepack enable
-          corepack install
+          corepack prepare pnpm@${{ env.PNPM_VERSION }} --activate
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -304,7 +304,7 @@ jobs:
       - name: 📦 Enable pnpm via Corepack
         run: |
           corepack enable
-          corepack install
+          corepack prepare pnpm@${{ env.PNPM_VERSION }} --activate
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -459,7 +459,7 @@ jobs:
       - name: 📦 Enable pnpm via Corepack
         run: |
           corepack enable
-          corepack install
+          corepack prepare pnpm@${{ env.PNPM_VERSION }} --activate
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -583,7 +583,7 @@ jobs:
       - name: 📦 Enable pnpm via Corepack
         run: |
           corepack enable
-          corepack install
+          corepack prepare pnpm@${{ env.PNPM_VERSION }} --activate
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -688,7 +688,7 @@ jobs:
       - name: 📦 Enable pnpm via Corepack
         run: |
           corepack enable
-          corepack install
+          corepack prepare pnpm@${{ env.PNPM_VERSION }} --activate
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -739,7 +739,7 @@ jobs:
       - name: 📦 Enable pnpm via Corepack
         run: |
           corepack enable
-          corepack install
+          corepack prepare pnpm@${{ env.PNPM_VERSION }} --activate
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
