@@ -25,10 +25,10 @@ const GroupedProblemsDisplay: React.FC<GroupedProblemsDisplayProps> = ({
   return (
     <>
       {groups.map((group, groupIndex) => {
-        const groupKey = hasProblems(group) 
+        const groupKey = hasProblems(group)
           ? `group-${group[0]?.id || 0}-${group.length}`
           : `empty-${settings.totalGroups}-${settings.problemsPerGroup}-${groupIndex + 1}`;
-        
+
         return hasProblems(group) ? (
           <div key={groupKey} className='problem-group'>
             <h3 className='group-title'>{getGroupTitle(groupIndex, t)}</h3>
