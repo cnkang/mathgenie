@@ -10,6 +10,7 @@ overrides:
   chrome-launcher: ^1.2.0
   tmp: ^0.2.5
   os-tmpdir: ^2.0.0
+  punycode: npm:punycode.js@^2.3.1
   '@babel/plugin-proposal-private-methods': npm:@babel/plugin-transform-private-methods@^7.27.1
 
 importers:
@@ -3255,8 +3256,8 @@ packages:
   pump@3.0.3:
     resolution: {integrity: sha512-todwxLMY7/heScKmntwQG8CXVkWUOdYxIvY2s0VWAAMh/nd8SoYiRaKjlr7+iCs984f2P8zvrfWcDDYVb73NfA==}
 
-  punycode@2.3.1:
-    resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
+  punycode.js@2.3.1:
+    resolution: {integrity: sha512-uxFIHU0YlHYhDQtV4R9J6a52SLx28BCjT+4ieh7IGbgwVJWO+km431c4yRlREUAsAmt/uMjQUyQHNEPf0M39CA==}
     engines: {node: '>=6'}
 
   puppeteer-core@24.23.0:
@@ -7594,7 +7595,7 @@ snapshots:
       end-of-stream: 1.4.5
       once: 1.4.0
 
-  punycode@2.3.1: {}
+  punycode.js@2.3.1: {}
 
   puppeteer-core@24.23.0:
     dependencies:
@@ -8313,7 +8314,7 @@ snapshots:
 
   tr46@5.1.1:
     dependencies:
-      punycode: 2.3.1
+      punycode: punycode.js@2.3.1
     optional: true
 
   tree-kill@1.2.2: {}
@@ -8410,7 +8411,7 @@ snapshots:
 
   uri-js@4.4.1:
     dependencies:
-      punycode: 2.3.1
+      punycode: punycode.js@2.3.1
 
   util-deprecate@1.0.2: {}
 
