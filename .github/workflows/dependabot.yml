@@ -150,27 +150,17 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v5
 
-      - name: 📦 Setup Node.js & pnpm
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: 📦 Setup Node.js
         uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "pnpm"
-
-      - name: 📦 Enable pnpm via Corepack
-        run: |
-          echo "🔧 Enabling pnpm via Corepack..."
-          corepack enable
-
-          echo "🔍 Pinning and activating pnpm version via Corepack..."
-          corepack prepare pnpm@${{ env.PNPM_VERSION }} --activate
-
-          echo "📋 Final pnpm verification:"
-          if ! which pnpm > /dev/null 2>&1; then
-            echo "❌ pnpm not found in PATH after installation attempts"
-            exit 1
-          fi
-          pnpm --version
-          echo "✅ pnpm setup completed successfully"
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
