@@ -112,8 +112,8 @@ importers:
         specifier: ^19.0.2
         version: 19.0.2
       html-validate:
-        specifier: ^10.0.0
-        version: 10.0.0(vitest@3.2.4(@types/node@24.6.2)(happy-dom@19.0.2)(jiti@2.6.1)(jsdom@25.0.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
+        specifier: ^10.1.1
+        version: 10.1.1(vitest@3.2.4(@types/node@24.6.2)(happy-dom@19.0.2)(jiti@2.6.1)(jsdom@25.0.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -2147,9 +2147,9 @@ packages:
     resolution: {integrity: sha512-ztqyC3kLto0e9WbNp0aeP+M3kTt+nbaIveGmUxAtZa+8iFgKLUOD4YKM5j+f3QD89bra7UeumolZHKuOXnTmeQ==}
     engines: {node: '>=8'}
 
-  html-validate@10.0.0:
-    resolution: {integrity: sha512-r+TsXZIstqvlOrVEAEfuxhYy9M4wAqhQuuSnQdeIidowKKHUhanpCXHk7uQMWi83v8cwpgAoYhM8J38nlZgYHQ==}
-    engines: {node: '>= 20.6.0'}
+  html-validate@10.1.1:
+    resolution: {integrity: sha512-oY4iDeiiCYCR+mXOADcNH4/mjEHQ0bn7fLSNaoh/PB9i3xZwy2RhpQ/3IfE/yE61UYkRo8a+Xi3PzxkblaePDw==}
+    engines: {node: ^20.19.0 || >= 22.12.0}
     hasBin: true
     peerDependencies:
       jest: ^28.1.3 || ^29.0.3 || ^30.0.0
@@ -6475,7 +6475,7 @@ snapshots:
 
   html-tags@3.3.1: {}
 
-  html-validate@10.0.0(vitest@3.2.4(@types/node@24.6.2)(happy-dom@19.0.2)(jiti@2.6.1)(jsdom@25.0.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)):
+  html-validate@10.1.1(vitest@3.2.4(@types/node@24.6.2)(happy-dom@19.0.2)(jiti@2.6.1)(jsdom@25.0.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)):
     dependencies:
       '@html-validate/stylish': 4.3.0
       '@sidvind/better-ajv-errors': 4.0.0(ajv@8.17.1)
