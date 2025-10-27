@@ -105,7 +105,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.0",
-    "@eslint/js": "^9.37.0",
+    "@eslint/js": "^9.38.0",
     "@fullhuman/postcss-purgecss": "^7.0.2",
     "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.56.1",
