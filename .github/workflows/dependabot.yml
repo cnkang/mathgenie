@@ -215,8 +215,8 @@ jobs:
               body: '🤖 Enabling auto-merge for this safe dependency update. The PR will be automatically merged once all required checks pass.'
             });
 
-            // Enable auto-merge using GitHub's GraphQL API
-            try {
+            // Enable auto-merge with retry for transient 422 errors
+            const enableAutoMerge = async () => {
               const mutation = `
                 mutation($pullRequestId: ID!, $mergeMethod: PullRequestMergeMethod!) {
                   enablePullRequestAutoMerge(input: {
@@ -235,22 +235,39 @@ jobs:
                 }
               `;
 
-              await github.graphql(mutation, {
+              return github.graphql(mutation, {
                 pullRequestId: pr.node_id,
                 mergeMethod: 'SQUASH'
               });
+            };
 
-              console.log('✅ Auto-merge enabled successfully');
+            // Retry logic for 422 errors (unknown/unstable mergeable_state)
+            let lastError;
+            for (let attempt = 1; attempt <= 6; attempt++) {
+              try {
+                await enableAutoMerge();
+                console.log('✅ Auto-merge enabled successfully');
 
-              // Add success comment
-              await github.rest.issues.createComment({
-                owner,
-                repo,
-                issue_number: pr.number,
-                body: '✅ Auto-merge enabled! This PR will be automatically merged when all required status checks pass and any required reviews are approved.'
-              });
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: pr.number,
+                  body: '✅ Auto-merge enabled! This PR will be automatically merged when all required status checks pass and any required reviews are approved.'
+                });
+                return; // Success, exit the script
+              } catch (error) {
+                lastError = error;
+                if (error.status === 422 && attempt < 6) {
+                  console.log(`Attempt ${attempt}/6 failed with 422, retrying in 10s...`);
+                  await new Promise(resolve => setTimeout(resolve, 10000));
+                  continue;
+                }
+                break; // Non-422 error or max attempts reached
+              }
+            }
 
-            } catch (error) {
+            // Handle final error
+            const error = lastError;
               console.log('❌ Failed to enable auto-merge:', error.message);
 
               // Provide detailed error information
