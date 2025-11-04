@@ -9,11 +9,8 @@ concurrency:
   group: dependabot-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
-# Configurable inputs for timeout and polling
 env:
   NODE_VERSION: "22"
-  WAIT_TIMEOUT_MS: 300000 # 5 minutes
-  POLL_INTERVAL_MS: 10000 # 10 seconds
 
 jobs:
   # Job 1: Dependabot PR Analysis
@@ -185,7 +182,7 @@ jobs:
       github.actor == 'dependabot[bot]' && 
       needs.dependabot-analysis.outputs.auto_merge == 'true' &&
       needs.dependabot-ci.result == 'success'
-    timeout-minutes: 5
+    timeout-minutes: 2
     permissions:
       contents: write
       pull-requests: write
@@ -199,59 +196,6 @@ jobs:
             const pr = context.payload.pull_request;
             const { owner, repo } = context.repo;
 
-            const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-            const WAIT_TIMEOUT_MS = parseInt(process.env.WAIT_TIMEOUT_MS || '300000', 10);
-            const POLL_INTERVAL_MS = parseInt(process.env.POLL_INTERVAL_MS || '10000', 10);
-
-            if (
-              isNaN(WAIT_TIMEOUT_MS) || WAIT_TIMEOUT_MS <= 0 ||
-              isNaN(POLL_INTERVAL_MS) || POLL_INTERVAL_MS <= 0
-            ) {
-              throw new Error(
-                `Invalid WAIT_TIMEOUT_MS (${WAIT_TIMEOUT_MS}) or POLL_INTERVAL_MS (${POLL_INTERVAL_MS}). Both must be positive integers greater than zero.`
-              );
-            }
-
-            const waitForStableMergeState = async () => {
-              const start = Date.now();
-              let lastState = 'unknown';
-              let lastMergeable = false;
-
-              while (Date.now() - start < WAIT_TIMEOUT_MS) {
-                const { data } = await github.rest.pulls.get({
-                  owner,
-                  repo,
-                  pull_number: pr.number
-                });
-
-                lastState = (data.mergeable_state || 'unknown').toLowerCase();
-                lastMergeable = Boolean(data.mergeable);
-                console.log(`mergeable_state=${lastState}, mergeable=${lastMergeable}`);
-
-                if (!['unknown', 'unstable'].includes(lastState)) {
-                  return { state: lastState, mergeable: lastMergeable };
-                }
-
-                await sleep(POLL_INTERVAL_MS);
-              }
-
-              throw new Error(`Timed out waiting for pull request to leave the unstable state (last state: ${lastState}).`);
-            };
-
-            let mergeState;
-            try {
-              mergeState = await waitForStableMergeState();
-            } catch (error) {
-              throw new Error(`Auto-merge readiness check failed: ${error.message}`);
-            }
-
-            if (
-              !mergeState.mergeable ||
-              ['dirty', 'draft', 'blocked', 'behind'].includes(mergeState.state)
-            ) {
-              throw new Error(`Pull request is not ready for auto-merge (current state: ${mergeState.state}).`);
-            }
-
             // Add a comment before enabling auto-merge
             await github.rest.issues.createComment({
               owner,
@@ -260,7 +204,7 @@ jobs:
               body: '🤖 Enabling auto-merge for this safe dependency update. The PR will be automatically merged once all required checks pass.'
             });
 
-            // Enable auto-merge using GitHub's GraphQL API (more reliable)
+            // Enable auto-merge using GitHub's GraphQL API
             try {
               const mutation = `
                 mutation($pullRequestId: ID!, $mergeMethod: PullRequestMergeMethod!) {
