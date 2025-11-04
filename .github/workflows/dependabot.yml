@@ -196,6 +196,17 @@ jobs:
             const pr = context.payload.pull_request;
             const { owner, repo } = context.repo;
 
+            // Check current mergeable state (single check, no polling)
+            const { data: prData } = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: pr.number
+            });
+
+            if (prData.mergeable === false || ['dirty', 'draft'].includes(prData.mergeable_state)) {
+              throw new Error(`PR not mergeable: state=${prData.mergeable_state}, mergeable=${prData.mergeable}`);
+            }
+
             // Add a comment before enabling auto-merge
             await github.rest.issues.createComment({
               owner,
