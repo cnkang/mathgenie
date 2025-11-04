@@ -112,8 +112,8 @@ importers:
         specifier: ^20.0.10
         version: 20.0.10
       html-validate:
-        specifier: ^10.2.1
-        version: 10.2.1(vitest@3.2.4(@types/node@24.10.0)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@25.0.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
+        specifier: ^10.3.0
+        version: 10.3.0(vitest@3.2.4(@types/node@24.10.0)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@25.0.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -2331,8 +2331,8 @@ packages:
     resolution: {integrity: sha512-ztqyC3kLto0e9WbNp0aeP+M3kTt+nbaIveGmUxAtZa+8iFgKLUOD4YKM5j+f3QD89bra7UeumolZHKuOXnTmeQ==}
     engines: {node: '>=8'}
 
-  html-validate@10.2.1:
-    resolution: {integrity: sha512-jGN4Lsq0bs8zfSvVeKbMLhxjvfxTQB1fZxQ3FSjumRh7ZMISzVf3RG0aK5gmcxyytPGicR7tCV4QlLGrrfeTTw==}
+  html-validate@10.3.0:
+    resolution: {integrity: sha512-Y/JF8w4uNBf4bfT7oIUN7Iw5pq8SRZmNiotJPgmzzadvMJnhMcv5hQj34EnA1HQa56RZvaoq1BS+63Dx5CGBUQ==}
     engines: {node: ^20.19.0 || >= 22.12.0}
     hasBin: true
     peerDependencies:
@@ -2895,8 +2895,8 @@ packages:
     resolution: {integrity: sha512-VP79XUPxV2CigYP3jWwAUFSku2aKqBH7uTAapFWCBqutsbmDo96KY5o8uh6U+/YSIn5OxJnXp73beVkpqMIGhA==}
     engines: {node: '>=18'}
 
-  minimatch@10.0.3:
-    resolution: {integrity: sha512-IPZ167aShDZZUMdRk66cyQAW3qr0WzbHkPdMYa8bzZhlHhO3jALbKdxcaak7W9FfT2rZNpQuUu4Od7ILEpXSaw==}
+  minimatch@10.1.1:
+    resolution: {integrity: sha512-enIvLvRAFZYXJzkCYG5RKmPfrFArdLv+R+lbQ53BmIMLIry74bjKzX6iHAm8WYamJkhSSEabrWN5D97XnKObjQ==}
     engines: {node: 20 || >=22}
 
   minimatch@3.1.2:
@@ -6703,7 +6703,7 @@ snapshots:
     dependencies:
       foreground-child: 3.3.1
       jackspeak: 4.1.1
-      minimatch: 10.0.3
+      minimatch: 10.1.1
       minipass: 7.1.2
       package-json-from-dist: 1.0.1
       path-scurry: 2.0.0
@@ -6795,7 +6795,7 @@ snapshots:
 
   html-tags@3.3.1: {}
 
-  html-validate@10.2.1(vitest@3.2.4(@types/node@24.10.0)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@25.0.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)):
+  html-validate@10.3.0(vitest@3.2.4(@types/node@24.10.0)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@25.0.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)):
     dependencies:
       '@html-validate/stylish': 4.3.0
       '@sidvind/better-ajv-errors': 4.0.0(ajv@8.17.1)
@@ -7399,7 +7399,7 @@ snapshots:
 
   mimic-function@5.0.1: {}
 
-  minimatch@10.0.3:
+  minimatch@10.1.1:
     dependencies:
       '@isaacs/brace-expansion': 5.0.0
 
