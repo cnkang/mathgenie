@@ -224,9 +224,10 @@ describe.sequential('I18n System', () => {
 
   it('handles string interpolation in translations', async () => {
     const TestInterpolationComponent = () => {
-      const { t } = useTranslation();
+      const { t, isLoading } = useTranslation();
       return (
         <div>
+          <div data-testid='loading'>{isLoading ? 'loading' : 'loaded'}</div>
           <div data-testid='interpolation'>{t('test.interpolation', { name: 'World' })}</div>
         </div>
       );
@@ -238,6 +239,13 @@ describe.sequential('I18n System', () => {
       </I18nProvider>
     );
 
+    // Wait for translations to load
+    await waitFor(() => {
+      const loadingEl = container.querySelector('[data-testid="loading"]');
+      expect(loadingEl?.textContent).toBe('loaded');
+    });
+
+    // Then check interpolation
     await waitFor(() => {
       const interpolationEl = container.querySelector('[data-testid="interpolation"]');
       expect(interpolationEl?.textContent).toBe('Hello World!');
