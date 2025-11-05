@@ -12,7 +12,11 @@ const mockJsPDFInstance = {
 
 // Mock the jsPDF module
 vi.mock('jspdf', () => {
-  const MockJsPDF = vi.fn().mockImplementation(() => mockJsPDFInstance);
+  // Create a proper constructor function that can be called with 'new'
+  function MockJsPDF(_options?: any) {
+    return mockJsPDFInstance;
+  }
+
   return {
     default: MockJsPDF,
   };
@@ -67,7 +71,7 @@ describe('pdf utils', () => {
     ).resolves.toBeUndefined();
   });
 
-  test.skip('generatePdf handles different paper sizes', async () => {
+  test('generatePdf handles different paper sizes', async () => {
     const { generatePdf } = await import('./pdf');
     const problems: Problem[] = [{ id: 1, text: '1 + 1 =' }];
 
