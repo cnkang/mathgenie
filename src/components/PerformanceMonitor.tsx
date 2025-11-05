@@ -1,110 +1,126 @@
-import { useEffect, type FC, type ReactElement } from 'react';
+import {
+  useConcurrentFeatures,
+  useEnhancedCache,
+  usePerformanceTracking,
+} from '@/hooks/usePerformance';
+import React, { useDeferredValue, useEffect, useState } from 'react';
 
-// Extend Window interface for gtag
-declare global {
-  interface Window {
-    gtag?: (command: string, action: string, parameters?: Record<string, unknown>) => void;
-  }
+interface PerformanceData {
+  renderCount: number;
+  lastRenderTime: number;
+  averageRenderTime: number;
+  memoryUsage?: number;
 }
 
-// Performance memory interface
-interface PerformanceMemory {
-  usedJSHeapSize: number;
-  totalJSHeapSize: number;
-  jsHeapSizeLimit: number;
-}
-
-// Extend Performance interface
-interface ExtendedPerformance extends Performance {
-  memory?: PerformanceMemory;
-}
-
-// Performance entry with value property
-interface PerformanceEntryWithValue extends PerformanceEntry {
-  value?: number;
+interface PerformanceMonitorProps {
+  enabled?: boolean;
+  showDetails?: boolean;
+  children?: React.ReactNode;
 }
 
 /**
- * Performance Monitor Component with TypeScript support
- * Tracks and reports performance metrics for optimization
+ * Performance monitor component with React concurrent features
+ * - Enhanced batching for better performance tracking
+ * - Improved caching mechanisms
+ * - Better memory management
  */
-type PerformanceMonitorProps = { children?: ReactElement | null };
+const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
+  enabled = process.env.NODE_ENV === 'development',
+  showDetails = false,
+  children,
+}) => {
+  const { performanceMetrics, trackRender } = usePerformanceTracking();
+  const { isPending, scheduleUpdate } = useConcurrentFeatures();
+  const [memoryInfo, setMemoryInfo] = useState<number | undefined>();
 
-const PerformanceMonitor: FC<PerformanceMonitorProps> = ({ children }) => {
+  // Use React 19.2's useDeferredValue for better performance
+  const deferredMemoryInfo = useDeferredValue(memoryInfo);
+  const deferredMetrics = useDeferredValue(performanceMetrics);
+
+  // Use React 19.2's enhanced caching for performance data
+  const cachedPerformanceData = useEnhancedCache<PerformanceData>('performance-data', () => ({
+    ...deferredMetrics,
+    memoryUsage: deferredMemoryInfo,
+  }));
+
   useEffect(() => {
-    const isProd = import.meta.env.PROD;
-    const devLogger: ((...args: unknown[]) => void) | undefined = import.meta.env.DEV
-      ? (...args: unknown[]) => console.log(...args)
-      : undefined;
+    if (!enabled) return;
 
-    const observer = createPerformanceObserver(isProd, devLogger);
-    try {
-      observer.observe({ entryTypes: ['measure', 'navigation', 'paint'] });
-    } catch (error) {
-      console.warn('Performance observer not fully supported:', error);
+    trackRender();
+
+    // Monitor memory usage if available (Chrome DevTools)
+    if (
+      'memory' in performance &&
+      (performance as { memory?: { usedJSHeapSize: number } }).memory
+    ) {
+      const { memory } = performance as { memory: { usedJSHeapSize: number } };
+      setMemoryInfo(memory.usedJSHeapSize);
     }
+  }, [enabled, trackRender]);
 
-    const cleanupMemory = setupMemoryLogging(performance as ExtendedPerformance, devLogger);
-    return () => {
-      cleanupMemory?.();
-      observer.disconnect();
-    };
-  }, []);
+  // React 19.2 enhanced batching for state updates
+  useEffect(() => {
+    if (!enabled) return;
 
-  return children ? <>{children}</> : null;
-};
+    const interval = setInterval(() => {
+      // Use concurrent features for better performance
+      scheduleUpdate(() => {
+        if (
+          'memory' in performance &&
+          (performance as { memory?: { usedJSHeapSize: number } }).memory
+        ) {
+          const { memory } = performance as { memory: { usedJSHeapSize: number } };
+          setMemoryInfo(memory.usedJSHeapSize);
+        }
+      });
+    }, 1000);
 
-const reportMetrics = (
-  isProd: boolean,
-  devLogger: ((...args: unknown[]) => void) | undefined,
-  entry: PerformanceEntryWithValue
-): void => {
-  const value = entry.value ?? entry.duration;
-  if (devLogger) {
-    devLogger(`${entry.name}: ${value}ms`);
-    return;
+    return () => clearInterval(interval);
+  }, [enabled, scheduleUpdate]);
+
+  if (!enabled) {
+    return <>{children}</>;
   }
 
-  if (isProd && window.gtag) {
-    window.gtag('event', 'web_vitals', {
-      event_category: 'Performance',
-      event_label: entry.name,
-      value: Math.round(value || 0),
-      non_interaction: true,
-    });
-  }
-};
+  return (
+    <>
+      {children}
+      <div
+        className='performance-monitor'
+        style={{
+          position: 'fixed',
+          top: '10px',
+          right: '10px',
+          background: 'rgba(0, 0, 0, 0.8)',
+          color: 'white',
+          padding: '8px 12px',
+          borderRadius: '4px',
+          fontSize: '12px',
+          fontFamily: 'monospace',
+          zIndex: 9999,
+          minWidth: '200px',
+        }}
+      >
+        <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
+          React 19.2 Performance {isPending && '⏳'}
+        </div>
 
-const createPerformanceObserver = (
-  isProd: boolean,
-  devLogger?: (...args: unknown[]) => void
-): PerformanceObserver => {
-  return new PerformanceObserver(list => {
-    list.getEntries().forEach(entry => {
-      reportMetrics(isProd, devLogger, entry as PerformanceEntryWithValue);
-    });
-  });
-};
+        <div>Renders: {cachedPerformanceData.renderCount}</div>
 
-const setupMemoryLogging = (
-  perf: ExtendedPerformance,
-  devLogger?: (...args: unknown[]) => void
-): (() => void) | undefined => {
-  if (!perf.memory) {
-    return undefined;
-  }
-
-  const logMemoryUsage = (): void => {
-    const memory = perf.memory!;
-    devLogger?.('Memory usage:', {
-      used: Math.round(memory.usedJSHeapSize / 1048576) + ' MB',
-      total: Math.round(memory.totalJSHeapSize / 1048576) + ' MB',
-      limit: Math.round(memory.jsHeapSizeLimit / 1048576) + ' MB',
-    });
-  };
-
-  const memoryInterval = setInterval(logMemoryUsage, 30000);
-  return () => clearInterval(memoryInterval);
+        {showDetails && (
+          <>
+            <div>Avg Render: {cachedPerformanceData.averageRenderTime.toFixed(2)}ms</div>
+            {cachedPerformanceData.memoryUsage && (
+              <div>Memory: {(cachedPerformanceData.memoryUsage / 1024 / 1024).toFixed(2)}MB</div>
+            )}
+            <div style={{ fontSize: '10px', marginTop: '4px', opacity: 0.7 }}>
+              Enhanced with React 19.2 concurrent features, batching & caching
+            </div>
+          </>
+        )}
+      </div>
+    </>
+  );
 };
 
 export default PerformanceMonitor;

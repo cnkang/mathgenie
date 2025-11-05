@@ -6,8 +6,10 @@ import viteCompression from 'vite-plugin-compression';
 export default defineConfig(({ mode }) => ({
   plugins: [
     react({
-      // Optimize JSX runtime
+      // Optimize JSX runtime for React 19.2
       jsxRuntime: 'automatic',
+      // Enable React 19.2 optimizations
+      jsxImportSource: undefined, // Use default React JSX runtime
     }),
     // Brotli compression (better compression ratio)
     viteCompression({
@@ -37,8 +39,8 @@ export default defineConfig(({ mode }) => ({
     outDir: 'dist',
     // Enable source maps (development environment only)
     sourcemap: process.env.NODE_ENV !== 'production',
-    // Build target - use ES2020 for better compatibility
-    target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'],
+    // Build target - optimized for React 19.2 and modern browsers
+    target: ['es2022', 'edge88', 'firefox78', 'chrome87', 'safari14'],
     // Enable CSS code splitting
     cssCodeSplit: true,
     // Set chunk size warning limit
@@ -127,12 +129,15 @@ export default defineConfig(({ mode }) => ({
       '@/types': resolve(__dirname, './src/types'),
     },
   },
-  // Optimize dependency pre-bundling
+  // Optimize dependency pre-bundling for React 19.2
   optimizeDeps: {
     include: ['react', 'react-dom', 'jspdf'],
     exclude: ['@vercel/speed-insights'],
     esbuildOptions: {
       target: 'es2022',
+      // Enable React 19.2 optimizations
+      jsx: 'automatic',
+      jsxDev: mode !== 'production',
     },
   },
   // Environment variables

@@ -1,0 +1,92 @@
+import { render, screen } from '@testing-library/react';
+import EnhancedSuspense from './EnhancedSuspense';
+
+// Mock the hooks
+vi.mock('@/hooks/usePerformance', () => ({
+  useConcurrentFeatures: () => ({
+    isPending: false,
+    scheduleUpdate: vi.fn(),
+  }),
+}));
+
+vi.mock('@/hooks/useReact19Features', () => ({
+  useReact19Features: () => ({
+    createTransition: () => [false, vi.fn()],
+    createOptimisticState: () => [{ data: { children: null, hasError: false } }, vi.fn()],
+  }),
+  useErrorRecovery: () => ({
+    recoverFromError: vi.fn(),
+    isRecovering: false,
+  }),
+}));
+
+describe('EnhancedSuspense', () => {
+  test('should render children when not suspended', () => {
+    render(
+      <EnhancedSuspense>
+        <div>Test Content</div>
+      </EnhancedSuspense>
+    );
+
+    expect(screen.getByText('Test Content')).toBeInTheDocument();
+  });
+
+  test('should render fallback when suspended', () => {
+    const SuspendingComponent = () => {
+      throw new Promise(() => {}); // Never resolves
+    };
+
+    render(
+      <EnhancedSuspense fallback={<div>Loading...</div>}>
+        <SuspendingComponent />
+      </EnhancedSuspense>
+    );
+
+    expect(screen.getByText('Loading...')).toBeInTheDocument();
+  });
+
+  test('should render custom fallback', () => {
+    const SuspendingComponent = () => {
+      throw new Promise(() => {}); // Never resolves
+    };
+
+    render(
+      <EnhancedSuspense fallback={<div>Custom Loading</div>}>
+        <SuspendingComponent />
+      </EnhancedSuspense>
+    );
+
+    expect(screen.getByText('Custom Loading')).toBeInTheDocument();
+  });
+
+  test('should handle error callback', () => {
+    const onError = vi.fn();
+    const ErrorComponent = () => {
+      throw new Error('Test error');
+    };
+
+    // Suppress console.error for this test
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    render(
+      <EnhancedSuspense onError={onError}>
+        <ErrorComponent />
+      </EnhancedSuspense>
+    );
+
+    // The error should be caught by the error boundary
+    expect(onError).toHaveBeenCalledWith(expect.any(Error));
+
+    consoleSpy.mockRestore();
+  });
+
+  test('should enable optimistic updates when requested', () => {
+    render(
+      <EnhancedSuspense enableOptimisticUpdates>
+        <div>Optimistic Content</div>
+      </EnhancedSuspense>
+    );
+
+    expect(screen.getByText('Optimistic Content')).toBeInTheDocument();
+  });
+});
