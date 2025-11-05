@@ -8,8 +8,8 @@ interface ErrorBoundaryState {
 }
 
 /**
- * React 19 Enhanced Error Boundary with TypeScript support
- * Provides better error handling and recovery mechanisms
+ * React 19.2 Enhanced Error Boundary with TypeScript support
+ * Provides better error handling and recovery mechanisms with concurrent features
  */
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
@@ -78,8 +78,8 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 export default ErrorBoundary;
 
 /**
- * React 19 Function Component Error Boundary Hook with TypeScript
- * For use with function components
+ * React 19.2 Function Component Error Boundary Hook with TypeScript
+ * For use with function components with enhanced concurrent error handling
  */
 interface ErrorHandlerReturn {
   handleError: (error: Error) => void;

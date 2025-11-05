@@ -19,8 +19,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: "22"
-  NODE_OPTIONS: "--max-old-space-size=4096"
+  NODE_VERSION: '24.11.0'
+  NODE_OPTIONS: '--max-old-space-size=4096'
   # Let Playwright use default cache paths for better caching
   # PLAYWRIGHT_BROWSERS_PATH: 0  # Removed - this prevents proper caching
   # Disable color output for CI consistency (FORCE_COLOR takes precedence over NO_COLOR)
@@ -50,7 +50,7 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -95,7 +95,7 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -149,7 +149,7 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -211,7 +211,7 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -241,7 +241,7 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -303,7 +303,7 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -424,25 +424,25 @@ jobs:
         include:
           - browser: chromium
             project: chromium
-            name: "Desktop Chrome"
+            name: 'Desktop Chrome'
           - browser: firefox
             project: firefox
-            name: "Desktop Firefox"
+            name: 'Desktop Firefox'
           - browser: webkit
             project: mobile-iphone
-            name: "iPhone 16 Pro"
+            name: 'iPhone 16 Pro'
             mobile: true
           - browser: chromium
             project: mobile-android
-            name: "Galaxy S24"
+            name: 'Galaxy S24'
             mobile: true
           - browser: webkit
             project: mobile-ipad
-            name: "Large iPad Landscape"
+            name: 'Large iPad Landscape'
             mobile: true
           - browser: chromium
             project: mobile-android-tablet
-            name: "Galaxy Tab S9 Landscape"
+            name: 'Galaxy Tab S9 Landscape'
             mobile: true
 
     steps:
@@ -458,7 +458,7 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -582,7 +582,7 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -687,7 +687,7 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -738,7 +738,7 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -808,16 +808,7 @@ jobs:
   quality-gate:
     name: 🚪 Quality Gate
     runs-on: ubuntu-latest
-    needs:
-      [
-        code-quality,
-        test,
-        security,
-        build,
-        accessibility,
-        cross-browser,
-        i18n-check,
-      ]
+    needs: [code-quality, test, security, build, accessibility, cross-browser, i18n-check]
     if: always()
     timeout-minutes: 5
 

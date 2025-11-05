@@ -20,8 +20,10 @@ import {
   useQuizHandlers,
 } from '@/hooks/useAppLogic';
 import { saveQuizResult } from '@/utils/resultsStorage';
+import PerformanceMonitor from './components/PerformanceMonitor';
 import TranslationLoader from './components/TranslationLoader';
 import { useAppMessages } from './hooks/useAppMessages';
+import { usePerformanceTracking } from './hooks/usePerformance';
 import { useProblemGenerator } from './hooks/useProblemGenerator';
 import { useSettings } from './hooks/useSettings';
 import { useSettingsValidation } from './hooks/useSettingsValidation';
@@ -736,8 +738,16 @@ const useAppViewModel = (): AppViewModel => {
 };
 
 function App(): React.JSX.Element {
+  // React 19.2 Features Integration
+  const { trackRender } = usePerformanceTracking();
+
   const { t, isLoading, loadingMessages, messages, mainContentProps, showSpeedInsights } =
     useAppViewModel();
+
+  // Track render performance with React 19.2 features
+  React.useEffect(() => {
+    trackRender();
+  });
 
   if (isLoading) {
     return <LoadingScreen title={loadingMessages.title} message={loadingMessages.message} />;
@@ -766,6 +776,9 @@ function App(): React.JSX.Element {
             </Suspense>
           )}
         </main>
+
+        {/* React 19.2 Performance Monitor */}
+        <PerformanceMonitor enabled={process.env.NODE_ENV === 'development'} showDetails />
       </div>
     </TranslationLoader>
   );

@@ -7,7 +7,7 @@
 [![pnpm 10.18.0](https://img.shields.io/badge/pnpm-10.18.0-orange.svg)](https://pnpm.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-MathGenie is a modern web application built with **React 19.1.1**, **TypeScript 5.9**, and **Node.js 22.19.1**, designed to help tutors generate math problems focusing on basic arithmetic operations. Enhanced with the latest React concurrent features and full TypeScript support for optimal performance, type safety, and developer experience.
+MathGenie is a modern web application built with **React 19.2.0**, **TypeScript 5.9**, and **Node.js 22.19.1**, designed to help tutors generate math problems focusing on basic arithmetic operations. Enhanced with the latest React concurrent features and full TypeScript support for optimal performance, type safety, and developer experience.
 
 ## ✨ Features
 
@@ -40,7 +40,7 @@ MathGenie is a modern web application built with **React 19.1.1**, **TypeScript 
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React 19.1.1 with concurrent features and TypeScript 5.9
+- **Frontend**: React 19.2.0 with concurrent features and TypeScript 5.9
 - **Runtime**: Node.js 22.19.1 with enhanced performance
 - **Build Tool**: Vite 7.1.4 for lightning-fast development with TypeScript support
 - **Package Manager**: pnpm 10.18.0 for optimal performance and disk efficiency
@@ -677,7 +677,7 @@ pnpm build:types
 
 **React 19 Features Not Working**
 
-- Ensure you're using React 19.1.1 or higher
+- Ensure you're using React 19.2.0 or higher
 - Check TypeScript configuration for React 19 support
 - Verify feature flags in `react19-config.ts`
 
@@ -719,4 +719,4 @@ Third-party dependencies and their licenses are documented in the [NOTICE](NOTIC
 
 ---
 
-**Built with ❤️ using React 19.1.1, TypeScript 5.9, and Node.js 22.19.1**
+**Built with ❤️ using React 19.2.0, TypeScript 5.9, and Node.js 22.19.1**

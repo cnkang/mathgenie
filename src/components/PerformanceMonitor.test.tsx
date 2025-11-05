@@ -36,8 +36,8 @@ describe('PerformanceMonitor', () => {
     originalPerformanceObserver = global.PerformanceObserver;
     global.PerformanceObserver = MockPerformanceObserver as any;
 
-    consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-    consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {}) as any;
+    consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {}) as any;
 
     vi.useFakeTimers();
   });

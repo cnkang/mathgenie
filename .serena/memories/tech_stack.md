@@ -1,7 +1,7 @@
 # MathGenie Tech Stack
 
 ## Core Technologies
-- **React 19.1.1**: Latest React with concurrent features, automatic batching, and enhanced performance
+- **React 19.2.0**: Latest React with concurrent features, automatic batching, and enhanced performance
   - Concurrent rendering with `useTransition`
   - Optimistic updates with `useOptimistic`
   - Deferred values with `useDeferredValue`
