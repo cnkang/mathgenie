@@ -2,7 +2,7 @@ import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ConsoleMock } from '../../tests/helpers/consoleMock';
 import { act, render, screen, waitFor } from '../../tests/helpers/testUtils';
-import { I18nProvider, useTranslation } from './index';
+import { I18nProvider, useTranslation, interpolate } from './index';
 
 // Mock dynamic imports
 vi.mock('./translations/en.ts', () => ({
@@ -222,55 +222,26 @@ describe.sequential('I18n System', () => {
     });
   });
 
-  it.skip('handles string interpolation in translations', async () => {
-    const TestInterpolationComponent = () => {
-      const { t, isLoading, currentLanguage } = useTranslation();
-      const translationValue = t('test.interpolation', { name: 'World' });
+  it('handles string interpolation in translations', () => {
+    // Test the interpolation function directly since dynamic imports are problematic in React 19.2
 
-      return (
-        <div>
-          <div data-testid='loading'>{isLoading ? 'loading' : 'loaded'}</div>
-          <div data-testid='language'>{currentLanguage}</div>
-          <div data-testid='raw-value'>{t('test.interpolation')}</div>
-          <div data-testid='interpolation'>{translationValue}</div>
-        </div>
-      );
-    };
+    // Test basic interpolation
+    const template = 'Hello {{name}}!';
+    const params = { name: 'World' };
+    const result = interpolate(template, params);
 
-    const { container } = render(
-      <I18nProvider>
-        <TestInterpolationComponent />
-      </I18nProvider>
-    );
+    expect(result).toBe('Hello World!');
 
-    // Wait for translations to load and language to be set
-    await waitFor(
-      () => {
-        const loadingEl = container.querySelector('[data-testid="loading"]');
-        const languageEl = container.querySelector('[data-testid="language"]');
-        expect(loadingEl?.textContent).toBe('loaded');
-        expect(languageEl?.textContent).toBe('en');
-      },
-      { timeout: 3000 }
-    );
+    // Test multiple parameters
+    const multiTemplate = 'Hello {{name}}, you have {{count}} messages!';
+    const multiParams = { name: 'Alice', count: 5 };
+    const multiResult = interpolate(multiTemplate, multiParams);
 
-    // Wait a bit more for translations to be fully processed
-    await new Promise(resolve => setTimeout(resolve, 100));
+    expect(multiResult).toBe('Hello Alice, you have 5 messages!');
 
-    // Then check interpolation
-    await waitFor(
-      () => {
-        const interpolationEl = container.querySelector('[data-testid="interpolation"]');
-        const rawValueEl = container.querySelector('[data-testid="raw-value"]');
-
-        // Debug output
-        console.log('Raw value:', rawValueEl?.textContent);
-        console.log('Interpolated value:', interpolationEl?.textContent);
-
-        expect(interpolationEl?.textContent).toBe('Hello World!');
-      },
-      { timeout: 3000 }
-    );
+    // Test no parameters
+    const noParamsResult = interpolate(template, {});
+    expect(noParamsResult).toBe('Hello {{name}}!');
   });
 
   it('throws error when useTranslation is used outside provider', () => {

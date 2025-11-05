@@ -96,7 +96,7 @@ const replaceAllPlaceholders = (text: string, key: string, value: string | numbe
   return result;
 };
 
-const interpolate = (template: string, params: Record<string, string | number>): string => {
+export const interpolate = (template: string, params: Record<string, string | number>): string => {
   if (hasNoParams(params)) {
     return template;
   }
