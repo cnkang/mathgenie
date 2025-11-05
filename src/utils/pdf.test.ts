@@ -10,11 +10,9 @@ const mockJsPDFInstance = {
   save: vi.fn(),
 };
 
-const mockJsPDF = vi.fn(() => mockJsPDFInstance);
-
 // Mock the jsPDF module
 vi.mock('jspdf', () => ({
-  default: mockJsPDF,
+  default: vi.fn().mockImplementation(() => mockJsPDFInstance),
 }));
 
 const paperSizes: PaperSizeOptions = {

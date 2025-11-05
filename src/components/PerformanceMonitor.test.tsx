@@ -245,7 +245,7 @@ describe('PerformanceMonitor', () => {
       configurable: true,
     });
 
-    let observerCallback: PerformanceObserverCallback;
+    let observerCallback: PerformanceObserverCallback | undefined;
 
     class TestObserver {
       private active = false;
@@ -277,7 +277,9 @@ describe('PerformanceMonitor', () => {
       getEntries: () => mockEntries,
     };
 
-    observerCallback!(mockList as any, {} as any);
+    if (observerCallback) {
+      observerCallback(mockList as any, {} as any);
+    }
 
     expect(consoleLogSpy).toHaveBeenCalledWith('test-metric: 100ms');
     expect(consoleLogSpy).toHaveBeenCalledWith('test-duration: 200ms');
@@ -294,7 +296,7 @@ describe('PerformanceMonitor', () => {
       configurable: true,
     });
 
-    let observerCallback: PerformanceObserverCallback;
+    let observerCallback: PerformanceObserverCallback | undefined;
 
     class TestObserver {
       private active = false;
@@ -323,7 +325,9 @@ describe('PerformanceMonitor', () => {
       getEntries: () => mockEntries,
     };
 
-    observerCallback!(mockList as any, {} as any);
+    if (observerCallback) {
+      observerCallback(mockList as any, {} as any);
+    }
 
     expect(mockGtag).toHaveBeenCalledWith('event', 'web_vitals', {
       event_category: 'Performance',
@@ -343,7 +347,7 @@ describe('PerformanceMonitor', () => {
       configurable: true,
     });
 
-    let observerCallback: PerformanceObserverCallback;
+    let observerCallback: PerformanceObserverCallback | undefined;
 
     class TestObserver {
       private active = false;
@@ -373,7 +377,9 @@ describe('PerformanceMonitor', () => {
     };
 
     expect(() => {
-      observerCallback!(mockList as any, {} as any);
+      if (observerCallback) {
+        observerCallback(mockList as any, {} as any);
+      }
     }).not.toThrow();
 
     delete (global as any).window;
@@ -388,7 +394,7 @@ describe('PerformanceMonitor', () => {
       configurable: true,
     });
 
-    let observerCallback: PerformanceObserverCallback;
+    let observerCallback: PerformanceObserverCallback | undefined;
 
     class TestObserver {
       private active = false;
@@ -420,7 +426,9 @@ describe('PerformanceMonitor', () => {
       getEntries: () => mockEntries,
     };
 
-    observerCallback!(mockList as any, {} as any);
+    if (observerCallback) {
+      observerCallback(mockList as any, {} as any);
+    }
 
     expect(mockGtag).toHaveBeenCalledWith('event', 'web_vitals', {
       event_category: 'Performance',
