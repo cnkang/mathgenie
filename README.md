@@ -699,6 +699,21 @@ pnpm build:types
 - `@types/node`: Node.js TypeScript definitions
 - `vitest`: Testing framework with TypeScript support
 
+### Security Overrides
+
+The project uses pnpm overrides to enforce secure versions of transitive dependencies:
+
+- **js-yaml**: Forced to `^4.1.1` to address security vulnerabilities in older versions (< 4.1.1) used by `@lhci/utils`. This override ensures all instances of js-yaml in the dependency tree use a secure version.
+  - **Vulnerability**: js-yaml < 4.1.1 contains high-severity security issues with potential code execution via malicious YAML parsing
+  - **Affected Package**: `@lhci/utils@0.15.1` depends on vulnerable js-yaml 3.14.2
+  - **Fix**: Override forces all js-yaml instances to version 4.1.1 or higher
+  - **References**: [js-yaml Security Advisory](https://github.com/nodeca/js-yaml/security/advisories), [npm Advisory Database](https://www.npmjs.com/advisories)
+  - **Removal Criteria**: This override can be removed when:
+    - `@lhci/utils` is updated to use js-yaml 4.1.1+ natively, OR
+    - An alternative performance testing tool is adopted, OR
+    - js-yaml is no longer a transitive dependency
+  - **Monitoring**: Run `pnpm audit` and `pnpm why js-yaml` regularly to verify the override is still necessary
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

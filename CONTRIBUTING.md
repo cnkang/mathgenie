@@ -793,7 +793,8 @@ Brief description of changes
 
 - **Input Validation**: Validate all user inputs
 - **XSS Prevention**: Sanitize dynamic content
-- **Dependencies**: Keep dependencies updated
+- **Dependencies**: Keep dependencies updated and use pnpm overrides for security fixes when needed
+- **Security Overrides**: The project uses pnpm overrides (e.g., `js-yaml ^4.1.1`) to enforce secure versions of transitive dependencies
 - **Secrets**: Never commit sensitive information
 
 ### Reporting Security Issues
