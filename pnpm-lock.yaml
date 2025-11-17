@@ -14,11 +14,6 @@ overrides:
   punycode: npm:punycode.js@^2.3.1
   '@babel/plugin-proposal-private-methods': npm:@babel/plugin-transform-private-methods@^7.27.1
 
-patchedDependencies:
-  '@lhci/utils@0.15.1':
-    hash: d543de2cd2dadadbb6465e9411e7bc12dd6706a75c6d3ef9fe352cf51f90761c
-    path: patches/@lhci__utils@0.15.1.patch
-
 importers:
 
   .:
@@ -4595,7 +4590,7 @@ snapshots:
 
   '@lhci/cli@0.15.1':
     dependencies:
-      '@lhci/utils': 0.15.1(patch_hash=d543de2cd2dadadbb6465e9411e7bc12dd6706a75c6d3ef9fe352cf51f90761c)
+      '@lhci/utils': 0.15.1
       chrome-launcher: 1.2.1
       compression: 1.8.1
       debug: 4.4.3
@@ -4619,7 +4614,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@lhci/utils@0.15.1(patch_hash=d543de2cd2dadadbb6465e9411e7bc12dd6706a75c6d3ef9fe352cf51f90761c)':
+  '@lhci/utils@0.15.1':
     dependencies:
       debug: 4.4.3
       isomorphic-fetch: 3.0.0
