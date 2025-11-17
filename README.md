@@ -703,7 +703,7 @@ pnpm build:types
 
 The project uses pnpm overrides to enforce secure versions of transitive dependencies:
 
-- **js-yaml**: Forced to `^4.1.1` to address security vulnerabilities in older versions (< 4.1.1) used by `@lhci/utils`. This override ensures all instances of js-yaml in the dependency tree use a secure version.
+- **js-yaml**: Forced to `^4.1.1` to address security vulnerabilities in older versions (< 4.1.1) used by `@lhci/utils` (transitive dependency of `@lhci/cli`). This override ensures all instances of js-yaml in the dependency tree use a secure version.
   - **Vulnerability**: js-yaml < 4.1.1 contains high-severity security issues with potential code execution via malicious YAML parsing
   - **Affected Package**: `@lhci/utils@0.15.1` depends on vulnerable js-yaml 3.14.2
   - **Fix**: Override forces all js-yaml instances to version 4.1.1 or higher
