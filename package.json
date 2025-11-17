@@ -113,7 +113,7 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/node": "^24.10.1",
-    "@types/react": "^19.2.4",
+    "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@typescript-eslint/eslint-plugin": "^8.46.4",
     "@typescript-eslint/parser": "^8.46.4",
@@ -170,12 +170,16 @@
   "pnpm": {
     "overrides": {
       "glob": "^11.0.3",
+      "js-yaml": "^4.1.1",
       "rimraf": "^6.0.1",
       "chrome-launcher": "^1.2.0",
       "tmp": "^0.2.5",
       "os-tmpdir": "^2.0.0",
       "punycode": "npm:punycode.js@^2.3.1",
       "@babel/plugin-proposal-private-methods": "npm:@babel/plugin-transform-private-methods@^7.27.1"
+    },
+    "patchedDependencies": {
+      "@lhci/utils@0.15.1": "patches/@lhci__utils@0.15.1.patch"
     }
   },
   "packageManager": "pnpm@10.18.0+sha512.e804f889f1cecc40d572db084eec3e4881739f8dec69c0ff10d2d1beff9a4e309383ba27b5b750059d7f4c149535b6cd0d2cb1ed3aeb739239a4284a68f40cfa"
