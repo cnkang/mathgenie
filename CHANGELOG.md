@@ -10,9 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 
 - **js-yaml Security Fix**: Added pnpm override to force js-yaml to version 4.1.1 or higher
-  - **Issue**: `@lhci/utils@0.15.1` depends on vulnerable js-yaml 3.14.2
+  - **Issue**: `@lhci/utils@0.15.1` (transitive dependency of `@lhci/cli`) depends on vulnerable js-yaml 3.14.2
   - **Vulnerability**: js-yaml < 4.1.1 contains high-severity security issues with potential code execution via malicious YAML parsing
   - **Solution**: pnpm override ensures all js-yaml instances use secure version 4.1.1+
+  - **Note**: Previously used pnpm patch, now simplified to use only pnpm override
   - **Impact**: Zero functional changes; all tests pass; Lighthouse CI continues to work correctly
   - **References**: See [SECURITY.md](SECURITY.md) for detailed information and removal criteria
   - **Verification**: Run `pnpm audit` and `pnpm why js-yaml` to verify the fix

@@ -19,7 +19,7 @@ MathGenie takes dependency security seriously and implements the following measu
 
 #### js-yaml Security Fix
 
-**Issue**: The `@lhci/utils@0.15.1` package depends on js-yaml 3.14.2, which contains known security vulnerabilities.
+**Issue**: The `@lhci/utils@0.15.1` package (transitive dependency of `@lhci/cli`) depends on js-yaml 3.14.2, which contains known security vulnerabilities.
 
 **Vulnerability Details**:
 
