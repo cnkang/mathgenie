@@ -30,6 +30,26 @@ select {
   transition: all var(--transition-fast);
 }
 
+/* WCAG 2.2 AAA: Dark mode input color contrast fix */
+@media (prefers-color-scheme: dark) {
+  input,
+  select {
+    /* Force proper text color in dark mode to ensure 7:1+ contrast ratio */
+    color: var(--text-primary) !important;
+    /* Ensure background uses the correct dark mode color */
+    background-color: var(--bg-primary) !important;
+    /* Prevent browser default styling from overriding */
+    -webkit-text-fill-color: var(--text-primary) !important;
+  }
+
+  /* Ensure placeholder text also has sufficient contrast */
+  input::placeholder,
+  select::placeholder {
+    color: var(--text-muted) !important;
+    opacity: 1 !important;
+  }
+}
+
 /* WCAG 2.2 AAA: Comprehensive touch target enforcement for ALL interactive elements */
 button,
 input,
