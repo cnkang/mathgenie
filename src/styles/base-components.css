@@ -36,8 +36,10 @@ select {
   select {
     /* Force proper text color in dark mode to ensure 7:1+ contrast ratio */
     color: var(--text-primary) !important;
+
     /* Ensure background uses the correct dark mode color */
     background-color: var(--bg-primary) !important;
+
     /* Prevent browser default styling from overriding */
     -webkit-text-fill-color: var(--text-primary) !important;
   }
