@@ -314,13 +314,24 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
       await page.waitForTimeout(2000);
 
       // Dismiss any error/success messages that might be blocking elements
-      const dismissButtons = page.locator('.message-dismiss');
-      const dismissCount = await dismissButtons.count();
-      for (let i = 0; i < dismissCount; i++) {
-        const button = dismissButtons.nth(i);
-        if (await button.isVisible()) {
-          await button.click();
+      // Use a more robust approach that handles element instability
+      try {
+        const dismissButtons = page.locator('.message-dismiss');
+        const dismissCount = await dismissButtons.count();
+        for (let i = 0; i < dismissCount; i++) {
+          try {
+            const button = dismissButtons.nth(i);
+            // Wait for the button to be stable before clicking
+            await button.waitFor({ state: 'visible', timeout: 2000 });
+            await button.click({ timeout: 3000, force: true });
+            await page.waitForTimeout(300);
+          } catch (e) {
+            // Button might have auto-dismissed or is not clickable, continue
+            continue;
+          }
         }
+      } catch (e) {
+        // No dismiss buttons found or they disappeared, continue with test
       }
 
       await page.waitForTimeout(500);
