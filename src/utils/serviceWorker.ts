@@ -9,8 +9,8 @@ interface ServiceWorkerConfig {
 // SONAR-SAFE: The .exec() below is a regex method call, not OS command execution
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||
-    window.location.hostname === '[::1]' ||
-    /^127(?:\.(?:25[0-5]|2[0-4]\d|[01]?\d\d?)){3}$/.exec(window.location.hostname)
+  window.location.hostname === '[::1]' ||
+  /^127(?:\.(?:25[0-5]|2[0-4]\d|[01]?\d\d?)){3}$/.exec(window.location.hostname)
 );
 
 const isServiceWorkerSupported = (): boolean => 'serviceWorker' in navigator;

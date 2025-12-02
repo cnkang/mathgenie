@@ -6,10 +6,7 @@ export type Translator = (key: string, params?: Record<string, string | number>)
 
 const mapProblemsWithAnswers = (problems: Problem[]): Problem[] =>
   problems.map(problem => {
-    const expression = problem.text
-      .replace(' = ', '')
-      .replace(/[✖×]/g, '*')
-      .replace(/[➗÷]/g, '/');
+    const expression = problem.text.replace(' = ', '').replace(/[✖×]/g, '*').replace(/[➗÷]/g, '/');
     let correctAnswer: number;
     try {
       correctAnswer = safeEvaluateExpression(expression);
