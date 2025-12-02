@@ -176,7 +176,8 @@
       "tmp": "^0.2.5",
       "os-tmpdir": "^2.0.0",
       "punycode": "npm:punycode.js@^2.3.1",
-      "@babel/plugin-proposal-private-methods": "npm:@babel/plugin-transform-private-methods@^7.27.1"
+      "@babel/plugin-proposal-private-methods": "npm:@babel/plugin-transform-private-methods@^7.27.1",
+      "express": "^5.2.0"
     }
   },
   "packageManager": "pnpm@10.23.0"
