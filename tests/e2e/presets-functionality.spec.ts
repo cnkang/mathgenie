@@ -66,7 +66,9 @@ test.describe('Presets Functionality', () => {
 
     // Check multiplication preset - use more specific selector
     const multiplicationCard = page.locator('.preset-card:has-text("Multiplication")');
-    await expect(multiplicationCard.locator('h3')).toContainText('Multiplication', { timeout: 8000 });
+    await expect(multiplicationCard.locator('h3')).toContainText('Multiplication', {
+      timeout: 8000,
+    });
     await expect(multiplicationCard.locator('p')).toContainText('Focus on multiplication practice');
   });
 
@@ -80,26 +82,8 @@ test.describe('Presets Functionality', () => {
       { timeout: 10000 }
     );
 
-    // Wait for presets to load
-    await page.waitForSelector('.settings-presets', { timeout: 10000 });
-
-    // Wait for all preset cards to be visible
-    await page.waitForSelector('.preset-card', { timeout: 10000 });
-
-    // Ensure we have exactly 4 preset cards
-    const presetCount = await page.locator('.preset-card').count();
-    expect(presetCount).toBe(4);
-
-    // Click beginner preset (first preset card)
-    const beginnerButton = page.locator('.preset-card').first();
-
-    await expect(beginnerButton).toBeVisible();
-
-    // Use Playwright's native click for better cross-browser compatibility
-    await beginnerButton.click({ timeout: 5000 });
-
-    // Wait for settings to be applied by checking for actual state change
-    await expect(page.locator('#numProblems')).toHaveValue('15', { timeout: 5000 });
+    // Use WebKit-safe preset application for better cross-browser compatibility
+    await applyPresetWebkitSafe(page, 0);
 
     // Verify beginner preset settings are applied
     await expect(page.locator('#numProblems')).toHaveValue('15');
@@ -300,28 +284,21 @@ test.describe('Presets Functionality', () => {
 
     // Check that preset buttons have proper ARIA labels
     const presetButtons = page.locator('.preset-card');
-    
+
     // Get count once and use it, avoid repeated count() calls in Firefox
     const buttonCount = await presetButtons.count();
     expect(buttonCount).toBeGreaterThan(0); // Ensure we have buttons to test
 
-    // Use Promise.all for better performance in Firefox instead of sequential loop
-    const buttonChecks = [];
-    for (let i = 0; i < Math.min(buttonCount, 10); i++) { // Limit to 10 to prevent Firefox timeout
+    // Check each button sequentially to avoid nested Promise.all issues
+    for (let i = 0; i < Math.min(buttonCount, 10); i++) {
+      // Limit to 10 to prevent Firefox timeout
       const button = presetButtons.nth(i);
-      buttonChecks.push(
-        Promise.all([
-          expect(button).toBeVisible({ timeout: 5000 }),
-          button.getAttribute('aria-label').then(ariaLabel => {
-            expect(ariaLabel).toBeTruthy();
-            expect(ariaLabel).toContain('Apply');
-          })
-        ])
-      );
+      await expect(button).toBeVisible({ timeout: 5000 });
+      
+      const ariaLabel = await button.getAttribute('aria-label');
+      expect(ariaLabel).toBeTruthy();
+      expect(ariaLabel).toContain('Apply');
     }
-    
-    // Wait for all checks to complete
-    await Promise.all(buttonChecks);
   });
 
   test('should handle rapid preset switching', async ({ page }: { page: Page }) => {
