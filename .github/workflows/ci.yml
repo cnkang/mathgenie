@@ -521,8 +521,12 @@ jobs:
             echo "📋 Available browsers:"
             pnpm exec playwright install --dry-run || true
             echo "🔍 WebKit browser check:"
-            find ~/.cache/ms-playwright -name "*webkit*" -type d || echo "No WebKit in cache"
-            find node_modules/playwright-core/.local-browsers -name "*webkit*" -type d || echo "No WebKit in local"
+            find ~/.cache/ms-playwright -name "*webkit*" -type d 2>/dev/null || echo "No WebKit in cache"
+            if [ -d "node_modules/playwright-core/.local-browsers" ]; then
+              find node_modules/playwright-core/.local-browsers -name "*webkit*" -type d 2>/dev/null || echo "No WebKit in local"
+            else
+              echo "Local browsers directory does not exist (using cache)"
+            fi
           fi
 
           JSON_REPORT_FILE=test-results-${{ matrix.project }}.json \
