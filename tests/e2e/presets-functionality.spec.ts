@@ -109,16 +109,8 @@ test.describe('Presets Functionality', () => {
   });
 
   test('should apply intermediate preset correctly', async ({ page }: { page: Page }) => {
-    // Wait for presets to load
-    await page.waitForSelector('.settings-presets', { timeout: 10000 });
-
-    // Click intermediate preset using Playwright's native click
-    const intermediateButton = page.locator('.preset-card').nth(1);
-    await expect(intermediateButton).toBeVisible();
-    await intermediateButton.click({ timeout: 5000 });
-
-    // Wait for settings to be applied by checking for actual state change
-    await expect(page.locator('#numProblems')).toHaveValue('20', { timeout: 5000 });
+    // Use WebKit-safe preset application for better cross-browser compatibility
+    await applyPresetWebkitSafe(page, 1);
 
     // Verify intermediate preset settings are applied
     await expect(page.locator('#numProblems')).toHaveValue('20');
@@ -138,16 +130,8 @@ test.describe('Presets Functionality', () => {
   });
 
   test('should apply advanced preset correctly', async ({ page }: { page: Page }) => {
-    // Wait for presets to load
-    await page.waitForSelector('.settings-presets', { timeout: 10000 });
-
-    // Click advanced preset using Playwright's native click
-    const advancedButton = page.locator('.preset-card').nth(2);
-    await expect(advancedButton).toBeVisible();
-    await advancedButton.click({ timeout: 5000 });
-
-    // Wait for settings to be applied by checking for actual state change
-    await expect(page.locator('#numProblems')).toHaveValue('25', { timeout: 5000 });
+    // Use WebKit-safe preset application for better cross-browser compatibility
+    await applyPresetWebkitSafe(page, 2);
 
     // Verify advanced preset settings are applied
     await expect(page.locator('#numProblems')).toHaveValue('25');
@@ -170,16 +154,8 @@ test.describe('Presets Functionality', () => {
   });
 
   test('should apply multiplication preset correctly', async ({ page }: { page: Page }) => {
-    // Wait for presets to load
-    await page.waitForSelector('.settings-presets', { timeout: 10000 });
-
-    // Click multiplication preset using Playwright's native click
-    const multiplicationButton = page.locator('.preset-card').nth(3);
-    await expect(multiplicationButton).toBeVisible();
-    await multiplicationButton.click({ timeout: 5000 });
-
-    // Wait for settings to be applied by checking for actual state change
-    await expect(page.locator('#numProblems')).toHaveValue('30', { timeout: 5000 });
+    // Use WebKit-safe preset application for better cross-browser compatibility
+    await applyPresetWebkitSafe(page, 3);
 
     // Verify multiplication preset settings are applied
     await expect(page.locator('#numProblems')).toHaveValue('30');
@@ -199,12 +175,8 @@ test.describe('Presets Functionality', () => {
   });
 
   test('should generate problems after applying preset', async ({ page }: { page: Page }) => {
-    // Wait for presets to load
-    await page.waitForSelector('.settings-presets', { timeout: 10000 });
-
-    // Apply beginner preset
-    const beginnerButton = page.locator('.preset-card').first();
-    await beginnerButton.click({ timeout: 5000 });
+    // Use WebKit-safe preset application for better cross-browser compatibility
+    await applyPresetWebkitSafe(page, 0);
 
     // Wait for problems to be generated automatically
     await page.waitForSelector('.problem-item', { timeout: 10000 });
@@ -226,27 +198,21 @@ test.describe('Presets Functionality', () => {
   }: {
     page: Page;
   }) => {
-    // Wait for presets to load
-    await page.waitForSelector('.settings-presets', { timeout: 10000 });
-
-    // Apply beginner preset first
-    const beginnerPreset = page.locator('.preset-card').first();
-    await beginnerPreset.click({ timeout: 5000 });
+    // Use WebKit-safe preset application for better cross-browser compatibility
+    await applyPresetWebkitSafe(page, 0);
 
     // Verify beginner settings
     await expect(page.locator('#numProblems')).toHaveValue('15', { timeout: 5000 });
 
     // Apply intermediate preset
-    const intermediatePreset = page.locator('.preset-card').nth(1);
-    await intermediatePreset.click({ timeout: 5000 });
+    await applyPresetWebkitSafe(page, 1);
 
     // Verify intermediate settings
     await expect(page.locator('#numProblems')).toHaveValue('20', { timeout: 5000 });
     await expect(page.locator('#numRangeTo')).toHaveValue('50', { timeout: 5000 });
 
     // Apply advanced preset
-    const advancedPreset = page.locator('.preset-card').nth(2);
-    await advancedPreset.click({ timeout: 5000 });
+    await applyPresetWebkitSafe(page, 2);
 
     // Verify advanced settings
     await expect(page.locator('#numProblems')).toHaveValue('25', { timeout: 5000 });
@@ -264,10 +230,8 @@ test.describe('Presets Functionality', () => {
     // Presets should still be visible and functional
     await expect(page.locator('.settings-presets')).toBeVisible();
 
-    // Apply a preset
-    const firstPresetButton = page.locator('.preset-card').first();
-    await expect(firstPresetButton).toBeVisible();
-    await firstPresetButton.click({ timeout: 5000 });
+    // Apply a preset using WebKit-safe method
+    await applyPresetWebkitSafe(page, 0);
 
     // Verify settings are applied correctly
     await expect(page.locator('#numProblems')).toHaveValue('15', { timeout: 5000 });
@@ -294,7 +258,7 @@ test.describe('Presets Functionality', () => {
       // Limit to 10 to prevent Firefox timeout
       const button = presetButtons.nth(i);
       await expect(button).toBeVisible({ timeout: 5000 });
-      
+
       const ariaLabel = await button.getAttribute('aria-label');
       expect(ariaLabel).toBeTruthy();
       expect(ariaLabel).toContain('Apply');
@@ -318,15 +282,8 @@ test.describe('Presets Functionality', () => {
   });
 
   test('should persist preset settings in localStorage', async ({ page }: { page: Page }) => {
-    // Wait for presets to load
-    await page.waitForSelector('.settings-presets', { timeout: 10000 });
-
-    // Apply advanced preset
-    const advancedPreset = page.locator('.preset-card').nth(2);
-    await advancedPreset.click({ timeout: 5000 });
-
-    // Wait for settings to be applied by checking for actual state change
-    await expect(page.locator('#numProblems')).toHaveValue('25', { timeout: 5000 });
+    // Use WebKit-safe preset application for better cross-browser compatibility
+    await applyPresetWebkitSafe(page, 2);
 
     // Verify settings are saved in localStorage
     const savedSettings = await page.evaluate(() => {
@@ -350,7 +307,7 @@ test.describe('Presets Functionality', () => {
 
   test('should show visual feedback when preset is applied', async ({ page }: { page: Page }) => {
     // Wait for presets to load
-    await page.waitForSelector('.settings-presets', { timeout: 10000 });
+    await waitForPresetsLoad(page);
 
     // First set a different value to ensure change is visible
     await page.fill('#numProblems', '10');
@@ -360,9 +317,8 @@ test.describe('Presets Functionality', () => {
     const initialNumProblems = await page.locator('#numProblems').inputValue();
     expect(initialNumProblems).toBe('10');
 
-    // Apply intermediate preset (should change to 20)
-    const intermediatePreset = page.locator('.preset-card').nth(1);
-    await intermediatePreset.click({ timeout: 5000 });
+    // Apply intermediate preset (should change to 20) using WebKit-safe method
+    await applyPresetWebkitSafe(page, 1);
 
     // Wait for changes to be visible by checking for actual state change
     await expect(page.locator('#numProblems')).toHaveValue('20', { timeout: 5000 });
