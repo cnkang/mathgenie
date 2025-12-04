@@ -11,7 +11,7 @@
     "./src/utils/serviceWorker.ts"
   ],
   "dependencies": {
-    "@vercel/speed-insights": "^1.3.0",
+    "@vercel/speed-insights": "^1.3.1",
     "jspdf": "^3.0.4",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
