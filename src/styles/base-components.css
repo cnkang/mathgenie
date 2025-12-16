@@ -30,27 +30,109 @@ select {
   transition: all var(--transition-fast);
 }
 
-/* WCAG 2.2 AAA: Dark mode input color contrast fix */
+/* WCAG 2.2 AAA: Dark mode input color contrast fix - Enhanced with explicit colors */
 @media (prefers-color-scheme: dark) {
+  /* High specificity selectors to override browser defaults */
   input,
-  select {
-    /* Force proper text color in dark mode to ensure 7:1+ contrast ratio */
-    color: var(--text-primary) !important;
-
-    /* Ensure background uses the correct dark mode color */
-    background-color: var(--bg-primary) !important;
-
+  select,
+  input[type="number"],
+  input[type="text"],
+  input.single-input,
+  input.range-from,
+  input.range-to,
+  input[id="numProblems"],
+  input[id="numRangeFrom"],
+  input[id="numRangeTo"],
+  input[id="result-range-from"],
+  input[id="result-range-to"],
+  input[id="operands-range-from"],
+  input[id="operands-range-to"] {
+    /* WCAG 2.2 AAA: Explicit colors for 7:1+ contrast ratio */
+    color: #f8fafc !important; /* Light text on dark background */
+    background-color: #0f172a !important; /* Dark background */
+    border-color: #475569 !important; /* Visible border */
+    
     /* Prevent browser default styling from overriding */
-    -webkit-text-fill-color: var(--text-primary) !important;
+    -webkit-text-fill-color: #f8fafc !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
   }
 
   /* Ensure placeholder text also has sufficient contrast */
   input::placeholder,
-  select::placeholder {
-    color: var(--text-muted) !important;
+  select::placeholder,
+  input[type="number"]::placeholder,
+  input.single-input::placeholder,
+  input.range-from::placeholder,
+  input.range-to::placeholder {
+    color: #94a3b8 !important; /* Muted but still accessible */
     opacity: 1 !important;
   }
+
+  /* Focus states with proper contrast */
+  input:focus,
+  select:focus,
+  input[type="number"]:focus,
+  input.single-input:focus,
+  input.range-from:focus,
+  input.range-to:focus {
+    color: #f8fafc !important;
+    background-color: #0f172a !important;
+    border-color: #6366f1 !important; /* Primary color for focus */
+    -webkit-text-fill-color: #f8fafc !important;
+  }
+
+  /* Hover states with proper contrast */
+  input:hover,
+  select:hover,
+  input[type="number"]:hover,
+  input.single-input:hover,
+  input.range-from:hover,
+  input.range-to:hover {
+    color: #f8fafc !important;
+    background-color: #1e293b !important; /* Slightly lighter on hover */
+    border-color: #64748b !important;
+    -webkit-text-fill-color: #f8fafc !important;
+  }
 }
+
+  /* Ensure placeholder text also has sufficient contrast */
+  input::placeholder,
+  select::placeholder,
+  input[type="number"]::placeholder,
+  input.single-input::placeholder,
+  input.range-from::placeholder,
+  input.range-to::placeholder {
+    color: #94a3b8 !important; /* Muted but still accessible */
+    opacity: 1 !important;
+  }
+
+  /* Focus states with proper contrast */
+  input:focus,
+  select:focus,
+  input[type="number"]:focus,
+  input.single-input:focus,
+  input.range-from:focus,
+  input.range-to:focus {
+    color: #f8fafc !important;
+    background-color: #0f172a !important;
+    border-color: #6366f1 !important; /* Primary color for focus */
+    -webkit-text-fill-color: #f8fafc !important;
+  }
+
+  /* Hover states with proper contrast */
+  input:hover,
+  select:hover,
+  input[type="number"]:hover,
+  input.single-input:hover,
+  input.range-from:hover,
+  input.range-to:hover {
+    color: #f8fafc !important;
+    background-color: #1e293b !important; /* Slightly lighter on hover */
+    border-color: #64748b !important;
+    -webkit-text-fill-color: #f8fafc !important;
+  }
 
 /* WCAG 2.2 AAA: Comprehensive touch target enforcement for ALL interactive elements */
 button,
