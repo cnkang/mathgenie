@@ -130,7 +130,7 @@
     "eslint-plugin-sonarjs": "^3.0.5",
     "globals": "^17.1.0",
     "happy-dom": "^20.3.4",
-    "html-validate": "^10.6.0",
+    "html-validate": "^10.7.0",
     "husky": "^9.1.7",
     "identity-obj-proxy": "^3.0.0",
     "jiti": "^2.6.1",
