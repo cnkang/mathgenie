@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: '24.11.0'
+  NODE_VERSION: '24.13.0'
   NODE_OPTIONS: '--max-old-space-size=4096'
   # Let Playwright use default cache paths for better caching
   # PLAYWRIGHT_BROWSERS_PATH: 0  # Removed - this prevents proper caching
