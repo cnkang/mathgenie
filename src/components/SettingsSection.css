@@ -226,6 +226,30 @@ select:focus {
   border-color: var(--border-color, #e2e8f0) !important;
 }
 
+@media (prefers-color-scheme: dark) {
+  .grouping-toggle {
+    background: var(--bg-primary);
+    border-color: var(--border-color);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 35%);
+  }
+
+  .grouping-toggle.grouping-enabled {
+    background: linear-gradient(135deg, var(--bg-secondary), rgb(99 102 241 / 25%));
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 12px rgb(99 102 241 / 25%);
+  }
+
+  .grouping-label,
+  .grouping-text,
+  .grouping-status {
+    text-shadow: none;
+  }
+
+  .grouping-help {
+    color: var(--text-secondary);
+  }
+}
+
 @media (min-width: 768px) {
   .settings-section {
     grid-template-columns: repeat(2, minmax(0, 1fr));
