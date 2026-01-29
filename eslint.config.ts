@@ -11,6 +11,9 @@ const reactPlugin: ESLint.Plugin = react as unknown as ESLint.Plugin;
 const sonarjsPlugin: ESLint.Plugin = sonarjs as unknown as ESLint.Plugin;
 const tsPlugin: ESLint.Plugin = typescript as unknown as ESLint.Plugin;
 const reactHooksPlugin: ESLint.Plugin = reactHooks as unknown as ESLint.Plugin;
+const sonarjsRecommendedRules: Linter.RulesRecord =
+  (sonarjs as { configs?: { recommended?: { rules?: Linter.RulesRecord } } }).configs?.recommended
+    ?.rules ?? {};
 
 const config = [
   js.configs.recommended,
@@ -50,7 +53,7 @@ const config = [
     },
     rules: {
       ...react.configs.recommended.rules,
-      ...sonarjs.configs.recommended.rules,
+      ...sonarjsRecommendedRules,
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
       // React hooks best practices
