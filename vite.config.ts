@@ -3,6 +3,28 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import viteCompression from 'vite-plugin-compression';
 
+const reactChunkPackages = new Set([
+  'react',
+  'react-dom',
+  'react-is',
+  'scheduler',
+  'use-sync-external-store',
+]);
+
+const getPackageName = (id: string): string | null => {
+  const nodeModulesIndex = id.lastIndexOf('node_modules/');
+  if (nodeModulesIndex === -1) {
+    return null;
+  }
+  const modulePath = id.slice(nodeModulesIndex + 'node_modules/'.length);
+  if (modulePath.startsWith('@')) {
+    const [scope, name] = modulePath.split('/');
+    return scope && name ? `${scope}/${name}` : null;
+  }
+  const [name] = modulePath.split('/');
+  return name || null;
+};
+
 export default defineConfig(({ mode }) => ({
   plugins: [
     react({
@@ -65,20 +87,14 @@ export default defineConfig(({ mode }) => ({
               return `i18n-${langMatch[1]}`; // Use prefixed chunk name to avoid conflicts
             }
           }
-          // Bundle React-related libraries separately
-          if (id.includes('react') || id.includes('react-dom')) {
-            return 'react-vendor';
-          }
-          // Bundle PDF generation library separately (large)
-          if (id.includes('jspdf')) {
-            return 'jspdf';
-          }
-          // Bundle analytics tools separately
-          if (id.includes('speed-insights') || id.includes('web-vitals')) {
-            return 'analytics';
-          }
-          // Other third-party libraries
-          if (id.includes('node_modules')) {
+          const packageName = getPackageName(id);
+          if (packageName) {
+            if (reactChunkPackages.has(packageName)) {
+              return 'react-vendor';
+            }
+            if (packageName === 'jspdf') {
+              return 'jspdf';
+            }
             return 'vendor';
           }
         },
