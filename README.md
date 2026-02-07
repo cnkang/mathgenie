@@ -119,16 +119,15 @@ pnpm type-check
 pnpm lint
 pnpm format
 
-# Complete validation (runs lint, lint:css-html, type-check, sonar:check, i18n:check, build, playwright:check, and tests)
+# Complete validation (runs lint, type-check, sonar:check, i18n:check, build, playwright:check, and tests)
 pnpm validate
 ```
 
 ### 🔍 Code Quality
 
 - **TypeScript strict mode**: Full type safety
-- **ESLint + Prettier**: Consistent code style
+- **Biome**: Unified lint + format toolchain
 - **Pre-commit hooks**: Automatic formatting and linting
-- **CSS & HTML Quality**: Unified quality checks with auto-fix capabilities
 - **Comprehensive testing**: Unit and E2E tests with cross-browser accessibility validation
 - **SonarQube Analysis**: Advanced code quality checks with HIGH priority rule focus
 - **Cross-Browser Accessibility**: Firefox-optimized WCAG enforcement for enhanced performance
@@ -382,25 +381,22 @@ After configuring the settings:
 - **Enhanced Performance**: Automatic batching and smart scheduling
 - **Error Boundaries**: Robust error handling with TypeScript
 
-#### CSS & HTML Quality Commands
+#### Biome Commands
 
 ```bash
-# Unified CSS & HTML quality check with auto-fix (recommended for development)
-pnpm lint:css-html:fix
+# Lint + format check (used in CI/CD)
+pnpm lint
 
-# Unified CSS & HTML quality check (validation only, used in CI/CD)
-pnpm lint:css-html
+# Auto-fix lint and formatting issues
+pnpm lint:fix
 
-# Individual tool commands (for specific use cases)
-pnpm lint:css:fix    # CSS auto-fix only
-pnpm lint:html       # HTML validation only
+# Format-only write mode
+pnpm format
 ```
 
 **Quality Tools:**
 
-- **stylelint**: CSS quality checking with auto-fix capabilities
-- **html-validate**: Modern HTML validation (replaces HTMLHint)
-- **Unified Script**: Consolidated reporting and error handling
+- **Biome**: Unified linting, formatting, and import organization
 
 ## 🧪 Testing
 
@@ -694,8 +690,7 @@ pnpm build:types
 
 ### Development Dependencies
 
-- `@typescript-eslint/eslint-plugin`: TypeScript ESLint rules
-- `@typescript-eslint/parser`: TypeScript parser for ESLint
+- `@biomejs/biome`: Unified linter and formatter
 - `@types/node`: Node.js TypeScript definitions
 - `vitest`: Testing framework with TypeScript support
 

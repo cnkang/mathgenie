@@ -30,7 +30,7 @@ pnpm test:unit:dev
 # Watch mode (automatically runs when files change)
 pnpm test:unit:watch
 
-# Quick validation (runs lint + lint:css-html + type-check + sonar:check + i18n:check + build + playwright:check + tests)
+# Quick validation (runs lint + type-check + sonar:check + i18n:check + build + playwright:check + tests)
 pnpm validate
 ```
 
@@ -43,7 +43,7 @@ pnpm test
 # Serial testing (for memory-constrained environments)
 pnpm test:unit:serial
 
-# Full validation (same as validate - runs lint + lint:css-html + type-check + sonar:check + i18n:check + build + playwright:check + tests)
+# Full validation (same as validate - runs lint + type-check + sonar:check + i18n:check + build + playwright:check + tests)
 pnpm validate:full
 
 # E2E accessibility testing

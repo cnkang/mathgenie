@@ -20,7 +20,6 @@ This directory contains optimized build and test scripts for the MathGenie proje
 - **`optimize-build.ts`** - Production build optimization
 - **`check-browsers.ts`** - Browser installation verification
 - **`check-i18n.ts`** - Translation validation
-- **`css-html-quality-check.ts`** - CSS/HTML quality validation
 - **`sonar-check.ts`** - SonarQube quality analysis
 
 ## Usage Examples

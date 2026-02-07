@@ -199,7 +199,7 @@ Problem to Solve → Choose Approach → Try It → Evaluate Result
 1. **Complete Validation**
 
    ```bash
-   pnpm validate       # Full validation pipeline (lint + lint:css-html + type-check + i18n:check + build + playwright:check + tests)
+   pnpm validate       # Full validation pipeline (lint + type-check + i18n:check + build + playwright:check + tests)
    pnpm sonar:high     # Advanced code quality analysis
    pnpm sonar:local    # Complete local validation (lint + SonarJS)
    ```
@@ -228,13 +228,11 @@ Regardless of the approach chosen, always ensure:
 - ✅ **Testing**: Adequate test coverage
 - ✅ **Documentation**: Decisions and trade-offs documented
 
-#### CSS & HTML Quality Standards
+#### Biome Quality Standards
 
-- **Unified Quality Checks**: Use `pnpm lint:css-html:fix` for development
-- **Auto-fixing**: CSS issues are automatically resolved when possible
-- **HTML Validation**: Modern html-validate ensures semantic correctness
-- **Pre-commit Integration**: Quality checks run automatically before commits
-- **Individual Tools**: Available for specific use cases (`lint:css:fix`, `lint:html`)
+- **Unified Checks**: Use `pnpm lint` for lint + format validation
+- **Auto-fixing**: Use `pnpm lint:fix` during development
+- **Pre-commit Integration**: Biome checks run automatically before commits
 
 #### TypeScript Requirements
 
@@ -252,8 +250,7 @@ Regardless of the approach chosen, always ensure:
 
 #### Code Style
 
-- **ESLint**: All code must pass ESLint checks
-- **Prettier**: Consistent formatting required
+- **Biome**: All code must pass Biome lint/format checks
 - **Naming**: Use descriptive, clear names for variables and functions
 - **Comments**: Add JSDoc for public APIs and complex logic
 - **Input Validation**: Use robust validation patterns like those in `useSettings` hook
