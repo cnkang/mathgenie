@@ -239,7 +239,6 @@ const createLargeProblemWarning = (numProblems: number): MessageValue => ({
   params: { count: numProblems },
 });
 
-// eslint-disable-next-line sonarjs/function-return-type
 const getLargeProblemWarning = (numProblems: number): MessageValue => {
   return isLargeProblemCount(numProblems)
     ? createLargeProblemWarning(numProblems)
@@ -339,7 +338,6 @@ export const useProblemGenerator = (
       generateProblems(false);
     }
     // We intentionally exclude generateProblems from deps to avoid recreation loop
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings, isLoading, validateSettings]);
 
   return {

@@ -44,7 +44,6 @@ export const useInitialGeneration = ({
     } else {
       setError({ key: validationError });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isI18nReady,
     hasInitialGenerated,

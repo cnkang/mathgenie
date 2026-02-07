@@ -236,7 +236,6 @@ export default defineConfig(({ mode }) => ({
         '**/playwright-report/**',
         '**/test-results/**',
         '**/postcss.config.cjs',
-        '**/eslint.config.{js,ts}',
         '**/vite.config.ts',
         '**/vite/**',
         'vite/**',

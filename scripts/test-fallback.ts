@@ -19,7 +19,7 @@ function main(): void {
   });
 
   console.log('\n📁 Local executable detection:');
-  const tools = ['vitest', 'playwright', 'stylelint', 'html-validate'];
+  const tools = ['vitest', 'playwright', 'biome'];
   tools.forEach(tool => {
     const path = findExecutable(tool);
     console.log(`  ${path ? '✅' : '❌'} ${tool}: ${path || 'not found'}`);

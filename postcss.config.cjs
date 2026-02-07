@@ -1,4 +1,4 @@
-/* eslint-env node */
+/* Node.js PostCSS config */
 /* global process */
 const isProduction = process.env.NODE_ENV === 'production';
 

@@ -100,35 +100,8 @@ jobs:
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: 🗂️ Cache ESLint
-        uses: actions/cache@v4.2.4
-        with:
-          path: .eslintcache
-          key: ${{ runner.os }}-eslint-${{ hashFiles('**/.eslintrc*', '**/eslint.config.*') }}
-          restore-keys: |
-            ${{ runner.os }}-eslint-
-
-      - name: 🔍 Run ESLint
-        run: |
-          pnpm lint --format=json --output-file=eslint-report.json || true
-          # Ensure the file exists even if ESLint passes
-          if [ ! -f eslint-report.json ]; then
-            echo '[]' > eslint-report.json
-          fi
-
-      - name: 📊 Upload ESLint results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: eslint-report
-          path: eslint-report.json
-
-      - name: 🎨 Check code formatting
-        run: |
-          if ! pnpm format --check; then
-            echo "❌ Code formatting issues found. Run 'pnpm format' to fix."
-            exit 1
-          fi
+      - name: 🔍 Run Biome (lint + format)
+        run: pnpm lint
 
   # Job 2: Testing (runs in parallel)
   test:
