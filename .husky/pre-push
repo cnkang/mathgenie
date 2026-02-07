@@ -33,11 +33,11 @@ if ! pnpm i18n:check; then
   exit 1
 fi
 
-# 运行CSS和HTML质量检查（不自动修复，确保代码质量）
-echo "🎨 Running CSS & HTML quality checks..."
-if ! pnpm lint:css-html; then
-  echo "❌ CSS & HTML quality checks failed"
-  echo "💡 Run 'pnpm lint:css-html:fix' to auto-fix issues"
+# 运行 Biome 质量检查（lint + format）
+echo "🎨 Running Biome checks..."
+if ! pnpm lint; then
+  echo "❌ Biome checks failed"
+  echo "💡 Run 'pnpm lint:fix' to auto-fix issues"
   exit 1
 fi
 
