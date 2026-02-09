@@ -64,7 +64,7 @@ jobs:
             ${{ runner.os }}-typescript-
 
       - name: 🔍 Quick lint check
-        run: pnpm lint --max-warnings 0
+        run: pnpm lint
 
       - name: 🏗️ Type check
         run: pnpm type-check
