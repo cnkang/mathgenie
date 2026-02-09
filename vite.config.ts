@@ -185,13 +185,9 @@ export default defineConfig(({ mode }) => ({
     },
     // 动态调整worker数量基于CPU核心数和环境
     pool: 'threads',
-    poolOptions: {
-      threads: {
-        // CI环境使用较少的线程以避免资源竞争，本地开发使用更多线程
-        maxThreads: process.env.CI ? 4 : 8,
-        minThreads: process.env.CI ? 1 : 2,
-      },
-    },
+    // Vitest 4: poolOptions moved to top-level
+    maxThreads: process.env.CI ? 4 : 8,
+    minThreads: process.env.CI ? 1 : 2,
     // 根据CPU核心数动态调整并发数
     maxConcurrency: process.env.CI ? 4 : 12,
     sequence: {

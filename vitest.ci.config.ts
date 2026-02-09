@@ -12,13 +12,9 @@ export default defineConfig({
 
     // CI环境优化配置
     pool: 'threads',
-    poolOptions: {
-      threads: {
-        // CI环境使用保守的线程数
-        maxThreads: Math.min(4, Math.ceil(cpus().length / 2)),
-        minThreads: 1,
-      },
-    },
+    // Vitest 4: poolOptions moved to top-level
+    maxThreads: Math.min(4, Math.ceil(cpus().length / 2)),
+    minThreads: 1,
 
     // 适中的并发数以平衡速度和稳定性
     maxConcurrency: 4,
