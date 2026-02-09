@@ -70,7 +70,7 @@ jobs:
         run: pnpm type-check
 
       - name: 🧪 Quick test
-        run: pnpm test:unit --reporter=basic
+        run: pnpm test:unit
 
   # Job 1: Code Quality & Linting (runs in parallel)
   code-quality:
