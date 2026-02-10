@@ -5,7 +5,7 @@
 ### Environment Setup
 
 - [ ] Node.js 22.19.1+ installed and verified
-- [ ] pnpm 10.15.1+ installed and verified
+- [ ] pnpm 10.29.2+ installed and verified
 - [ ] Project dependencies installed (`pnpm install`)
 - [ ] Development server starts successfully (`pnpm dev`)
 - [ ] All browsers installed for testing (`pnpm playwright:install`)

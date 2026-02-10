@@ -30,7 +30,7 @@ Problem to Solve → Choose Approach → Try It → Evaluate Result
 ### Prerequisites
 
 - **Node.js 22.19.0** or higher
-- **pnpm 10.18.0** or higher
+- **pnpm 10.29.2** or higher
 - **Git** for version control
 - **TypeScript 5.9** knowledge
 

@@ -7,7 +7,7 @@
 ```bash
 # Verify required versions
 node --version    # Should be 22.19.1+
-pnpm --version    # Should be 10.15.1+
+pnpm --version    # Should be 10.29.2+
 ```
 
 ### Project Activation

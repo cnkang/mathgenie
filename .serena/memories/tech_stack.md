@@ -15,7 +15,7 @@
   - React plugin with TypeScript support
   - Code splitting and tree shaking
   - Development server with instant HMR
-- **pnpm 10.15.1**: Fast, disk space efficient package manager (REQUIRED)
+- **pnpm 10.29.2**: Fast, disk space efficient package manager (REQUIRED)
 
 ## Build System & Tooling
 

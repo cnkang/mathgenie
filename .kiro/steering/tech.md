@@ -6,7 +6,7 @@
 - **TypeScript 5.9**: Strict type checking with comprehensive type definitions
 - **Node.js 22.19.1**: Latest LTS with enhanced performance
 - **Vite 7.1.4**: Lightning-fast build tool with HMR and optimized bundling
-- **pnpm 10.15.1**: Fast, disk space efficient package manager
+- **pnpm 10.29.2**: Fast, disk space efficient package manager
 
 ## Build System & Tooling
 
