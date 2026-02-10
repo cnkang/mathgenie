@@ -12,3 +12,11 @@ updates:
     # Check the npm registry for updates every day (weekdays)
     schedule:
       interval: "daily"
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    # Look for workflow files in the repository root
+    directory: "/"
+    # Check for Actions updates every week
+    schedule:
+      interval: "weekly"

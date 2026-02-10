@@ -16,6 +16,7 @@ concurrency:
 
 env:
   NODE_VERSION: '24.13.0'
+  PNPM_VERSION: '10.29.2'
   NODE_OPTIONS: '--max-old-space-size=4096'
   # Let Playwright use default cache paths for better caching
   # PLAYWRIGHT_BROWSERS_PATH: 0  # Removed - this prevents proper caching
@@ -42,6 +43,7 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
         with:
+          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: 📦 Setup Node.js
@@ -89,6 +91,7 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
         with:
+          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: 📦 Setup Node.js
@@ -119,6 +122,7 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
         with:
+          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: 📦 Setup Node.js
@@ -183,6 +187,7 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
         with:
+          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: 📦 Setup Node.js
@@ -215,6 +220,7 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
         with:
+          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: 📦 Setup Node.js
@@ -279,6 +285,7 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
         with:
+          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: 📦 Setup Node.js
@@ -436,6 +443,7 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
         with:
+          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: 📦 Setup Node.js
@@ -566,6 +574,7 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
         with:
+          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: 📦 Setup Node.js
@@ -673,6 +682,7 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
         with:
+          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: 📦 Setup Node.js
@@ -726,6 +736,7 @@ jobs:
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
         with:
+          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: 📦 Setup Node.js
