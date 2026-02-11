@@ -220,12 +220,17 @@ jobs:
             // Enable auto-merge with retry for transient 422 errors
             const enableAutoMerge = async () => {
               const mutation = `
-                mutation($pullRequestId: ID!, $mergeMethod: PullRequestMergeMethod!) {
+                mutation(
+                  $pullRequestId: ID!,
+                  $mergeMethod: PullRequestMergeMethod!,
+                  $commitHeadline: String!,
+                  $commitBody: String!
+                ) {
                   enablePullRequestAutoMerge(input: {
                     pullRequestId: $pullRequestId,
                     mergeMethod: $mergeMethod,
-                    commitHeadline: "${pr.title} (#${pr.number})",
-                    commitBody: "Auto-merged by Dependabot workflow after successful CI checks"
+                    commitHeadline: $commitHeadline,
+                    commitBody: $commitBody
                   }) {
                     pullRequest {
                       autoMergeRequest {
@@ -239,7 +244,9 @@ jobs:
 
               return github.graphql(mutation, {
                 pullRequestId: pr.node_id,
-                mergeMethod: 'SQUASH'
+                mergeMethod: 'SQUASH',
+                commitHeadline: `${pr.title} (#${pr.number})`,
+                commitBody: 'Auto-merged by Dependabot workflow after successful CI checks'
               });
             };
 
