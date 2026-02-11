@@ -6,6 +6,7 @@
 
 import { spawnSync } from 'child_process';
 import { cpus, freemem, totalmem } from 'os';
+import { delimiter, dirname } from 'path';
 import { buildSafeEnv, findExecutable, isCommandAvailable } from './exec-utils';
 
 // 颜色输出 (支持 NO_COLOR 环境变量)
@@ -19,6 +20,29 @@ const colors = process.env.NO_COLOR
       cyan: '\u001b[0;36m',
       reset: '\u001b[0m',
     };
+
+const ALLOWED_E2E_PROJECTS = new Set(['chromium', 'firefox', 'webkit']);
+const ALLOWED_E2E_SUITES = new Set([
+  'basic',
+  'error-handling',
+  'localstorage-persistence',
+  'presets-functionality',
+  'integration',
+  'accessibility-unified',
+]);
+const ALLOWED_MOBILE_DEVICES = new Set([
+  'all',
+  'iphone',
+  'iphone16',
+  'iphone15',
+  'ipad',
+  'android',
+  'galaxy',
+  'pixel',
+  'latest',
+]);
+const REPORTER_PATTERN = /^[a-zA-Z0-9._-]+$/;
+const EXEC_TIMEOUT_MS = 20 * 60 * 1000;
 
 type LogLevel = 'info' | 'success' | 'warning' | 'error' | 'system';
 
@@ -46,16 +70,22 @@ function log(level: LogLevel, message: string): void {
  * This provides maximum compatibility across different environments
  */
 function safeSpawn(command: string, args: string[], env: Record<string, string> = {}): void {
-  const safeEnv = buildSafeEnv({ removePath: true });
-  const fullEnv = {
-    ...process.env,
-    ...safeEnv,
-    ...env,
-  };
+  // SONAR-SAFE (S4036): Use restricted PATH with fixed system directories and current Node bin.
+  const restrictedPath =
+    process.platform === 'win32'
+      ? process.env.Path || process.env.PATH || ''
+      : ['/usr/local/bin', '/usr/bin', '/bin', dirname(process.execPath)].join(delimiter);
 
-  // Filter out undefined values to ensure Record<string, string>
-  const cleanEnv: Record<string, string> = {};
-  for (const [key, value] of Object.entries(fullEnv)) {
+  const cleanEnv: Record<string, string> = {
+    ...buildSafeEnv({ removePath: true }),
+    PATH: restrictedPath,
+  };
+  if (process.platform === 'win32') {
+    cleanEnv.Path = restrictedPath;
+  }
+
+  // Only merge caller-provided env onto sanitized base.
+  for (const [key, value] of Object.entries(env)) {
     if (typeof value === 'string') {
       cleanEnv[key] = value;
     }
@@ -63,22 +93,22 @@ function safeSpawn(command: string, args: string[], env: Record<string, string> 
 
   // Strategy 1: Direct execution
   const executablePath = findExecutable(command);
+  if (executablePath && tryExecution(process.execPath, [executablePath, ...args], cleanEnv)) {
+    return;
+  }
+
+  // Strategy 2: direct executable (non-node fallback)
   if (executablePath && tryExecution(executablePath, args, cleanEnv)) {
     return;
   }
 
-  // Strategy 2: pnpm exec
+  // Strategy 3: pnpm exec
   if (isCommandAvailable('pnpm') && tryExecution('pnpm', ['exec', command, ...args], cleanEnv)) {
     return;
   }
 
-  // Strategy 3: npx
+  // Strategy 4: npx
   if (isCommandAvailable('npx') && tryExecution('npx', [command, ...args], cleanEnv)) {
-    return;
-  }
-
-  // Strategy 4: node direct
-  if (executablePath && tryExecution(process.execPath, [executablePath, ...args], cleanEnv)) {
     return;
   }
 
@@ -90,6 +120,8 @@ function tryExecution(executable: string, args: string[], env: Record<string, st
     const result = spawnSync(executable, args, {
       stdio: 'inherit',
       shell: false,
+      timeout: EXEC_TIMEOUT_MS,
+      windowsHide: true,
       env,
     });
     return result.status === 0;
@@ -431,6 +463,30 @@ function getStringOption(
   return typeof value === 'string' ? value : undefined;
 }
 
+function validateReporterOption(reporter?: string): string | undefined {
+  if (!reporter) {
+    return undefined;
+  }
+  if (!REPORTER_PATTERN.test(reporter)) {
+    throw new Error(`Invalid reporter: ${reporter}`);
+  }
+  return reporter;
+}
+
+function validateAllowlistedOption(
+  optionName: string,
+  value: string | undefined,
+  allowlist: Set<string>
+): string | undefined {
+  if (!value) {
+    return undefined;
+  }
+  if (!allowlist.has(value)) {
+    throw new Error(`Invalid ${optionName}: ${value}`);
+  }
+  return value;
+}
+
 function handleUnitCommands(
   command: string,
   options: Record<string, string | boolean>,
@@ -441,7 +497,7 @@ function handleUnitCommands(
     case 'unit':
       runUnitTests(strategy, {
         coverage: !options['no-coverage'] && systemInfo.isCoverage,
-        reporter: getStringOption(options, 'reporter'),
+        reporter: validateReporterOption(getStringOption(options, 'reporter')),
       });
       return true;
 
@@ -466,9 +522,21 @@ function handleE2ECommands(
   switch (command) {
     case 'e2e':
       runE2ETests(strategy, {
-        project: getStringOption(options, 'project'),
-        suite: getStringOption(options, 'suite'),
-        mobile: getStringOption(options, 'mobile'),
+        project: validateAllowlistedOption(
+          'project',
+          getStringOption(options, 'project'),
+          ALLOWED_E2E_PROJECTS
+        ),
+        suite: validateAllowlistedOption(
+          'suite',
+          getStringOption(options, 'suite'),
+          ALLOWED_E2E_SUITES
+        ),
+        mobile: validateAllowlistedOption(
+          'mobile',
+          getStringOption(options, 'mobile'),
+          ALLOWED_MOBILE_DEVICES
+        ),
       });
       return true;
 
@@ -479,16 +547,34 @@ function handleE2ECommands(
     case 'e2e:debug':
       runE2ETests(strategy, {
         debug: true,
-        suite: getStringOption(options, 'positional'),
-        project: getStringOption(options, 'project') || 'chromium',
+        suite: validateAllowlistedOption(
+          'suite',
+          getStringOption(options, 'positional'),
+          ALLOWED_E2E_SUITES
+        ),
+        project:
+          validateAllowlistedOption(
+            'project',
+            getStringOption(options, 'project'),
+            ALLOWED_E2E_PROJECTS
+          ) || 'chromium',
       });
       return true;
 
     case 'e2e:headed':
       runE2ETests(strategy, {
         headed: true,
-        suite: getStringOption(options, 'positional'),
-        project: getStringOption(options, 'project') || 'chromium',
+        suite: validateAllowlistedOption(
+          'suite',
+          getStringOption(options, 'positional'),
+          ALLOWED_E2E_SUITES
+        ),
+        project:
+          validateAllowlistedOption(
+            'project',
+            getStringOption(options, 'project'),
+            ALLOWED_E2E_PROJECTS
+          ) || 'chromium',
       });
       return true;
 
@@ -499,7 +585,11 @@ function handleE2ECommands(
         process.exit(1);
       }
       runE2ETests(strategy, {
-        mobile: getStringOption(options, 'positional'),
+        mobile: validateAllowlistedOption(
+          'mobile device',
+          getStringOption(options, 'positional'),
+          ALLOWED_MOBILE_DEVICES
+        ),
       });
       return true;
   }
