@@ -184,7 +184,7 @@ jobs:
       github.actor == 'dependabot[bot]' && 
       needs.dependabot-analysis.outputs.auto_merge == 'true' &&
       needs.dependabot-ci.result == 'success'
-    timeout-minutes: 2
+    timeout-minutes: 5
     permissions:
       contents: write
       pull-requests: write
@@ -197,15 +197,39 @@ jobs:
           script: |
             const pr = context.payload.pull_request;
             const { owner, repo } = context.repo;
+            const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-            // Check current mergeable state (single check, no polling)
-            const { data: prData } = await github.rest.pulls.get({
-              owner,
-              repo,
-              pull_number: pr.number
-            });
+            // Wait until GitHub computes a stable mergeable state.
+            // GitHub can briefly return null/unknown/unstable right after checks start.
+            let prData;
+            for (let poll = 1; poll <= 12; poll++) {
+              const { data } = await github.rest.pulls.get({
+                owner,
+                repo,
+                pull_number: pr.number
+              });
+              prData = data;
 
-            if (prData.mergeable === false || ['dirty', 'draft'].includes(prData.mergeable_state)) {
+              const state = (prData.mergeable_state || '').toLowerCase();
+              const isUnstable = prData.mergeable === null || state === 'unknown' || state === 'unstable';
+              if (!isUnstable) break;
+
+              if (poll < 12) {
+                console.log(
+                  `PR mergeability not ready yet (poll ${poll}/12): state=${prData.mergeable_state}, mergeable=${prData.mergeable}. Retrying in 5s...`
+                );
+                await sleep(5000);
+              }
+            }
+
+            if (!prData) {
+              throw new Error('Failed to load pull request mergeability details.');
+            }
+
+            if (
+              prData.mergeable === false ||
+              ['dirty', 'draft', 'unknown', 'unstable'].includes((prData.mergeable_state || '').toLowerCase())
+            ) {
               throw new Error(`PR not mergeable: state=${prData.mergeable_state}, mergeable=${prData.mergeable}`);
             }
 
@@ -250,9 +274,19 @@ jobs:
               });
             };
 
-            // Retry logic for 422 errors (unknown/unstable mergeable_state)
+            const isRetryableAutoMergeError = (error) => {
+              const message = (error?.message || '').toLowerCase();
+              return (
+                error?.status === 422 ||
+                message.includes('unstable status') ||
+                message.includes('mergeable') ||
+                message.includes('head branch was modified')
+              );
+            };
+
+            // Retry logic for transient API failures while checks are still settling.
             let lastError;
-            for (let attempt = 1; attempt <= 6; attempt++) {
+            for (let attempt = 1; attempt <= 8; attempt++) {
               try {
                 await enableAutoMerge();
                 console.log('✅ Auto-merge enabled successfully');
@@ -266,9 +300,12 @@ jobs:
                 return; // Success, exit the script
               } catch (error) {
                 lastError = error;
-                if (error.status === 422 && attempt < 6) {
-                  console.log(`Attempt ${attempt}/6 failed with 422, retrying in 10s...`);
-                  await new Promise(resolve => setTimeout(resolve, 10000));
+                if (isRetryableAutoMergeError(error) && attempt < 8) {
+                  const waitMs = Math.min(15000, attempt * 3000);
+                  console.log(
+                    `Attempt ${attempt}/8 failed (${error?.status || 'no-status'}): ${error.message}. Retrying in ${Math.round(waitMs / 1000)}s...`
+                  );
+                  await sleep(waitMs);
                   continue;
                 }
                 break; // Non-422 error or max attempts reached
@@ -309,6 +346,9 @@ jobs:
                 issue_number: pr.number,
                 body: errorMessage
               });
+
+              // Mark the job as failed so this doesn't look like a successful auto-merge enablement.
+              throw error;
             }
 
   # Job 4: Notify on manual review required
