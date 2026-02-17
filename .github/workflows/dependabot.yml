@@ -184,7 +184,7 @@ jobs:
       github.actor == 'dependabot[bot]' && 
       needs.dependabot-analysis.outputs.auto_merge == 'true' &&
       needs.dependabot-ci.result == 'success'
-    timeout-minutes: 5
+    timeout-minutes: 15
     permissions:
       contents: write
       pull-requests: write
@@ -199,38 +199,36 @@ jobs:
             const { owner, repo } = context.repo;
             const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-            // Wait until GitHub computes a stable mergeable state.
-            // GitHub can briefly return null/unknown/unstable right after checks start.
-            let prData;
-            for (let poll = 1; poll <= 12; poll++) {
+            const getPrData = async () => {
               const { data } = await github.rest.pulls.get({
                 owner,
                 repo,
                 pull_number: pr.number
               });
-              prData = data;
+              return data;
+            };
 
-              const state = (prData.mergeable_state || '').toLowerCase();
-              const isUnstable = prData.mergeable === null || state === 'unknown' || state === 'unstable';
-              if (!isUnstable) break;
+            const isDefinitelyUnmergeable = (data) => {
+              const state = (data?.mergeable_state || '').toLowerCase();
+              return data?.mergeable === false || state === 'dirty' || state === 'draft';
+            };
 
-              if (poll < 12) {
-                console.log(
-                  `PR mergeability not ready yet (poll ${poll}/12): state=${prData.mergeable_state}, mergeable=${prData.mergeable}. Retrying in 5s...`
-                );
-                await sleep(5000);
-              }
+            const isMergeabilityStillComputing = (data) => {
+              const state = (data?.mergeable_state || '').toLowerCase();
+              return data?.mergeable === null || state === 'unknown' || state === 'unstable';
+            };
+
+            const initialPrData = await getPrData();
+            if (isDefinitelyUnmergeable(initialPrData)) {
+              throw new Error(
+                `PR not mergeable: state=${initialPrData.mergeable_state}, mergeable=${initialPrData.mergeable}`
+              );
             }
 
-            if (!prData) {
-              throw new Error('Failed to load pull request mergeability details.');
-            }
-
-            if (
-              prData.mergeable === false ||
-              ['dirty', 'draft', 'unknown', 'unstable'].includes((prData.mergeable_state || '').toLowerCase())
-            ) {
-              throw new Error(`PR not mergeable: state=${prData.mergeable_state}, mergeable=${prData.mergeable}`);
+            if (isMergeabilityStillComputing(initialPrData)) {
+              console.log(
+                `PR mergeability still computing: state=${initialPrData.mergeable_state}, mergeable=${initialPrData.mergeable}. Will retry enabling auto-merge.`
+              );
             }
 
             // Add a comment before enabling auto-merge
@@ -280,14 +278,22 @@ jobs:
                 error?.status === 422 ||
                 message.includes('unstable status') ||
                 message.includes('mergeable') ||
+                message.includes('not mergeable') ||
                 message.includes('head branch was modified')
               );
             };
 
             // Retry logic for transient API failures while checks are still settling.
             let lastError;
-            for (let attempt = 1; attempt <= 8; attempt++) {
+            for (let attempt = 1; attempt <= 40; attempt++) {
               try {
+                const currentPrData = await getPrData();
+                if (isDefinitelyUnmergeable(currentPrData)) {
+                  throw new Error(
+                    `PR not mergeable: state=${currentPrData.mergeable_state}, mergeable=${currentPrData.mergeable}`
+                  );
+                }
+
                 await enableAutoMerge();
                 console.log('✅ Auto-merge enabled successfully');
 
@@ -300,10 +306,14 @@ jobs:
                 return; // Success, exit the script
               } catch (error) {
                 lastError = error;
-                if (isRetryableAutoMergeError(error) && attempt < 8) {
-                  const waitMs = Math.min(15000, attempt * 3000);
+                const currentPrData = await getPrData();
+                const mergeabilityPending = isMergeabilityStillComputing(currentPrData);
+                const retryable = isRetryableAutoMergeError(error) || mergeabilityPending;
+
+                if (retryable && attempt < 40) {
+                  const waitMs = 15000;
                   console.log(
-                    `Attempt ${attempt}/8 failed (${error?.status || 'no-status'}): ${error.message}. Retrying in ${Math.round(waitMs / 1000)}s...`
+                    `Attempt ${attempt}/40 failed (${error?.status || 'no-status'}): ${error.message}. Current mergeability: state=${currentPrData.mergeable_state}, mergeable=${currentPrData.mergeable}. Retrying in ${Math.round(waitMs / 1000)}s...`
                   );
                   await sleep(waitMs);
                   continue;
