@@ -185,7 +185,7 @@ jobs:
       (github.event.pull_request.user.login == 'dependabot[bot]' || github.event.pull_request.user.login == 'app/dependabot') &&
       needs.dependabot-analysis.outputs.auto_merge == 'true' &&
       needs.dependabot-ci.result == 'success'
-    timeout-minutes: 20
+    timeout-minutes: 30
     permissions:
       contents: write
       pull-requests: write
@@ -326,6 +326,19 @@ jobs:
               });
             };
 
+            const mergeDirectly = async () => {
+              return github.rest.pulls.merge({
+                owner,
+                repo,
+                pull_number: pr.number,
+                merge_method: 'squash',
+                commit_title: `${pr.title} (#${pr.number})`,
+                commit_message:
+                  'Merged directly by Dependabot workflow after successful CI checks (auto-merge API remained unstable).',
+                sha: pr.head.sha
+              });
+            };
+
             const isRetryableAutoMergeError = (error) => {
               const message = (error?.message || '').toLowerCase();
               return (
@@ -337,9 +350,10 @@ jobs:
               );
             };
 
+            const autoMergeAttempts = 20;
             // Retry logic for transient API failures while checks are still settling.
             let lastError;
-            for (let attempt = 1; attempt <= 40; attempt++) {
+            for (let attempt = 1; attempt <= autoMergeAttempts; attempt++) {
               try {
                 const currentPrData = await getPrData();
                 if (isDefinitelyUnmergeable(currentPrData)) {
@@ -364,10 +378,10 @@ jobs:
                 const mergeabilityPending = isMergeabilityStillComputing(currentPrData);
                 const retryable = isRetryableAutoMergeError(error) || mergeabilityPending;
 
-                if (retryable && attempt < 40) {
+                if (retryable && attempt < autoMergeAttempts) {
                   const waitMs = 15000;
                   console.log(
-                    `Attempt ${attempt}/40 failed (${error?.status || 'no-status'}): ${error.message}. Current mergeability: state=${currentPrData.mergeable_state}, mergeable=${currentPrData.mergeable}. Retrying in ${Math.round(waitMs / 1000)}s...`
+                    `Attempt ${attempt}/${autoMergeAttempts} failed (${error?.status || 'no-status'}): ${error.message}. Current mergeability: state=${currentPrData.mergeable_state}, mergeable=${currentPrData.mergeable}. Retrying in ${Math.round(waitMs / 1000)}s...`
                   );
                   await sleep(waitMs);
                   continue;
@@ -377,8 +391,32 @@ jobs:
             }
 
             // Handle final error
-            const error = lastError;
+            let error = lastError;
             {
+              const currentPrData = await getPrData();
+              const mergeabilityPending = isMergeabilityStillComputing(currentPrData);
+              const retryable = isRetryableAutoMergeError(error);
+              const shouldTryDirectMerge = !isDefinitelyUnmergeable(currentPrData) && (retryable || mergeabilityPending);
+
+              if (shouldTryDirectMerge) {
+                console.log(
+                  `⚠️ Auto-merge enablement remained unstable (state=${currentPrData.mergeable_state}, mergeable=${currentPrData.mergeable}). Attempting direct squash merge fallback.`
+                );
+                try {
+                  await mergeDirectly();
+                  console.log('✅ Direct squash merge fallback succeeded');
+                  await github.rest.issues.createComment({
+                    owner,
+                    repo,
+                    issue_number: pr.number,
+                    body: '✅ Auto-merge API remained unstable for this PR, so the workflow performed a direct squash merge after all required checks passed.'
+                  });
+                  return;
+                } catch (mergeError) {
+                  error = mergeError;
+                }
+              }
+
               console.log('❌ Failed to enable auto-merge:', error.message);
 
               // Provide detailed error information
