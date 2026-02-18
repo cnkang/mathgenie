@@ -3,10 +3,13 @@ name: 🤖 Dependabot Auto-merge
 on:
   pull_request:
     types: [opened, synchronize]
+  workflow_run:
+    workflows: ["🚀 CI/CD Pipeline"]
+    types: [completed]
 
 # Only run on Dependabot PRs
 concurrency:
-  group: dependabot-${{ github.event.pull_request.number }}
+  group: dependabot-${{ github.event.pull_request.number || github.event.workflow_run.head_branch || github.run_id }}
   cancel-in-progress: true
 
 env:
@@ -18,7 +21,7 @@ jobs:
   dependabot-analysis:
     name: 🔍 Dependabot Analysis
     runs-on: ubuntu-latest
-    if: github.event.pull_request.user.login == 'dependabot[bot]' || github.event.pull_request.user.login == 'app/dependabot'
+    if: github.event_name == 'pull_request' && (github.event.pull_request.user.login == 'dependabot[bot]' || github.event.pull_request.user.login == 'app/dependabot')
     timeout-minutes: 10
     permissions:
       contents: read
@@ -96,9 +99,26 @@ jobs:
             }
 
             const labels = ['dependencies', `${updateType}-update`];
+            const policyLabels = ['auto-merge-eligible', 'manual-review-required'];
             if (isDevDependency) labels.push('dev-dependency');
             if (securitySeverity) labels.push('security-update');
             if (breakingRisk === 'High') labels.push('breaking-change-risk');
+            labels.push(autoMerge ? 'auto-merge-eligible' : 'manual-review-required');
+
+            for (const policyLabel of policyLabels) {
+              try {
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: pr.number,
+                  name: policyLabel
+                });
+              } catch (error) {
+                if (error.status !== 404) {
+                  throw error;
+                }
+              }
+            }
 
             await github.rest.issues.addLabels({
               owner: context.repo.owner,
@@ -139,7 +159,7 @@ jobs:
     name: 🧪 Dependabot CI
     runs-on: ubuntu-latest
     needs: dependabot-analysis
-    if: github.event.pull_request.user.login == 'dependabot[bot]' || github.event.pull_request.user.login == 'app/dependabot'
+    if: github.event_name == 'pull_request' && (github.event.pull_request.user.login == 'dependabot[bot]' || github.event.pull_request.user.login == 'app/dependabot')
     timeout-minutes: 20
     permissions:
       contents: read
@@ -180,84 +200,72 @@ jobs:
   dependabot-auto-merge:
     name: 🔄 Enable Auto-merge
     runs-on: ubuntu-latest
-    needs: [dependabot-analysis, dependabot-ci]
     if: |
-      (github.event.pull_request.user.login == 'dependabot[bot]' || github.event.pull_request.user.login == 'app/dependabot') &&
-      needs.dependabot-analysis.outputs.auto_merge == 'true' &&
-      needs.dependabot-ci.result == 'success'
-    timeout-minutes: 30
+      github.event_name == 'workflow_run' &&
+      github.event.workflow_run.name == '🚀 CI/CD Pipeline' &&
+      github.event.workflow_run.conclusion == 'success'
+    timeout-minutes: 10
     permissions:
       contents: write
       pull-requests: write
       issues: write
-      checks: read
 
     steps:
       - name: 🤖 Enable Auto-merge
         uses: actions/github-script@v8
         with:
           script: |
-            const pr = context.payload.pull_request;
+            const workflowRun = context.payload.workflow_run;
             const { owner, repo } = context.repo;
             const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-            const qualityGateName = '🚪 Quality Gate';
+            if (workflowRun.event !== 'pull_request') {
+              console.log(`Skipping workflow_run event "${workflowRun.event}" (not a pull_request run).`);
+              return;
+            }
 
-            const waitForQualityGate = async () => {
-              const maxAttempts = 80;
-              const waitMs = 15000;
+            const associatedPr = workflowRun.pull_requests?.[0];
+            if (!associatedPr) {
+              console.log('No associated pull request found for this workflow run.');
+              return;
+            }
 
-              for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-                const { data } = await github.rest.checks.listForRef({
-                  owner,
-                  repo,
-                  ref: pr.head.sha,
-                  per_page: 100
-                });
+            const pullNumber = associatedPr.number;
+            const { data: pr } = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: pullNumber
+            });
 
-                const qualityGate = data.check_runs.find((checkRun) => checkRun.name === qualityGateName);
+            const prAuthor = pr.user?.login || '';
+            const isDependabotPr = prAuthor === 'dependabot[bot]' || prAuthor === 'app/dependabot';
+            if (!isDependabotPr) {
+              console.log(`Skipping PR #${pullNumber}: author is "${prAuthor}", not Dependabot.`);
+              return;
+            }
 
-                if (!qualityGate) {
-                  if (attempt < maxAttempts) {
-                    console.log(
-                      `Quality gate check "${qualityGateName}" not found yet (attempt ${attempt}/${maxAttempts}). Retrying in ${Math.round(waitMs / 1000)}s...`
-                    );
-                    await sleep(waitMs);
-                    continue;
-                  }
+            if (pr.state !== 'open' || pr.draft) {
+              console.log(`Skipping PR #${pullNumber}: state=${pr.state}, draft=${pr.draft}.`);
+              return;
+            }
 
-                  throw new Error(`Timed out waiting for "${qualityGateName}" check run to appear.`);
-                }
+            if (pr.head.sha !== workflowRun.head_sha) {
+              console.log(
+                `Skipping stale workflow run. run.head_sha=${workflowRun.head_sha}, pr.head.sha=${pr.head.sha}`
+              );
+              return;
+            }
 
-                if (qualityGate.status !== 'completed') {
-                  if (attempt < maxAttempts) {
-                    console.log(
-                      `Quality gate status=${qualityGate.status}, conclusion=${qualityGate.conclusion || 'n/a'} (attempt ${attempt}/${maxAttempts}). Retrying in ${Math.round(waitMs / 1000)}s...`
-                    );
-                    await sleep(waitMs);
-                    continue;
-                  }
-
-                  throw new Error(`Timed out waiting for "${qualityGateName}" to complete.`);
-                }
-
-                if (qualityGate.conclusion !== 'success') {
-                  throw new Error(
-                    `Cannot enable auto-merge because "${qualityGateName}" concluded with "${qualityGate.conclusion}".`
-                  );
-                }
-
-                console.log(`"${qualityGateName}" completed successfully.`);
-                return;
-              }
-            };
-
-            await waitForQualityGate();
+            const labels = new Set((pr.labels || []).map((label) => label.name));
+            if (!labels.has('auto-merge-eligible')) {
+              console.log(`Skipping PR #${pullNumber}: missing "auto-merge-eligible" label.`);
+              return;
+            }
 
             const getPrData = async () => {
               const { data } = await github.rest.pulls.get({
                 owner,
                 repo,
-                pull_number: pr.number
+                pull_number: pullNumber
               });
               return data;
             };
@@ -321,7 +329,7 @@ jobs:
               return github.graphql(mutation, {
                 pullRequestId: pr.node_id,
                 mergeMethod: 'SQUASH',
-                commitHeadline: `${pr.title} (#${pr.number})`,
+                commitHeadline: `${pr.title} (#${pullNumber})`,
                 commitBody: 'Auto-merged by Dependabot workflow after successful CI checks'
               });
             };
@@ -330,9 +338,9 @@ jobs:
               return github.rest.pulls.merge({
                 owner,
                 repo,
-                pull_number: pr.number,
+                pull_number: pullNumber,
                 merge_method: 'squash',
-                commit_title: `${pr.title} (#${pr.number})`,
+                commit_title: `${pr.title} (#${pullNumber})`,
                 commit_message:
                   'Merged directly by Dependabot workflow after successful CI checks (auto-merge API remained unstable).',
                 sha: pr.head.sha
@@ -350,7 +358,7 @@ jobs:
               );
             };
 
-            const autoMergeAttempts = 20;
+            const autoMergeAttempts = 6;
             // Retry logic for transient API failures while checks are still settling.
             let lastError;
             for (let attempt = 1; attempt <= autoMergeAttempts; attempt++) {
@@ -368,7 +376,7 @@ jobs:
                 await github.rest.issues.createComment({
                   owner,
                   repo,
-                  issue_number: pr.number,
+                  issue_number: pullNumber,
                   body: '✅ Auto-merge enabled! This PR will be automatically merged when all required status checks pass and any required reviews are approved.'
                 });
                 return; // Success, exit the script
@@ -379,7 +387,7 @@ jobs:
                 const retryable = isRetryableAutoMergeError(error) || mergeabilityPending;
 
                 if (retryable && attempt < autoMergeAttempts) {
-                  const waitMs = 15000;
+                  const waitMs = 10000;
                   console.log(
                     `Attempt ${attempt}/${autoMergeAttempts} failed (${error?.status || 'no-status'}): ${error.message}. Current mergeability: state=${currentPrData.mergeable_state}, mergeable=${currentPrData.mergeable}. Retrying in ${Math.round(waitMs / 1000)}s...`
                   );
@@ -408,7 +416,7 @@ jobs:
                   await github.rest.issues.createComment({
                     owner,
                     repo,
-                    issue_number: pr.number,
+                    issue_number: pullNumber,
                     body: '✅ Auto-merge API remained unstable for this PR, so the workflow performed a direct squash merge after all required checks passed.'
                   });
                   return;
@@ -445,7 +453,7 @@ jobs:
               await github.rest.issues.createComment({
                 owner,
                 repo,
-                issue_number: pr.number,
+                issue_number: pullNumber,
                 body: errorMessage
               });
 
@@ -459,6 +467,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [dependabot-analysis, dependabot-ci]
     if: |
+      github.event_name == 'pull_request' &&
       (github.event.pull_request.user.login == 'dependabot[bot]' || github.event.pull_request.user.login == 'app/dependabot') &&
       needs.dependabot-analysis.outputs.auto_merge == 'false' &&
       needs.dependabot-ci.result == 'success'
@@ -527,6 +536,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [dependabot-analysis, dependabot-ci]
     if: |
+      github.event_name == 'pull_request' &&
       (github.event.pull_request.user.login == 'dependabot[bot]' || github.event.pull_request.user.login == 'app/dependabot') &&
       needs.dependabot-ci.result == 'failure'
     timeout-minutes: 5
