@@ -157,7 +157,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: 📋 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -184,11 +184,12 @@ jobs:
       github.actor == 'dependabot[bot]' && 
       needs.dependabot-analysis.outputs.auto_merge == 'true' &&
       needs.dependabot-ci.result == 'success'
-    timeout-minutes: 15
+    timeout-minutes: 20
     permissions:
       contents: write
       pull-requests: write
       issues: write
+      checks: read
 
     steps:
       - name: 🤖 Enable Auto-merge
@@ -198,6 +199,58 @@ jobs:
             const pr = context.payload.pull_request;
             const { owner, repo } = context.repo;
             const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+            const qualityGateName = '🚪 Quality Gate';
+
+            const waitForQualityGate = async () => {
+              const maxAttempts = 80;
+              const waitMs = 15000;
+
+              for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+                const { data } = await github.rest.checks.listForRef({
+                  owner,
+                  repo,
+                  ref: pr.head.sha,
+                  per_page: 100
+                });
+
+                const qualityGate = data.check_runs.find((checkRun) => checkRun.name === qualityGateName);
+
+                if (!qualityGate) {
+                  if (attempt < maxAttempts) {
+                    console.log(
+                      `Quality gate check "${qualityGateName}" not found yet (attempt ${attempt}/${maxAttempts}). Retrying in ${Math.round(waitMs / 1000)}s...`
+                    );
+                    await sleep(waitMs);
+                    continue;
+                  }
+
+                  throw new Error(`Timed out waiting for "${qualityGateName}" check run to appear.`);
+                }
+
+                if (qualityGate.status !== 'completed') {
+                  if (attempt < maxAttempts) {
+                    console.log(
+                      `Quality gate status=${qualityGate.status}, conclusion=${qualityGate.conclusion || 'n/a'} (attempt ${attempt}/${maxAttempts}). Retrying in ${Math.round(waitMs / 1000)}s...`
+                    );
+                    await sleep(waitMs);
+                    continue;
+                  }
+
+                  throw new Error(`Timed out waiting for "${qualityGateName}" to complete.`);
+                }
+
+                if (qualityGate.conclusion !== 'success') {
+                  throw new Error(
+                    `Cannot enable auto-merge because "${qualityGateName}" concluded with "${qualityGate.conclusion}".`
+                  );
+                }
+
+                console.log(`"${qualityGateName}" completed successfully.`);
+                return;
+              }
+            };
+
+            await waitForQualityGate();
 
             const getPrData = async () => {
               const { data } = await github.rest.pulls.get({
