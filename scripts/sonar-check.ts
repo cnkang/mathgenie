@@ -3,8 +3,9 @@
  * 专注于 HIGH 级别的 SonarQube 规则检查
  */
 
-import { readFileSync } from 'fs';
-import { glob } from 'glob';
+import { readFileSync } from 'node:fs';
+import { readdir } from 'node:fs/promises';
+import { join } from 'node:path';
 import ts from 'typescript';
 
 // ANSI color codes
@@ -71,9 +72,7 @@ class SonarChecker {
   }
 
   private async checkAllRules(): Promise<void> {
-    const files = await glob('src/**/*.{ts,tsx}', {
-      ignore: ['**/*.test.*', '**/*.spec.*', 'src/i18n/translations/*.ts'],
-    });
+    const files = await this.collectSourceFiles('src');
 
     console.log(`📊 Analyzing ${files.length} files...\n`);
 
@@ -84,6 +83,46 @@ class SonarChecker {
     // Check unused variables using ESLint
     console.log('🗑️ Checking for unused variables...');
     await this.checkUnusedVariables();
+  }
+
+  private async collectSourceFiles(rootDir: string): Promise<string[]> {
+    try {
+      const files: string[] = [];
+      await this.walkSourceFiles(rootDir, files);
+      return files;
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        'code' in error &&
+        (error as NodeJS.ErrnoException).code === 'ENOENT'
+      ) {
+        return [];
+      }
+      throw error;
+    }
+  }
+
+  private async walkSourceFiles(currentDir: string, files: string[]): Promise<void> {
+    const entries = await readdir(currentDir, { withFileTypes: true });
+    for (const entry of entries) {
+      const path = join(currentDir, entry.name);
+      if (entry.isDirectory()) {
+        await this.walkSourceFiles(path, files);
+        continue;
+      }
+
+      if (entry.isFile() && this.shouldAnalyzeFile(path)) {
+        files.push(path);
+      }
+    }
+  }
+
+  private shouldAnalyzeFile(filePath: string): boolean {
+    const normalizedPath = filePath.replace(/\\/g, '/');
+    const isTsFile = normalizedPath.endsWith('.ts') || normalizedPath.endsWith('.tsx');
+    const isTestFile = /\.(test|spec)\.(ts|tsx)$/.test(normalizedPath);
+    const isTranslationFile = /^src\/i18n\/translations\/[^/]+\.ts$/.test(normalizedPath);
+    return isTsFile && !isTestFile && !isTranslationFile;
   }
 
   private async analyzeFile(filePath: string): Promise<void> {
