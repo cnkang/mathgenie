@@ -870,3 +870,277 @@ jobs:
           echo "- Vercel webhook will trigger deployment automatically" >> $GITHUB_STEP_SUMMARY
           echo "- Monitor deployment status in Vercel dashboard" >> $GITHUB_STEP_SUMMARY
           echo "- Check live site after deployment completes" >> $GITHUB_STEP_SUMMARY
+
+  # Job 11: Dependabot Auto-merge (runs after quality gate)
+  dependabot-auto-merge:
+    name: 🔄 Dependabot Auto-merge
+    runs-on: ubuntu-latest
+    needs: [quality-gate]
+    if: |
+      github.event_name == 'pull_request' &&
+      (github.event.pull_request.user.login == 'dependabot[bot]' || github.event.pull_request.user.login == 'app/dependabot') &&
+      needs.quality-gate.result == 'success'
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: 🤖 Enable auto-merge (with direct merge fallback)
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+            const pullNumber = context.payload.pull_request?.number;
+
+            if (!pullNumber) {
+              console.log('No pull request found in event payload.');
+              return;
+            }
+
+            const { data: pr } = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: pullNumber
+            });
+
+            const prAuthor = pr.user?.login || '';
+            const isDependabotPr = prAuthor === 'dependabot[bot]' || prAuthor === 'app/dependabot';
+            if (!isDependabotPr) {
+              console.log(`Skipping PR #${pullNumber}: author is "${prAuthor}", not Dependabot.`);
+              return;
+            }
+
+            if (pr.state !== 'open' || pr.draft) {
+              console.log(`Skipping PR #${pullNumber}: state=${pr.state}, draft=${pr.draft}.`);
+              return;
+            }
+
+            const labels = new Set((pr.labels || []).map((label) => label.name));
+            if (!labels.has('auto-merge-eligible')) {
+              console.log(`Skipping PR #${pullNumber}: missing "auto-merge-eligible" label.`);
+              return;
+            }
+
+            const getPrData = async () => {
+              const { data } = await github.rest.pulls.get({
+                owner,
+                repo,
+                pull_number: pullNumber
+              });
+              return data;
+            };
+
+            const isDefinitelyUnmergeable = (data) => {
+              const state = (data?.mergeable_state || '').toLowerCase();
+              return data?.mergeable === false || state === 'dirty' || state === 'draft';
+            };
+
+            const isMergeabilityStillComputing = (data) => {
+              const state = (data?.mergeable_state || '').toLowerCase();
+              return data?.mergeable === null || state === 'unknown' || state === 'unstable';
+            };
+
+            const isCleanStatusError = (error) => {
+              const message = (error?.message || '').toLowerCase();
+              return message.includes('clean status');
+            };
+
+            const enableAutoMerge = async () => {
+              const mutation = `
+                mutation(
+                  $pullRequestId: ID!,
+                  $mergeMethod: PullRequestMergeMethod!,
+                  $commitHeadline: String!,
+                  $commitBody: String!
+                ) {
+                  enablePullRequestAutoMerge(input: {
+                    pullRequestId: $pullRequestId,
+                    mergeMethod: $mergeMethod,
+                    commitHeadline: $commitHeadline,
+                    commitBody: $commitBody
+                  }) {
+                    pullRequest {
+                      autoMergeRequest {
+                        enabledAt
+                        mergeMethod
+                      }
+                    }
+                  }
+                }
+              `;
+
+              return github.graphql(mutation, {
+                pullRequestId: pr.node_id,
+                mergeMethod: 'SQUASH',
+                commitHeadline: `${pr.title} (#${pullNumber})`,
+                commitBody: 'Auto-merged by CI workflow after successful quality gate checks'
+              });
+            };
+
+            const mergeDirectly = async () => {
+              return github.rest.pulls.merge({
+                owner,
+                repo,
+                pull_number: pullNumber,
+                merge_method: 'squash',
+                commit_title: `${pr.title} (#${pullNumber})`,
+                commit_message:
+                  'Merged directly by CI workflow after successful quality gate checks (auto-merge API remained unstable).',
+                sha: pr.head.sha
+              });
+            };
+
+            const isRetryableAutoMergeError = (error) => {
+              const message = (error?.message || '').toLowerCase();
+              return (
+                error?.status === 422 ||
+                message.includes('unstable status') ||
+                message.includes('mergeable') ||
+                message.includes('not mergeable') ||
+                message.includes('head branch was modified') ||
+                isCleanStatusError(error)
+              );
+            };
+
+            const initialPrData = await getPrData();
+            if (isDefinitelyUnmergeable(initialPrData)) {
+              throw new Error(
+                `PR not mergeable: state=${initialPrData.mergeable_state}, mergeable=${initialPrData.mergeable}`
+              );
+            }
+
+            if (isMergeabilityStillComputing(initialPrData)) {
+              console.log(
+                `PR mergeability still computing: state=${initialPrData.mergeable_state}, mergeable=${initialPrData.mergeable}. Will retry enabling auto-merge.`
+              );
+            }
+
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: pullNumber,
+              body: '🤖 Enabling auto-merge for this safe dependency update. The PR will be automatically merged once all required checks pass.'
+            });
+
+            const autoMergeAttempts = 6;
+            let lastError;
+
+            for (let attempt = 1; attempt <= autoMergeAttempts; attempt++) {
+              try {
+                const currentPrData = await getPrData();
+                if (isDefinitelyUnmergeable(currentPrData)) {
+                  throw new Error(
+                    `PR not mergeable: state=${currentPrData.mergeable_state}, mergeable=${currentPrData.mergeable}`
+                  );
+                }
+
+                await enableAutoMerge();
+                console.log('✅ Auto-merge enabled successfully');
+
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: pullNumber,
+                  body: '✅ Auto-merge enabled! This PR will be automatically merged when all required status checks pass and any required reviews are approved.'
+                });
+                return;
+              } catch (error) {
+                lastError = error;
+
+                if (isCleanStatusError(error)) {
+                  console.log('ℹ️ Auto-merge API returned "clean status". Attempting direct squash merge.');
+                  try {
+                    await mergeDirectly();
+                    console.log('✅ Direct squash merge succeeded after clean status response');
+                    await github.rest.issues.createComment({
+                      owner,
+                      repo,
+                      issue_number: pullNumber,
+                      body: '✅ Auto-merge API returned "clean status", so the workflow performed a direct squash merge after all required checks passed.'
+                    });
+                    return;
+                  } catch (mergeError) {
+                    lastError = mergeError;
+                    break;
+                  }
+                }
+
+                const currentPrData = await getPrData();
+                const mergeabilityPending = isMergeabilityStillComputing(currentPrData);
+                const retryable = isRetryableAutoMergeError(error) || mergeabilityPending;
+
+                if (retryable && attempt < autoMergeAttempts) {
+                  const waitMs = 10000;
+                  console.log(
+                    `Attempt ${attempt}/${autoMergeAttempts} failed (${error?.status || 'no-status'}): ${error.message}. Current mergeability: state=${currentPrData.mergeable_state}, mergeable=${currentPrData.mergeable}. Retrying in ${Math.round(waitMs / 1000)}s...`
+                  );
+                  await sleep(waitMs);
+                  continue;
+                }
+                break;
+              }
+            }
+
+            let error = lastError;
+            {
+              const currentPrData = await getPrData();
+              const mergeabilityPending = isMergeabilityStillComputing(currentPrData);
+              const retryable = isRetryableAutoMergeError(error);
+              const shouldTryDirectMerge =
+                !isDefinitelyUnmergeable(currentPrData) &&
+                (retryable || mergeabilityPending || isCleanStatusError(error));
+
+              if (shouldTryDirectMerge) {
+                console.log(
+                  `⚠️ Auto-merge enablement remained unstable (state=${currentPrData.mergeable_state}, mergeable=${currentPrData.mergeable}). Attempting direct squash merge fallback.`
+                );
+                try {
+                  await mergeDirectly();
+                  console.log('✅ Direct squash merge fallback succeeded');
+                  await github.rest.issues.createComment({
+                    owner,
+                    repo,
+                    issue_number: pullNumber,
+                    body: '✅ Auto-merge API remained unstable for this PR, so the workflow performed a direct squash merge after all required checks passed.'
+                  });
+                  return;
+                } catch (mergeError) {
+                  error = mergeError;
+                }
+              }
+
+              console.log('❌ Failed to enable auto-merge:', error.message);
+
+              let errorMessage = '❌ Failed to enable auto-merge: ' + error.message + '\n\n**Possible reasons:**';
+              if (error.status === 422) {
+                errorMessage += '\n- Auto-merge is not enabled for this repository';
+                errorMessage += '\n- Branch protection rules may prevent auto-merge';
+                errorMessage += '\n- PR may have conflicts or failing checks';
+                errorMessage += '\n- Repository settings may restrict auto-merge';
+              } else if (error.status === 403) {
+                errorMessage += '\n- Insufficient permissions to enable auto-merge';
+                errorMessage += '\n- Repository may not allow auto-merge for this user';
+              } else {
+                errorMessage += '\n- Unexpected error occurred';
+                errorMessage += '\n- Check repository settings and branch protection rules';
+              }
+
+              errorMessage += '\n\n**Next steps:**';
+              errorMessage += '\n1. Check if auto-merge is enabled in repository settings';
+              errorMessage += '\n2. Verify branch protection rules allow auto-merge';
+              errorMessage += '\n3. Ensure all required status checks are configured';
+              errorMessage += '\n4. Consider manual merge if auto-merge is not available';
+              errorMessage += '\n\n**Manual merge:** You can safely merge this PR manually as it passed all CI checks and was identified as a safe dependency update.';
+
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: pullNumber,
+                body: errorMessage
+              });
+
+              throw error;
+            }
