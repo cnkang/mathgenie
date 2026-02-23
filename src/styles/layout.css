@@ -742,7 +742,7 @@
     gap: var(--space-md);
     width: 100%;
     margin-bottom: var(--space-md);
-    order: 2; /* Ensure settings are easily accessible on mobile */
+    order: 1; /* Settings first on mobile so users can configure before seeing results */
   }
 
   .results-section {
@@ -750,6 +750,7 @@
     flex-direction: column;
     gap: var(--space-md);
     width: 100%;
+    order: 2;
   }
 
   h1 {

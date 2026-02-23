@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from 'vitest';
-import { fireEvent, render, screen } from '../../tests/helpers/testUtils';
+import { render, screen } from '../../tests/helpers/testUtils';
 import type { Settings } from '../types';
 import InfoPanel from './InfoPanel';
 
@@ -18,41 +18,18 @@ vi.mock('../i18n', async () => {
     'infoPanel.stats.difficultyLevel': 'Difficulty Level',
     'infoPanel.progress.title': 'Learning Progress',
     'infoPanel.progress.completed': '{{percent}}% completed (Goal: 100 problems)',
-    'infoPanel.quickActions.title': 'Quick Actions',
-    'infoPanel.quickActions.regenerate': 'Regenerate Problems',
-    'infoPanel.quickActions.downloadPdf': 'Download PDF',
-    'infoPanel.quickActions.startQuiz': 'Start Quiz',
-    'infoPanel.quickActions.jumpToProblems': 'Jump to Problems',
-    'infoPanel.tips.title': 'Usage Tips',
-    'infoPanel.tips.items.0': 'Use quick presets for common settings',
-    'infoPanel.tips.items.1': 'More operands increase difficulty',
-    'infoPanel.tips.items.2': 'Limiting result range controls answer complexity',
-    'infoPanel.tips.items.3': 'Show answers helps with learning verification',
-    'infoPanel.tips.items.4': 'PDF export supports various paper formats',
-    'infoPanel.currentConfig.title': 'Current Configuration',
-    'infoPanel.currentConfig.operations': 'Operations: {{operations}}',
-    'infoPanel.currentConfig.numbers': 'Numbers: {{min}}-{{max}}',
-    'infoPanel.currentConfig.results': 'Results: {{min}}-{{max}}',
-    'infoPanel.currentConfig.operands': 'Operands: {{min}}-{{max}}',
-    'messages.loading': 'Loading...',
+    'infoPanel.recentResults.title': 'Recent Results',
+    'infoPanel.recentResults.score': 'Score: {{score}}',
+    'infoPanel.recentResults.grade': 'Grade',
+    'infoPanel.recentResults.accuracy': 'Accuracy',
   });
 });
-
-// Mock LoadingButton to avoid act warnings from internal state updates
-vi.mock('./LoadingButton', () => ({
-  __esModule: true,
-  default: ({ onClick, children, disabled }: any) => (
-    <button onClick={onClick} disabled={disabled} aria-label='Download PDF'>
-      {children}
-    </button>
-  ),
-}));
 
 // Mock the progress bar hook
 vi.mock('../hooks/useProgressBar', () => ({
   useProgressBar: vi.fn(() => ({
-    progress: 0,
-    isVisible: false,
+    progressBarProps: { className: 'progress-bar', role: 'progressbar' },
+    progressFillProps: { className: 'progress-fill', style: { width: '0%' } },
   })),
 }));
 
@@ -85,13 +62,10 @@ describe.sequential('InfoPanel', () => {
   test('displays statistics correctly', () => {
     render(<InfoPanel problems={[]} settings={mockSettings} />);
 
-    // Check specific statistics using aria-labels - use getAllByLabelText for multiple instances
     expect(screen.getAllByLabelText('Current Problems: 0')[0]).toBeInTheDocument();
     expect(screen.getAllByLabelText('Total Generated: 0')[0]).toBeInTheDocument();
     expect(screen.getAllByLabelText('Operation Types: 0')[0]).toBeInTheDocument();
     expect(screen.getAllByLabelText('Difficulty Level: Beginner')[0]).toBeInTheDocument();
-
-    // Check that difficulty level text is displayed
     expect(screen.getAllByText('Beginner')[0]).toBeInTheDocument();
   });
 
@@ -104,51 +78,36 @@ describe.sequential('InfoPanel', () => {
 
     render(<InfoPanel problems={mockProblems} settings={mockSettings} />);
 
-    // Should show actual problem count
     expect(screen.getAllByLabelText('Current Problems: 3')[0]).toBeInTheDocument();
-
-    // Should show operation types count (2 for ['+', '-'])
     expect(screen.getAllByLabelText('Operation Types: 2')[0]).toBeInTheDocument();
-
-    // Should still show Beginner difficulty for simple settings
     expect(screen.getAllByLabelText('Difficulty Level: Beginner')[0]).toBeInTheDocument();
   });
 
   test('renders without crashing with empty problems', () => {
     render(<InfoPanel problems={[]} settings={mockSettings} />);
-
-    // Should render without errors - use getAllByText to handle multiple instances
     expect(screen.getAllByText('Problem Statistics')[0]).toBeInTheDocument();
   });
 
-  test('calls onDownloadPdf when download button is clicked', async () => {
-    const mockDownload = vi.fn().mockResolvedValue(undefined);
+  test('shows quiz results when provided', () => {
     const mockProblems = [{ id: 1, text: '2 + 2 = ' }];
+    const quizResult = {
+      score: 80,
+      grade: 'B',
+      correctAnswers: 8,
+      incorrectAnswers: 2,
+      totalProblems: 10,
+      feedback: 'Good job!',
+    };
 
-    render(
-      <InfoPanel problems={mockProblems} settings={mockSettings} onDownloadPdf={mockDownload} />
-    );
+    render(<InfoPanel problems={mockProblems} settings={mockSettings} quizResult={quizResult} />);
 
-    // Find the enabled download button - there might be multiple but we want the enabled one
-    const downloadButtons = screen.getAllByRole('button', { name: /download pdf/i });
-    const enabledButton = downloadButtons.find(button => !button.disabled);
-    expect(enabledButton).toBeInTheDocument();
-
-    if (!enabledButton) {
-      throw new Error('Expected an enabled download button to be present');
-    }
-
-    fireEvent.click(enabledButton);
-    expect(mockDownload).toHaveBeenCalledTimes(1);
+    expect(screen.getByText(/Recent Results/)).toBeInTheDocument();
+    expect(screen.getByText('B')).toBeInTheDocument();
+    expect(screen.getByText('80%')).toBeInTheDocument();
   });
 
-  test('disables download button when no problems', async () => {
-    const mockDownload = vi.fn().mockResolvedValue(undefined);
-    render(<InfoPanel problems={[]} settings={mockSettings} onDownloadPdf={mockDownload} />);
-
-    const downloadButtons = screen.getAllByRole('button', { name: /download pdf/i });
-    const button = downloadButtons[0] as HTMLButtonElement;
-    expect(button).toBeInTheDocument();
-    expect(button.disabled).toBe(true);
+  test('does not show quiz results when not provided', () => {
+    render(<InfoPanel problems={[]} settings={mockSettings} />);
+    expect(screen.queryByText(/Recent Results/)).not.toBeInTheDocument();
   });
 });

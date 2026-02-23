@@ -1,52 +1,31 @@
-import React, { useCallback, useDeferredValue, useMemo, useRef, useTransition } from 'react';
+import { useCallback, useDeferredValue, useMemo, useRef, useTransition } from 'react';
 
 /**
  * Hook for tracking component performance metrics
  * Leverages React 19.2's enhanced automatic batching
  */
 export const usePerformanceTracking = () => {
-  const performanceRef = useRef<{
-    renderCount: number;
-    lastRenderTime: number;
-  }>({
-    renderCount: 0,
-    lastRenderTime: Date.now(),
-  });
+  const renderCountRef = useRef(0);
 
-  // Leverage React 19.2's enhanced batching for better performance
   const trackRender = useCallback(() => {
-    performanceRef.current.renderCount += 1;
-    performanceRef.current.lastRenderTime = Date.now();
+    renderCountRef.current += 1;
   }, []);
 
-  // Use React 19.2's improved useMemo for better memoization
-  const performanceMetrics = useMemo(() => {
-    return {
-      renderCount: performanceRef.current.renderCount,
-      lastRenderTime: performanceRef.current.lastRenderTime,
-      averageRenderTime:
-        performanceRef.current.renderCount > 0
-          ? (Date.now() - performanceRef.current.lastRenderTime) /
-            performanceRef.current.renderCount
-          : 0,
-    };
-  }, []);
-
-  // Enhanced event handler optimization
-  const createOptimizedHandler = useCallback(
-    <T extends (...args: unknown[]) => void>(
-      handler: T,
-      dependencies: React.DependencyList = []
-    ) => {
-      return { handler, dependencies };
-    },
+  // Return a getter so consumers always read the latest count
+  const performanceMetrics = useMemo(
+    () => ({
+      get renderCount() {
+        return renderCountRef.current;
+      },
+      lastRenderTime: Date.now(),
+      averageRenderTime: 0,
+    }),
     []
   );
 
   return {
     trackRender,
     performanceMetrics,
-    createOptimizedHandler,
   };
 };
 

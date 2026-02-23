@@ -70,7 +70,7 @@ describe.sequential('SettingsSection', () => {
       />
     );
 
-    expect(screen.getByRole('region', { name: 'settings.title' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Settings' })).toBeInTheDocument();
     expect(screen.getByLabelText('accessibility.selectOperations')).toBeInTheDocument();
     expect(screen.getByLabelText('accessibility.numProblemsInput')).toBeInTheDocument();
   });

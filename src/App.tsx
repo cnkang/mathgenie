@@ -116,14 +116,7 @@ const MainContent: React.FC<MainContentProps> = ({
 
         <ProblemsSection t={t} problems={problems} settings={settings} />
 
-        <InfoPanel
-          problems={problems}
-          settings={settings}
-          onGenerateProblems={onGenerate}
-          onDownloadPdf={onDownload}
-          quizResult={quizResult}
-          onStartQuiz={onStartQuiz}
-        />
+        <InfoPanel problems={problems} settings={settings} quizResult={quizResult} />
       </div>
     </div>
   );
