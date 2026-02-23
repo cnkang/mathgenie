@@ -1,11 +1,11 @@
 // Setup for testing environment with happy-dom only
-import { vi } from "vitest";
+import { vi } from 'vitest';
 
 // Ensure window is available for React DOM operations
 // This is critical for React 19.2.0 + happy-dom 19.0.2 compatibility
 
 // First, ensure we have a proper global object
-if (typeof globalThis === "undefined") {
+if (typeof globalThis === 'undefined') {
   (global as any).globalThis = global;
 }
 
@@ -18,20 +18,20 @@ const createMockWindow = () => {
     // Essential browser APIs
     document: globalThis.document || {},
     location: globalThis.location || {
-      href: "http://localhost:3000",
-      origin: "http://localhost:3000",
-      protocol: "http:",
-      host: "localhost:3000",
-      hostname: "localhost",
-      port: "3000",
-      pathname: "/",
-      search: "",
-      hash: "",
+      href: 'http://localhost:3000',
+      origin: 'http://localhost:3000',
+      protocol: 'http:',
+      host: 'localhost:3000',
+      hostname: 'localhost',
+      port: '3000',
+      pathname: '/',
+      search: '',
+      hash: '',
     },
     navigator: globalThis.navigator || {
-      userAgent: "Mozilla/5.0 (Node.js) Test Environment",
-      language: "en-US",
-      languages: ["en-US", "en"],
+      userAgent: 'Mozilla/5.0 (Node.js) Test Environment',
+      language: 'en-US',
+      languages: ['en-US', 'en'],
     },
     history: globalThis.history || {
       pushState: vi.fn(),
@@ -66,7 +66,7 @@ const createMockWindow = () => {
       class Event {
         constructor(
           public type: string,
-          public eventInitDict?: EventInit,
+          public eventInitDict?: EventInit
         ) {}
         preventDefault = vi.fn();
         stopPropagation = vi.fn();
@@ -129,7 +129,7 @@ const createMockWindow = () => {
     // Window methods
     alert: vi.fn(),
     confirm: vi.fn(() => true),
-    prompt: vi.fn(() => ""),
+    prompt: vi.fn(() => ''),
     open: vi.fn(),
     close: vi.fn(),
     focus: vi.fn(),
@@ -176,11 +176,11 @@ const createMockWindow = () => {
 };
 
 // Only create window if it doesn't exist
-if (typeof window === "undefined") {
+if (typeof window === 'undefined') {
   const mockWindow = createMockWindow();
 
   // Set window on globalThis
-  Object.defineProperty(globalThis, "window", {
+  Object.defineProperty(globalThis, 'window', {
     value: mockWindow,
     writable: true,
     configurable: true,
@@ -190,7 +190,7 @@ if (typeof window === "undefined") {
   (global as any).window = mockWindow;
 
   // Ensure window is also available as a direct global
-  Object.defineProperty(global, "window", {
+  Object.defineProperty(global, 'window', {
     value: mockWindow,
     writable: true,
     configurable: true,
@@ -198,10 +198,10 @@ if (typeof window === "undefined") {
 }
 
 // Ensure window has all necessary properties for React DOM
-if (typeof window !== "undefined") {
+if (typeof window !== 'undefined') {
   // Performance API
   if (!window.performance) {
-    Object.defineProperty(window, "performance", {
+    Object.defineProperty(window, 'performance', {
       value: {
         now: () => Date.now(),
         mark: vi.fn(),
@@ -216,7 +216,7 @@ if (typeof window !== "undefined") {
 
   // Ensure essential window properties exist
   if (!window.document) {
-    Object.defineProperty(window, "document", {
+    Object.defineProperty(window, 'document', {
       value: globalThis.document || {},
       writable: true,
       configurable: true,
@@ -224,7 +224,7 @@ if (typeof window !== "undefined") {
   }
 
   if (!window.requestAnimationFrame) {
-    Object.defineProperty(window, "requestAnimationFrame", {
+    Object.defineProperty(window, 'requestAnimationFrame', {
       value: vi.fn((cb: FrameRequestCallback) => setTimeout(cb, 16)),
       writable: true,
       configurable: true,
@@ -232,7 +232,7 @@ if (typeof window !== "undefined") {
   }
 
   if (!window.cancelAnimationFrame) {
-    Object.defineProperty(window, "cancelAnimationFrame", {
+    Object.defineProperty(window, 'cancelAnimationFrame', {
       value: vi.fn(),
       writable: true,
       configurable: true,
@@ -240,7 +240,7 @@ if (typeof window !== "undefined") {
   }
 
   if (!window.addEventListener) {
-    Object.defineProperty(window, "addEventListener", {
+    Object.defineProperty(window, 'addEventListener', {
       value: vi.fn(),
       writable: true,
       configurable: true,
@@ -248,7 +248,7 @@ if (typeof window !== "undefined") {
   }
 
   if (!window.removeEventListener) {
-    Object.defineProperty(window, "removeEventListener", {
+    Object.defineProperty(window, 'removeEventListener', {
       value: vi.fn(),
       writable: true,
       configurable: true,
@@ -256,7 +256,7 @@ if (typeof window !== "undefined") {
   }
 
   if (!window.dispatchEvent) {
-    Object.defineProperty(window, "dispatchEvent", {
+    Object.defineProperty(window, 'dispatchEvent', {
       value: vi.fn(),
       writable: true,
       configurable: true,
@@ -289,52 +289,52 @@ expect.extend({
     const node = received as Node | null | undefined;
     const pass = !!(node && document.body.contains(node));
     return {
-      message: () => `expected element ${pass ? "not " : ""}to be in the document`,
+      message: () => `expected element ${pass ? 'not ' : ''}to be in the document`,
       pass,
     };
   },
   toHaveTextContent(
     received: { textContent?: string | null } | null | undefined,
-    expected: string,
+    expected: string
   ): { pass: boolean; message: () => string } {
     const pass = received?.textContent?.includes(expected) ?? false;
     return {
-      message: () => `expected element ${pass ? "not " : ""}to have text content "${expected}"`,
+      message: () => `expected element ${pass ? 'not ' : ''}to have text content "${expected}"`,
       pass,
     };
   },
   toHaveValue(
     received: { value?: string | number } | null | undefined,
-    expected: string | number,
+    expected: string | number
   ): { pass: boolean; message: () => string } {
     const pass =
       (received?.value ?? undefined) === expected ||
       (received?.value ?? undefined) === String(expected);
     return {
-      message: () => `expected element ${pass ? "not " : ""}to have value "${expected}"`,
+      message: () => `expected element ${pass ? 'not ' : ''}to have value "${expected}"`,
       pass,
     };
   },
   toHaveClass(
     received: { className?: string } | null | undefined,
-    expected: string,
+    expected: string
   ): { pass: boolean; message: () => string } {
-    const className = received?.className ?? "";
-    const pass = className.split(" ").includes(expected);
+    const className = received?.className ?? '';
+    const pass = className.split(' ').includes(expected);
     return {
-      message: () => `expected element ${pass ? "not " : ""}to have class "${expected}"`,
+      message: () => `expected element ${pass ? 'not ' : ''}to have class "${expected}"`,
       pass,
     };
   },
   toHaveAttribute(
     received: Element | null | undefined,
     attribute: string,
-    expectedValue?: string,
+    expectedValue?: string
   ): { pass: boolean; message: () => string } {
     const element = received as Element | null | undefined;
     if (!element?.hasAttribute) {
       return {
-        message: () => "expected element to be a valid DOM element",
+        message: () => 'expected element to be a valid DOM element',
         pass: false,
       };
     }
@@ -344,7 +344,7 @@ expect.extend({
     if (expectedValue === undefined) {
       return {
         message: () =>
-          `expected element ${hasAttribute ? "not " : ""}to have attribute "${attribute}"`,
+          `expected element ${hasAttribute ? 'not ' : ''}to have attribute "${attribute}"`,
         pass: hasAttribute,
       };
     }
@@ -353,7 +353,7 @@ expect.extend({
     const pass = hasAttribute && actualValue === expectedValue;
     return {
       message: () =>
-        `expected element ${pass ? "not " : ""}to have attribute "${attribute}" with value "${expectedValue}"`,
+        `expected element ${pass ? 'not ' : ''}to have attribute "${attribute}" with value "${expectedValue}"`,
       pass,
     };
   },
@@ -389,20 +389,20 @@ const createMockContext = () => ({
 
 const mockCanvas = {
   getContext: vi.fn(createMockContext),
-  toDataURL: vi.fn(() => ""),
+  toDataURL: vi.fn(() => ''),
   addEventListener: vi.fn(),
   removeEventListener: vi.fn(),
 };
 
-Object.defineProperty(window, "HTMLCanvasElement", {
+Object.defineProperty(window, 'HTMLCanvasElement', {
   writable: true,
   value: vi.fn().mockImplementation(() => mockCanvas),
 });
 
 // 简化的 crypto mock using Node.js crypto for security compliance
-import { randomBytes } from "crypto";
+import { randomBytes } from 'crypto';
 
-Object.defineProperty(window, "crypto", {
+Object.defineProperty(window, 'crypto', {
   writable: true,
   value: {
     getRandomValues: vi.fn((arr: Uint32Array) => {
@@ -433,14 +433,14 @@ const localStorageMock = {
   }),
 };
 
-Object.defineProperty(window, "localStorage", {
+Object.defineProperty(window, 'localStorage', {
   writable: true,
   value: localStorageMock,
 });
 
 // Global test cleanup
-import { cleanup } from "@testing-library/react";
-import { afterEach, beforeEach } from "vitest";
+import { cleanup } from '@testing-library/react';
+import { afterEach, beforeEach } from 'vitest';
 
 // Store original console methods (for potential future use)
 // const originalConsole = {
@@ -451,9 +451,9 @@ import { afterEach, beforeEach } from "vitest";
 
 // Ensure window is always available for React DOM operations
 const ensureWindow = () => {
-  if (typeof window === "undefined") {
+  if (typeof window === 'undefined') {
     const mockWindow = createMockWindow();
-    Object.defineProperty(globalThis, "window", {
+    Object.defineProperty(globalThis, 'window', {
       value: mockWindow,
       writable: true,
       configurable: true,
@@ -465,9 +465,9 @@ const ensureWindow = () => {
 // Mock window APIs once at startup
 ensureWindow();
 
-Object.defineProperty(window, "matchMedia", {
+Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: vi.fn().mockImplementation((query) => ({
+  value: vi.fn().mockImplementation(query => ({
     matches: false,
     media: query,
     onchange: null,
@@ -507,12 +507,12 @@ afterEach(() => {
 // URL.createObjectURL and revokeObjectURL may not be implemented
 try {
   // Safely attach mocks without throwing in environments that already provide them
-  if (typeof URL !== "undefined") {
+  if (typeof URL !== 'undefined') {
     const g: any = globalThis as any;
-    if (!("createObjectURL" in URL)) {
-      g.URL.createObjectURL = vi.fn(() => "blob:mock-url");
+    if (!('createObjectURL' in URL)) {
+      g.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
     }
-    if (!("revokeObjectURL" in URL)) {
+    if (!('revokeObjectURL' in URL)) {
       g.URL.revokeObjectURL = vi.fn();
     }
   }
