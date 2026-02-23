@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **InfoPanel stats double-counting**: Fixed `totalGenerated` counter incrementing on component remount (e.g., entering/exiting quiz mode) by tracking previous problems reference
+- **SettingsSection aria-label**: Fixed raw translation key `"settings.title"` appearing as aria-label before translations load; now falls back to `"Settings"` when the key is unresolved
+- **usePerformance `performanceMetrics`**: Fixed `useMemo` with empty deps that caused metrics to never update; replaced with a getter-based approach for live render count
+- **Mobile content ordering**: Settings section now appears before results on mobile (≤480px), so users can configure before scrolling to generated problems
+
+### Changed
+
+- **InfoPanel simplified**: Removed duplicate quick-action buttons, tips section, and current config display; kept stats grid, progress bar, and conditional quiz results
+- **useReact19Features cleaned up**: Removed placeholder code (`usePromise` that only throws, `createMemoizedCallback` no-op, `batchUpdates` wrapper); retained only the actively used `optimisticState`, `updateOptimistic`, `startTransition`, and `useErrorRecovery`
+- **usePerformance cleaned up**: Removed unused `createOptimizedHandler` that returned an inert `{ handler, dependencies }` object
+- **Console noise reduced**: Suppressed non-actionable `console.log` calls in `browserOptimizations.ts` (`logBrowserInfo`, Firefox CSS message) and `wcagEnforcement.ts` (mutation observer logging)
+- **Removed unused jsdom dependency**: Disabled `auto-install-peers` in `.npmrc` to prevent pnpm from auto-installing vitest's optional peer dependency `jsdom` (project uses `happy-dom`). This eliminates the deprecated `whatwg-encoding@3.1.1` transitive dependency
+
 ### Security
 
 - **js-yaml Security Fix**: Added pnpm override to force js-yaml to version 4.1.1 or higher

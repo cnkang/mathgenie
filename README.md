@@ -259,17 +259,14 @@ MathGenie uses a balanced hook architecture that promotes code reusability and m
 
 - **Focused Hooks**: Each hook has a single, well-defined responsibility
 - **Simplified Structure**: Complex logic is organized within hooks using clear internal functions
+- **Lean Implementation**: Placeholder and no-op code is avoided; hooks only export actively used functionality
 - **Type Safety**: All hooks are fully typed with comprehensive TypeScript support
 - **Testability**: Hook design enables comprehensive testing of functionality through public APIs
 
 **Example: Problem Generation Hook Structure**
 
 ```typescript
-export const useProblemGenerator = (
-  settings: Settings,
-  isLoading: boolean,
-  validateSettings: (settings: Settings) => string
-) => {
+export const useProblemGenerator = (settings: Settings, isLoading: boolean, validateSettings: (settings: Settings) => string) => {
   const [problems, setProblems] = useState<Problem[]>([]);
 
   // Internal logic organized with useCallback for performance
@@ -281,7 +278,7 @@ export const useProblemGenerator = (
       }
       return createGenerationOutcome({ settings, showSuccessMessage, setProblems });
     },
-    [settings, validateSettings, setProblems]
+    [settings, validateSettings, setProblems],
   );
 
   const generateProblems = useCallback(
@@ -291,7 +288,7 @@ export const useProblemGenerator = (
       }
       return processGeneration(showSuccessMessage);
     },
-    [isLoading, processGeneration]
+    [isLoading, processGeneration],
   );
 
   // Auto-regeneration effect
@@ -592,15 +589,15 @@ MathGenie uses a sophisticated message system that supports dynamic translation 
 
 ```typescript
 // New MessageState object approach (recommended)
-setError({ key: 'errors.validation.invalidRange', params: { min: 1, max: 100 } });
-setSuccessMessage({ key: 'messages.success.problemsGenerated', params: { count: 20 } });
+setError({ key: "errors.validation.invalidRange", params: { min: 1, max: 100 } });
+setSuccessMessage({ key: "messages.success.problemsGenerated", params: { count: 20 } });
 
 // Legacy string support (still supported)
-setError('Error message');
+setError("Error message");
 
 // Clear messages
-setError({ key: '' });
-setWarning({ key: '' });
+setError({ key: "" });
+setWarning({ key: "" });
 ```
 
 ## 🔧 Configuration
