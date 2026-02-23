@@ -1,5 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import { act } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import EnhancedSuspense from './EnhancedSuspense';
 
 // Mock the hooks
@@ -12,8 +11,10 @@ vi.mock('@/hooks/usePerformance', () => ({
 
 vi.mock('@/hooks/useReact19Features', () => ({
   useReact19Features: () => ({
-    createTransition: () => [false, vi.fn()],
-    createOptimisticState: () => [{ data: { children: null, hasError: false } }, vi.fn()],
+    optimisticState: { data: 'initial', isPending: false },
+    updateOptimistic: vi.fn(),
+    isPending: false,
+    startTransition: vi.fn((cb: () => void) => cb()),
   }),
   useErrorRecovery: () => ({
     recoverFromError: vi.fn(),

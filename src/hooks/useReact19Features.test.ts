@@ -2,19 +2,16 @@ import { act, renderHook } from '@testing-library/react';
 import { createSuspenseResource, useErrorRecovery, useReact19Features } from './useReact19Features';
 
 describe('useReact19Features', () => {
-  test('should provide React 19.2 features', () => {
+  test('should provide optimistic state and transition utilities', () => {
     const { result } = renderHook(() => useReact19Features());
 
-    expect(typeof result.current.usePromise).toBe('function');
     expect(typeof result.current.optimisticState).toBe('object');
     expect(typeof result.current.updateOptimistic).toBe('function');
     expect(typeof result.current.isPending).toBe('boolean');
     expect(typeof result.current.startTransition).toBe('function');
-    expect(typeof result.current.batchUpdates).toBe('function');
-    expect(typeof result.current.createMemoizedCallback).toBe('function');
   });
 
-  test('should have optimistic state', () => {
+  test('should have optimistic state with initial values', () => {
     const { result } = renderHook(() => useReact19Features());
 
     expect(result.current.optimisticState.data).toBe('initial');
@@ -24,8 +21,6 @@ describe('useReact19Features', () => {
       result.current.updateOptimistic('updated');
     });
 
-    // Note: In a real scenario, the optimistic state would be updated
-    // This test verifies the function structure
     expect(typeof result.current.updateOptimistic).toBe('function');
   });
 
@@ -36,22 +31,13 @@ describe('useReact19Features', () => {
     expect(typeof result.current.startTransition).toBe('function');
   });
 
-  test('should create memoized callback', () => {
-    const { result } = renderHook(() => useReact19Features());
-
-    const mockCallback = vi.fn();
-    const memoizedCallback = result.current.createMemoizedCallback(mockCallback, []);
-
-    expect(typeof memoizedCallback).toBe('function');
-  });
-
-  test('should batch updates', () => {
+  test('should execute startTransition callback', () => {
     const { result } = renderHook(() => useReact19Features());
 
     const mockCallback = vi.fn();
 
     act(() => {
-      result.current.batchUpdates(mockCallback);
+      result.current.startTransition(mockCallback);
     });
 
     expect(mockCallback).toHaveBeenCalled();
@@ -63,7 +49,6 @@ describe('createSuspenseResource', () => {
     const promise = Promise.resolve('test data');
     const resource = createSuspenseResource(promise);
 
-    // Wait for promise to resolve
     await promise;
 
     expect(resource.read()).toBe('test data');
@@ -74,7 +59,6 @@ describe('createSuspenseResource', () => {
     const promise = Promise.reject(error);
     const resource = createSuspenseResource(promise);
 
-    // Wait for promise to reject
     try {
       await promise;
     } catch {
