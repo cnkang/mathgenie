@@ -325,12 +325,6 @@ export const enforceWCAGTouchTargets = (): void => {
   const elements = document.querySelectorAll(selector);
 
   processElementsByStrategy(elements, minSize, firefoxBrowser);
-
-  if (import.meta.env.DEV) {
-    console.log(
-      `WCAG Enforcement: Applied ${minSize}px minimum touch targets to ${elements.length} elements (Firefox optimized: ${firefoxBrowser})`
-    );
-  }
 };
 
 const hasAddedInteractiveNodes = (mutation: MutationRecord): boolean => {

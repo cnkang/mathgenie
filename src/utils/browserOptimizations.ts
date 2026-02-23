@@ -113,13 +113,9 @@ const handleDOMOperationMeasurement = <T>(
   return measureOperation(operation, operationName, isFirefox);
 };
 
-// Helper function to handle browser info logging
-const handleBrowserInfoLogging = (shouldLog: boolean): void => {
-  if (!shouldLog) {
-    return;
-  }
-  const browserInfo = getBrowserInfo();
-  console.log('Browser optimizations applied:', browserInfo);
+// Helper function to handle browser info logging - suppressed to reduce console noise
+const handleBrowserInfoLogging = (_shouldLog: boolean): void => {
+  // Intentionally silent - browser info is not actionable for developers
 };
 
 // Performance monitoring for different browsers
@@ -177,9 +173,5 @@ export const applyBrowserSpecificStyles = () => {
     // Add Firefox-specific CSS optimizations
     const style = createFirefoxStyles();
     document.head.appendChild(style);
-
-    if (import.meta.env.DEV) {
-      console.log('Firefox-specific CSS optimizations applied');
-    }
   }
 };

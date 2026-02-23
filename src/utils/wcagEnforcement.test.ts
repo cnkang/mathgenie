@@ -256,7 +256,7 @@ describe('WCAG Enforcement', () => {
     global.document = originalDocument;
   });
 
-  test('logs Firefox optimization status in development mode', () => {
+  test('applies Firefox optimizations without logging', () => {
     const originalUserAgent = navigator.userAgent;
     const originalEnv = import.meta.env.DEV;
 
@@ -270,8 +270,8 @@ describe('WCAG Enforcement', () => {
 
     enforceWCAGTouchTargets();
 
-    // Verify Firefox optimization status is logged
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Firefox optimized: true'));
+    // Console logging was removed to reduce noise - enforcement still works
+    expect(consoleSpy).not.toHaveBeenCalled();
 
     document.body.removeChild(btn);
     consoleSpy.mockRestore();

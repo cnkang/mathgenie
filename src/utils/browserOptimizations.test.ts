@@ -1,10 +1,10 @@
 import {
-  getBrowserInfo,
-  getFirefoxOptimizations,
-  getChromeOptimizations,
-  getBrowserOptimizations,
-  createPerformanceMonitor,
   applyBrowserSpecificStyles,
+  createPerformanceMonitor,
+  getBrowserInfo,
+  getBrowserOptimizations,
+  getChromeOptimizations,
+  getFirefoxOptimizations,
 } from './browserOptimizations';
 
 // Mock navigator for browser detection tests
@@ -201,7 +201,7 @@ describe('Browser Optimizations', () => {
       (import.meta.env as any).DEV = originalEnv;
     });
 
-    test('logs browser info in development mode', () => {
+    test('logBrowserInfo is silent (no console noise)', () => {
       const originalEnv = import.meta.env.DEV;
       (import.meta.env as any).DEV = true;
 
@@ -210,15 +210,8 @@ describe('Browser Optimizations', () => {
 
       monitor.logBrowserInfo();
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        'Browser optimizations applied:',
-        expect.objectContaining({
-          isFirefox: expect.any(Boolean),
-          isChrome: expect.any(Boolean),
-          isSafari: expect.any(Boolean),
-          isEdge: expect.any(Boolean),
-        })
-      );
+      // logBrowserInfo was intentionally silenced to reduce console noise
+      expect(consoleSpy).not.toHaveBeenCalled();
 
       consoleSpy.mockRestore();
       (import.meta.env as any).DEV = originalEnv;
@@ -291,7 +284,7 @@ describe('Browser Optimizations', () => {
       });
     });
 
-    test('logs Firefox CSS optimization message in dev mode', () => {
+    test('applies Firefox styles without logging in dev mode', () => {
       mockNavigator('Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0');
       const originalEnv = import.meta.env.DEV;
       (import.meta.env as any).DEV = true;
@@ -309,7 +302,8 @@ describe('Browser Optimizations', () => {
 
       applyBrowserSpecificStyles();
 
-      expect(consoleSpy).toHaveBeenCalledWith('Firefox-specific CSS optimizations applied');
+      // Console log was removed to reduce noise - styles should still be applied
+      expect(mockHead.appendChild).toHaveBeenCalled();
 
       consoleSpy.mockRestore();
       Object.defineProperty(document, 'head', {
