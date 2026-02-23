@@ -35,7 +35,10 @@ const SettingsSection: React.FC<SettingsSectionProps> = ({
   const MAX_LABEL = t('settings.to') || STR_TO;
 
   return (
-    <section className='settings-section' aria-label={t('settings.title') || 'Settings'}>
+    <section
+      className='settings-section'
+      aria-label={t('settings.title') !== 'settings.title' ? t('settings.title') : 'Settings'}
+    >
       <div className='field'>
         <label htmlFor={STR_OPERATIONS} className='field-label'>
           {t('operations.title')}
