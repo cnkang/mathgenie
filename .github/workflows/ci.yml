@@ -161,7 +161,7 @@ jobs:
           fail_ci_if_error: false
 
       - name: 📋 Upload test results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-results-unit
@@ -258,7 +258,7 @@ jobs:
           done
 
       - name: 🚀 Upload build artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: build-production
           path: dist/
@@ -376,7 +376,7 @@ jobs:
           fi
 
       - name: 📊 Upload accessibility report
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: accessibility-report
@@ -387,7 +387,7 @@ jobs:
           retention-days: 30
 
       - name: 📊 Upload accessibility HTML report
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always() && hashFiles('playwright-report/**/*') != ''
         with:
           name: accessibility-html-report
@@ -533,7 +533,7 @@ jobs:
           PLAYWRIGHT_OUTPUT_DIR: test-results-${{ matrix.project }}
 
       - name: 📊 Upload test results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: playwright-results-${{ matrix.project }}
@@ -543,7 +543,7 @@ jobs:
           retention-days: 30
 
       - name: 📊 Upload Playwright HTML Report
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always() && hashFiles('playwright-report/**/*') != ''
         with:
           name: playwright-report-${{ matrix.project }}
@@ -651,7 +651,7 @@ jobs:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
 
       - name: 📊 Upload Lighthouse results
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: lighthouse-results
@@ -691,7 +691,7 @@ jobs:
         continue-on-error: false
 
       - name: 📊 Upload i18n report
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: i18n-report
@@ -782,7 +782,7 @@ jobs:
         run: pnpm analyze
 
       - name: 📊 Upload dependency analysis
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: dependency-analysis
@@ -791,7 +791,7 @@ jobs:
           retention-days: 7
 
       - name: 📊 Upload bundle analysis
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always() && hashFiles('bundle-report.html') != ''
         with:
           name: bundle-analysis
