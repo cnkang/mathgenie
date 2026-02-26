@@ -578,7 +578,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 📋 Download build artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: build-production
           path: dist/
