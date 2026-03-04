@@ -114,3 +114,15 @@ a[href]:focus:not(:focus-visible),
     box-shadow: none;
   }
 }
+
+/* Enforce dark-theme form control contrast on Safari/WebKit */
+@media (prefers-color-scheme: dark) {
+  input,
+  select,
+  textarea {
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
+    border-color: var(--border-color);
+    -webkit-text-fill-color: var(--text-primary);
+  }
+}
