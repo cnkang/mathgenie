@@ -87,31 +87,83 @@ const collectContrastSamples = async (page: Page): Promise<ContrastSample[]> => 
       return [red, green, blue, alpha] as [number, number, number, number];
     };
 
+    const parseRgbChannel = (value: string): number => {
+      const token = value.trim();
+      if (token.endsWith('%')) {
+        return (Number.parseFloat(token) / 100) * 255;
+      }
+      return Number(token);
+    };
+
+    const parseNormalizedChannel = (value: string): number => {
+      const token = value.trim();
+      if (token.endsWith('%')) {
+        return (Number.parseFloat(token) / 100) * 255;
+      }
+      const numeric = Number(token);
+      return numeric <= 1 ? numeric * 255 : numeric;
+    };
+
+    const parseAlpha = (value?: string): number => {
+      if (value === undefined) {
+        return 1;
+      }
+      const token = value.trim();
+      if (token.endsWith('%')) {
+        return Number.parseFloat(token) / 100;
+      }
+      return Number(token);
+    };
+
     const parseRgbColor = (raw: string): [number, number, number, number] | null => {
       const match = /rgba?\(([^)]+)\)/i.exec(raw);
       if (!match) {
         return null;
       }
-      const parts = match[1].split(',').map(item => item.trim());
+
+      const content = match[1].trim();
+      let channels: string[] = [];
+      let alpha: string | undefined;
+
+      if (content.includes(',')) {
+        const parts = content.split(',').map(item => item.trim());
+        channels = parts.slice(0, 3);
+        alpha = parts[3];
+      } else {
+        const [channelPart, alphaPart] = content.split('/').map(item => item.trim());
+        channels = channelPart.split(/\s+/).filter(Boolean).slice(0, 3);
+        alpha = alphaPart;
+      }
+
+      if (channels.length < 3) {
+        return null;
+      }
+
       return toRgba(
-        Number(parts[0]),
-        Number(parts[1]),
-        Number(parts[2]),
-        parts[3] === undefined ? 1 : Number(parts[3])
+        parseRgbChannel(channels[0]),
+        parseRgbChannel(channels[1]),
+        parseRgbChannel(channels[2]),
+        parseAlpha(alpha)
       );
     };
 
-    const parseSrgbColor = (raw: string): [number, number, number, number] | null => {
-      const match =
-        /color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\)/i.exec(raw);
+    const parseWideGamutColor = (raw: string): [number, number, number, number] | null => {
+      const match = /color\((?:srgb|display-p3)\s+([^)]+)\)/i.exec(raw);
       if (!match) {
         return null;
       }
+
+      const [channelPart, alphaPart] = match[1].split('/').map(item => item.trim());
+      const channels = channelPart.split(/\s+/).filter(Boolean);
+      if (channels.length < 3) {
+        return null;
+      }
+
       return toRgba(
-        Number(match[1]) * 255,
-        Number(match[2]) * 255,
-        Number(match[3]) * 255,
-        match[4] === undefined ? 1 : Number(match[4])
+        parseNormalizedChannel(channels[0]),
+        parseNormalizedChannel(channels[1]),
+        parseNormalizedChannel(channels[2]),
+        parseAlpha(alphaPart)
       );
     };
 
@@ -141,7 +193,7 @@ const collectContrastSamples = async (page: Page): Promise<ContrastSample[]> => 
       if (raw.startsWith('#')) {
         return parseHex(raw);
       }
-      return parseRgbColor(raw) ?? parseSrgbColor(raw) ?? parseCanvasColor(raw);
+      return parseRgbColor(raw) ?? parseWideGamutColor(raw) ?? parseCanvasColor(raw);
     };
 
     const toLinear = (channel: number): number => {
