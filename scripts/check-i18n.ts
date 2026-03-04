@@ -363,18 +363,23 @@ async function main(): Promise<void> {
   }
 
   // Exit with appropriate code
-  if (!result.isValid) {
-    console.error('\n❌ i18n validation failed!');
-    process.exit(1);
-  } else {
+  if (result.isValid) {
     console.log('\n✅ i18n validation passed!');
     process.exit(0);
+  } else {
+    console.error('\n❌ i18n validation failed!');
+    process.exit(1);
   }
 }
 
 // Run if called directly
 if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch(console.error);
+  try {
+    await main();
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  }
 }
 
 export {

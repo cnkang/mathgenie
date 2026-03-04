@@ -37,12 +37,12 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
     if (currentProblemId.current !== problem.id) {
       currentProblemId.current = problem.id;
 
-      if (problem.userAnswer !== undefined) {
-        setUserInput(problem.userAnswer.toString());
-        setIsSubmitted(true);
-      } else {
+      if (problem.userAnswer === undefined) {
         setUserInput('');
         setIsSubmitted(false);
+      } else {
+        setUserInput(problem.userAnswer.toString());
+        setIsSubmitted(true);
       }
     }
   }, [problem.id, problem.userAnswer]);

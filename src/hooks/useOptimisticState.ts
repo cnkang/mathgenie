@@ -40,7 +40,7 @@ export const useOptimisticState = <T>(initialValue: T) => {
   );
 
   return {
-    state: optimisticState !== null ? optimisticState : actualState,
+    state: optimisticState === null ? actualState : optimisticState,
     isPending,
     updateOptimistic,
     commit,

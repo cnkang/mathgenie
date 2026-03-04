@@ -150,8 +150,10 @@ self.addEventListener('fetch', (event) => {
   console.log('📊 Run "npm run analyze" to analyze bundle size');
 }
 
-main().catch(error => {
+try {
+  await main();
+} catch (error) {
   const buildError = error as BuildError;
   console.error('❌ Build failed:', buildError.message);
   process.exit(1);
-});
+}

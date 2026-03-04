@@ -251,7 +251,7 @@ function runUnitTests(strategy: TestStrategy, options: UnitTestOptions = {}): vo
 
   const coverageFlag = coverage ? '--coverage' : '--no-coverage';
   const watchFlag = watch ? '' : '--run';
-  const reporterFlag = reporter !== 'default' ? `--reporter=${reporter}` : '';
+  const reporterFlag = reporter === 'default' ? '' : `--reporter=${reporter}`;
 
   const command =
     `vitest ${watchFlag} ${coverageFlag} ${reporterFlag} --config=${strategy.config}`.trim();
