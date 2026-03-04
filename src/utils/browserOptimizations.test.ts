@@ -66,8 +66,8 @@ describe('Browser Optimizations', () => {
     });
 
     test('handles undefined navigator gracefully', () => {
-      const originalNavigator = global.navigator;
-      delete (global as any).navigator;
+      const originalNavigator = globalThis.navigator;
+      delete (globalThis as any).navigator;
 
       const info = getBrowserInfo();
       expect(info.isFirefox).toBe(false);
@@ -75,7 +75,7 @@ describe('Browser Optimizations', () => {
       expect(info.isSafari).toBe(false);
       expect(info.isEdge).toBe(false);
 
-      global.navigator = originalNavigator;
+      globalThis.navigator = originalNavigator;
     });
   });
 
@@ -316,12 +316,12 @@ describe('Browser Optimizations', () => {
     test('handles undefined document gracefully', () => {
       mockNavigator('Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0');
 
-      const originalDocument = global.document;
-      delete (global as any).document;
+      const originalDocument = globalThis.document;
+      delete (globalThis as any).document;
 
       expect(() => applyBrowserSpecificStyles()).not.toThrow();
 
-      global.document = originalDocument;
+      globalThis.document = originalDocument;
     });
   });
 });

@@ -228,10 +228,10 @@ const loadFallbackTranslations = async (): Promise<Translations> => {
 };
 
 const persistLanguageSelection = (language: string): void => {
-  if (typeof window === STR_UNDEFINED || !window.localStorage) {
+  if (typeof globalThis === STR_UNDEFINED || !globalThis.localStorage) {
     return;
   }
-  window.localStorage.setItem('mathgenie-language', language);
+  globalThis.localStorage.setItem('mathgenie-language', language);
 };
 
 const setDocumentLanguage = (language: string): void => {
@@ -345,7 +345,7 @@ interface I18nProviderProps {
 export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   const [currentLanguage, setCurrentLanguage] = useState<string>(() => {
     // 优先使用用户保存的语言设置，只有在没有保存设置时才使用浏览器语言
-    if (typeof window !== STR_UNDEFINED && window.localStorage) {
+    if (typeof globalThis !== STR_UNDEFINED && globalThis.localStorage) {
       const savedLanguage = localStorage.getItem('mathgenie-language');
       return savedLanguage || getBrowserLanguage();
     }

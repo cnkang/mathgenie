@@ -8,16 +8,16 @@ interface ServiceWorkerConfig {
 
 // SONAR-SAFE: The .exec() below is a regex method call, not OS command execution
 const isLocalhost = Boolean(
-  window.location.hostname === 'localhost' ||
-    window.location.hostname === '[::1]' ||
-    /^127(?:\.(?:25[0-5]|2[0-4]\d|[01]?\d\d?)){3}$/.exec(window.location.hostname)
+  globalThis.location.hostname === 'localhost' ||
+    globalThis.location.hostname === '[::1]' ||
+    /^127(?:\.(?:25[0-5]|2[0-4]\d|[01]?\d\d?)){3}$/.exec(globalThis.location.hostname)
 );
 
 const isServiceWorkerSupported = (): boolean => 'serviceWorker' in navigator;
 
 const isValidPublicUrl = (): boolean => {
-  const publicUrl = new URL(import.meta.env.VITE_PUBLIC_URL || '', window.location.href);
-  return publicUrl.origin === window.location.origin;
+  const publicUrl = new URL(import.meta.env.VITE_PUBLIC_URL || '', globalThis.location.href);
+  return publicUrl.origin === globalThis.location.origin;
 };
 
 const handleServiceWorkerLoad = (config?: ServiceWorkerConfig): void => {
@@ -42,7 +42,7 @@ export function register(config?: ServiceWorkerConfig): void {
     return;
   }
 
-  window.addEventListener('load', () => handleServiceWorkerLoad(config));
+  globalThis.addEventListener('load', () => handleServiceWorkerLoad(config));
 }
 
 const handleInstallingWorkerStateChange = (
@@ -89,8 +89,8 @@ function registerValidSW(swUrl: string, config?: ServiceWorkerConfig): void {
 
 const validateServiceWorkerUrl = (swUrl: string): boolean => {
   try {
-    const url = new URL(swUrl, window.location.origin);
-    return url.origin === window.location.origin;
+    const url = new URL(swUrl, globalThis.location.origin);
+    return url.origin === globalThis.location.origin;
   } catch {
     console.error('Invalid service worker URL');
     return false;
@@ -100,7 +100,7 @@ const validateServiceWorkerUrl = (swUrl: string): boolean => {
 const handleInvalidServiceWorker = (): void => {
   navigator.serviceWorker.ready.then((registration: ServiceWorkerRegistration) => {
     registration.unregister().then((): void => {
-      window.location.reload();
+      globalThis.location.reload();
     });
   });
 };

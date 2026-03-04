@@ -16,7 +16,7 @@ export const useAppMessages = (): UseAppMessagesReturn => {
   const [error, setError] = useState<MessageValue>('');
   const [warning, setWarning] = useState<MessageValue>('');
   const [successMessage, setSuccessMessage] = useState<MessageValue>('');
-  const timeoutRef = useRef<number | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clearMessages = (): void => {
     setError('');
@@ -27,11 +27,11 @@ export const useAppMessages = (): UseAppMessagesReturn => {
   const showSuccessMessage = (message: MessageValue): void => {
     // Clear any existing timeout
     if (timeoutRef.current) {
-      window.clearTimeout(timeoutRef.current);
+      globalThis.clearTimeout(timeoutRef.current);
     }
 
     setSuccessMessage(message);
-    timeoutRef.current = window.setTimeout(() => setSuccessMessage(''), 5000);
+    timeoutRef.current = globalThis.setTimeout(() => setSuccessMessage(''), 5000);
   };
 
   return {

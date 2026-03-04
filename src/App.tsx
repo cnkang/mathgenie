@@ -189,11 +189,11 @@ const useSuccessMessageManager = (
   scheduleSuccessMessage: (message: MessageValue) => void;
   dismissSuccessMessage: () => void;
 } => {
-  const successTimeoutRef = useRef<number | null>(null);
+  const successTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clearSuccessTimeout = useCallback(() => {
-    if (successTimeoutRef.current !== null && typeof window !== 'undefined') {
-      window.clearTimeout(successTimeoutRef.current);
+    if (successTimeoutRef.current !== null && typeof globalThis !== 'undefined') {
+      globalThis.clearTimeout(successTimeoutRef.current);
     }
     successTimeoutRef.current = null;
   }, []);
@@ -203,13 +203,13 @@ const useSuccessMessageManager = (
   const scheduleSuccessMessage = useCallback(
     (message: MessageValue): void => {
       setSuccessMessage(message);
-      if (!message || typeof window === 'undefined') {
+      if (!message || typeof globalThis === 'undefined') {
         clearSuccessTimeout();
         return;
       }
 
       clearSuccessTimeout();
-      successTimeoutRef.current = window.setTimeout(() => {
+      successTimeoutRef.current = globalThis.setTimeout(() => {
         setSuccessMessage('');
         successTimeoutRef.current = null;
       }, NUMERIC_CONSTANTS.SUCCESS_MESSAGE_TIMEOUT);

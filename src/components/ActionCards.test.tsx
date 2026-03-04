@@ -6,7 +6,7 @@ const t = (key: string, params?: Record<string, string | number>) => {
   let result = key;
   if (params) {
     Object.entries(params).forEach(([k, v]) => {
-      result = result.replace(new RegExp(`\\{\\{${k}\\}\\}`, 'g'), String(v));
+      result = result.replaceAll(new RegExp(String.raw`\{\{${k}\}\}`, 'g'), String(v));
     });
   }
   return result;

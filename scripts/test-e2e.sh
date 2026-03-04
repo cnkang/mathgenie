@@ -38,19 +38,27 @@ fi
 
 # Function to print colored output
 print_status() {
-    echo -e "${BLUE}[INFO]${NC} $1"
+    local message="$1"
+    echo -e "${BLUE}[INFO]${NC} $message"
+    return 0
 }
 
 print_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
+    local message="$1"
+    echo -e "${GREEN}[SUCCESS]${NC} $message"
+    return 0
 }
 
 print_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
+    local message="$1"
+    echo -e "${YELLOW}[WARNING]${NC} $message"
+    return 0
 }
 
 print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
+    local message="$1"
+    echo -e "${RED}[ERROR]${NC} $message" >&2
+    return 0
 }
 
 # Function to check if required commands exist
@@ -68,6 +76,7 @@ check_dependencies() {
     fi
     
     print_success "All dependencies are available."
+    return 0
 }
 
 # Function to install playwright browsers if needed
@@ -76,6 +85,7 @@ install_browsers() {
     print_status "Installing Playwright browsers..."
     npx playwright install
     print_success "Playwright browsers installed."
+    return 0
 }
 
 # Function to build the project
@@ -84,6 +94,7 @@ build_project() {
     print_status "Building the project..."
     pnpm build
     print_success "Project built successfully."
+    return 0
 }
 
 # Function to start the preview server
@@ -106,7 +117,7 @@ start_server() {
     local max_attempts=30
     local attempt=1
     
-    while [ $attempt -le $max_attempts ]; do
+    while [[ $attempt -le $max_attempts ]]; do
         if curl -s http://localhost:4173 > /dev/null 2>&1; then
             print_success "Preview server started on http://localhost:4173"
             return 0
@@ -125,7 +136,7 @@ start_server() {
 # Function to stop the server
 # Gracefully stops the preview server and cleans up background processes
 stop_server() {
-    if [ ! -z "$SERVER_PID" ]; then
+    if [[ -n "$SERVER_PID" ]]; then
         print_status "Stopping preview server..."
         kill $SERVER_PID 2>/dev/null || true
         # Wait a bit for graceful shutdown
@@ -135,6 +146,7 @@ stop_server() {
         wait $SERVER_PID 2>/dev/null || true
         print_success "Preview server stopped."
     fi
+    return 0
 }
 
 # Function to run mobile device tests
@@ -194,6 +206,7 @@ run_mobile_tests() {
             exit 1
             ;;
     esac
+    return 0
 }
 
 # Function to run specific test suites
@@ -247,6 +260,7 @@ run_test_suite() {
             exit 1
             ;;
     esac
+    return 0
 }
 
 # Function to run tests in different modes
@@ -296,6 +310,7 @@ run_tests() {
             exit 1
             ;;
     esac
+    return 0
 }
 
 # Function to generate test report
@@ -303,6 +318,7 @@ run_tests() {
 generate_report() {
     print_status "Generating test report..."
     npx playwright show-report
+    return 0
 }
 
 # Function to show usage information and available commands
@@ -324,7 +340,7 @@ show_usage() {
     echo "  help                     - Show this help message"
     echo ""
     echo "Test Suites:"
-    echo "  error-handling          - Error message and validation tests"
+    echo "  error-handling          - Error message and validation tests" >&2
     echo "  localstorage           - localStorage persistence tests"
     echo "  presets                - Presets functionality tests"
     echo "  integration            - Integration tests"
@@ -360,7 +376,7 @@ show_usage() {
     echo "  $0 setup                           # Install dependencies"
     echo "  $0 quick                           # Run basic tests"
     echo "  $0 full                            # Run all tests"
-    echo "  $0 suite error-handling            # Run error handling tests"
+    echo "  $0 suite error-handling            # Run error handling tests" >&2
     echo "  $0 suite presets firefox           # Run presets tests on Firefox"
     echo "  $0 suite accessibility             # Run unified WCAG 2.2 AAA tests"
     echo "  $0 suite accessibility-all         # Run unified accessibility tests"
@@ -373,6 +389,7 @@ show_usage() {
     echo "  $0 headed basic                    # Run basic tests in headed mode"
     echo "  $0 debug integration               # Debug integration tests"
     echo "  $0 ui                              # Open Playwright UI"
+    return 0
 }
 
 # Trap to ensure server is stopped on exit
@@ -413,7 +430,7 @@ case ${1:-help} in
         print_success "Full test suite completed!"
         ;;
     "suite")
-        if [ -z "$2" ]; then
+        if [[ -z "$2" ]]; then
             print_error "Please specify a test suite name"
             show_usage
             exit 1
@@ -425,7 +442,7 @@ case ${1:-help} in
         print_success "Test suite '$2' completed!"
         ;;
     "mobile")
-        if [ -z "$2" ]; then
+        if [[ -z "$2" ]]; then
             print_error "Please specify a mobile device type"
             show_usage
             exit 1
@@ -437,7 +454,7 @@ case ${1:-help} in
         print_success "Mobile tests for '$2' completed!"
         ;;
     "mobile-e2e")
-        if [ -z "$2" ]; then
+        if [[ -z "$2" ]]; then
             print_error "Please specify a mobile device type"
             show_usage
             exit 1

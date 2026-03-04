@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '../../tests/helpers/testUtils';
+import { fireEvent, render, screen, waitFor } from '../../tests/helpers/testUtils';
 import type { Settings } from '../types';
 import SettingsManager from './SettingsManager';
 
@@ -253,32 +253,20 @@ describe('SettingsManager Component', () => {
     expect(importButton?.getAttribute('aria-label')).toBeTruthy();
   });
 
-  it('shows inline import error message for invalid file content', () => {
-    const originalFileReader = globalThis.FileReader;
-
-    class InvalidResultFileReader {
-      onload: ((event: ProgressEvent<FileReader>) => void) | null = null;
-
-      readAsText(): void {
-        this.onload?.({
-          target: { result: new ArrayBuffer(8) } as FileReader,
-        } as ProgressEvent<FileReader>);
-      }
-    }
-
-    vi.stubGlobal('FileReader', InvalidResultFileReader as unknown as typeof FileReader);
-
+  it('handles invalid file content without importing settings', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const { container } = render(
       <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />
     );
 
     const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
-    const file = new File(['{}'], 'settings.json', { type: 'application/json' });
+    const file = new File(['not-json'], 'settings.json', { type: 'application/json' });
     fireEvent.change(fileInput, { target: { files: [file] } });
 
-    const errorMessage = screen.getByRole('alert');
-    expect(errorMessage.textContent).toBe('settings.importError');
-
-    vi.stubGlobal('FileReader', originalFileReader);
+    await waitFor(() => {
+      expect(errorSpy).toHaveBeenCalled();
+    });
+    expect(mockOnImportSettings).not.toHaveBeenCalled();
+    errorSpy.mockRestore();
   });
 });

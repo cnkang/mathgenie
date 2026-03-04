@@ -13,9 +13,9 @@
  */
 
 import { spawnNodeCli } from './exec-utils';
-import { existsSync, readdirSync, statSync } from 'fs';
-import { homedir, platform } from 'os';
-import { join } from 'path';
+import { existsSync, readdirSync, statSync } from 'node:fs';
+import { homedir, platform } from 'node:os';
+import { join } from 'node:path';
 
 // Colors for output (respect NO_COLOR environment variable)
 const colors = {

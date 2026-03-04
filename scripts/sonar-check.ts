@@ -118,7 +118,7 @@ class SonarChecker {
   }
 
   private shouldAnalyzeFile(filePath: string): boolean {
-    const normalizedPath = filePath.replace(/\\/g, '/');
+    const normalizedPath = filePath.replaceAll('\\', '/');
     const isTsFile = normalizedPath.endsWith('.ts') || normalizedPath.endsWith('.tsx');
     const isTestFile = /\.(test|spec)\.(ts|tsx)$/.test(normalizedPath);
     const isTranslationFile = /^src\/i18n\/translations\/[^/]+\.ts$/.test(normalizedPath);
@@ -516,4 +516,9 @@ const verbose = args.includes('--verbose');
 
 // Run the checker
 const checker = new SonarChecker({ highOnly: showOnlyHigh, verbose });
-checker.run().catch(console.error);
+try {
+  await checker.run();
+} catch (error) {
+  console.error(error);
+  process.exit(1);
+}

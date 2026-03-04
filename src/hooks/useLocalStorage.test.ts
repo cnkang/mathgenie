@@ -5,7 +5,7 @@ import { useLocalStorage } from './useLocalStorage';
 // 使用全局 setupTests.ts 中的 localStorage mock
 
 describe('useLocalStorage', () => {
-  const localStorageMock = window.localStorage as any;
+  const localStorageMock = globalThis.localStorage as any;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -198,7 +198,7 @@ describe('useLocalStorage', () => {
     });
 
     act(() => {
-      window.dispatchEvent(storageEvent);
+      globalThis.dispatchEvent(storageEvent);
     });
 
     expect(result.current[0]).toBe('updated-from-other-tab');
@@ -218,7 +218,7 @@ describe('useLocalStorage', () => {
     });
 
     act(() => {
-      window.dispatchEvent(storageEvent);
+      globalThis.dispatchEvent(storageEvent);
     });
 
     expect(result.current[0]).toBe('initial');
@@ -238,7 +238,7 @@ describe('useLocalStorage', () => {
     });
 
     act(() => {
-      window.dispatchEvent(storageEvent);
+      globalThis.dispatchEvent(storageEvent);
     });
 
     expect(result.current[0]).toBe('initial');
@@ -260,7 +260,7 @@ describe('useLocalStorage', () => {
     });
 
     act(() => {
-      window.dispatchEvent(storageEvent);
+      globalThis.dispatchEvent(storageEvent);
     });
 
     expect(result.current[0]).toBe('initial');
@@ -273,7 +273,7 @@ describe('useLocalStorage', () => {
   });
 
   test('should clean up event listener on unmount', () => {
-    const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
+    const removeEventListenerSpy = vi.spyOn(globalThis, 'removeEventListener');
     localStorageMock.getItem.mockReturnValue(null);
 
     const { unmount } = renderHook(() => useLocalStorage('test-key', 'default'));

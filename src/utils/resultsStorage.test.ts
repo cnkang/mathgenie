@@ -24,7 +24,7 @@ describe.sequential('resultsStorage', () => {
   });
 
   test('swallows storage errors and warns in dev', () => {
-    const setSpy = vi.spyOn(window.localStorage, 'setItem').mockImplementation(() => {
+    const setSpy = vi.spyOn(globalThis.localStorage, 'setItem').mockImplementation(() => {
       throw new Error('boom');
     });
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});

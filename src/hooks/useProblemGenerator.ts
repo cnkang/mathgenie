@@ -76,8 +76,8 @@ const formatProblemExpression = (operands: number[], operators: string[]): strin
     .reduce((expression, operator, index) => {
       return `${expression} ${operator} ${operands[index + 1]}`;
     }, operands[0].toString())
-    .replace(/\*/g, '✖')
-    .replace(/\//g, '➗');
+    .replaceAll(/\*/g, '✖')
+    .replaceAll(/\//g, '➗');
 };
 
 const canGenerateProblem = (settings: Settings, numOperands: number): boolean => {

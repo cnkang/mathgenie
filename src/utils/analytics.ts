@@ -24,6 +24,9 @@ declare global {
   interface Window {
     gtag?: (command: string, action: string, parameters?: Record<string, unknown>) => void;
   }
+  var gtag:
+    | ((command: string, action: string, parameters?: Record<string, unknown>) => void)
+    | undefined;
 }
 
 export const trackEvent = (eventName: string, properties: EventProperties = {}): void => {
@@ -45,7 +48,7 @@ export const trackEvent = (eventName: string, properties: EventProperties = {}):
       userAgent: navigator.userAgent.substring(0, 50), // Truncated for privacy
       language: navigator.language,
       screenSize: `${screen.width}x${screen.height}`,
-      viewport: `${window.innerWidth}x${window.innerHeight}`,
+      viewport: `${globalThis.innerWidth}x${globalThis.innerHeight}`,
     },
   };
 
@@ -61,8 +64,8 @@ export const trackEvent = (eventName: string, properties: EventProperties = {}):
   }
 
   // Send to analytics service (if configured)
-  if (window.gtag) {
-    window.gtag('event', eventName, properties);
+  if (globalThis.gtag) {
+    globalThis.gtag('event', eventName, properties);
   }
 };
 

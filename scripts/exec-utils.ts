@@ -131,7 +131,7 @@ function sanitizeArg(arg: unknown): arg is string {
     return false;
   }
   // Block dangerous characters and patterns
-  if (/[;|&`$(){}\[\]<>*?~\n\r]/.test(arg)) {
+  if (/[][;|&`$(){}<>*?~\n\r]/.test(arg)) {
     return false;
   }
   // Block eval flags
@@ -159,7 +159,7 @@ export function spawnNodeCli(
 
   // Validate and sanitize arguments to prevent code injection
   if (!Array.isArray(args)) {
-    throw new Error('Arguments must be an array');
+    throw new TypeError('Arguments must be an array');
   }
 
   const invalidArg = args.find(arg => !sanitizeArg(arg));

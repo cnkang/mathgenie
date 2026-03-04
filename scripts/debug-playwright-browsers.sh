@@ -25,10 +25,10 @@ CACHE_DIRS=(
 )
 
 for dir in "${CACHE_DIRS[@]}"; do
-    if [ -d "$dir" ]; then
+    if [[ -d "$dir" ]]; then
         echo "✅ $dir exists"
         echo "   Contents: $(ls -la "$dir" 2>/dev/null | wc -l) items"
-        if [ "$(ls -A "$dir" 2>/dev/null)" ]; then
+        if [[ -n "$(ls -A "$dir" 2>/dev/null)" ]]; then
             echo "   Browsers: $(ls "$dir" 2>/dev/null | grep -E "(chromium|firefox|webkit)" | head -3)"
         fi
     else

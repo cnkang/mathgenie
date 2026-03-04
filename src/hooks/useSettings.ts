@@ -30,8 +30,8 @@ const isValidOperationArray = (value: unknown): value is Operation[] => {
   if (!Array.isArray(value)) {
     return false;
   }
-  const validOperations: Operation[] = ['+', '-', '*', '/', '×', '÷'];
-  return value.every(op => typeof op === 'string' && validOperations.includes(op as Operation));
+  const validOperations = new Set<Operation>(['+', '-', '*', '/', '×', '÷']);
+  return value.every(op => typeof op === 'string' && validOperations.has(op as Operation));
 };
 
 const validateAndMergeSettings = (parsed: unknown): Settings => {

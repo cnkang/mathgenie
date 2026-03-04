@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 
-import { readFileSync, rmSync, writeFileSync } from 'fs';
-import { dirname, join, delimiter } from 'path';
+import { readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { dirname, join, delimiter } from 'node:path';
 import { build as viteBuild } from 'vite';
 
 interface BuildError extends Error {

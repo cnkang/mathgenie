@@ -9,9 +9,8 @@ const getCrypto = (): Crypto => {
     }
   }
   // Legacy IE fallback (unlikely used):
-  const w =
-    typeof window !== 'undefined' ? (window as typeof window & { msCrypto?: Crypto }) : undefined;
-  if (typeof w?.msCrypto?.getRandomValues === 'function') {
+  const w = globalThis as typeof globalThis & { msCrypto?: Crypto };
+  if (typeof w.msCrypto?.getRandomValues === 'function') {
     return w.msCrypto;
   }
   throw new Error('Secure crypto.getRandomValues is not available');

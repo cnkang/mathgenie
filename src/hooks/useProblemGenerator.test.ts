@@ -15,7 +15,7 @@ const mockCrypto = {
   }),
 };
 
-Object.defineProperty(global, 'crypto', {
+Object.defineProperty(globalThis, 'crypto', {
   value: mockCrypto,
   writable: true,
 });

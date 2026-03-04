@@ -36,7 +36,7 @@ const PdfSettings: React.FC<PdfSettingsProps> = ({ settings, onChange, paperSize
         announcer.className = STR_SR_ONLY;
         announcer.textContent = announcement;
         document.body.appendChild(announcer);
-        setTimeout(() => document.body.removeChild(announcer), 1000);
+        setTimeout(() => announcer.remove(), 1000);
       }}
     >
       <summary
@@ -76,7 +76,10 @@ const PdfSettings: React.FC<PdfSettingsProps> = ({ settings, onChange, paperSize
             id={STR_FONTSIZE}
             value={settings.fontSize}
             onChange={e =>
-              onChange(STR_FONTSIZE, parseInt(e.target.value, NUMERIC_CONSTANTS.DECIMAL_RADIX))
+              onChange(
+                STR_FONTSIZE,
+                Number.parseInt(e.target.value, NUMERIC_CONSTANTS.DECIMAL_RADIX)
+              )
             }
             aria-label={t('accessibility.fontSizeInput')}
             className={CSS_CLASSES.FORM_INPUT}
@@ -89,7 +92,10 @@ const PdfSettings: React.FC<PdfSettingsProps> = ({ settings, onChange, paperSize
             id={STR_LINESPACING}
             value={settings.lineSpacing}
             onChange={e =>
-              onChange(STR_LINESPACING, parseInt(e.target.value, NUMERIC_CONSTANTS.DECIMAL_RADIX))
+              onChange(
+                STR_LINESPACING,
+                Number.parseInt(e.target.value, NUMERIC_CONSTANTS.DECIMAL_RADIX)
+              )
             }
             aria-label={t('accessibility.lineSpacingInput')}
             className={CSS_CLASSES.FORM_INPUT}

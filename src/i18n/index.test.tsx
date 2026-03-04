@@ -76,7 +76,7 @@ describe.sequential('I18n System', () => {
 
   it('handles string interpolation', () => {
     const interpolate = (template: string, params: Record<string, any>): string => {
-      return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+      return template.replaceAll(/\{\{(\w+)\}\}/g, (match, key) => {
         return params[key] !== undefined ? String(params[key]) : match;
       });
     };
