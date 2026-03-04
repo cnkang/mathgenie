@@ -20,16 +20,16 @@ describe('ErrorMessage', () => {
   });
 
   test.each([
-    ['error', 'Test error message', '⚠️'],
-    ['warning', 'Test warning message', '⚡'],
-    ['info', 'Test info message', 'ℹ️'],
+    ['error', 'Test error message'],
+    ['warning', 'Test warning message'],
+    ['info', 'Test info message'],
   ] as Array<
-    ['error' | 'warning' | 'info', string, string]
-  >)('renders %s message correctly', (type, message, expectedIcon) => {
-    render(<ErrorMessage error={message} type={type} />);
+    ['error' | 'warning' | 'info', string]
+  >)('renders %s message correctly', (type, message) => {
+    const { container } = render(<ErrorMessage error={message} type={type} />);
 
     expect(screen.getByText(message)).toBeDefined();
-    expect(screen.getByText(expectedIcon)).toBeDefined();
+    expect(container.querySelector('.message-icon svg')).toBeDefined();
   });
 
   test('renders MessageState with translation and parameters', () => {

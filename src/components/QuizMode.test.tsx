@@ -14,7 +14,7 @@ vi.mock('../i18n', async () => {
     'quiz.nextProblem': 'Next →',
     'quiz.problemNumber': 'Problem {{number}}',
     'quiz.progress': '{{current}} / {{total}}',
-    'quiz.completed': '🎉 Quiz Completed!',
+    'quiz.completed': 'Quiz Completed!',
     'quiz.retry': 'Retry Quiz',
     'quiz.backToPractice': 'Back to Practice',
     'quiz.detailedResults': 'Detailed Results',
@@ -282,7 +282,7 @@ describe('QuizMode', () => {
     });
 
     // Should show results screen
-    expect(screen.getByText('🎉 Quiz Completed!')).toBeDefined();
+    expect(screen.getByText('Quiz Completed!')).toBeDefined();
     expect(screen.getByText('Back to Practice')).toBeDefined();
     expect(screen.getByText('Retry Quiz')).toBeDefined();
     expect(mockOnQuizComplete).toHaveBeenCalledTimes(1);
@@ -334,7 +334,7 @@ describe('QuizMode', () => {
     // Should return to quiz mode
     expect(container.textContent).toContain('Problem 1');
     expect(container.textContent).toContain('1 / 3');
-    expect(container.textContent).not.toContain('🎉 Quiz Completed!');
+    expect(container.textContent).not.toContain('Quiz Completed!');
   });
 
   test('handles exit from results screen', () => {
@@ -625,9 +625,7 @@ describe('QuizMode', () => {
     });
 
     // Should show quiz completed - use container to avoid multiple elements
-    expect(container.querySelector('.results-header h2')?.textContent).toContain(
-      '🎉 Quiz Completed!'
-    );
+    expect(container.querySelector('.results-header h2')?.textContent).toContain('Quiz Completed!');
 
     // Clean up
     unmount();

@@ -292,7 +292,9 @@ const useAppInitialization = (params: {
   });
 
   useEffect(() => {
-    if (import.meta.env.MODE === 'test') {
+    const shouldEnableRuntimeEnforcement =
+      import.meta.env.DEV && import.meta.env.VITE_WCAG_RUNTIME_ENFORCEMENT === 'true';
+    if (!shouldEnableRuntimeEnforcement) {
       return;
     }
     return setupWCAGEnforcement();

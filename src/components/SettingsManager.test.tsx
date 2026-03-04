@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen } from '../../tests/helpers/testUtils';
+import { fireEvent, render, screen } from '../../tests/helpers/testUtils';
 import type { Settings } from '../types';
 import SettingsManager from './SettingsManager';
 
@@ -48,8 +48,8 @@ describe('SettingsManager Component', () => {
     render(<SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />);
 
     expect(screen.getByText('settings.manager.title')).toBeInTheDocument();
-    expect(screen.getByText('📤 settings.manager.export')).toBeInTheDocument();
-    expect(screen.getByText('📥 settings.manager.import')).toBeInTheDocument();
+    expect(screen.getByText('settings.manager.export')).toBeInTheDocument();
+    expect(screen.getByText('settings.manager.import')).toBeInTheDocument();
   });
 
   it('renders export button with correct attributes', () => {
@@ -139,7 +139,7 @@ describe('SettingsManager Component', () => {
     expect(heading).toHaveTextContent('settings.manager.title');
   });
 
-  it('renders buttons with proper emoji icons', () => {
+  it('renders buttons with svg icons', () => {
     const { container } = render(
       <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />
     );
@@ -149,8 +149,8 @@ describe('SettingsManager Component', () => {
 
     expect(exportButton).toBeInTheDocument();
     expect(importButton).toBeInTheDocument();
-    expect(exportButton?.textContent).toContain('📤');
-    expect(importButton?.textContent).toContain('📥');
+    expect(exportButton?.querySelector('svg')).toBeInTheDocument();
+    expect(importButton?.querySelector('svg')).toBeInTheDocument();
   });
 
   it('tests file input functionality exists', () => {
@@ -251,5 +251,34 @@ describe('SettingsManager Component', () => {
     // Verify accessibility attributes are present
     expect(exportButton?.getAttribute('aria-label')).toBeTruthy();
     expect(importButton?.getAttribute('aria-label')).toBeTruthy();
+  });
+
+  it('shows inline import error message for invalid file content', () => {
+    const originalFileReader = globalThis.FileReader;
+
+    class InvalidResultFileReader {
+      onload: ((event: ProgressEvent<FileReader>) => void) | null = null;
+
+      readAsText(): void {
+        this.onload?.({
+          target: { result: new ArrayBuffer(8) } as FileReader,
+        } as ProgressEvent<FileReader>);
+      }
+    }
+
+    vi.stubGlobal('FileReader', InvalidResultFileReader as unknown as typeof FileReader);
+
+    const { container } = render(
+      <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />
+    );
+
+    const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['{}'], 'settings.json', { type: 'application/json' });
+    fireEvent.change(fileInput, { target: { files: [file] } });
+
+    const errorMessage = screen.getByRole('alert');
+    expect(errorMessage.textContent).toBe('settings.importError');
+
+    vi.stubGlobal('FileReader', originalFileReader);
   });
 });

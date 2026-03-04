@@ -55,7 +55,11 @@
 }
 
 .timer-icon {
-  font-size: var(--font-size-lg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.125rem;
+  height: 1.125rem;
 }
 
 .exit-quiz-btn-small {
@@ -227,7 +231,11 @@
 }
 
 .result-icon {
-  font-size: var(--font-size-lg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.125rem;
+  height: 1.125rem;
 }
 
 .result-text {
@@ -321,8 +329,12 @@
 }
 
 .stat-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
   margin-bottom: var(--space-sm);
-  font-size: var(--font-size-2xl);
 }
 
 .stat-label {
@@ -474,17 +486,17 @@
   .submit-answer-btn,
   .retry-quiz-btn,
   .exit-quiz-btn-small {
-    color: #fff !important;
-    background: #5b21b6 !important;
+    color: #fff;
+    background: var(--button-primary-bg);
   }
 
   .submit-answer-btn:hover:not(:disabled),
   .retry-quiz-btn:hover {
-    background: #4c1d95 !important;
+    background: var(--button-primary-hover-bg);
   }
 
   .exit-quiz-btn-small:hover {
-    background: #b91c1c !important;
+    background: #b91c1c;
   }
 }
 

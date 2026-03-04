@@ -11,180 +11,178 @@
 }
 
 /* Specific fixes for German and other long-text languages */
-html[lang='de'] .preset-card.clickable-card,
-html[lang='fr'] .preset-card.clickable-card {
-  min-height: 120px !important;
+html[lang='de'] .preset-card,
+html[lang='fr'] .preset-card {
+  min-height: 120px;
 }
 
 html[lang='de'] .preset-content,
 html[lang='fr'] .preset-content {
-  gap: var(--space-md) !important;
-  min-height: 100px !important;
+  gap: var(--space-md);
+  min-height: 100px;
 }
 
 html[lang='de'] .preset-info,
 html[lang='fr'] .preset-info {
-  max-width: calc(100% - 180px) !important; /* Reserve more space for German and French text */
+  max-width: calc(100% - 180px); /* Reserve more space for German and French text */
 }
 
-html[lang='de'] .preset-card.clickable-card h4,
-html[lang='fr'] .preset-card.clickable-card h4 {
-  font-size: var(
-    --font-size-sm
-  ) !important; /* Slightly reduce font size to accommodate longer text */
-  line-height: 1.5 !important;
+html[lang='de'] .preset-info h3,
+html[lang='fr'] .preset-info h3 {
+  font-size: var(--font-size-sm); /* Slightly reduce font size to accommodate longer text */
+  line-height: 1.5;
 }
 
-html[lang='de'] .preset-card.clickable-card p,
-html[lang='fr'] .preset-card.clickable-card p {
-  font-size: var(--font-size-xs) !important;
-  line-height: 1.6 !important;
+html[lang='de'] .preset-info p,
+html[lang='fr'] .preset-info p {
+  font-size: var(--font-size-xs);
+  line-height: 1.6;
 }
 
 /* Action cards international fixes */
 html[lang='de'] .action-card,
 html[lang='fr'] .action-card {
-  min-height: 160px !important;
+  min-height: 160px;
 }
 
 html[lang='de'] .action-card-content,
 html[lang='fr'] .action-card-content {
-  min-height: 120px !important;
+  min-height: 120px;
 }
 
 html[lang='de'] .action-text h3,
 html[lang='fr'] .action-text h3 {
-  font-size: var(--font-size-base) !important;
-  line-height: 1.4 !important;
+  font-size: var(--font-size-base);
+  line-height: 1.4;
 }
 
 html[lang='de'] .action-text p,
 html[lang='fr'] .action-text p {
-  font-size: var(--font-size-xs) !important;
-  line-height: 1.6 !important;
+  font-size: var(--font-size-xs);
+  line-height: 1.6;
 }
 
 /* Mobile international fixes */
 @media (width <= 767px) {
-  html[lang='de'] .preset-card.clickable-card,
-  html[lang='fr'] .preset-card.clickable-card {
-    min-height: 140px !important;
+  html[lang='de'] .preset-card,
+  html[lang='fr'] .preset-card {
+    min-height: 140px;
   }
 
   html[lang='de'] .preset-content,
   html[lang='fr'] .preset-content {
-    flex-direction: column !important;
-    gap: var(--space-lg) !important;
-    min-height: 120px !important;
+    flex-direction: column;
+    gap: var(--space-lg);
+    min-height: 120px;
   }
 
   html[lang='de'] .preset-info,
   html[lang='fr'] .preset-info {
-    max-width: 100% !important;
-    margin-bottom: var(--space-md) !important;
+    max-width: 100%;
+    margin-bottom: var(--space-md);
   }
 
   html[lang='de'] .action-card,
   html[lang='fr'] .action-card {
-    min-height: 180px !important;
+    min-height: 180px;
   }
 
   html[lang='de'] .action-card-content,
   html[lang='fr'] .action-card-content {
-    min-height: 140px !important;
+    min-height: 140px;
   }
 }
 
 @media (width <= 480px) {
-  html[lang='de'] .preset-card.clickable-card,
-  html[lang='fr'] .preset-card.clickable-card {
-    min-height: 180px !important;
+  html[lang='de'] .preset-card,
+  html[lang='fr'] .preset-card {
+    min-height: 180px;
   }
 
   html[lang='de'] .preset-content,
   html[lang='fr'] .preset-content {
-    min-height: 160px !important;
+    min-height: 160px;
   }
 
   html[lang='de'] .action-card,
   html[lang='fr'] .action-card {
-    min-height: 200px !important;
+    min-height: 200px;
   }
 
   html[lang='de'] .action-card-content,
   html[lang='fr'] .action-card-content {
-    min-height: 160px !important;
+    min-height: 160px;
   }
 }
 
 /* Japanese and Chinese compact text optimizations */
-html[lang='ja'] .preset-card.clickable-card,
-html[lang='zh'] .preset-card.clickable-card {
-  min-height: 80px !important;
+html[lang='ja'] .preset-card,
+html[lang='zh'] .preset-card {
+  min-height: 80px;
 }
 
 html[lang='ja'] .preset-content,
 html[lang='zh'] .preset-content {
-  min-height: 60px !important;
+  min-height: 60px;
 }
 
 html[lang='ja'] .action-card,
 html[lang='zh'] .action-card {
-  min-height: 120px !important;
+  min-height: 120px;
 }
 
 html[lang='ja'] .action-card-content,
 html[lang='zh'] .action-card-content {
-  min-height: 80px !important;
+  min-height: 80px;
 }
 
 /* Spanish text handling */
-html[lang='es'] .preset-card.clickable-card {
-  min-height: 110px !important;
+html[lang='es'] .preset-card {
+  min-height: 110px;
 }
 
 html[lang='es'] .preset-content {
-  min-height: 90px !important;
+  min-height: 90px;
 }
 
 html[lang='es'] .action-card {
-  min-height: 150px !important;
+  min-height: 150px;
 }
 
 html[lang='es'] .action-card-content {
-  min-height: 110px !important;
+  min-height: 110px;
 }
 
 /* Ensure all text elements can handle long content (merged duplicate selectors) */
-.preset-card h4,
-.preset-card p,
+.preset-info h3,
+.preset-info p,
 .action-text h3,
 .action-text p {
-  hyphens: auto !important;
-  white-space: normal !important;
+  hyphens: auto;
+  white-space: normal;
   max-width: 100%;
   word-break: break-word; /* Fallback */
   overflow-wrap: anywhere;
 }
 
 /* Prevent text cutoff in all languages */
-.preset-card.clickable-card,
+.preset-card,
 .action-card {
-  overflow: visible !important;
+  overflow: visible;
 }
 
 .preset-content,
 .action-card-content {
-  overflow: visible !important;
+  overflow: visible;
 }
 
 /* Ensure proper spacing for all languages */
 .presets-grid {
-  gap: var(--space-lg) !important;
+  gap: var(--space-lg);
 }
 
 .action-cards-grid {
-  gap: var(--space-lg) !important;
+  gap: var(--space-lg);
 }
 
 /* (removed duplicate selector block; properties merged above) */

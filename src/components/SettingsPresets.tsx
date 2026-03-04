@@ -3,6 +3,18 @@ import { useTranslation } from '../i18n';
 import type { Settings, SettingsPreset, SettingsPresetsProps } from '../types';
 import './SettingsPresets.css';
 
+const PresetIcon: React.FC = () => (
+  <svg viewBox='0 0 24 24' width='16' height='16' fill='none' aria-hidden='true'>
+    <path
+      d='M5 12h14m0 0-5-5m5 5-5 5'
+      stroke='currentColor'
+      strokeWidth='2'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+    />
+  </svg>
+);
+
 /**
  * Settings Presets Component with TypeScript support
  * Provides quick preset configurations for common use cases
@@ -110,7 +122,9 @@ const SettingsPresets: React.FC<SettingsPresetsProps> = ({ onApplyPreset }) => {
                 <p>{preset.description}</p>
               </div>
               <div className='preset-indicator'>
-                <span className='preset-icon'>✨</span>
+                <span className='preset-icon'>
+                  <PresetIcon />
+                </span>
                 <span className='preset-action'>
                   {t('presets.clickToApply') || 'Click to apply'}
                 </span>

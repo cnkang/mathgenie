@@ -9,6 +9,18 @@ interface InteractiveProblemProps {
   disabled?: boolean;
 }
 
+const CorrectIcon: React.FC = () => (
+  <svg viewBox='0 0 24 24' width='18' height='18' fill='none' aria-hidden='true'>
+    <path d='m5 12 4 4L19 6' stroke='currentColor' strokeWidth='2.2' strokeLinecap='round' />
+  </svg>
+);
+
+const IncorrectIcon: React.FC = () => (
+  <svg viewBox='0 0 24 24' width='18' height='18' fill='none' aria-hidden='true'>
+    <path d='m7 7 10 10M17 7 7 17' stroke='currentColor' strokeWidth='2.2' strokeLinecap='round' />
+  </svg>
+);
+
 const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
   problem,
   onAnswerSubmit,
@@ -57,14 +69,14 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
 
   const canShowResult = showResult && problem.isAnswered;
   let resultClass = '';
-  let resultIcon: string | null = null;
+  let resultIcon: React.ReactNode = null;
   if (canShowResult) {
     if (problem.isCorrect) {
       resultClass = 'correct';
-      resultIcon = '✅';
+      resultIcon = <CorrectIcon />;
     } else {
       resultClass = 'incorrect';
-      resultIcon = '❌';
+      resultIcon = <IncorrectIcon />;
     }
   }
 
@@ -96,7 +108,9 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
 
       {canShowResult && (
         <div className='answer-result'>
-          <span className='result-icon'>{resultIcon}</span>
+          <span className='result-icon' aria-hidden='true'>
+            {resultIcon}
+          </span>
           <span className='result-text'>
             {problem.isCorrect ? (
               t('quiz.correct') || 'Correct!'

@@ -191,7 +191,7 @@ export default {
     nextProblem: 'Next →',
     problemNumber: 'Problem {{number}}',
     progress: '{{current}} / {{total}}',
-    completed: '🎉 Quiz Completed!',
+    completed: 'Quiz Completed!',
     score: 'points',
     retry: 'Retry Quiz',
     backToPractice: 'Back to Practice',

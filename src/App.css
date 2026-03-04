@@ -36,8 +36,9 @@
 .problems h3::before {
   width: auto;
   height: auto;
-  font-size: var(--font-size-lg);
-  content: '📝';
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  content: '#';
   background: none;
   border-radius: 0;
 }
@@ -55,18 +56,12 @@
   font-size: var(--font-size-lg);
   font-weight: 500;
   color: var(--text-primary);
-  cursor: pointer;
+  cursor: default;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-left: 4px solid var(--primary-color);
   border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
-}
-
-.problem-item:hover {
-  background: var(--bg-accent);
-  box-shadow: var(--shadow-sm);
-  transform: translateX(4px);
+  transition: border-color var(--transition-fast);
 }
 
 .problem-item:last-child {

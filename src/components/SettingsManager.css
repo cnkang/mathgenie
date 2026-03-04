@@ -1,5 +1,8 @@
-/* Settings Manager Component Styles */
+/* Settings Manager */
 .settings-manager {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
   padding: var(--space-lg);
   margin: var(--space-lg) 0;
   background: var(--bg-accent);
@@ -15,112 +18,82 @@
 
 .export-button,
 .import-button {
-  display: flex;
+  display: inline-flex;
   gap: var(--space-xs);
   align-items: center;
+  justify-content: center;
   min-width: 44px;
-
-  /* WCAG 2.2 AAA: Minimum 44px touch target */
   min-height: 44px;
   padding: var(--space-md) var(--space-lg);
   font-size: var(--font-size-sm);
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
+  font-weight: 700;
+  border: 0;
   border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background-color var(--transition-fast);
 }
 
 .export-button {
-  color: white;
-  background: var(--success-color);
+  color: var(--button-success-text);
+  background: var(--button-success-bg);
 }
 
 .export-button:hover {
-  background: #047857;
+  background: var(--button-success-hover-bg);
+  box-shadow: var(--shadow-sm);
   transform: translateY(-1px);
 }
 
 .import-button {
-  color: white;
-  background: #0891b2;
+  color: var(--button-primary-text);
+  background: var(--button-primary-bg);
 }
 
 .import-button:hover {
-  background: #0e7490;
+  background: var(--button-primary-hover-bg);
+  box-shadow: var(--shadow-sm);
   transform: translateY(-1px);
 }
 
-.preset-button {
-  min-width: 44px;
+.settings-button-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+}
 
-  /* WCAG 2.2 AAA: Minimum 44px touch target */
-  min-height: 44px;
-  padding: var(--space-md) var(--space-lg);
+.settings-manager-alert {
+  margin: 0;
+  padding: var(--space-sm) var(--space-md);
   font-size: var(--font-size-sm);
-  font-weight: 500;
-  color: var(--text-primary);
-  cursor: pointer;
-  background: var(--bg-secondary);
-  border: 2px solid var(--border-color);
-  border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
+  font-weight: 700;
+  line-height: 1.5;
+  color: #7f1d1d;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-left: 4px solid #dc2626;
+  border-radius: var(--radius-sm);
 }
 
-.preset-button:hover {
-  background: var(--primary-light);
-  border-color: var(--primary-color);
-  transform: translateY(-1px);
-}
-
-.preset-button.active {
-  color: white;
-  background: var(--primary-color);
-  border-color: var(--primary-color);
-}
-
-/* PDF Settings Grid */
-.pdf-settings-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-lg);
-}
-
-.pdf-settings-grid > div {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-}
-
-/* Responsive adjustments */
-@media (width >= 1200px) {
-  .pdf-settings-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-lg);
-  }
-
-  .pdf-settings-grid > div {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
+@media (prefers-color-scheme: dark) {
+  .settings-manager-alert {
+    color: #fecaca;
+    background: #450a0a;
+    border-color: #7f1d1d;
   }
 }
 
 @media (width <= 768px) {
-  .pdf-settings-grid {
-    grid-template-columns: 1fr;
-    gap: var(--space-md);
-  }
-
   .settings-actions {
     flex-direction: column;
   }
 
   .export-button,
-  .import-button,
-  .preset-button {
-    justify-content: center;
+  .import-button {
     width: 100%;
+    min-height: 48px;
   }
 }
