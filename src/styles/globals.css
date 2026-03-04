@@ -4,6 +4,8 @@
 
 /* CSS Custom Properties for consistent theming */
 :root {
+  color-scheme: light;
+
   /* Performance optimization */
   --will-change: transform;
   --contain: layout style paint;
@@ -94,6 +96,7 @@
 /* Dark mode support - WCAG 2.2 AAA compliant */
 @media (prefers-color-scheme: dark) {
   :root {
+    color-scheme: dark;
     --bg-primary: #0b1220;
     --bg-secondary: #111a2b;
     --bg-tertiary: #17243a;

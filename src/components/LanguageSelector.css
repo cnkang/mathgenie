@@ -18,7 +18,11 @@
 }
 
 .language-select {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
   min-width: 44px;
+  height: 44px;
 
   /* WCAG 2.2 AAA: Minimum 44px touch target */
   min-height: 44px;
@@ -59,6 +63,7 @@
 
   .language-select {
     min-width: 140px;
+    height: 44px;
 
     /* WCAG 2.2 AAA: Maintain minimum 44px touch target on mobile */
     min-height: 44px;
@@ -81,6 +86,7 @@
 
   .language-select {
     min-width: 120px;
+    height: 44px;
 
     /* WCAG 2.2 AAA: Maintain minimum 44px touch target on small mobile */
     min-height: 44px;
