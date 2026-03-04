@@ -7,12 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **UI AAA documentation**: Added [`docs/UI_AAA_GUIDE.md`](docs/UI_AAA_GUIDE.md) covering style layering, component accessibility contract, runtime enforcement policy, and verification scope
+- **Local artifact retention policy**: Documented local-only QA artifact handling and Git ignore workflow in `README.md` and `TESTING.md`
+- **Explicit AAA contrast assertions**: Added E2E contrast threshold assertions (normal text `>= 7:1`, large text `>= 4.5:1`) in `tests/e2e/accessibility-unified.spec.ts`
+
 ### Fixed
 
 - **InfoPanel stats double-counting**: Fixed `totalGenerated` counter incrementing on component remount (e.g., entering/exiting quiz mode) by tracking previous problems reference
 - **SettingsSection aria-label**: Fixed raw translation key `"settings.title"` appearing as aria-label before translations load; now falls back to `"Settings"` when the key is unresolved
 - **usePerformance `performanceMetrics`**: Fixed `useMemo` with empty deps that caused metrics to never update; replaced with a getter-based approach for live render count
 - **Mobile content ordering**: Settings section now appears before results on mobile (≤480px), so users can configure before scrolling to generated problems
+- **Import error UX**: Replaced blocking `alert(...)` behavior in settings import flow with inline live-region feedback (`role="alert"` + `aria-live`)
 
 ### Changed
 
@@ -21,6 +28,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **usePerformance cleaned up**: Removed unused `createOptimizedHandler` that returned an inert `{ handler, dependencies }` object
 - **Console noise reduced**: Suppressed non-actionable `console.log` calls in `browserOptimizations.ts` (`logBrowserInfo`, Firefox CSS message) and `wcagEnforcement.ts` (mutation observer logging)
 - **Removed unused jsdom dependency**: Disabled `auto-install-peers` in `.npmrc` to prevent pnpm from auto-installing vitest's optional peer dependency `jsdom` (project uses `happy-dom`). This eliminates the deprecated `whatwg-encoding@3.1.1` transitive dependency
+- **Component-first accessibility styling**: Reduced global accessibility forcing and moved touch/focus/error semantics to component-level CSS contracts
+- **Runtime enforcement policy**: `setupWCAGEnforcement` now runs only in explicitly enabled development diagnostics and is disabled by default in production flows
+- **Iconography refresh**: Migrated key interaction surfaces from emoji affordances to accessible SVG icon set
+- **i18n copy consistency**: Updated quiz completion copy across locales to remove decorative emoji prefix while preserving keys
+
+### Removed
+
+- **Broad global style forcing**: Removed wide global `!important`/universal selector accessibility overrides as primary compliance mechanism
 
 ### Security
 

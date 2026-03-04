@@ -505,6 +505,40 @@ pnpm test:mobile:e2e:ipad
 ./scripts/test-e2e.sh mobile-e2e latest  # E2E on latest devices
 ```
 
+### UI Design System & AAA Contract
+
+MathGenie now uses a component-first UI contract tuned for a lively education visual style while maintaining WCAG 2.2 AAA.
+
+See [`docs/UI_AAA_GUIDE.md`](docs/UI_AAA_GUIDE.md) for architecture details and enforcement boundaries.
+
+- **Tokenized visual system**: color, typography, radius, spacing, and shadow are centralized via CSS variables in `src/styles/globals.css`
+- **Component-level accessibility contract**: touch target/focus/error semantics are defined at component layer instead of broad global overrides
+- **Reduced global forcing**: removed wide `!important`/universal enforcement patterns in favor of predictable local styles
+- **Runtime enforcement policy**: runtime WCAG DOM patching is no longer forced in production
+
+Runtime enforcement can be enabled only during development diagnostics:
+
+```bash
+# Enable runtime WCAG enforcement (dev only)
+VITE_WCAG_RUNTIME_ENFORCEMENT=true pnpm dev
+```
+
+Default behavior keeps production deterministic by relying on component contracts + automated accessibility tests.
+
+### Local QA Artifacts & Git Ignore Policy
+
+Temporary verification artifacts are intentionally kept local and excluded from Git history.
+
+- Local artifact directories:
+  - `.tmp/qa-artifacts/<date>/`
+  - `.tmp/playwright-local/`
+- Typical generated outputs kept local:
+  - `.codex-latest-*.png|jpg|jpeg|webp`
+  - `.codex-*.trace|har|log|json`
+  - Playwright local artifacts under `test-results/`, `playwright-report/`, or `.tmp/playwright-local/`
+
+The `.gitignore` is configured so screenshots/traces/logs remain available for local review without polluting commits.
+
 ## 🚀 Deployment
 
 ### Automatic Deployment with Vercel

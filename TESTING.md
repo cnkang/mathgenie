@@ -557,6 +557,25 @@ pnpm test:accessibility:cross-browser
 pnpm test:accessibility:mobile
 ```
 
+### Local Artifact Retention Policy
+
+Keep validation artifacts on local machine for debugging and audit, but never commit them.
+
+- Preferred directories:
+  - `.tmp/qa-artifacts/<date>/`
+  - `.tmp/playwright-local/`
+- Playwright temporary outputs are allowed in:
+  - `test-results/`
+  - `playwright-report/`
+  - `.tmp/playwright-local/`
+- Codex screenshot/trace/log/json artifacts are ignored by `.gitignore`.
+
+Verification checklist:
+
+1. Run your test command(s).
+2. Confirm artifacts are preserved locally for review.
+3. Run `git status` and ensure no temporary artifacts are staged.
+
 ### Accessibility Test Requirements
 
 #### Automated Testing
@@ -566,6 +585,19 @@ pnpm test:accessibility:mobile
 - **Keyboard Navigation**: Automated keyboard accessibility testing with Firefox-specific optimizations
 - **Screen Reader**: Test with screen reader simulation on all engines with enhanced Firefox performance
 - **Firefox Performance**: Specialized WCAG enforcement optimizations including batched processing, reduced DOM queries, and optimized mutation observation
+
+#### Explicit Contrast Threshold Assertion (AAA)
+
+The E2E accessibility suite includes explicit ratio assertions:
+
+- Normal text: **>= 7.0:1**
+- Large text: **>= 4.5:1**
+
+Implementation notes:
+
+- Text nodes are sampled from semantic UI selectors.
+- Decorative symbol-only nodes are excluded to avoid false positives.
+- Contrast sampling runs for both light and dark themes.
 
 #### Manual Testing Checklist
 
