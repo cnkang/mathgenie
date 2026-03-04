@@ -196,7 +196,7 @@ export default {
     nextProblem: 'Siguiente →',
     problemNumber: 'Problema {{number}}',
     progress: '{{current}} / {{total}}',
-    completed: '🎉 ¡Cuestionario Completado!',
+    completed: '¡Cuestionario Completado!',
     score: 'puntos',
     retry: 'Reintentar Cuestionario',
     backToPractice: 'Volver a Práctica',

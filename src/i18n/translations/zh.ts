@@ -185,7 +185,7 @@ export default {
     nextProblem: '下一题 →',
     problemNumber: '第 {{number}} 题',
     progress: '{{current}} / {{total}}',
-    completed: '🎉 答题完成！',
+    completed: '答题完成！',
     score: '分',
     retry: '重新答题',
     backToPractice: '返回练习',

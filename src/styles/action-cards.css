@@ -22,6 +22,13 @@
   isolation: isolate;
 }
 
+.action-cards-heading {
+  margin: 0 0 var(--space-md) 0;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
 /* WCAG 2.2 AAA: Large clickable action cards */
 .action-card {
   position: relative;
@@ -71,10 +78,16 @@
 }
 
 .action-icon {
+  display: inline-flex;
   flex-shrink: 0;
-  font-size: 2.5rem;
-  opacity: 0.8;
+  color: var(--primary-color);
+  opacity: 0.9;
   transition: all var(--transition-fast);
+}
+
+.action-icon svg {
+  width: 2rem;
+  height: 2rem;
 }
 
 .action-text {
@@ -97,6 +110,10 @@
 
   /* 确保长文本可以正常显示 */
   white-space: normal;
+}
+
+.action-text h3::before {
+  display: none;
 }
 
 .action-text p {
@@ -125,8 +142,9 @@
 }
 
 .action-arrow {
-  font-size: var(--font-size-lg);
-  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--primary-color);
   transition: all var(--transition-fast);
 }
@@ -188,6 +206,11 @@
   transform: translateY(-2px);
 }
 
+.action-card:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
 /* Disabled state */
 .action-card:disabled {
   /* Ensure disabled buttons are positioned correctly */
@@ -195,7 +218,7 @@
   z-index: 1;
 
   /* Prevent disabled buttons from intercepting clicks */
-  pointer-events: none !important;
+  pointer-events: none;
   cursor: not-allowed;
   background: var(--bg-secondary);
   border-color: var(--border-color);
@@ -225,18 +248,6 @@
 }
 
 /* Specific fix for download button overlap issue */
-.download-card:disabled {
-  position: relative;
-  z-index: 1 !important;
-  pointer-events: none !important;
-}
-
-/* Ensure generate button is always clickable */
-.generate-card {
-  z-index: 12 !important;
-  pointer-events: auto !important;
-}
-
 /* Desktop layout optimizations */
 @media (width >= 1200px) {
   .desktop-action-grid {

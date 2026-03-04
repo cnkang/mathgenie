@@ -10,6 +10,37 @@ export interface ErrorMessageProps {
   showIcon?: boolean;
 }
 
+const WarningIcon: React.FC = () => (
+  <svg viewBox='0 0 24 24' width='16' height='16' fill='none' aria-hidden='true'>
+    <path
+      d='M12 8v5m0 3h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z'
+      stroke='currentColor'
+      strokeWidth='2'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+    />
+  </svg>
+);
+
+const BoltIcon: React.FC = () => (
+  <svg viewBox='0 0 24 24' width='16' height='16' fill='none' aria-hidden='true'>
+    <path
+      d='M13 2 4 14h6l-1 8 9-12h-6l1-8Z'
+      stroke='currentColor'
+      strokeWidth='2'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+    />
+  </svg>
+);
+
+const InfoIcon: React.FC = () => (
+  <svg viewBox='0 0 24 24' width='16' height='16' fill='none' aria-hidden='true'>
+    <circle cx='12' cy='12' r='9' stroke='currentColor' strokeWidth='2' />
+    <path d='M12 10v6m0-9h.01' stroke='currentColor' strokeWidth='2' strokeLinecap='round' />
+  </svg>
+);
+
 const ErrorMessage: React.FC<ErrorMessageProps> = ({
   error,
   type = 'error',
@@ -42,17 +73,17 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
 
   const messageConfig = {
     error: {
-      icon: '⚠️',
+      icon: <WarningIcon />,
       ariaKey: 'accessibility.errorMessage',
       fallback: 'Error message',
     },
     warning: {
-      icon: '⚡',
+      icon: <BoltIcon />,
       ariaKey: 'accessibility.warningMessage',
       fallback: 'Warning message',
     },
     info: {
-      icon: 'ℹ️',
+      icon: <InfoIcon />,
       ariaKey: 'accessibility.infoMessage',
       fallback: 'Information message',
     },
@@ -60,7 +91,7 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
 
   const config = messageConfig[type] || messageConfig.error;
 
-  const getIcon = (): string => config.icon;
+  const getIcon = (): React.ReactNode => config.icon;
 
   const getAriaLabel = (): string => t(config.ariaKey) || config.fallback;
 

@@ -205,7 +205,7 @@ describe('SettingsPresets', () => {
 
     // Check that each card has title, description, and button
     presetCards.forEach(card => {
-      expect(card.querySelector('h4')).toBeDefined();
+      expect(card.querySelector('h3')).toBeDefined();
       expect(card.querySelector('p')).toBeDefined();
       expect(card.querySelector('button')).toBeDefined();
     });

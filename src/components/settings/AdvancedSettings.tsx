@@ -14,6 +14,23 @@ type AdvancedSettingsProps = {
   onChange: OnChange;
 };
 
+const SettingsIcon: React.FC = () => (
+  <svg viewBox='0 0 24 24' width='16' height='16' fill='none' aria-hidden='true'>
+    <path
+      d='M12 9.5A2.5 2.5 0 1 0 12 14.5 2.5 2.5 0 0 0 12 9.5Z'
+      stroke='currentColor'
+      strokeWidth='2'
+    />
+    <path
+      d='M19.4 15a1 1 0 0 0 .2 1.1l.1.1a1 1 0 0 1 0 1.4l-1.1 1.1a1 1 0 0 1-1.4 0l-.1-.1a1 1 0 0 0-1.1-.2 1 1 0 0 0-.6.9V20a1 1 0 0 1-1 1h-1.8a1 1 0 0 1-1-1v-.2a1 1 0 0 0-.6-.9 1 1 0 0 0-1.1.2l-.1.1a1 1 0 0 1-1.4 0l-1.1-1.1a1 1 0 0 1 0-1.4l.1-.1a1 1 0 0 0 .2-1.1 1 1 0 0 0-.9-.6H4a1 1 0 0 1-1-1v-1.8a1 1 0 0 1 1-1h.2a1 1 0 0 0 .9-.6 1 1 0 0 0-.2-1.1l-.1-.1a1 1 0 0 1 0-1.4l1.1-1.1a1 1 0 0 1 1.4 0l.1.1a1 1 0 0 0 1.1.2 1 1 0 0 0 .6-.9V4a1 1 0 0 1 1-1h1.8a1 1 0 0 1 1 1v.2a1 1 0 0 0 .6.9 1 1 0 0 0 1.1-.2l.1-.1a1 1 0 0 1 1.4 0l1.1 1.1a1 1 0 0 1 0 1.4l-.1.1a1 1 0 0 0-.2 1.1 1 1 0 0 0 .9.6h.2a1 1 0 0 1 1 1v1.8a1 1 0 0 1-1 1h-.2a1 1 0 0 0-.9.6Z'
+      stroke='currentColor'
+      strokeWidth='1.6'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+    />
+  </svg>
+);
+
 const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({ settings, onChange }) => {
   const { t } = useTranslation();
 
@@ -46,7 +63,9 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({ settings, onChange 
           }
         }}
       >
-        <span aria-hidden='true'>⚙️</span>
+        <span aria-hidden='true'>
+          <SettingsIcon />
+        </span>
         <span>{t('settings.advanced')}</span>
         <span className='toggle-indicator' aria-hidden='true'>
           <span className='toggle-icon'>▼</span>

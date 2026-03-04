@@ -187,7 +187,7 @@ export default {
     nextProblem: '次へ →',
     problemNumber: '問題 {{number}}',
     progress: '{{current}} / {{total}}',
-    completed: '🎉 クイズ完了！',
+    completed: 'クイズ完了！',
     score: 'ポイント',
     retry: 'クイズを再試行',
     backToPractice: '練習に戻る',

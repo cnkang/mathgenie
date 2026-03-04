@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useProgressBar } from '../hooks/useProgressBar';
 import { useTranslation } from '../i18n';
 import type { Problem, QuizResult, Settings } from '../types';
+import './InfoPanel.css';
 
 interface InfoPanelProps {
   problems: Problem[];
@@ -18,6 +19,37 @@ const ProgressBar: React.FC<{ value: number }> = ({ value }) => {
     </div>
   );
 };
+
+const ChartIcon: React.FC = () => (
+  <svg viewBox='0 0 24 24' width='20' height='20' fill='none' aria-hidden='true'>
+    <path
+      d='M4 20h16M7 16V9m5 7V5m5 11v-8'
+      stroke='currentColor'
+      strokeWidth='2'
+      strokeLinecap='round'
+    />
+  </svg>
+);
+
+const TargetIcon: React.FC = () => (
+  <svg viewBox='0 0 24 24' width='20' height='20' fill='none' aria-hidden='true'>
+    <circle cx='12' cy='12' r='8' stroke='currentColor' strokeWidth='2' />
+    <circle cx='12' cy='12' r='4' stroke='currentColor' strokeWidth='2' />
+    <circle cx='12' cy='12' r='1.5' fill='currentColor' />
+  </svg>
+);
+
+const TrophyIcon: React.FC = () => (
+  <svg viewBox='0 0 24 24' width='20' height='20' fill='none' aria-hidden='true'>
+    <path
+      d='M8 4h8v2a4 4 0 0 1-8 0V4Zm-3 2h3a4 4 0 0 1-3 3V6Zm14 0h-3a4 4 0 0 0 3 3V6ZM9 20h6m-5-3h4m-2-2v2'
+      stroke='currentColor'
+      strokeWidth='2'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+    />
+  </svg>
+);
 
 const InfoPanel: React.FC<InfoPanelProps> = ({ problems, settings, quizResult }) => {
   const { t } = useTranslation();
@@ -86,8 +118,10 @@ const InfoPanel: React.FC<InfoPanelProps> = ({ problems, settings, quizResult })
 
   return (
     <div className='info-panel'>
-      <h2>
-        <span>📊</span>
+      <h2 className='section-title'>
+        <span className='section-icon' aria-hidden='true'>
+          <ChartIcon />
+        </span>
         {t('infoPanel.title')}
       </h2>
 
@@ -126,7 +160,12 @@ const InfoPanel: React.FC<InfoPanelProps> = ({ problems, settings, quizResult })
       </div>
 
       <div className='progress-section'>
-        <h3>🎯 {t('infoPanel.progress.title')}</h3>
+        <h3 className='section-title'>
+          <span className='section-icon' aria-hidden='true'>
+            <TargetIcon />
+          </span>
+          {t('infoPanel.progress.title')}
+        </h3>
         <ProgressBar value={learningProgress} />
         <div className='progress-text'>
           {t('infoPanel.progress.completed', { percent: Math.round(learningProgress) })}
@@ -135,7 +174,12 @@ const InfoPanel: React.FC<InfoPanelProps> = ({ problems, settings, quizResult })
 
       {quizResult && (
         <div className='tips-section'>
-          <h3>🏆 {t('infoPanel.recentResults.title')}</h3>
+          <h3 className='section-title'>
+            <span className='section-icon' aria-hidden='true'>
+              <TrophyIcon />
+            </span>
+            {t('infoPanel.recentResults.title')}
+          </h3>
           <div className='quiz-result-summary'>
             <div className='result-item'>
               <span className='result-label'>

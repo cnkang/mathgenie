@@ -181,11 +181,11 @@ select:focus {
 }
 
 .grouping-input {
-  border-color: var(--primary-color, #4f46e5) !important;
+  border-color: var(--primary-color, #4f46e5);
 }
 
 .grouping-input:focus {
-  box-shadow: 0 0 0 2px rgb(79 70 229 / 25%) !important;
+  box-shadow: 0 0 0 2px rgb(79 70 229 / 25%);
 }
 
 .total-calculation {
@@ -223,7 +223,7 @@ select:focus {
 }
 
 .single-input {
-  border-color: var(--border-color, #e2e8f0) !important;
+  border-color: var(--border-color, #e2e8f0);
 }
 
 @media (prefers-color-scheme: dark) {

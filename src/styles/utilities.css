@@ -71,7 +71,7 @@
 .error-message::before {
   margin-right: var(--space-sm);
   font-size: var(--font-size-lg);
-  content: '⚠️';
+  content: '!';
 }
 
 .success-message {
@@ -89,7 +89,7 @@
 .success-message::before {
   margin-right: var(--space-sm);
   font-size: var(--font-size-lg);
-  content: '✅';
+  content: '✓';
 }
 
 /* Settings group */
@@ -128,7 +128,7 @@
   width: auto;
   height: auto;
   font-size: var(--font-size-lg);
-  content: '⚙️';
+  content: '•';
   background: none;
   border-radius: 0;
 }
@@ -166,7 +166,7 @@
 
 .tips-list li::before {
   flex-shrink: 0;
-  content: '💡';
+  content: '•';
 }
 
 /* Progress section */
@@ -205,78 +205,25 @@
   gap: var(--space-sm);
   align-items: center;
   justify-content: center;
-  min-width: 120px !important;
+  min-width: 120px;
 
   /* WCAG 2.2 AAA: Large touch targets */
-  min-height: 60px !important;
+  min-height: 60px;
   padding: var(--space-md) var(--space-lg);
   font-size: var(--font-size-sm);
   font-weight: 600;
-  color: white;
+  color: var(--button-primary-text);
   cursor: pointer;
-  background: var(--primary-color);
-  border: 1px solid var(--primary-color);
+  background: var(--button-primary-bg);
+  border: 1px solid var(--button-primary-bg);
   border-radius: var(--radius-md);
   transition: all var(--transition-fast);
 }
 
 .quick-action-btn:hover {
-  background: var(--primary-hover);
-  border-color: var(--primary-hover);
+  background: var(--button-primary-hover-bg);
+  border-color: var(--button-primary-hover-bg);
   transform: translateY(-1px);
-}
-
-/* Dark mode overrides */
-@media (prefers-color-scheme: dark) {
-  /* Force all H3 elements to use white text in dark mode */
-  h3,
-  .info-panel h3,
-  .container h3,
-  .tips-section h4,
-  .progress-section h4 {
-    font-weight: 700 !important;
-    color: #fff !important;
-  }
-
-  /* Force all tips list items to use white text on dark background */
-  .tips-list li,
-  .tips-section ul li {
-    padding: var(--space-sm) !important;
-    margin-bottom: var(--space-xs) !important;
-    font-weight: 600 !important;
-    color: #fff !important;
-    background: #334155 !important;
-    border-radius: var(--radius-sm) !important;
-  }
-
-  /* Force tips sections to use dark background */
-  .tips-section {
-    background: #1e293b !important;
-  }
-
-  /* Ensure small text and help text have proper contrast */
-  small,
-  .help-text {
-    font-weight: 600 !important;
-    color: #fff !important;
-  }
-
-  /* All buttons in dark theme - WCAG AA compliant */
-  button,
-  .preset-button,
-  .quick-action-btn,
-  .quiz-mode-btn {
-    font-weight: 600 !important;
-    color: #fff !important;
-    background: #5b21b6 !important;
-  }
-
-  button:hover,
-  .preset-button:hover,
-  .quick-action-btn:hover,
-  .quiz-mode-btn:hover {
-    background: #4c1d95 !important;
-  }
 }
 
 /* Mobile-specific improvements */

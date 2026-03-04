@@ -24,6 +24,229 @@ const testDevices = {
 };
 
 const themes = ['light', 'dark'] as const;
+type Theme = (typeof themes)[number];
+
+type ContrastSample = {
+  selector: string;
+  text: string;
+  ratio: number;
+  threshold: number;
+  isLargeText: boolean;
+};
+
+const collectContrastSamples = async (page: Page): Promise<ContrastSample[]> => {
+  return page.evaluate(() => {
+    const selectors = [
+      'h1',
+      'h2',
+      'h3',
+      'label',
+      'p',
+      'small',
+      '.subtitle',
+      '.field-label',
+      '.stat-label',
+      '.stat-value',
+      '.message-text',
+      '.problem-expression',
+      '.correct-answer',
+      '.progress-text',
+      '.result-label',
+      '.result-value',
+      '.feedback-text',
+      '.no-problems-text',
+      '.no-problems-hint',
+    ];
+
+    const parseHex = (value: string): [number, number, number, number] | null => {
+      const hex = value.replace('#', '').trim();
+      if (![3, 4, 6, 8].includes(hex.length) || !/^[0-9a-f]+$/i.test(hex)) {
+        return null;
+      }
+
+      const expand = (chunk: string): string => (chunk.length === 1 ? `${chunk}${chunk}` : chunk);
+      if (hex.length <= 4) {
+        const r = Number.parseInt(expand(hex[0]), 16);
+        const g = Number.parseInt(expand(hex[1]), 16);
+        const b = Number.parseInt(expand(hex[2]), 16);
+        const a = hex.length === 4 ? Number.parseInt(expand(hex[3]), 16) / 255 : 1;
+        return [r, g, b, a];
+      }
+
+      const r = Number.parseInt(hex.slice(0, 2), 16);
+      const g = Number.parseInt(hex.slice(2, 4), 16);
+      const b = Number.parseInt(hex.slice(4, 6), 16);
+      const a = hex.length === 8 ? Number.parseInt(hex.slice(6, 8), 16) / 255 : 1;
+      return [r, g, b, a];
+    };
+
+    const parseColor = (value: string): [number, number, number, number] | null => {
+      const raw = value.trim().toLowerCase();
+      if (!raw) {
+        return null;
+      }
+
+      if (raw.startsWith('#')) {
+        return parseHex(raw);
+      }
+
+      const rgbMatch = raw.match(/rgba?\(([^)]+)\)/i);
+      if (rgbMatch) {
+        const parts = rgbMatch[1].split(',').map(item => item.trim());
+        const red = Number(parts[0]);
+        const green = Number(parts[1]);
+        const blue = Number(parts[2]);
+        const alpha = parts[3] === undefined ? 1 : Number(parts[3]);
+        if (![red, green, blue, alpha].some(Number.isNaN)) {
+          return [red, green, blue, alpha];
+        }
+      }
+
+      const srgbMatch = raw.match(
+        /color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\)/i
+      );
+      if (srgbMatch) {
+        const red = Number(srgbMatch[1]) * 255;
+        const green = Number(srgbMatch[2]) * 255;
+        const blue = Number(srgbMatch[3]) * 255;
+        const alpha = srgbMatch[4] === undefined ? 1 : Number(srgbMatch[4]);
+        if (![red, green, blue, alpha].some(Number.isNaN)) {
+          return [red, green, blue, alpha];
+        }
+      }
+
+      const parser = document.createElement('canvas').getContext('2d');
+      if (!parser) {
+        return null;
+      }
+      parser.fillStyle = '#000000';
+      parser.fillStyle = raw;
+      const normalized = parser.fillStyle;
+      if (!normalized || normalized === '#000000') {
+        return raw === '#000' || raw === '#000000' || raw === 'rgb(0, 0, 0)' ? [0, 0, 0, 1] : null;
+      }
+      if (normalized.startsWith('#')) {
+        return parseHex(normalized);
+      }
+      const fallback = normalized.match(/rgba?\(([^)]+)\)/i);
+      if (!fallback) {
+        return null;
+      }
+      const parts = fallback[1].split(',').map(item => item.trim());
+      const red = Number(parts[0]);
+      const green = Number(parts[1]);
+      const blue = Number(parts[2]);
+      const alpha = parts[3] === undefined ? 1 : Number(parts[3]);
+      return [red, green, blue, alpha];
+    };
+
+    const toLinear = (channel: number): number => {
+      const normalized = channel / 255;
+      return normalized <= 0.03928
+        ? normalized / 12.92
+        : Math.pow((normalized + 0.055) / 1.055, 2.4);
+    };
+
+    const luminance = ([r, g, b]: [number, number, number]): number => {
+      return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
+    };
+
+    const contrastRatio = (fg: [number, number, number], bg: [number, number, number]): number => {
+      const foreground = luminance(fg);
+      const background = luminance(bg);
+      const lighter = Math.max(foreground, background);
+      const darker = Math.min(foreground, background);
+      return (lighter + 0.05) / (darker + 0.05);
+    };
+
+    const getOpaqueBackground = (element: Element): [number, number, number] => {
+      let current: Element | null = element;
+
+      while (current) {
+        const color = window.getComputedStyle(current).backgroundColor;
+        const parsed = parseColor(color);
+        if (parsed && parsed[3] > 0) {
+          return [parsed[0], parsed[1], parsed[2]];
+        }
+        current = current.parentElement;
+      }
+
+      return [255, 255, 255];
+    };
+
+    const samples: Array<{
+      selector: string;
+      text: string;
+      ratio: number;
+      threshold: number;
+      isLargeText: boolean;
+    }> = [];
+
+    const elements = Array.from(document.querySelectorAll(selectors.join(', ')));
+    const sampledElements = elements.slice(0, 180);
+
+    for (const element of sampledElements) {
+      const style = window.getComputedStyle(element);
+      if (style.visibility === 'hidden' || style.display === 'none' || style.opacity === '0') {
+        continue;
+      }
+
+      const text = (element.textContent || '').replace(/\\s+/g, ' ').trim();
+      if (!text || text.length < 2) {
+        continue;
+      }
+      // Ignore non-lexical symbols (for example decorative arrows/icons)
+      if (/^[^\\p{L}\\p{N}]+$/u.test(text)) {
+        continue;
+      }
+
+      const rect = element.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) {
+        continue;
+      }
+
+      const color = parseColor(style.color);
+      if (!color) {
+        continue;
+      }
+
+      const background = getOpaqueBackground(element);
+      const ratio = contrastRatio([color[0], color[1], color[2]], background);
+      const fontSize = Number.parseFloat(style.fontSize) || 0;
+      const fontWeight = Number.parseInt(style.fontWeight, 10) || 400;
+      const isLargeText = fontSize >= 24 || (fontWeight >= 700 && fontSize >= 18.66);
+      const threshold = isLargeText ? 4.5 : 7.0;
+
+      samples.push({
+        selector: element.tagName.toLowerCase(),
+        text: text.slice(0, 60),
+        ratio,
+        threshold,
+        isLargeText,
+      });
+    }
+
+    return samples;
+  });
+};
+
+const assertAAAContrast = (samples: ContrastSample[], theme: Theme): void => {
+  expect(samples.length).toBeGreaterThan(0);
+  const failing = samples.filter(sample => sample.ratio < sample.threshold);
+  if (failing.length === 0) {
+    return;
+  }
+
+  const details = failing
+    .slice(0, 12)
+    .map(
+      sample =>
+        `[${theme}] ${sample.selector} "${sample.text}" ratio=${sample.ratio.toFixed(2)} threshold=${sample.threshold.toFixed(1)} (${sample.isLargeText ? 'large' : 'normal'})`
+    )
+    .join('\n');
+
+  throw new Error(`❌ AAA contrast threshold check failed:\n${details}`);
+};
 
 test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
   test.beforeEach(async ({ page }: { page: Page }) => {
@@ -280,6 +503,20 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
         await page.waitForTimeout(500);
       }
     });
+
+    for (const theme of themes) {
+      test(`should enforce explicit contrast thresholds (normal >= 7:1, large >= 4.5:1) - ${theme}`, async ({
+        page,
+      }: {
+        page: Page;
+      }) => {
+        await page.emulateMedia({ colorScheme: theme });
+        await page.waitForTimeout(1000);
+
+        const samples = await collectContrastSamples(page);
+        assertAAAContrast(samples, theme);
+      });
+    }
   });
 
   const logContrastViolations = (contrastResults: any, theme: string): void => {
