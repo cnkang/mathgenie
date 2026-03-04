@@ -31,13 +31,15 @@ const NumberInput: React.FC<ExtendedNumberInputProps> = ({
   const [optimisticValue, setOptimisticValue] = useOptimistic(
     value,
     (currentValue: number, newValue: number | string) => {
-      return typeof newValue === 'string' ? parseInt(newValue, 10) || currentValue : newValue;
+      return typeof newValue === 'string'
+        ? Number.parseInt(newValue, 10) || currentValue
+        : newValue;
     }
   );
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const inputValue = e.target.value;
-    const newValue = parseInt(inputValue, 10);
+    const newValue = Number.parseInt(inputValue, 10);
 
     // Use transition for both optimistic update and state change
     startTransition(() => {
@@ -45,7 +47,7 @@ const NumberInput: React.FC<ExtendedNumberInputProps> = ({
       setOptimisticValue(inputValue);
 
       // Then validate and update the actual state
-      if (!isNaN(newValue) && newValue >= min && newValue <= max) {
+      if (!Number.isNaN(newValue) && newValue >= min && newValue <= max) {
         onChange(newValue);
       } else if (inputValue === '') {
         onChange(min); // Reset to minimum value for empty input
@@ -54,9 +56,9 @@ const NumberInput: React.FC<ExtendedNumberInputProps> = ({
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>): void => {
-    const newValue = parseInt(e.target.value, 10);
+    const newValue = Number.parseInt(e.target.value, 10);
     startTransition(() => {
-      if (isNaN(newValue) || newValue < min) {
+      if (Number.isNaN(newValue) || newValue < min) {
         onChange(min);
       } else if (newValue > max) {
         onChange(max);

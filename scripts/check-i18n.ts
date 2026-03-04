@@ -6,8 +6,8 @@
  * and reports any missing translations across supported languages.
  */
 
-import { readdirSync } from 'fs';
-import { join } from 'path';
+import { readdirSync } from 'node:fs';
+import { join } from 'node:path';
 
 interface TranslationObject {
   [key: string]: string | TranslationObject;
@@ -294,8 +294,7 @@ function generateMissingTranslations(missingTranslations: Record<string, string[
   const lines = ['## ❌ Missing Translations\n'];
 
   for (const [lang, keys] of Object.entries(missingTranslations)) {
-    lines.push(`### ${lang.toUpperCase()}`);
-    lines.push(`Missing ${keys.length} translations:\n`);
+    lines.push(`### ${lang.toUpperCase()}`, `Missing ${keys.length} translations:\n`);
 
     for (const key of keys.slice(0, 10)) {
       lines.push(`- \`${key}\``);
@@ -317,8 +316,10 @@ function generateMissingTranslations(missingTranslations: Record<string, string[
 function generateReport(result: ValidationResult): string {
   const lines: string[] = [];
 
-  lines.push(...generateSummary(result));
-  lines.push(...generateMissingTranslations(result.stats.missingTranslations));
+  lines.push(
+    ...generateSummary(result),
+    ...generateMissingTranslations(result.stats.missingTranslations)
+  );
 
   // Errors
   if (result.errors.length > 0) {
@@ -335,8 +336,7 @@ function generateReport(result: ValidationResult): string {
   }
 
   if (result.isValid) {
-    lines.push('## 🎉 All Good!\n');
-    lines.push('All translation files are complete and consistent.');
+    lines.push('## 🎉 All Good!\n', 'All translation files are complete and consistent.');
   }
 
   return lines.join('\n');
@@ -355,7 +355,7 @@ async function main(): Promise<void> {
 
   // Write report to file for CI
   if (process.env.CI) {
-    const { writeFileSync } = await import('fs');
+    const { writeFileSync } = await import('node:fs');
     writeFileSync('i18n-report.md', report);
 
     // Also create a JSON report for programmatic use

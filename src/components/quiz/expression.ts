@@ -5,7 +5,7 @@ const parseNumber = (p: Parser): number => {
   if (!token || !/^\d+(?:\.\d+)?$/.test(token)) {
     throw new Error('Expected number');
   }
-  return parseFloat(token);
+  return Number.parseFloat(token);
 };
 
 const parseFactor = (p: Parser): number => {
@@ -42,7 +42,7 @@ const parseExpression = (p: Parser): number => {
 };
 
 export const safeEvaluateExpression = (expression: string): number => {
-  const cleanExpression = expression.replace(/\s/g, '');
+  const cleanExpression = expression.replaceAll(/\s/g, '');
   if (!/^[\d+\-*/().]+$/.test(cleanExpression)) {
     throw new Error('Invalid characters in expression');
   }

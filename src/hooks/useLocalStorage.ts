@@ -10,7 +10,7 @@ export const useLocalStorage = <T>(
 ): [T, (value: T | ((prev: T) => T)) => void] => {
   const [value, setValue] = useState<T>(() => {
     try {
-      const item = window.localStorage.getItem(key);
+      const item = globalThis.localStorage.getItem(key);
       return item ? JSON.parse(item) : defaultValue;
     } catch (error) {
       console.warn(`Error reading localStorage key "${key}":`, error);
@@ -20,9 +20,10 @@ export const useLocalStorage = <T>(
 
   const setStoredValue = (newValue: T | ((prev: T) => T)): void => {
     try {
-      const valueToStore = newValue instanceof Function ? newValue(value) : newValue;
+      const valueToStore =
+        typeof newValue === 'function' ? (newValue as (prev: T) => T)(value) : newValue;
       setValue(valueToStore);
-      window.localStorage.setItem(key, JSON.stringify(valueToStore));
+      globalThis.localStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {
       console.warn(`Error setting localStorage key "${key}":`, JSON.stringify(error));
     }
@@ -53,8 +54,8 @@ export const useLocalStorage = <T>(
       }
     };
 
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    globalThis.addEventListener('storage', handleStorageChange);
+    return () => globalThis.removeEventListener('storage', handleStorageChange);
   }, [key]);
 
   return [value, setStoredValue];

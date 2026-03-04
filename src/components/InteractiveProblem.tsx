@@ -53,8 +53,8 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
       return;
     }
 
-    const answer = parseFloat(userInput.trim());
-    if (!isNaN(answer)) {
+    const answer = Number.parseFloat(userInput.trim());
+    if (!Number.isNaN(answer)) {
       onAnswerSubmit(problem.id, answer);
       setIsSubmitted(true);
       setUserInput(''); // Clear input after submission

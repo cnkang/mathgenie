@@ -10,13 +10,12 @@ const mockJsPDFInstance = {
   save: vi.fn(),
 };
 
+function MockJsPDF(_options?: any) {
+  return mockJsPDFInstance;
+}
+
 // Mock the jsPDF module
 vi.mock('jspdf', () => {
-  // Create a proper constructor function that can be called with 'new'
-  function MockJsPDF(_options?: any) {
-    return mockJsPDFInstance;
-  }
-
   return {
     default: MockJsPDF,
   };

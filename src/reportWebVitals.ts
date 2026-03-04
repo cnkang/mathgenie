@@ -18,7 +18,7 @@ interface WebVitalsModule {
 }
 
 const isValidReportHandler = (onPerfEntry?: ReportHandler): onPerfEntry is ReportHandler => {
-  return onPerfEntry != null && onPerfEntry instanceof Function;
+  return onPerfEntry != null && typeof onPerfEntry === 'function';
 };
 
 const setupWebVitalsReporting = (vitals: WebVitalsModule, onPerfEntry: ReportHandler): void => {

@@ -80,45 +80,47 @@ const collectContrastSamples = async (page: Page): Promise<ContrastSample[]> => 
       return [r, g, b, a];
     };
 
-    const parseColor = (value: string): [number, number, number, number] | null => {
-      const raw = value.trim().toLowerCase();
-      if (!raw) {
+    const toRgba = (red: number, green: number, blue: number, alpha = 1) => {
+      if ([red, green, blue, alpha].some(Number.isNaN)) {
         return null;
       }
+      return [red, green, blue, alpha] as [number, number, number, number];
+    };
 
-      if (raw.startsWith('#')) {
-        return parseHex(raw);
+    const parseRgbColor = (raw: string): [number, number, number, number] | null => {
+      const match = /rgba?\(([^)]+)\)/i.exec(raw);
+      if (!match) {
+        return null;
       }
-
-      const rgbMatch = raw.match(/rgba?\(([^)]+)\)/i);
-      if (rgbMatch) {
-        const parts = rgbMatch[1].split(',').map(item => item.trim());
-        const red = Number(parts[0]);
-        const green = Number(parts[1]);
-        const blue = Number(parts[2]);
-        const alpha = parts[3] === undefined ? 1 : Number(parts[3]);
-        if (![red, green, blue, alpha].some(Number.isNaN)) {
-          return [red, green, blue, alpha];
-        }
-      }
-
-      const srgbMatch = raw.match(
-        /color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\)/i
+      const parts = match[1].split(',').map(item => item.trim());
+      return toRgba(
+        Number(parts[0]),
+        Number(parts[1]),
+        Number(parts[2]),
+        parts[3] === undefined ? 1 : Number(parts[3])
       );
-      if (srgbMatch) {
-        const red = Number(srgbMatch[1]) * 255;
-        const green = Number(srgbMatch[2]) * 255;
-        const blue = Number(srgbMatch[3]) * 255;
-        const alpha = srgbMatch[4] === undefined ? 1 : Number(srgbMatch[4]);
-        if (![red, green, blue, alpha].some(Number.isNaN)) {
-          return [red, green, blue, alpha];
-        }
-      }
+    };
 
+    const parseSrgbColor = (raw: string): [number, number, number, number] | null => {
+      const match =
+        /color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\)/i.exec(raw);
+      if (!match) {
+        return null;
+      }
+      return toRgba(
+        Number(match[1]) * 255,
+        Number(match[2]) * 255,
+        Number(match[3]) * 255,
+        match[4] === undefined ? 1 : Number(match[4])
+      );
+    };
+
+    const parseCanvasColor = (raw: string): [number, number, number, number] | null => {
       const parser = document.createElement('canvas').getContext('2d');
       if (!parser) {
         return null;
       }
+
       parser.fillStyle = '#000000';
       parser.fillStyle = raw;
       const normalized = parser.fillStyle;
@@ -128,16 +130,18 @@ const collectContrastSamples = async (page: Page): Promise<ContrastSample[]> => 
       if (normalized.startsWith('#')) {
         return parseHex(normalized);
       }
-      const fallback = normalized.match(/rgba?\(([^)]+)\)/i);
-      if (!fallback) {
+      return parseRgbColor(normalized);
+    };
+
+    const parseColor = (value: string): [number, number, number, number] | null => {
+      const raw = value.trim().toLowerCase();
+      if (!raw) {
         return null;
       }
-      const parts = fallback[1].split(',').map(item => item.trim());
-      const red = Number(parts[0]);
-      const green = Number(parts[1]);
-      const blue = Number(parts[2]);
-      const alpha = parts[3] === undefined ? 1 : Number(parts[3]);
-      return [red, green, blue, alpha];
+      if (raw.startsWith('#')) {
+        return parseHex(raw);
+      }
+      return parseRgbColor(raw) ?? parseSrgbColor(raw) ?? parseCanvasColor(raw);
     };
 
     const toLinear = (channel: number): number => {
@@ -163,7 +167,7 @@ const collectContrastSamples = async (page: Page): Promise<ContrastSample[]> => 
       let current: Element | null = element;
 
       while (current) {
-        const color = window.getComputedStyle(current).backgroundColor;
+        const color = globalThis.getComputedStyle(current).backgroundColor;
         const parsed = parseColor(color);
         if (parsed && parsed[3] > 0) {
           return [parsed[0], parsed[1], parsed[2]];
@@ -186,17 +190,17 @@ const collectContrastSamples = async (page: Page): Promise<ContrastSample[]> => 
     const sampledElements = elements.slice(0, 180);
 
     for (const element of sampledElements) {
-      const style = window.getComputedStyle(element);
+      const style = globalThis.getComputedStyle(element);
       if (style.visibility === 'hidden' || style.display === 'none' || style.opacity === '0') {
         continue;
       }
 
-      const text = (element.textContent || '').replace(/\\s+/g, ' ').trim();
+      const text = (element.textContent || '').replaceAll(/\\s+/g, ' ').trim();
       if (!text || text.length < 2) {
         continue;
       }
       // Ignore non-lexical symbols (for example decorative arrows/icons)
-      if (/^[^\\p{L}\\p{N}]+$/u.test(text)) {
+      if (/^[^\p{L}\p{N}]+$/u.test(text)) {
         continue;
       }
 
@@ -215,7 +219,7 @@ const collectContrastSamples = async (page: Page): Promise<ContrastSample[]> => 
       const fontSize = Number.parseFloat(style.fontSize) || 0;
       const fontWeight = Number.parseInt(style.fontWeight, 10) || 400;
       const isLargeText = fontSize >= 24 || (fontWeight >= 700 && fontSize >= 18.66);
-      const threshold = isLargeText ? 4.5 : 7.0;
+      const threshold = isLargeText ? 4.5 : 7;
 
       samples.push({
         selector: element.tagName.toLowerCase(),
@@ -374,7 +378,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
           for (const [index, el] of limitedElements.entries()) {
             try {
               const rect = el.getBoundingClientRect();
-              const computedStyle = window.getComputedStyle(el);
+              const computedStyle = globalThis.getComputedStyle(el);
 
               // Skip hidden or zero-size elements
               if (
@@ -488,7 +492,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
         await expect(errorElement).toBeVisible();
 
         const errorStyles = await errorElement.evaluate(el => {
-          const computed = window.getComputedStyle(el);
+          const computed = globalThis.getComputedStyle(el);
           return {
             color: computed.color,
             backgroundColor: computed.backgroundColor,
@@ -533,7 +537,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
       for (let j = 0; j < violation.nodes.length; j++) {
         const node = violation.nodes[j];
         console.log(`   Element ${j + 1}: ${node.target.join(' ')}`);
-        const data = node.any && node.any[0] && node.any[0].data;
+        const data = node.any?.[0]?.data;
         if (data) {
           console.log(`   Contrast: ${data.contrastRatio}`);
           console.log(`   Expected: ${data.expectedContrastRatio}`);
@@ -563,12 +567,14 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
             await button.click({ timeout: 3000, force: true });
             await page.waitForTimeout(300);
           } catch (e) {
-            // Button might have auto-dismissed or is not clickable, continue
+            // Button might have auto-dismissed or be transiently unclickable.
+            console.debug('Dismiss button skip:', e);
             continue;
           }
         }
       } catch (e) {
-        // No dismiss buttons found or they disappeared, continue with test
+        // No dismiss buttons found or they disappeared.
+        console.debug('Dismiss button query failed:', e);
       }
 
       await page.waitForTimeout(500);
@@ -680,7 +686,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
 
         const focusedElement = page.locator(selector);
         const styles = await focusedElement.evaluate(el => {
-          const computed = window.getComputedStyle(el);
+          const computed = globalThis.getComputedStyle(el);
           return {
             outline: computed.outline,
             outlineWidth: computed.outlineWidth,

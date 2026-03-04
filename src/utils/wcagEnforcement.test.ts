@@ -13,8 +13,8 @@ const mockNavigator = (userAgent: string) => {
 describe('WCAG Enforcement', () => {
   test('removes resize listener and clears timeout on cleanup', () => {
     vi.useFakeTimers();
-    const addSpy = vi.spyOn(window, 'addEventListener');
-    const removeSpy = vi.spyOn(window, 'removeEventListener');
+    const addSpy = vi.spyOn(globalThis, 'addEventListener');
+    const removeSpy = vi.spyOn(globalThis, 'removeEventListener');
     const enforceSpy = vi.spyOn(wcag, 'enforceWCAGTouchTargets');
 
     const cleanup = setupWCAGEnforcement();
@@ -23,7 +23,7 @@ describe('WCAG Enforcement', () => {
     const handler = resizeCall?.[1] as EventListener;
 
     enforceSpy.mockClear();
-    window.dispatchEvent(new Event('resize'));
+    globalThis.dispatchEvent(new Event('resize'));
     cleanup();
     vi.runAllTimers();
 
@@ -62,10 +62,10 @@ describe('WCAG Enforcement', () => {
     expect(zeroOpacityButton.style.minHeight).toBe('');
     expect(visibleButton.style.minHeight).not.toBe('');
 
-    document.body.removeChild(displayNoneButton);
-    document.body.removeChild(visibilityHiddenButton);
-    document.body.removeChild(zeroOpacityButton);
-    document.body.removeChild(visibleButton);
+    displayNoneButton.remove();
+    visibilityHiddenButton.remove();
+    zeroOpacityButton.remove();
+    visibleButton.remove();
   });
 
   test('applies min size when element is revealed', () => {
@@ -80,7 +80,7 @@ describe('WCAG Enforcement', () => {
     expect(button.style.minHeight).not.toBe('');
 
     cleanup();
-    document.body.removeChild(button);
+    button.remove();
   });
 
   test('wraps checkbox/radio inputs in parent with min size', () => {
@@ -93,7 +93,7 @@ describe('WCAG Enforcement', () => {
     enforceWCAGTouchTargets();
     expect(wrapper.style.minHeight).not.toBe('');
 
-    document.body.removeChild(wrapper);
+    wrapper.remove();
   });
 
   test('mutation observer triggers enforcement when interactive added', () => {
@@ -106,21 +106,21 @@ describe('WCAG Enforcement', () => {
     enforceWCAGTouchTargets();
     expect(btn.style.minHeight).not.toBe('');
 
-    document.body.removeChild(btn);
+    btn.remove();
     cleanup();
   });
 
   test('applies device-specific min size for very small screens', () => {
-    const originalWidth = window.innerWidth;
-    window.innerWidth = 400; // small-mobile tier
+    const originalWidth = globalThis.innerWidth;
+    globalThis.innerWidth = 400; // small-mobile tier
     const btn = document.createElement('button');
     document.body.appendChild(btn);
 
     enforceWCAGTouchTargets();
     expect(btn.style.getPropertyValue('min-height')).toBe('50px');
 
-    document.body.removeChild(btn);
-    window.innerWidth = originalWidth;
+    btn.remove();
+    globalThis.innerWidth = originalWidth;
   });
 
   test('uses Firefox-optimized selector when Firefox is detected', () => {
@@ -139,7 +139,7 @@ describe('WCAG Enforcement', () => {
       'button, input, select, textarea, a[href], [role="button"]'
     );
 
-    document.body.removeChild(btn);
+    btn.remove();
     querySelectorAllSpy.mockRestore();
     mockNavigator(originalUserAgent);
   });
@@ -168,7 +168,7 @@ describe('WCAG Enforcement', () => {
     expect(selectorUsed).toContain('[tabindex]');
     expect(selectorUsed).toContain('[onclick]');
 
-    document.body.removeChild(btn);
+    btn.remove();
     querySelectorAllSpy.mockRestore();
     mockNavigator(originalUserAgent);
   });
@@ -186,7 +186,7 @@ describe('WCAG Enforcement', () => {
       buttons.push(btn);
     }
 
-    const requestAnimationFrameSpy = vi.spyOn(window, 'requestAnimationFrame');
+    const requestAnimationFrameSpy = vi.spyOn(globalThis, 'requestAnimationFrame');
 
     enforceWCAGTouchTargets();
 
@@ -194,7 +194,7 @@ describe('WCAG Enforcement', () => {
     expect(requestAnimationFrameSpy).toHaveBeenCalled();
 
     // Clean up
-    buttons.forEach(btn => document.body.removeChild(btn));
+    buttons.forEach(btn => btn.remove());
     requestAnimationFrameSpy.mockRestore();
     mockNavigator(originalUserAgent);
   });
@@ -216,7 +216,7 @@ describe('WCAG Enforcement', () => {
     // Verify getBoundingClientRect was called for size measurement
     expect(getBoundingClientRectSpy).toHaveBeenCalled();
 
-    document.body.removeChild(btn);
+    btn.remove();
     getBoundingClientRectSpy.mockRestore();
     mockNavigator(originalUserAgent);
   });
@@ -226,7 +226,7 @@ describe('WCAG Enforcement', () => {
     mockNavigator('Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0');
 
     vi.useFakeTimers();
-    const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
+    const addEventListenerSpy = vi.spyOn(globalThis, 'addEventListener');
 
     const cleanup = setupWCAGEnforcement();
 
@@ -240,20 +240,21 @@ describe('WCAG Enforcement', () => {
   });
 
   test('handles server-side rendering gracefully', () => {
-    const originalWindow = global.window;
-    const originalDocument = global.document;
+    const globalObj = globalThis as Record<string, unknown>;
+    const originalWindow = globalObj['window'];
+    const originalDocument = globalObj['document'];
 
     // Simulate SSR environment
-    delete (global as any).window;
-    delete (global as any).document;
+    delete globalObj['window'];
+    delete globalObj['document'];
 
     // Should not throw error
     expect(() => enforceWCAGTouchTargets()).not.toThrow();
     expect(() => setupWCAGEnforcement()).not.toThrow();
 
     // Restore environment
-    global.window = originalWindow;
-    global.document = originalDocument;
+    globalObj['window'] = originalWindow;
+    globalObj['document'] = originalDocument;
   });
 
   test('applies Firefox optimizations without logging', () => {
@@ -273,7 +274,7 @@ describe('WCAG Enforcement', () => {
     // Console logging was removed to reduce noise - enforcement still works
     expect(consoleSpy).not.toHaveBeenCalled();
 
-    document.body.removeChild(btn);
+    btn.remove();
     consoleSpy.mockRestore();
     mockNavigator(originalUserAgent);
     (import.meta.env as any).DEV = originalEnv;

@@ -83,7 +83,7 @@ describe('ErrorBoundary', () => {
 
   test('handles try again button click', () => {
     const mockReload = vi.fn();
-    Object.defineProperty(window, 'location', {
+    Object.defineProperty(globalThis, 'location', {
       value: { reload: mockReload },
       writable: true,
     });

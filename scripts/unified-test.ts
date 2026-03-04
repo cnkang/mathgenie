@@ -4,9 +4,9 @@
  * 统一测试脚本 - 智能选择最佳测试配置并支持多种测试类型
  */
 
-import { spawnSync } from 'child_process';
-import { cpus, freemem, totalmem } from 'os';
-import { delimiter, dirname } from 'path';
+import { spawnSync } from 'node:child_process';
+import { cpus, freemem, totalmem } from 'node:os';
+import { delimiter, dirname } from 'node:path';
 import { buildSafeEnv, findExecutable, isCommandAvailable } from './exec-utils';
 
 // 颜色输出 (支持 NO_COLOR 环境变量)
@@ -58,8 +58,8 @@ function log(level: LogLevel, message: string): void {
 
   // Sanitize message to prevent log injection (CWE-117)
   const sanitizedMessage = message
-    .replace(/[\r\n\t]/g, ' ') // Remove line breaks and tabs
-    .replace(/[^\x20-\x7E]/g, '?') // Replace non-printable chars
+    .replaceAll(/[\r\n\t]/g, ' ') // Remove line breaks and tabs
+    .replaceAll(/[^\x20-\x7E]/g, '?') // Replace non-printable chars
     .substring(0, 500); // Limit length
 
   console.log(`${prefix} ${sanitizedMessage}`);

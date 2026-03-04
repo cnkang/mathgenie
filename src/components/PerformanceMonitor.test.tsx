@@ -3,6 +3,17 @@ import { render, screen } from '../../tests/helpers/testUtils';
 import { setViteEnv, useViteEnv } from '../../tests/helpers/viteEnv';
 import PerformanceMonitor from './PerformanceMonitor';
 
+const WINDOW_KEY = 'window' as const;
+const setMockWindow = (value: unknown): void => {
+  Object.defineProperty(globalThis, WINDOW_KEY, {
+    value,
+    configurable: true,
+  });
+};
+const deleteMockWindow = (): void => {
+  delete (globalThis as Record<string, unknown>)[WINDOW_KEY];
+};
+
 // Mock PerformanceObserver
 class MockPerformanceObserver {
   callback: PerformanceObserverCallback;
@@ -33,8 +44,8 @@ describe('PerformanceMonitor', () => {
   useViteEnv();
 
   beforeEach(() => {
-    originalPerformanceObserver = global.PerformanceObserver;
-    global.PerformanceObserver = MockPerformanceObserver as any;
+    originalPerformanceObserver = globalThis.PerformanceObserver;
+    globalThis.PerformanceObserver = MockPerformanceObserver as any;
 
     consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {}) as any;
     consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {}) as any;
@@ -43,7 +54,7 @@ describe('PerformanceMonitor', () => {
   });
 
   afterEach(() => {
-    global.PerformanceObserver = originalPerformanceObserver;
+    globalThis.PerformanceObserver = originalPerformanceObserver;
     consoleLogSpy.mockRestore();
     consoleWarnSpy.mockRestore();
     vi.useRealTimers();
@@ -84,7 +95,7 @@ describe('PerformanceMonitor', () => {
       }
     }
 
-    global.PerformanceObserver = ErrorObserver as any;
+    globalThis.PerformanceObserver = ErrorObserver as any;
 
     render(
       <PerformanceMonitor>
@@ -167,7 +178,7 @@ describe('PerformanceMonitor', () => {
     setViteEnv('production');
 
     const mockGtag = vi.fn();
-    (global as any).window = { gtag: mockGtag };
+    setMockWindow({ gtag: mockGtag });
 
     render(
       <PerformanceMonitor>
@@ -175,17 +186,14 @@ describe('PerformanceMonitor', () => {
       </PerformanceMonitor>
     );
 
-    delete (global as any).window;
+    deleteMockWindow();
   });
 
   it('handles entries without value property', () => {
     setViteEnv('development');
 
     // Mock window for this test
-    Object.defineProperty(global, 'window', {
-      value: {},
-      configurable: true,
-    });
+    setMockWindow({});
 
     const mockObserver = new MockPerformanceObserver(() => {});
     const mockEntry = {
@@ -201,15 +209,12 @@ describe('PerformanceMonitor', () => {
       </PerformanceMonitor>
     );
 
-    delete (global as any).window;
+    deleteMockWindow();
   });
 
   it.skip('cleans up memory interval on unmount', () => {
     // Mock window for this test
-    Object.defineProperty(global, 'window', {
-      value: {},
-      configurable: true,
-    });
+    setMockWindow({});
 
     const mockMemory = {
       usedJSHeapSize: 50 * 1048576,
@@ -222,7 +227,7 @@ describe('PerformanceMonitor', () => {
       configurable: true,
     });
 
-    const clearIntervalSpy = vi.spyOn(global, 'clearInterval');
+    const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval');
 
     const { unmount } = render(
       <PerformanceMonitor>
@@ -234,16 +239,13 @@ describe('PerformanceMonitor', () => {
 
     expect(clearIntervalSpy).toHaveBeenCalled();
     clearIntervalSpy.mockRestore();
-    delete (global as any).window;
+    deleteMockWindow();
   });
 
   it.skip('triggers performance observer callback in development', () => {
     setViteEnv('development');
 
-    Object.defineProperty(global, 'window', {
-      value: {},
-      configurable: true,
-    });
+    setMockWindow({});
 
     let observerCallback: PerformanceObserverCallback | undefined;
 
@@ -260,7 +262,7 @@ describe('PerformanceMonitor', () => {
       }
     }
 
-    global.PerformanceObserver = TestObserver as any;
+    globalThis.PerformanceObserver = TestObserver as any;
 
     render(
       <PerformanceMonitor>
@@ -284,17 +286,14 @@ describe('PerformanceMonitor', () => {
     expect(consoleLogSpy).toHaveBeenCalledWith('test-metric: 100ms');
     expect(consoleLogSpy).toHaveBeenCalledWith('test-duration: 200ms');
 
-    delete (global as any).window;
+    deleteMockWindow();
   });
 
   it.skip('triggers performance observer callback in production with gtag', () => {
     setViteEnv('production');
 
     const mockGtag = vi.fn();
-    Object.defineProperty(global, 'window', {
-      value: { gtag: mockGtag },
-      configurable: true,
-    });
+    setMockWindow({ gtag: mockGtag });
 
     let observerCallback: PerformanceObserverCallback | undefined;
 
@@ -311,7 +310,7 @@ describe('PerformanceMonitor', () => {
       }
     }
 
-    global.PerformanceObserver = TestObserver as any;
+    globalThis.PerformanceObserver = TestObserver as any;
 
     render(
       <PerformanceMonitor>
@@ -336,16 +335,13 @@ describe('PerformanceMonitor', () => {
       non_interaction: true,
     });
 
-    delete (global as any).window;
+    deleteMockWindow();
   });
 
   it('handles production environment without gtag', () => {
     setViteEnv('production');
 
-    Object.defineProperty(global, 'window', {
-      value: {},
-      configurable: true,
-    });
+    setMockWindow({});
 
     let observerCallback: PerformanceObserverCallback | undefined;
 
@@ -362,7 +358,7 @@ describe('PerformanceMonitor', () => {
       }
     }
 
-    global.PerformanceObserver = TestObserver as any;
+    globalThis.PerformanceObserver = TestObserver as any;
 
     render(
       <PerformanceMonitor>
@@ -382,17 +378,14 @@ describe('PerformanceMonitor', () => {
       }
     }).not.toThrow();
 
-    delete (global as any).window;
+    deleteMockWindow();
   });
 
   it.skip('handles entries with undefined/null values', () => {
     setViteEnv('production');
 
     const mockGtag = vi.fn();
-    Object.defineProperty(global, 'window', {
-      value: { gtag: mockGtag },
-      configurable: true,
-    });
+    setMockWindow({ gtag: mockGtag });
 
     let observerCallback: PerformanceObserverCallback | undefined;
 
@@ -409,7 +402,7 @@ describe('PerformanceMonitor', () => {
       }
     }
 
-    global.PerformanceObserver = TestObserver as any;
+    globalThis.PerformanceObserver = TestObserver as any;
 
     render(
       <PerformanceMonitor>
@@ -437,6 +430,6 @@ describe('PerformanceMonitor', () => {
       non_interaction: true,
     });
 
-    delete (global as any).window;
+    deleteMockWindow();
   });
 });

@@ -9,7 +9,7 @@ import {
 } from './analytics';
 
 // Use the global localStorage mock from setupTests.ts
-const localStorageMock = window.localStorage as any;
+const localStorageMock = globalThis.localStorage as any;
 
 // Mock console.log
 const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
@@ -23,7 +23,7 @@ describe('Analytics Utils', () => {
 
   afterEach(() => {
     consoleSpy.mockClear();
-    delete (window as any).gtag;
+    delete (globalThis as any).gtag;
   });
 
   describe('trackEvent', () => {
@@ -32,7 +32,7 @@ describe('Analytics Utils', () => {
       localStorageMock.getItem.mockReturnValue(null);
 
       const mockGtag = vi.fn();
-      window.gtag = mockGtag;
+      globalThis.gtag = mockGtag;
 
       trackEvent('test-event', { prop: 'value' });
 
@@ -47,7 +47,7 @@ describe('Analytics Utils', () => {
       localStorageMock.getItem.mockReturnValue('true');
 
       const mockGtag = vi.fn();
-      window.gtag = mockGtag;
+      globalThis.gtag = mockGtag;
 
       trackEvent('test-event', { prop: 'value' });
 
@@ -95,7 +95,7 @@ describe('Analytics Utils', () => {
 
       // Mock gtag
       const mockGtag = vi.fn();
-      window.gtag = mockGtag;
+      globalThis.gtag = mockGtag;
 
       trackEvent('test-event', { prop: 'value' });
 
@@ -117,11 +117,11 @@ describe('Analytics Utils', () => {
       });
       Object.defineProperty(screen, 'width', { value: 1920, configurable: true });
       Object.defineProperty(screen, 'height', { value: 1080, configurable: true });
-      Object.defineProperty(window, 'innerWidth', { value: 1200, configurable: true });
-      Object.defineProperty(window, 'innerHeight', { value: 800, configurable: true });
+      Object.defineProperty(globalThis, 'innerWidth', { value: 1200, configurable: true });
+      Object.defineProperty(globalThis, 'innerHeight', { value: 800, configurable: true });
 
       const mockGtag = vi.fn();
-      window.gtag = mockGtag;
+      globalThis.gtag = mockGtag;
 
       trackEvent('test-event');
 
@@ -135,7 +135,7 @@ describe('Analytics Utils', () => {
       localStorageMock.getItem.mockReturnValue(null);
 
       const mockGtag = vi.fn();
-      window.gtag = mockGtag;
+      globalThis.gtag = mockGtag;
 
       const settings = {
         operations: ['addition', 'subtraction'],
@@ -162,7 +162,7 @@ describe('Analytics Utils', () => {
       localStorageMock.getItem.mockReturnValue(null);
 
       const mockGtag = vi.fn();
-      window.gtag = mockGtag;
+      globalThis.gtag = mockGtag;
 
       const settings = {
         operations: ['addition'],
@@ -187,7 +187,7 @@ describe('Analytics Utils', () => {
       localStorageMock.getItem.mockReturnValue(null);
 
       const mockGtag = vi.fn();
-      window.gtag = mockGtag;
+      globalThis.gtag = mockGtag;
 
       const settings = {
         operations: ['addition'],
@@ -212,7 +212,7 @@ describe('Analytics Utils', () => {
       localStorageMock.getItem.mockReturnValue(null);
 
       const mockGtag = vi.fn();
-      window.gtag = mockGtag;
+      globalThis.gtag = mockGtag;
 
       trackLanguageChange('en', 'zh');
 
@@ -229,7 +229,7 @@ describe('Analytics Utils', () => {
       localStorageMock.getItem.mockReturnValue(null);
 
       const mockGtag = vi.fn();
-      window.gtag = mockGtag;
+      globalThis.gtag = mockGtag;
 
       trackPresetUsed('beginner');
 

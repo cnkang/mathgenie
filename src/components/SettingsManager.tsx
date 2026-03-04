@@ -54,7 +54,7 @@ const exportSettingsToFile = (settings: Settings): void => {
   link.download = generateFilename();
   document.body.appendChild(link);
   link.click();
-  document.body.removeChild(link);
+  link.remove();
   URL.revokeObjectURL(url);
 };
 
@@ -76,22 +76,22 @@ const handleImportedContent = (
   }
 };
 
-const importSettingsFromFile = (
+const importSettingsFromFile = async (
   file: File,
   t: TFunc,
   onImportSettings: (settings: Settings) => void,
   onImportError: ImportErrorReporter
-): void => {
-  const reader = new FileReader();
-  reader.onload = (event: ProgressEvent<FileReader>) => {
-    const result = event.target?.result;
+): Promise<void> => {
+  try {
+    const result = await file.text();
     if (typeof result !== 'string') {
       onImportError(t('settings.importError') || 'Invalid settings file format');
       return;
     }
     handleImportedContent(result, t, onImportSettings, onImportError);
-  };
-  reader.readAsText(file);
+  } catch {
+    onImportError(t('settings.importError') || 'Invalid settings file format');
+  }
 };
 
 /**
@@ -120,7 +120,7 @@ const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onImportSet
       return;
     }
     clearImportError();
-    importSettingsFromFile(file, t, onImportSettings, showImportError);
+    void importSettingsFromFile(file, t, onImportSettings, showImportError);
 
     // Reset file input
     event.target.value = '';

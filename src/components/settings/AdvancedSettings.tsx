@@ -49,7 +49,7 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({ settings, onChange 
         announcer.className = 'sr-only';
         announcer.textContent = announcement;
         document.body.appendChild(announcer);
-        setTimeout(() => document.body.removeChild(announcer), 1000);
+        setTimeout(() => announcer.remove(), 1000);
       }}
     >
       <summary

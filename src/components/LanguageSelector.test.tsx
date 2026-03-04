@@ -51,7 +51,7 @@ describe('LanguageSelector', () => {
       expect(select).toBeInstanceOf(HTMLSelectElement);
 
       if (!(select instanceof HTMLSelectElement)) {
-        throw new Error('Expected language selector element to be a <select> element');
+        throw new TypeError('Expected language selector element to be a <select> element');
       }
 
       expect(select.value).toBe('en');

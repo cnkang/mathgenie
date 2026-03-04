@@ -84,12 +84,11 @@ function makeConstName(base: string, used: Set<string>): string {
   const cleaned = base
     .trim()
     .slice(0, 80)
-    .replace(/[ \t\n\r]{1,10}/g, '_')
-    .replace(/[^A-Za-z0-9_-]/g, '_')
-    .replace(/-{1,10}/g, '_')
-    .replace(/_/g, '_')
-    .replace(/^_{1,10}/g, '')
-    .replace(/_$/g, '')
+    .replaceAll(/[ \t\n\r]{1,10}/g, '_')
+    .replaceAll(/[^A-Za-z0-9_-]/g, '_')
+    .replaceAll(/-{1,10}/g, '_')
+    .replaceAll(/^_{1,10}/g, '')
+    .replaceAll(/_$/g, '')
     .toUpperCase();
 
   let candidate = cleaned ? `STR_${cleaned}` : 'STR_CONST';
@@ -294,13 +293,13 @@ export function applyDuplicateStringFixesToContent(
     // Only within JSX tag attribute lists: capture up to attribute, keep tag prefix intact
     const jsxAttrBareIdInTag =
       /(<[^>]{0,200}\b)([A-Za-z_:][A-Za-z\d_:.-]{0,50}[ \t]{0,10}=)[ \t]{0,10}(STR_[A-Z\d_]{1,100})(?![A-Za-z\d_])/g;
-    updated = updated.replace(
+    updated = updated.replaceAll(
       jsxAttrBareIdInTag,
       (_m, p0: string, p1: string, p2: string) => `${p0}${p1}{${p2}}`
     );
     // Repair accidental braces on DOM property assignments (not JSX)
     const domClassNameBrace = /(\.className[ \t]{0,10}=)[ \t]{0,10}{(STR_[A-Z0-9_]{1,100})}/g;
-    updated = updated.replace(domClassNameBrace, (_m, p1: string, p2: string) => `${p1} ${p2}`);
+    updated = updated.replaceAll(domClassNameBrace, (_m, p1: string, p2: string) => `${p1} ${p2}`);
   }
 
   return {
@@ -330,12 +329,15 @@ export function applyDuplicateStringFixesToFile(
   if (filePath.endsWith('.tsx')) {
     const jsxAttrBareIdInTag =
       /(<[^>]{0,200}\b)([A-Za-z_:][A-Za-z\d_:.-]{0,50}[ \t]{0,10}=)[ \t]{0,10}(STR_[A-Z\d_]{1,100})(?![A-Za-z\d_])/g;
-    let repaired = input.replace(
+    let repaired = input.replaceAll(
       jsxAttrBareIdInTag,
       (_m, p0: string, p1: string, p2: string) => `${p0}${p1}{${p2}}`
     );
     const domClassNameBrace = /(\.className[ \t]{0,10}=)[ \t]{0,10}{(STR_[A-Z0-9_]{1,100})}/g;
-    repaired = repaired.replace(domClassNameBrace, (_m, p1: string, p2: string) => `${p1} ${p2}`);
+    repaired = repaired.replaceAll(
+      domClassNameBrace,
+      (_m, p1: string, p2: string) => `${p1} ${p2}`
+    );
     if (repaired !== input) {
       writeFileSync(filePath, repaired, 'utf8');
       return { changed: true, replacedCount: 0, constsAdded: 0 };

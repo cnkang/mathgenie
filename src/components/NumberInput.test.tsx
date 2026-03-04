@@ -141,7 +141,7 @@ describe.sequential('NumberInput', () => {
     expect(input).not.toBeNull();
     // Use native DOM properties instead of jest-dom matchers
     expect((input as HTMLInputElement).className).toContain('custom-class');
-    expect(input.getAttribute('data-testid')).toBe('custom-input');
+    expect(input.dataset.testid).toBe('custom-input');
   });
 
   test('renders without label when not provided', () => {

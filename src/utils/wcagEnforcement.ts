@@ -33,7 +33,7 @@ const isInteractive = (node: Node): boolean => {
 };
 
 const isVisible = (el: HTMLElement): boolean => {
-  const style = window.getComputedStyle(el);
+  const style = globalThis.getComputedStyle(el);
   return (
     style.display !== 'none' &&
     style.visibility !== STR_HIDDEN &&
@@ -61,10 +61,10 @@ const DEVICE_TIERS = {
 const getDeviceTier = (): DeviceTier => {
   const MOBILE_BREAKPOINT = 768;
   const SMALL_MOBILE_BREAKPOINT = 480;
-  if (window.innerWidth <= SMALL_MOBILE_BREAKPOINT) {
+  if (globalThis.innerWidth <= SMALL_MOBILE_BREAKPOINT) {
     return DEVICE_TIERS.SMALL;
   }
-  if (window.innerWidth <= MOBILE_BREAKPOINT) {
+  if (globalThis.innerWidth <= MOBILE_BREAKPOINT) {
     return DEVICE_TIERS.MOBILE;
   }
   return DEVICE_TIERS.DESKTOP;
@@ -136,7 +136,8 @@ const applyFirefoxPadding = (element: HTMLElement): void => {
 
 // Helper function to apply standard padding
 const applyStandardPadding = (element: HTMLElement, style: CSSStyleDeclaration): void => {
-  const currentPadding = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+  const currentPadding =
+    Number.parseFloat(style.paddingTop) + Number.parseFloat(style.paddingBottom);
   if (currentPadding < 12) {
     const padding = getPaddingForDevice();
     element.style.setProperty('padding', padding, STR_IMPORTANT);
@@ -191,7 +192,7 @@ const processElement = (element: HTMLElement, minSize: number): void => {
   let computedStyle: CSSStyleDeclaration | null = null;
 
   const getComputedStyleCached = (): CSSStyleDeclaration => {
-    computedStyle ??= window.getComputedStyle(element);
+    computedStyle ??= globalThis.getComputedStyle(element);
     return computedStyle;
   };
 
@@ -221,7 +222,7 @@ const processElement = (element: HTMLElement, minSize: number): void => {
 };
 
 const inNonBrowser = (): boolean =>
-  typeof window === 'undefined' || typeof document === 'undefined';
+  typeof globalThis === 'undefined' || typeof document === 'undefined';
 
 // Firefox performance optimization: Detect browser and apply optimizations
 const isFirefox = (): boolean => {
@@ -360,7 +361,7 @@ const setupEventListeners = () => {
   const mutationDelay = isFirefox() ? 200 : 100;
 
   const resizeHandler = debounce(enforceWCAGTouchTargets, resizeDelay);
-  window.addEventListener('resize', resizeHandler);
+  globalThis.addEventListener('resize', resizeHandler);
 
   const mutationHandler = debounce(enforceWCAGTouchTargets, mutationDelay);
   const observer = createMutationObserver(mutationHandler);
@@ -402,7 +403,7 @@ export const setupWCAGEnforcement = (): (() => void) => {
 
   return () => {
     observer.disconnect();
-    window.removeEventListener('resize', resizeHandler);
+    globalThis.removeEventListener('resize', resizeHandler);
     resizeHandler.cancel();
     mutationHandler.cancel();
   };

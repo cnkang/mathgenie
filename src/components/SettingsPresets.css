@@ -192,8 +192,8 @@
   }
 
   .preset-indicator {
-    color: #dbeafe;
-    background: rgb(147 197 253 / 16%);
-    border-color: rgb(147 197 253 / 40%);
+    color: #eff6ff;
+    background: rgb(30 58 138 / 45%);
+    border-color: rgb(147 197 253 / 55%);
   }
 }

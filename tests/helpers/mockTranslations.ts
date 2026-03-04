@@ -9,7 +9,7 @@ export const mockUseTranslation = (
       if (params && typeof result === 'string') {
         Object.entries(params).forEach(([paramKey, paramValue]) => {
           const placeholder = `{{${paramKey}}}`;
-          result = result.replace(new RegExp(placeholder, 'g'), String(paramValue));
+          result = result.replaceAll(new RegExp(placeholder, 'g'), String(paramValue));
         });
       }
       return result;
