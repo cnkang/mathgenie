@@ -77,7 +77,10 @@ describe.sequential('I18n System', () => {
   it('handles string interpolation', () => {
     const interpolate = (template: string, params: Record<string, any>): string => {
       return template.replaceAll(/\{\{(\w+)\}\}/g, (match, key) => {
-        return params[key] !== undefined ? String(params[key]) : match;
+        if (params[key] === undefined) {
+          return match;
+        }
+        return String(params[key]);
       });
     };
 
@@ -115,8 +118,8 @@ describe.sequential('I18n System', () => {
   });
 
   it('validates language codes', () => {
-    const supportedLanguages = ['en', 'zh', 'es', 'fr', 'de', 'ja'];
-    const isValidLanguage = (lang: string) => supportedLanguages.includes(lang);
+    const supportedLanguages = new Set(['en', 'zh', 'es', 'fr', 'de', 'ja']);
+    const isValidLanguage = (lang: string) => supportedLanguages.has(lang);
 
     expect(isValidLanguage('en')).toBe(true);
     expect(isValidLanguage('zh')).toBe(true);

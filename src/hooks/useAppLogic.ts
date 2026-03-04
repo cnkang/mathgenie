@@ -35,15 +35,16 @@ export const useInitialGeneration = ({
     }
 
     const validationError = validateSettings(settings);
-    if (!validationError) {
-      const messages = generateProblems(true);
-      setError(messages.error);
-      setWarning(messages.warning);
-      setAndScheduleSuccess(messages.successMessage);
-      setHasInitialGenerated(true);
-    } else {
+    if (validationError) {
       setError({ key: validationError });
+      return;
     }
+
+    const messages = generateProblems(true);
+    setError(messages.error);
+    setWarning(messages.warning);
+    setAndScheduleSuccess(messages.successMessage);
+    setHasInitialGenerated(true);
   }, [
     isI18nReady,
     hasInitialGenerated,

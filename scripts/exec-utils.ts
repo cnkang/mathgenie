@@ -47,17 +47,17 @@ export function isCommandAvailable(
 
 export function buildSafeEnv(opts: SafeEnvOptions = {}): Record<string, string> {
   const { removePath = true } = opts;
-  const dangerousVars = [
+  const dangerousVars = new Set([
     'LD_PRELOAD',
     'LD_LIBRARY_PATH',
     'DYLD_INSERT_LIBRARIES',
     'DYLD_LIBRARY_PATH',
     'DYLD_FALLBACK_LIBRARY_PATH',
-  ];
+  ]);
 
   const baseEnv: Record<string, string> = {};
   for (const [k, v] of Object.entries(process.env)) {
-    if (!dangerousVars.includes(k) && typeof v === 'string') {
+    if (!dangerousVars.has(k) && typeof v === 'string') {
       baseEnv[k] = v;
     }
   }
@@ -131,7 +131,7 @@ function sanitizeArg(arg: unknown): arg is string {
     return false;
   }
   // Block dangerous characters and patterns
-  if (/[][;|&`$(){}<>*?~\n\r]/.test(arg)) {
+  if (/[;\|&`$(){}<>*?~\n\r\[\]]/.test(arg)) {
     return false;
   }
   // Block eval flags

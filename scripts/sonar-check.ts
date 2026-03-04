@@ -510,9 +510,9 @@ class SonarChecker {
 }
 
 // Parse command line arguments
-const args = process.argv.slice(2);
-const showOnlyHigh = args.includes('--high');
-const verbose = args.includes('--verbose');
+const args = new Set(process.argv.slice(2));
+const showOnlyHigh = args.has('--high');
+const verbose = args.has('--verbose');
 
 // Run the checker
 const checker = new SonarChecker({ highOnly: showOnlyHigh, verbose });

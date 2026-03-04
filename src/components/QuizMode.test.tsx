@@ -100,8 +100,8 @@ describe('QuizMode', () => {
     // Setup fake timers
     vi.useFakeTimers();
     vi.spyOn(Date, 'now').mockReturnValue(1000000);
-    vi.spyOn(global, 'setInterval');
-    vi.spyOn(global, 'clearInterval');
+    vi.spyOn(globalThis, 'setInterval');
+    vi.spyOn(globalThis, 'clearInterval');
   });
 
   afterEach(() => {

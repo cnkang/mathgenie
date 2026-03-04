@@ -6,7 +6,7 @@ interface UseSettingsValidationReturn {
 }
 
 export const useSettingsValidation = (): UseSettingsValidationReturn => {
-  const VALIDATION_SENSITIVE_FIELDS: Array<keyof Settings> = [
+  const VALIDATION_SENSITIVE_FIELDS = new Set<keyof Settings>([
     'numProblems',
     'numRange',
     'resultRange',
@@ -15,10 +15,10 @@ export const useSettingsValidation = (): UseSettingsValidationReturn => {
     'enableGrouping',
     'problemsPerGroup',
     'totalGroups',
-  ];
+  ]);
 
   const isValidationSensitiveField = (field: keyof Settings): boolean => {
-    return VALIDATION_SENSITIVE_FIELDS.includes(field);
+    return VALIDATION_SENSITIVE_FIELDS.has(field);
   };
 
   const checkRestrictiveSettings = (settings: Settings): boolean => {
