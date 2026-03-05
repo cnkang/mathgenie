@@ -80,11 +80,19 @@ const collectContrastSamples = async (page: Page): Promise<ContrastSample[]> => 
       return [r, g, b, a];
     };
 
+    const clampChannel = (value: number): number => Math.max(0, Math.min(255, value));
+    const clampAlpha = (value: number): number => Math.max(0, Math.min(1, value));
+
     const toRgba = (red: number, green: number, blue: number, alpha = 1) => {
-      if ([red, green, blue, alpha].some(Number.isNaN)) {
+      if ([red, green, blue, alpha].some(value => !Number.isFinite(value))) {
         return null;
       }
-      return [red, green, blue, alpha] as [number, number, number, number];
+      return [
+        clampChannel(red),
+        clampChannel(green),
+        clampChannel(blue),
+        clampAlpha(alpha),
+      ] as [number, number, number, number];
     };
 
     const parseRgbChannel = (value: string): number => {
@@ -148,12 +156,20 @@ const collectContrastSamples = async (page: Page): Promise<ContrastSample[]> => 
     };
 
     const parseWideGamutColor = (raw: string): [number, number, number, number] | null => {
-      const match = /color\((?:srgb|display-p3)\s+([^)]+)\)/i.exec(raw);
+      const match = /color\(([^)]+)\)/i.exec(raw);
       if (!match) {
         return null;
       }
 
-      const [channelPart, alphaPart] = match[1].split('/').map(item => item.trim());
+      const content = match[1].trim();
+      const tokens = content.split(/\s+/).filter(Boolean);
+      if (tokens.length < 4) {
+        return null;
+      }
+
+      // color(<profile> <r> <g> <b> [/ <a>]) where profile may vary across browsers.
+      const [, ...channelTokens] = tokens;
+      const [channelPart, alphaPart] = channelTokens.join(' ').split('/').map(item => item.trim());
       const channels = channelPart.split(/\s+/).filter(Boolean);
       if (channels.length < 3) {
         return null;
@@ -227,7 +243,8 @@ const collectContrastSamples = async (page: Page): Promise<ContrastSample[]> => 
         current = current.parentElement;
       }
 
-      return [255, 255, 255];
+      const prefersDark = globalThis.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
+      return prefersDark ? [11, 18, 32] : [255, 255, 255];
     };
 
     const samples: Array<{
@@ -304,6 +321,13 @@ const assertAAAContrast = (samples: ContrastSample[], theme: Theme): void => {
   throw new Error(`❌ AAA contrast threshold check failed:\n${details}`);
 };
 
+const applyThemeAndReload = async (page: Page, theme: Theme): Promise<void> => {
+  await page.emulateMedia({ colorScheme: theme });
+  await page.goto('/');
+  await waitForAppLoad(page);
+  await page.waitForTimeout(300);
+};
+
 test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
   test.beforeEach(async ({ page }: { page: Page }) => {
     await page.goto('/');
@@ -318,8 +342,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
       }: {
         page: Page;
       }) => {
-        await page.emulateMedia({ colorScheme: theme });
-        await page.waitForTimeout(1000);
+        await applyThemeAndReload(page, theme);
 
         const accessibilityScanResults = await new AxeBuilder({ page })
           .withTags(['wcag2a', 'wcag2aa', 'wcag2aaa', 'wcag22aa', 'wcag22aaa'])
@@ -379,8 +402,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
           page: Page;
         }) => {
           await page.setViewportSize({ width: device.width, height: device.height });
-          await page.emulateMedia({ colorScheme: theme });
-          await page.waitForTimeout(1000);
+          await applyThemeAndReload(page, theme);
 
           const accessibilityScanResults = await new AxeBuilder({ page })
             .withTags(['wcag2a', 'wcag2aa', 'wcag2aaa', 'wcag22aa', 'wcag22aaa'])
@@ -495,8 +517,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
           page: Page;
         }) => {
           await page.setViewportSize({ width: device.width, height: device.height });
-          await page.emulateMedia({ colorScheme: theme });
-          await page.waitForTimeout(1000);
+          await applyThemeAndReload(page, theme);
 
           const accessibilityScanResults = await new AxeBuilder({ page })
             .withTags(['wcag2a', 'wcag2aa', 'wcag2aaa', 'wcag22aa', 'wcag22aaa'])
@@ -517,8 +538,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
       }: {
         page: Page;
       }) => {
-        await page.emulateMedia({ colorScheme: theme });
-        await page.waitForTimeout(1000);
+        await applyThemeAndReload(page, theme);
 
         const contrastResults = await new AxeBuilder({ page })
           .withTags(['wcag2aa', 'wcag2aaa', 'wcag22aa', 'wcag22aaa'])
@@ -534,8 +554,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
 
     test('should maintain contrast with error messages', async ({ page }: { page: Page }) => {
       for (const theme of themes) {
-        await page.emulateMedia({ colorScheme: theme });
-        await page.waitForTimeout(1000);
+        await applyThemeAndReload(page, theme);
 
         await createValidationError(page, 'count');
         await waitForErrorMessage(page);
@@ -566,8 +585,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
       }: {
         page: Page;
       }) => {
-        await page.emulateMedia({ colorScheme: theme });
-        await page.waitForTimeout(1000);
+        await applyThemeAndReload(page, theme);
 
         const samples = await collectContrastSamples(page);
         assertAAAContrast(samples, theme);

@@ -120,18 +120,20 @@ a[href]:focus:not(:focus-visible),
   input,
   select,
   textarea {
-    color: var(--text-primary);
-    background-color: var(--bg-primary);
-    border-color: var(--border-color);
-    -webkit-text-fill-color: var(--text-primary);
+    color: var(--text-primary, #f8fafc);
+    background-color: var(--bg-primary, #0b1220);
+    border-color: var(--border-color, #334155);
+    -webkit-text-fill-color: var(--text-primary, #f8fafc);
+    color-scheme: dark;
   }
 
   /* Harden WebKit number input contrast under dark scheme in CI/mobile */
   input[type='number'] {
-    color: var(--text-primary) !important;
-    background-color: var(--bg-primary) !important;
-    border-color: var(--border-color) !important;
-    -webkit-text-fill-color: var(--text-primary) !important;
+    color: var(--text-primary, #f8fafc) !important;
+    background-color: var(--bg-primary, #0b1220) !important;
+    border-color: var(--border-color, #334155) !important;
+    -webkit-text-fill-color: var(--text-primary, #f8fafc) !important;
+    color-scheme: dark;
     -webkit-appearance: textfield;
     appearance: textfield;
   }
