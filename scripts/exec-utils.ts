@@ -131,7 +131,7 @@ function sanitizeArg(arg: unknown): arg is string {
     return false;
   }
   // Block dangerous characters and patterns
-  if (/[;\|&`$(){}<>*?~\n\r\[\]]/.test(arg)) {
+  if (/[;|&`$(){}<>*?~\n\r[\]]/.test(arg)) {
     return false;
   }
   // Block eval flags
