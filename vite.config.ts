@@ -11,6 +11,8 @@ const reactChunkPackages = new Set([
   'use-sync-external-store',
 ]);
 
+const jspdfOptionalHtmlDeps = ['canvg', 'core-js', 'dompurify', 'html2canvas'];
+
 const getPackageName = (id: string): string | null => {
   const nodeModulesIndex = id.lastIndexOf('node_modules/');
   if (nodeModulesIndex === -1) {
@@ -100,7 +102,9 @@ export default defineConfig(({ mode }) => ({
         },
       },
       // External dependencies (if CDN is needed)
-      external: [],
+      // jsPDF dynamically imports these HTML helper modules.
+      // We explicitly remove them from install graph, and this app only uses text APIs.
+      external: jspdfOptionalHtmlDeps,
     },
     // Use terser for better compatibility
     minify: 'terser',
@@ -148,7 +152,7 @@ export default defineConfig(({ mode }) => ({
   // Optimize dependency pre-bundling for React 19.2
   optimizeDeps: {
     include: ['react', 'react-dom', 'jspdf'],
-    exclude: ['@vercel/speed-insights'],
+    exclude: ['@vercel/speed-insights', ...jspdfOptionalHtmlDeps],
     esbuildOptions: {
       target: 'es2022',
       // Enable React 19.2 optimizations
