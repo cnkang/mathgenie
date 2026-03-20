@@ -52,12 +52,29 @@ jobs:
         with:
           script: |
             const pr = context.payload.pull_request;
+            const workflowConfigPrefixes = ['.github/workflows/'];
+            const workflowConfigFiles = new Set(['.github/dependabot.yml']);
 
             const updateTypeRaw = process.env.UPDATE_TYPE || 'unknown';
             const dependencyType = process.env.DEPENDENCY_TYPE || 'unknown';
             const dependencyNames = process.env.PACKAGE_NAMES || 'unknown';
             const securitySeverity = process.env.SECURITY_SEVERITY || '';
             const ecosystem = process.env.ECOSYSTEM || 'unknown';
+
+            const changedFiles = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number,
+              per_page: 100
+            });
+            const workflowConfigChanges = changedFiles
+              .map((file) => file.filename)
+              .filter(
+                (filename) =>
+                  workflowConfigFiles.has(filename) ||
+                  workflowConfigPrefixes.some((prefix) => filename.startsWith(prefix))
+              );
+            const touchesWorkflowConfig = workflowConfigChanges.length > 0;
 
             const updateType = updateTypeRaw.startsWith('version-update:semver-')
               ? updateTypeRaw.replace('version-update:semver-', '')
@@ -85,6 +102,10 @@ jobs:
               autoMerge = true;
             }
 
+            if (touchesWorkflowConfig) {
+              autoMerge = false;
+            }
+
             let breakingRisk = 'Low';
             if (securitySeverity) {
               breakingRisk = 'Security';
@@ -99,6 +120,7 @@ jobs:
             if (isDevDependency) labels.push('dev-dependency');
             if (securitySeverity) labels.push('security-update');
             if (breakingRisk === 'High') labels.push('breaking-change-risk');
+            if (touchesWorkflowConfig) labels.push('workflow-config-change');
             labels.push(autoMerge ? 'auto-merge-eligible' : 'manual-review-required');
 
             for (const policyLabel of policyLabels) {
@@ -131,10 +153,15 @@ jobs:
               `- **Dependency Type**: ${dependencyType}`,
               `- **Security Severity**: ${securitySeverity || 'N/A'}`,
               `- **Breaking Change Risk**: ${breakingRisk}`,
+              `- **Workflow Config Change**: ${touchesWorkflowConfig ? `⚠️ Yes (${workflowConfigChanges.join(', ')})` : 'No'}`,
               `- **Auto-merge Eligible**: ${autoMerge ? '✅ Yes' : '❌ No'}`
             ];
 
-            if (!autoMerge) {
+            if (touchesWorkflowConfig) {
+              commentLines.push(
+                '\n⚠️ This PR changes GitHub workflow or Dependabot configuration files, so it requires manual review and merge even if the dependency update itself is low risk.'
+              );
+            } else if (!autoMerge) {
               commentLines.push('\n⚠️ This update needs manual review before merging.');
             } else {
               commentLines.push('\n✅ This update meets the auto-merge policy.');

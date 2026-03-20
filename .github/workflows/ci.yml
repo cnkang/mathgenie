@@ -922,6 +922,25 @@ jobs:
               return;
             }
 
+            const changedFiles = await github.paginate(github.rest.pulls.listFiles, {
+              owner,
+              repo,
+              pull_number: pullNumber,
+              per_page: 100
+            });
+            const workflowProtectedFiles = changedFiles
+              .map((file) => file.filename)
+              .filter(
+                (filename) =>
+                  filename === '.github/dependabot.yml' || filename.startsWith('.github/workflows/')
+              );
+            if (workflowProtectedFiles.length > 0) {
+              console.log(
+                `Skipping PR #${pullNumber}: workflow-related files changed (${workflowProtectedFiles.join(', ')}), so manual review is required.`
+              );
+              return;
+            }
+
             const getPrData = async () => {
               const { data } = await github.rest.pulls.get({
                 owner,
