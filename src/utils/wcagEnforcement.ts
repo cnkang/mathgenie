@@ -43,7 +43,7 @@ const isVisible = (el: HTMLElement): boolean => {
 };
 
 const isElementHidden = (element: HTMLElement, computedStyle: CSSStyleDeclaration): boolean => {
-  const isHiddenAttribute = element.hidden;
+  const isHiddenAttribute = Boolean(element.hidden);
   const isDisplayNone = computedStyle.display === 'none';
   const isVisibilityHidden = computedStyle.visibility === STR_HIDDEN;
   const isOpacityZero = computedStyle.opacity === '0';

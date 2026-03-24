@@ -124,7 +124,7 @@
     "postcss": "^8.5.8",
     "terser": "^5.46.1",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.2",
     "vite": "^8.0.2",
     "vite-plugin-compression": "^0.5.1",
     "vitest": "^4.0.18"
