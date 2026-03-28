@@ -1,13 +1,13 @@
 # 🧮 MathGenie
 
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fcnkang%2Fmathgenie.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fcnkang%2Fmathgenie?ref=badge_shield)
-[![Node.js 22.19.1](https://img.shields.io/badge/Node.js-22.19.1-green.svg)](https://nodejs.org/)
+[![Node.js 24.14.1](https://img.shields.io/badge/Node.js-24.14.1-green.svg)](https://nodejs.org/)
 [![React 19.1.1](https://img.shields.io/badge/React-19.1.1-blue.svg)](https://reactjs.org/)
 [![TypeScript 5.9](https://img.shields.io/badge/TypeScript-5.9-blue.svg)](https://www.typescriptlang.org/)
-[![pnpm 10.29.2](https://img.shields.io/badge/pnpm-10.29.2-orange.svg)](https://pnpm.io/)
+[![pnpm 10.30.1](https://img.shields.io/badge/pnpm-10.30.1-orange.svg)](https://pnpm.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-MathGenie is a modern web application built with **React 19.2.0**, **TypeScript 5.9**, and **Node.js 22.19.1**, designed to help tutors generate math problems focusing on basic arithmetic operations. Enhanced with the latest React concurrent features and full TypeScript support for optimal performance, type safety, and developer experience.
+MathGenie is a modern web application built with **React 19.2.0**, **TypeScript 5.9**, and **Node.js 24.14.1**, designed to help tutors generate math problems focusing on basic arithmetic operations. Enhanced with the latest React concurrent features and full TypeScript support for optimal performance, type safety, and developer experience.
 
 ## ✨ Features
 
@@ -41,9 +41,9 @@ MathGenie is a modern web application built with **React 19.2.0**, **TypeScript 
 ## 🛠️ Tech Stack
 
 - **Frontend**: React 19.2.0 with concurrent features and TypeScript 5.9
-- **Runtime**: Node.js 22.19.1 with enhanced performance
+- **Runtime**: Node.js 24.14.1 with enhanced performance
 - **Build Tool**: Vite 7.1.4 for lightning-fast development with TypeScript support
-- **Package Manager**: pnpm 10.29.2 for optimal performance and disk efficiency
+- **Package Manager**: pnpm 10.30.1 for optimal performance and disk efficiency
 - **Testing**: Vitest + Playwright for comprehensive testing with TypeScript
 - **Styling**: Modern CSS with mobile-first responsive design
 - **PDF Generation**: jsPDF for client-side PDF creation
@@ -52,7 +52,7 @@ MathGenie is a modern web application built with **React 19.2.0**, **TypeScript 
 
 ## 📊 Performance Metrics
 
-- **Startup Time**: ~15% faster with Node.js 22
+- **Startup Time**: ~15% faster with Node.js 24
 - **Re-renders**: ~30% reduction with React 19 automatic batching
 - **Bundle Size**: Optimized with tree shaking and code splitting
 - **Core Web Vitals**: Excellent scores across all metrics
@@ -64,8 +64,8 @@ MathGenie is a modern web application built with **React 19.2.0**, **TypeScript 
 
 ### Prerequisites
 
-- **Node.js 22.19.1** or higher
-- **pnpm 10.29.2** or higher (install globally: `npm install -g pnpm`)
+- **Node.js 24.14.1** or higher
+- **pnpm 10.30.1** or higher (install globally: `npm install -g pnpm`)
 - **TypeScript 5.9** (installed automatically with dependencies)
 
 ### Setup
@@ -416,15 +416,15 @@ pnpm test
 # Fast (no coverage) – memory-tuned
 pnpm test:unit:fast
 
-# If Node 22 triggers worker OOM, temporarily ignore unhandled errors
+# If Node 24 triggers worker OOM, temporarily ignore unhandled errors
 pnpm test:unit:fast:ignore-errors
 
 # Watch mode for development
 pnpm test:watch
 
-Note: On Node 22.x, Vitest’s worker pool may report “ERR_WORKER_OUT_OF_MEMORY”
+Note: On Node 24.x, Vitest’s worker pool may report “ERR_WORKER_OUT_OF_MEMORY”
 intermittently due to upstream limits. Use the memory‑tuned commands above or
-run with Node 20.x for fully stable execution.
+use serial mode (`pnpm test:unit:serial`) for fully stable execution.
 ```
 
 ### E2E Tests
@@ -754,10 +754,10 @@ Third-party dependencies and their licenses are documented in the [NOTICE](NOTIC
 
 - **React Team** for the amazing React 19 features
 - **TypeScript Team** for the excellent type system and tooling
-- **Node.js Team** for the performance improvements in Node.js 22
+- **Node.js Team** for the performance improvements in Node.js 24
 - **Vite Team** for the lightning-fast build tool with TypeScript support
 - **Community Contributors** for their valuable feedback and contributions
 
 ---
 
-**Built with ❤️ using React 19.2.0, TypeScript 5.9, and Node.js 22.19.1**
+**Built with ❤️ using React 19.2.0, TypeScript 5.9, and Node.js 24.14.1**

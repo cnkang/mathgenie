@@ -23,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Node.js baseline upgraded**: Updated runtime/tooling baseline to Node.js 24.14.1 LTS (`.nvmrc`, CI workflow, Dependabot workflow)
+- **Test toolchain refresh**: Upgraded `vitest` and `@vitest/coverage-v8` to 4.1.2
 - **InfoPanel simplified**: Removed duplicate quick-action buttons, tips section, and current config display; kept stats grid, progress bar, and conditional quiz results
 - **useReact19Features cleaned up**: Removed placeholder code (`usePromise` that only throws, `createMemoizedCallback` no-op, `batchUpdates` wrapper); retained only the actively used `optimisticState`, `updateOptimistic`, `startTransition`, and `useErrorRecovery`
 - **usePerformance cleaned up**: Removed unused `createOptimizedHandler` that returned an inert `{ handler, dependencies }` object
@@ -39,6 +41,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+- **picomatch Security Fix**: Added pnpm override selector to force vulnerable 4.x transitive versions to `4.0.4`
+  - **Issue**: Transitive `picomatch@4.0.3` remained in tree via `vitest`
+  - **Vulnerabilities**: `GHSA-c2c7-rcm5-vvqj` (ReDoS) and `GHSA-3v7f-55p6-f55p` (method injection)
+  - **Solution**: Added `"picomatch@>=4.0.0 <4.0.4": "4.0.4"` in pnpm overrides
+- **path-to-regexp Security Fix**: Added pnpm override to force `path-to-regexp` to `8.4.0`
+  - **Issue**: Transitive `path-to-regexp@8.3.0` from `@lhci/cli -> express -> router`
+  - **Vulnerabilities**: `GHSA-j3q9-mxjg-w52f` and `GHSA-27v5-c462-wpq7`
+  - **Solution**: Added `"path-to-regexp": "^8.4.0"` in pnpm overrides
 - **js-yaml Security Fix**: Added pnpm override to force js-yaml to version 4.1.1 or higher
   - **Issue**: `@lhci/utils@0.15.1` (transitive dependency of `@lhci/cli`) depends on vulnerable js-yaml 3.14.2
   - **Vulnerability**: js-yaml < 4.1.1 contains high-severity security issues with potential code execution via malicious YAML parsing

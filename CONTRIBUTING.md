@@ -29,8 +29,8 @@ Problem to Solve → Choose Approach → Try It → Evaluate Result
 
 ### Prerequisites
 
-- **Node.js 22.19.0** or higher
-- **pnpm 10.29.2** or higher
+- **Node.js 24.14.1** or higher
+- **pnpm 10.30.1** or higher
 - **Git** for version control
 - **TypeScript 5.9** knowledge
 
