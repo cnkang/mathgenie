@@ -20,7 +20,7 @@ export default defineConfig({
     maxConcurrency: 4,
     sequence: {
       shuffle: false,
-      concurrent: true,
+      concurrent: false,
     },
     fileParallelism: true,
 

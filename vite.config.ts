@@ -196,7 +196,7 @@ export default defineConfig(({ mode }) => ({
     maxConcurrency: process.env.CI ? 4 : 12,
     sequence: {
       shuffle: false,
-      concurrent: true,
+      concurrent: false,
     },
     fileParallelism: true,
     exclude: [
