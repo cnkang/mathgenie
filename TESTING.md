@@ -20,7 +20,7 @@ MathGenie uses a comprehensive testing strategy with an optimized test suite tha
 # Fast testing (no coverage, tuned for memory)
 pnpm test:unit:fast
 
-# If you see ERR_WORKER_OUT_OF_MEMORY on Node 22, you can temporarily ignore
+# If you see ERR_WORKER_OUT_OF_MEMORY on Node 24, you can temporarily ignore
 # the upstream unhandled error while we track a fix in Vitest/tinypool:
 pnpm test:unit:fast:ignore-errors
 
@@ -117,10 +117,11 @@ pnpm test:unit:fast
 # Or use serial mode for maximum stability
 pnpm test:unit:serial
 
-# For stubborn cases on Node 22, temporarily ignore unhandled errors
+# For stubborn cases on Node 24, temporarily ignore unhandled errors
 pnpm test:unit:fast:ignore-errors
 
-# Alternatively, use Node 20.x LTS for fully stable runs
+# Alternatively, use serial mode for fully stable runs
+pnpm test:unit:serial
 ```
 
 ### Playwright Browser Issues
