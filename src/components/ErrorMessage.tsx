@@ -97,7 +97,7 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
 
   return (
     <div
-      className={`message-container message-${type}`}
+      className={`message-container message-${type} ${type === 'error' ? 'error-message' : ''}`}
       role='alert'
       aria-live='polite'
       aria-atomic='true'
