@@ -79,8 +79,8 @@ button.preset-card:active {
 
 .preset-card:hover .preset-indicator {
   color: #1e3a8a;
-  background: rgb(30 58 138 / 12%);
-  border-color: rgb(30 58 138 / 30%);
+  background: #dbeafe;
+  border-color: #93c5fd;
 }
 
 .preset-card.active {
@@ -96,8 +96,8 @@ button.preset-card.active:hover {
 
 button.preset-card.active:hover .preset-indicator {
   color: #065f46;
-  background: rgb(16 185 129 / 18%);
-  border-color: rgb(16 185 129 / 38%);
+  background: #d1fae5;
+  border-color: #6ee7b7;
 }
 
 .preset-card:active {

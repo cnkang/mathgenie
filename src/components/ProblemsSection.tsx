@@ -57,7 +57,7 @@ const ProblemsSection: React.FC<ProblemsSectionProps> = ({ t, problems, settings
     textArea.setSelectionRange(0, textArea.value.length);
     const copied =
       typeof document.execCommand === 'function' ? document.execCommand('copy') : false;
-    document.body.removeChild(textArea);
+    textArea.remove();
     return copied;
   }, []);
 
@@ -87,12 +87,18 @@ const ProblemsSection: React.FC<ProblemsSectionProps> = ({ t, problems, settings
     copyState === 'success'
       ? translateWithFallback('results.copied', 'Copied')
       : translateWithFallback('results.copyAll', 'Copy All');
-  const copyFeedbackText =
-    copyState === 'success'
-      ? translateWithFallback('results.copySuccess', 'Problems copied to clipboard.')
-      : copyState === 'error'
-        ? translateWithFallback('results.copyError', 'Copy failed. Please copy manually.')
-        : '';
+  let copyFeedbackText = '';
+  if (copyState === 'success') {
+    copyFeedbackText = translateWithFallback(
+      'results.copySuccess',
+      'Problems copied to clipboard.'
+    );
+  } else if (copyState === 'error') {
+    copyFeedbackText = translateWithFallback(
+      'results.copyError',
+      'Copy failed. Please copy manually.'
+    );
+  }
 
   // Render grouped problems using the dedicated component
   const renderGroupedProblems = () => {
@@ -142,7 +148,7 @@ const ProblemsSection: React.FC<ProblemsSectionProps> = ({ t, problems, settings
             <button
               type='button'
               className='copy-problems-button'
-              onClick={() => void copyProblems()}
+              onClick={copyProblems}
               disabled={problems.length === 0}
               aria-label={translateWithFallback(
                 'accessibility.copyProblems',
