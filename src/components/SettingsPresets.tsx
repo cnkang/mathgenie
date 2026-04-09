@@ -15,12 +15,56 @@ const PresetIcon: React.FC = () => (
   </svg>
 );
 
+const areRangesEqual = (left: [number, number], right: [number, number]): boolean => {
+  return left[0] === right[0] && left[1] === right[1];
+};
+
+const areOperationsEqual = (
+  left: Settings['operations'],
+  right: Settings['operations']
+): boolean => {
+  if (left.length !== right.length) {
+    return false;
+  }
+  const sortedLeft = [...left].sort((operationA, operationB) =>
+    operationA.localeCompare(operationB)
+  );
+  const sortedRight = [...right].sort((operationA, operationB) =>
+    operationA.localeCompare(operationB)
+  );
+  return sortedLeft.every((operation, index) => operation === sortedRight[index]);
+};
+
+const areSettingsEqual = (left: Settings, right: Settings): boolean => {
+  return (
+    areOperationsEqual(left.operations, right.operations) &&
+    left.numProblems === right.numProblems &&
+    areRangesEqual(left.numRange, right.numRange) &&
+    areRangesEqual(left.resultRange, right.resultRange) &&
+    areRangesEqual(left.numOperandsRange, right.numOperandsRange) &&
+    left.allowNegative === right.allowNegative &&
+    left.showAnswers === right.showAnswers &&
+    left.enableGrouping === right.enableGrouping &&
+    left.problemsPerGroup === right.problemsPerGroup &&
+    left.totalGroups === right.totalGroups
+  );
+};
+
 /**
  * Settings Presets Component with TypeScript support
  * Provides quick preset configurations for common use cases
  */
-const SettingsPresets: React.FC<SettingsPresetsProps> = ({ onApplyPreset }) => {
+const SettingsPresets: React.FC<SettingsPresetsProps> = ({ onApplyPreset, currentSettings }) => {
   const { t } = useTranslation();
+  const [lastAppliedPresetName, setLastAppliedPresetName] = React.useState<string>('');
+
+  const translateWithFallback = React.useCallback(
+    (key: string, fallback: string, params: Record<string, string | number> = {}): string => {
+      const translated = t(key, params);
+      return translated === key ? fallback : translated;
+    },
+    [t]
+  );
 
   const presets: SettingsPreset[] = [
     {
@@ -101,38 +145,68 @@ const SettingsPresets: React.FC<SettingsPresetsProps> = ({ onApplyPreset }) => {
     },
   ];
 
-  const handleApplyPreset = (settings: Partial<Settings>): void => {
-    onApplyPreset(settings as Settings);
+  const activePresetName = React.useMemo(() => {
+    if (!currentSettings) {
+      return '';
+    }
+    const matchedPreset = presets.find(preset =>
+      areSettingsEqual(preset.settings, currentSettings)
+    );
+    return matchedPreset?.name ?? '';
+  }, [currentSettings, presets]);
+
+  const handleApplyPreset = (settings: Settings, presetName: string): void => {
+    onApplyPreset(settings);
+    setLastAppliedPresetName(presetName);
   };
+
+  const applyLabel = translateWithFallback('presets.clickToApply', 'Click to apply');
+  const appliedLabel = translateWithFallback('presets.applied', 'Applied');
 
   return (
     <div className='settings-presets'>
       <h2>{t('presets.title') || 'Quick Presets'}</h2>
       <div className='presets-grid'>
-        {presets.map(preset => (
-          <button
-            key={preset.name}
-            className='preset-card clickable-card'
-            onClick={() => handleApplyPreset(preset.settings)}
-            aria-label={`${t('presets.apply') || 'Apply'} ${preset.name} preset: ${preset.description}`}
-          >
-            <div className='preset-content'>
-              <div className='preset-info'>
-                <h3>{preset.name}</h3>
-                <p>{preset.description}</p>
+        {presets.map(preset => {
+          const isActive = activePresetName === preset.name;
+          return (
+            <button
+              key={preset.name}
+              className={`preset-card clickable-card${isActive ? ' active' : ''}`}
+              onClick={() => handleApplyPreset(preset.settings, preset.name)}
+              aria-label={`${t('presets.apply') || 'Apply'} ${preset.name} preset: ${preset.description}`}
+              aria-pressed={isActive}
+            >
+              <div className='preset-content'>
+                <div className='preset-info'>
+                  <h3>
+                    <span>{preset.name}</span>
+                    {isActive && <span className='preset-badge'>{appliedLabel}</span>}
+                  </h3>
+                  <p>{preset.description}</p>
+                </div>
+                <div className={`preset-indicator${isActive ? ' active' : ''}`}>
+                  <span className='preset-icon'>
+                    <PresetIcon />
+                  </span>
+                  <span className='preset-action'>{isActive ? appliedLabel : applyLabel}</span>
+                </div>
               </div>
-              <div className='preset-indicator'>
-                <span className='preset-icon'>
-                  <PresetIcon />
-                </span>
-                <span className='preset-action'>
-                  {t('presets.clickToApply') || 'Click to apply'}
-                </span>
-              </div>
-            </div>
-          </button>
-        ))}
+            </button>
+          );
+        })}
       </div>
+      {lastAppliedPresetName && (
+        <p className='preset-feedback' aria-live='polite'>
+          {translateWithFallback(
+            'messages.info.presetApplied',
+            `Applied preset "${lastAppliedPresetName}".`,
+            {
+              name: lastAppliedPresetName,
+            }
+          )}
+        </p>
+      )}
     </div>
   );
 };

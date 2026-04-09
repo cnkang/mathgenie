@@ -13,6 +13,7 @@
   margin: 16px 0;
   font-size: 14px;
   line-height: 1.5;
+  border: 1px solid transparent;
   border-left: 4px solid;
   border-radius: 8px;
   animation: slideIn 0.3s ease-out;
@@ -21,18 +22,21 @@
 .message-error {
   color: #991b1b;
   background-color: #fef2f2;
+  border-color: #fecaca;
   border-left-color: #ef4444;
 }
 
 .message-warning {
   color: #92400e;
   background-color: #fffbeb;
+  border-color: #fde68a;
   border-left-color: #f59e0b;
 }
 
 .message-info {
   color: #1e40af;
   background-color: #eff6ff;
+  border-color: #bfdbfe;
   border-left-color: #3b82f6;
 }
 
@@ -94,6 +98,11 @@
   transform: scale(1.05);
 }
 
+.message-dismiss:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
 .message-dismiss:active {
   transform: scale(0.95);
 }
@@ -115,16 +124,69 @@
   .message-error {
     color: #fca5a5;
     background-color: #450a0a;
+    border-color: #7f1d1d;
+    border-left-color: #f87171;
   }
 
   .message-warning {
     color: #fbbf24;
     background-color: #451a03;
+    border-color: #78350f;
+    border-left-color: #f59e0b;
   }
 
   .message-info {
     color: #f1f5f9;
     background-color: #1e293b;
+    border-color: #334155;
+    border-left-color: #60a5fa;
+  }
+
+  .message-dismiss:hover {
+    background: rgb(255 255 255 / 14%);
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 20%);
+  }
+
+  .message-dismiss:focus {
+    background: rgb(255 255 255 / 14%);
+    box-shadow: 0 0 0 3px rgb(255 255 255 / 28%);
+  }
+}
+
+@media (forced-colors: active) {
+  .message-container {
+    color: canvastext;
+    background: canvas;
+    border-color: canvastext;
+    border-left-color: canvastext;
+  }
+
+  .message-error,
+  .message-warning,
+  .message-info {
+    color: canvastext;
+    background: canvas;
+    border-color: canvastext;
+    border-left-color: canvastext;
+  }
+
+  .message-dismiss {
+    color: buttontext;
+    background: buttonface;
+    border: 1px solid buttontext;
+    opacity: 1;
+  }
+
+  .message-dismiss:hover,
+  .message-dismiss:focus,
+  .message-dismiss:focus-visible {
+    color: buttontext;
+    background: buttonface;
+    border-color: highlight;
+    outline: 2px solid highlight;
+    outline-offset: 1px;
+    box-shadow: none;
+    transform: none;
   }
 }
 

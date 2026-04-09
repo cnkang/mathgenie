@@ -64,6 +64,10 @@ export default {
     clickToStart: '「{{generateButton}}」をクリックして開始',
     groupTitle: 'グループ {{number}}',
     groupingInfo: '{{groups}}グループ、各{{perGroup}}問題',
+    copyAll: 'すべてコピー',
+    copied: 'コピー済み',
+    copySuccess: '問題をクリップボードにコピーしました。',
+    copyError: 'コピーに失敗しました。手動でコピーしてください。',
   },
   problems: {
     emptyGroup: 'グループ {{group}} (問題なし)',
@@ -133,6 +137,7 @@ export default {
     paperSizeSelect: 'PDF出力の用紙サイズ',
     generateButton: '現在の設定で数学問題を生成',
     downloadButton: '生成された問題をPDFファイルとしてダウンロード',
+    copyProblems: '生成された問題をコピー',
     languageSelect: 'インターフェース言語を選択',
     errorMessage: 'エラーメッセージ',
     warningMessage: '警告メッセージ',
@@ -159,6 +164,7 @@ export default {
     title: 'クイックプリセット',
     apply: '適用',
     clickToApply: '適用',
+    applied: '適用済み',
     beginner: {
       name: '初級 (1-10)',
       description: '簡単な足し算と引き算',

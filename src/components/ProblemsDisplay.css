@@ -83,6 +83,64 @@
   border-bottom: 1px solid var(--border-color, #e2e8f0);
 }
 
+.problems-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm, 0.5rem);
+  align-items: center;
+  justify-content: flex-end;
+  margin-left: auto;
+}
+
+.copy-problems-button {
+  min-height: 44px;
+  padding: 0.5rem 0.875rem;
+  font-size: var(--font-size-sm, 0.875rem);
+  font-weight: 700;
+  color: var(--primary-color, #4f46e5);
+  cursor: pointer;
+  background: var(--bg-primary, #fff);
+  border: 1px solid rgb(79 70 229 / 30%);
+  border-radius: var(--radius-sm, 0.375rem);
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.copy-problems-button:hover:not(:disabled) {
+  color: var(--primary-dark, #3730a3);
+  background: rgb(79 70 229 / 8%);
+  border-color: rgb(79 70 229 / 45%);
+}
+
+.copy-problems-button:focus-visible {
+  outline: 2px solid var(--primary-color, #4f46e5);
+  outline-offset: 2px;
+}
+
+.copy-problems-button:disabled {
+  color: var(--text-muted, #94a3b8);
+  cursor: not-allowed;
+  background: var(--bg-secondary, #f8fafc);
+  border-color: var(--border-color, #e2e8f0);
+}
+
+.copy-problems-feedback {
+  width: 100%;
+  margin: 0;
+  font-size: var(--font-size-xs, 0.75rem);
+  text-align: right;
+}
+
+.copy-problems-feedback.success {
+  color: var(--success-color, #10b981);
+}
+
+.copy-problems-feedback.error {
+  color: var(--error-color, #ef4444);
+}
+
 .problems-title {
   display: flex;
   gap: var(--space-sm, 0.5rem);
@@ -203,17 +261,17 @@
 
 /* Responsive design with precise column control */
 
-/* Extra large screens (1600px+) - 6 columns */
+/* Extra large screens (1600px+) - adaptive columns */
 @media (width >= 1600px) {
   .problems-grid {
-    grid-template-columns: repeat(6, 1fr);
-    gap: var(--space-lg, 1.5rem);
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: var(--space-md, 1rem);
   }
 
   .problem-item {
-    min-height: 80px;
-    padding: var(--space-xl, 2rem);
-    font-size: var(--font-size-xl, 1.25rem);
+    min-height: 76px;
+    padding: var(--space-lg, 1.5rem);
+    font-size: var(--font-size-lg, 1.125rem);
   }
 
   .problems-content {
@@ -221,21 +279,21 @@
   }
 }
 
-/* Large screens (1200px-1599px) - 5 columns */
+/* Large screens (1200px-1599px) - adaptive columns */
 @media (width >= 1200px) and (width <= 1599px) {
   .results-section {
     gap: var(--space-2xl, 3rem);
   }
 
   .problems-grid {
-    grid-template-columns: repeat(5, 1fr);
-    gap: var(--space-lg, 1.5rem);
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: var(--space-md, 1rem);
   }
 
   .problem-item {
-    min-height: 80px;
-    padding: var(--space-xl, 2rem);
-    font-size: var(--font-size-xl, 1.25rem);
+    min-height: 72px;
+    padding: var(--space-md, 1rem);
+    font-size: var(--font-size-lg, 1.125rem);
   }
 
   .problems-content {
@@ -246,7 +304,7 @@
 /* Medium-large screens (992px-1199px) - 4 columns */
 @media (width >= 992px) and (width <= 1199px) {
   .problems-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
     gap: var(--space-md, 1rem);
   }
 
@@ -264,7 +322,7 @@
 /* Medium screens (768px-991px) - 3 columns */
 @media (width >= 768px) and (width <= 991px) {
   .problems-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: var(--space-md, 1rem);
   }
 
@@ -292,13 +350,23 @@
     align-items: flex-start;
   }
 
+  .problems-header-actions {
+    width: 100%;
+    justify-content: space-between;
+    margin-left: 0;
+  }
+
+  .copy-problems-feedback {
+    text-align: left;
+  }
+
   .problems-stats {
     flex-wrap: wrap;
     gap: var(--space-sm, 0.5rem);
   }
 
   .problems-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: var(--space-sm, 0.75rem);
   }
 
@@ -318,7 +386,7 @@
 /* Small screens (480px-575px) - 2 columns compact */
 @media (width >= 480px) and (width <= 575px) {
   .problems-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: var(--space-sm, 0.5rem);
   }
 
@@ -338,7 +406,7 @@
 /* Extra small screens (320px-479px) - 2 columns very compact */
 @media (width >= 320px) and (width <= 479px) {
   .problems-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: var(--space-xs, 0.5rem);
   }
 

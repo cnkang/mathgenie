@@ -1,7 +1,7 @@
 import React from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { fireEvent, render, screen } from '../../tests/helpers/testUtils';
-import type { Operation } from '../types';
+import type { Operation, Settings } from '../types';
 import SettingsPresets from './SettingsPresets';
 
 const translationMap: Record<string, string> = {
@@ -16,6 +16,7 @@ const translationMap: Record<string, string> = {
   'presets.multiplication.description': 'Focus on multiplication tables',
   'presets.apply': 'Apply',
   'presets.clickToApply': 'Click to apply',
+  'presets.applied': 'Applied',
 };
 
 function translate(key: string): string {
@@ -416,5 +417,40 @@ describe('SettingsPresets', () => {
 
       expect(mockOnApplyPreset).toHaveBeenCalledWith(expect.objectContaining(expectedPreset));
     });
+  });
+
+  test('marks matching preset as active based on current settings', () => {
+    const currentSettings: Settings = {
+      operations: ['+', '-'] as Operation[],
+      numProblems: 15,
+      numRange: [1, 10],
+      resultRange: [0, 20],
+      numOperandsRange: [2, 2],
+      allowNegative: false,
+      showAnswers: false,
+      fontSize: 18,
+      lineSpacing: 16,
+      paperSize: 'a4',
+      enableGrouping: false,
+      problemsPerGroup: 20,
+      totalGroups: 1,
+    };
+
+    render(<SettingsPresets onApplyPreset={mockOnApplyPreset} currentSettings={currentSettings} />);
+
+    const buttons = screen.getAllByRole('button');
+    const activeButtons = buttons.filter(button => button.getAttribute('aria-pressed') === 'true');
+    expect(activeButtons.length).toBe(1);
+    expect(activeButtons[0]?.className).toContain('active');
+    expect(screen.getAllByText('Applied').length).toBeGreaterThan(0);
+  });
+
+  test('shows applied feedback message after selecting a preset', () => {
+    render(<SettingsPresets onApplyPreset={mockOnApplyPreset} />);
+
+    const buttons = screen.getAllByRole('button');
+    fireEvent.click(buttons[0]);
+
+    expect(screen.getByText('Applied preset "Beginner (1-10)".')).toBeInTheDocument();
   });
 });

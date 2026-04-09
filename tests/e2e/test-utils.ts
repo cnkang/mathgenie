@@ -213,11 +213,14 @@ export async function getStoredLanguage(page: Page): Promise<string | null> {
 /**
  * Wait for error message to appear and verify its content
  */
+const ERROR_MESSAGE_SELECTOR = '[role="alert"], .error-message, .settings-manager-alert';
+
 export async function waitForErrorMessage(page: Page, expectedContent?: string): Promise<void> {
-  await expect(page.locator('.error-message')).toBeVisible({ timeout: 5000 });
+  const errorMessageLocator = page.locator(ERROR_MESSAGE_SELECTOR).first();
+  await expect(errorMessageLocator).toBeVisible({ timeout: 5000 });
 
   if (expectedContent) {
-    const errorMessage = await page.locator('.error-message').textContent();
+    const errorMessage = await errorMessageLocator.textContent();
     expect(errorMessage).toContain(expectedContent);
   }
 }
@@ -226,7 +229,7 @@ export async function waitForErrorMessage(page: Page, expectedContent?: string):
  * Wait for error message to disappear
  */
 export async function waitForErrorClear(page: Page): Promise<void> {
-  await expect(page.locator('.error-message')).not.toBeVisible({ timeout: 5000 });
+  await expect(page.locator(ERROR_MESSAGE_SELECTOR).first()).not.toBeVisible({ timeout: 5000 });
 }
 
 /**
@@ -318,15 +321,17 @@ export async function createValidationError(
     case 'count':
       await page.fill('#numProblems', '0');
       await page.locator('#numProblems').blur();
+      await page.click('.generate-card');
       break;
     case 'range':
       await page.fill('#numRangeFrom', '20');
       await page.fill('#numRangeTo', '10');
       await page.locator('#numRangeTo').blur();
+      await page.click('.generate-card');
       break;
     case 'operations':
       await page.locator('#operations').selectOption([]);
-      await page.click('button:has-text("Generate Problems")');
+      await page.click('.generate-card');
       break;
   }
 }
