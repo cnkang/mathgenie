@@ -64,6 +64,12 @@
   transition: all var(--transition-fast);
 }
 
+button.action-card,
+button.action-card:hover,
+button.action-card:active {
+  color: inherit;
+}
+
 .action-card-content {
   position: relative;
   z-index: 2;
@@ -137,6 +143,7 @@
   width: 40px;
   height: 40px;
   background: rgb(79 70 229 / 10%);
+  border: 1px solid rgb(79 70 229 / 20%);
   border-radius: 50%;
   transition: all var(--transition-fast);
 }
@@ -185,6 +192,7 @@
 
 .action-card:hover .action-indicator {
   background: rgb(79 70 229 / 20%);
+  border-color: rgb(79 70 229 / 36%);
   transform: scale(1.1);
 }
 
@@ -407,6 +415,15 @@
       0 4px 6px -2px rgb(0 0 0 / 40%);
   }
 
+  .action-card:hover .action-text h3 {
+    color: #f8fafc;
+  }
+
+  .action-card:hover .action-text p {
+    color: #cbd5e1;
+    opacity: 1;
+  }
+
   .action-card:focus {
     border-color: var(--primary-color);
     box-shadow:
@@ -423,11 +440,13 @@
   }
 
   .action-indicator {
-    background: rgb(139 92 246 / 15%);
+    background: rgb(139 92 246 / 20%);
+    border-color: rgb(139 92 246 / 35%);
   }
 
   .action-card:hover .action-indicator {
-    background: rgb(139 92 246 / 25%);
+    background: rgb(96 165 250 / 28%);
+    border-color: rgb(147 197 253 / 60%);
   }
 
   .action-arrow {
@@ -441,9 +460,74 @@
 
   .action-card:disabled .action-indicator {
     background: rgb(148 163 184 / 15%);
+    border-color: rgb(148 163 184 / 30%);
   }
 
   .action-card:disabled .action-arrow {
     color: var(--text-muted);
+  }
+}
+
+@media (forced-colors: active) {
+  .action-card {
+    background: canvas;
+    border-color: canvastext;
+    box-shadow: none;
+  }
+
+  .action-card::before {
+    display: none;
+  }
+
+  .action-card:hover,
+  .action-card:focus,
+  .action-card:focus-visible {
+    background: canvas;
+    border-color: highlight;
+    outline: 2px solid highlight;
+    outline-offset: 0;
+    box-shadow: none;
+  }
+
+  .action-text h3,
+  .action-text p {
+    color: canvastext;
+    opacity: 1;
+  }
+
+  .action-icon,
+  .action-arrow {
+    color: buttontext;
+  }
+
+  .action-indicator {
+    background: buttonface;
+    border-color: buttontext;
+  }
+
+  .action-card:hover .action-indicator {
+    background: buttonface;
+    border-color: highlight;
+    transform: none;
+  }
+
+  .action-card:disabled {
+    color: graytext;
+    background: canvas;
+    border-color: graytext;
+    opacity: 1;
+  }
+
+  .action-card:disabled .action-icon,
+  .action-card:disabled .action-text h3,
+  .action-card:disabled .action-text p,
+  .action-card:disabled .action-arrow {
+    color: graytext;
+    opacity: 1;
+  }
+
+  .action-card:disabled .action-indicator {
+    border-color: graytext;
+    background: canvas;
   }
 }

@@ -64,6 +64,10 @@ export default {
     clickToStart: '点击"{{generateButton}}"开始',
     groupTitle: '第 {{number}} 组',
     groupingInfo: '共 {{groups}} 组，每组 {{perGroup}} 道题目',
+    copyAll: '复制全部',
+    copied: '已复制',
+    copySuccess: '题目已复制到剪贴板。',
+    copyError: '复制失败，请手动复制。',
   },
   problems: {
     emptyGroup: '第 {{group}} 组 (无题目)',
@@ -131,6 +135,7 @@ export default {
     paperSizeSelect: 'PDF 输出的纸张大小',
     generateButton: '使用当前设置生成数学题目',
     downloadButton: '将生成的题目下载为 PDF 文件',
+    copyProblems: '复制生成的题目',
     languageSelect: '选择界面语言',
     errorMessage: '错误消息',
     warningMessage: '警告消息',
@@ -157,6 +162,7 @@ export default {
     title: '快速预设',
     apply: '应用',
     clickToApply: '点击应用',
+    applied: '已应用',
     beginner: {
       name: '初级 (1-10)',
       description: '简单的加法和减法',

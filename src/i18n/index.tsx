@@ -174,6 +174,10 @@ const createMessageFallbacks = (): Record<string, string> => ({
 const createOtherFallbacks = (): Record<string, string> => ({
   'results.title': 'Generated Problems',
   'results.noProblems': 'No problems generated yet',
+  'results.copyAll': 'Copy All',
+  'results.copied': 'Copied',
+  'results.copySuccess': 'Problems copied to clipboard.',
+  'results.copyError': 'Copy failed. Please copy manually.',
   'operations.title': 'Select Operations',
   'pdf.title': 'PDF Settings',
   'pdf.fontSize': 'Font Size (pt)',
@@ -182,6 +186,7 @@ const createOtherFallbacks = (): Record<string, string> => ({
   'presets.title': 'Quick Presets',
   'presets.apply': 'Apply',
   'presets.clickToApply': 'Click to apply',
+  'presets.applied': 'Applied',
   'presets.beginner.name': 'Beginner (1-10)',
   'presets.beginner.description': 'Simple addition and subtraction',
   'presets.intermediate.name': 'Intermediate (1-50)',
@@ -190,6 +195,7 @@ const createOtherFallbacks = (): Record<string, string> => ({
   'presets.advanced.description': 'All operations including division',
   'presets.multiplication.name': 'Multiplication Focus',
   'presets.multiplication.description': 'Focus on multiplication tables',
+  'accessibility.copyProblems': 'Copy generated problems',
   'language.select': 'Language',
 });
 

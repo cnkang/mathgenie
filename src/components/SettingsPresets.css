@@ -33,7 +33,7 @@
 
 .presets-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr));
   gap: var(--space-md);
 }
 
@@ -56,10 +56,48 @@
     background-color var(--transition-fast);
 }
 
+button.preset-card,
+button.preset-card:hover,
+button.preset-card:active {
+  color: inherit;
+}
+
 .preset-card:hover {
+  background: linear-gradient(135deg, var(--bg-primary), rgb(30 58 138 / 4%));
   border-color: var(--primary-color);
   box-shadow: var(--shadow-md);
   transform: translateY(-2px);
+}
+
+.preset-card:hover .preset-info h3 {
+  color: var(--text-primary);
+}
+
+.preset-card:hover .preset-info p {
+  color: var(--text-secondary);
+}
+
+.preset-card:hover .preset-indicator {
+  color: #1e3a8a;
+  background: rgb(30 58 138 / 12%);
+  border-color: rgb(30 58 138 / 30%);
+}
+
+.preset-card.active {
+  border-color: var(--success-color);
+  background: linear-gradient(135deg, var(--bg-primary), rgb(16 185 129 / 6%));
+  box-shadow: var(--shadow-md);
+}
+
+button.preset-card.active:hover {
+  background: linear-gradient(135deg, var(--bg-primary), rgb(16 185 129 / 10%));
+  border-color: var(--success-color);
+}
+
+button.preset-card.active:hover .preset-indicator {
+  color: #065f46;
+  background: rgb(16 185 129 / 18%);
+  border-color: rgb(16 185 129 / 38%);
 }
 
 .preset-card:active {
@@ -90,6 +128,10 @@
 }
 
 .preset-info h3 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  align-items: center;
   margin: 0;
   font-size: var(--font-size-base);
   font-weight: 700;
@@ -109,6 +151,20 @@
   overflow-wrap: anywhere;
 }
 
+.preset-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0.125rem 0.5rem;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  line-height: 1;
+  color: #065f46;
+  background: rgb(16 185 129 / 16%);
+  border: 1px solid rgb(16 185 129 / 35%);
+  border-radius: 999px;
+}
+
 .preset-indicator {
   display: inline-flex;
   flex-shrink: 0;
@@ -120,6 +176,13 @@
   background: rgb(30 58 138 / 9%);
   border: 1px solid rgb(30 58 138 / 25%);
   border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.preset-indicator.active {
+  color: #065f46;
+  background: rgb(16 185 129 / 14%);
+  border-color: rgb(16 185 129 / 35%);
 }
 
 .preset-icon {
@@ -137,10 +200,10 @@
   text-transform: uppercase;
 }
 
-@media (width >= 768px) {
-  .presets-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.preset-feedback {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
 }
 
 @media (width >= 1024px) {
@@ -150,12 +213,6 @@
 
   .preset-card {
     min-height: 112px;
-  }
-}
-
-@media (width >= 1366px) {
-  .presets-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
@@ -191,9 +248,88 @@
     border-color: var(--primary-color);
   }
 
+  .preset-card:hover .preset-info h3 {
+    color: #f8fafc;
+  }
+
+  .preset-card:hover .preset-info p {
+    color: #cbd5e1;
+  }
+
+  .preset-card:hover .preset-indicator {
+    color: #e2e8f0;
+    background: rgb(59 130 246 / 32%);
+    border-color: rgb(147 197 253 / 70%);
+  }
+
   .preset-indicator {
     color: #eff6ff;
     background: rgb(30 58 138 / 45%);
     border-color: rgb(147 197 253 / 55%);
+  }
+
+  .preset-indicator.active {
+    color: #d1fae5;
+    background: rgb(16 185 129 / 30%);
+    border-color: rgb(110 231 183 / 55%);
+  }
+
+  button.preset-card.active:hover .preset-indicator {
+    color: #d1fae5;
+    background: rgb(16 185 129 / 38%);
+    border-color: rgb(110 231 183 / 72%);
+  }
+}
+
+@media (forced-colors: active) {
+  .settings-presets {
+    background: canvas;
+    border-color: canvastext;
+    box-shadow: none;
+  }
+
+  .settings-presets::before {
+    background: canvastext;
+  }
+
+  .preset-card {
+    background: canvas;
+    border-color: canvastext;
+    box-shadow: none;
+  }
+
+  .preset-card:hover,
+  .preset-card.active {
+    background: canvas;
+    border-color: highlight;
+    outline: 2px solid highlight;
+    outline-offset: 0;
+  }
+
+  .preset-info h3,
+  .preset-info p,
+  .preset-feedback {
+    color: canvastext;
+  }
+
+  .preset-card:hover .preset-info h3,
+  .preset-card:hover .preset-info p,
+  .preset-card.active .preset-info h3,
+  .preset-card.active .preset-info p {
+    color: canvastext;
+  }
+
+  .preset-badge,
+  .preset-indicator {
+    color: buttontext;
+    background: buttonface;
+    border-color: buttontext;
+  }
+
+  .preset-card:hover .preset-indicator,
+  .preset-card.active .preset-indicator {
+    color: buttontext;
+    background: buttonface;
+    border-color: highlight;
   }
 }

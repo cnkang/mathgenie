@@ -12,6 +12,11 @@
   background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
 }
 
+/* Prevent content shrink in centered flex layout */
+.main-content {
+  width: 100%;
+}
+
 /* Main container */
 .container {
   position: relative;
@@ -509,35 +514,10 @@
     background: var(--text-secondary);
   }
 
-  /* Settings presets - within settings section */
+  /* Keep preset cards above background layers without overriding component sizing */
   .settings-presets {
     position: relative;
-    z-index: 60;
-    box-sizing: border-box;
-    width: 100%;
-
-    /* Increase minimum height to accommodate all 4 presets */
-    min-height: 550px;
-
-    /* Add extra bottom padding */
-    padding-bottom: calc(var(--space-xl) + var(--space-lg));
-    margin-bottom: var(--space-xl);
-    overflow: visible;
-
-    /* Create new stacking context */
-    isolation: isolate;
-  }
-
-  /* Ensure presets grid has proper spacing */
-  .presets-grid {
-    gap: var(--space-lg);
-    padding-bottom: var(--space-xl);
-  }
-
-  /* Ensure last preset card (乘法表) is fully visible */
-  .preset-card.clickable-card:nth-child(4),
-  .preset-card.clickable-card:last-child {
-    margin-bottom: var(--space-xl);
+    z-index: 6;
   }
 
   /* Individual preset cards - highest priority in settings section */
@@ -582,11 +562,6 @@
     box-sizing: border-box;
     width: 100%;
     margin-bottom: var(--space-md);
-  }
-
-  /* Add a spacer after the presets to ensure visibility */
-  .settings-presets + * {
-    margin-top: var(--space-xl);
   }
 
   /* Ensure proper spacing between sections */
