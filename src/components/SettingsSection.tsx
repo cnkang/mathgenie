@@ -94,7 +94,7 @@ const SettingsSection: React.FC<SettingsSectionProps> = ({
         ariaMaxLabel={MAX_LABEL}
       />
 
-      <SettingsPresets onApplyPreset={onApplyPreset} />
+      <SettingsPresets onApplyPreset={onApplyPreset} currentSettings={settings} />
       <PdfSettings settings={settings} onChange={onChange} paperSizeOptions={paperSizeOptions} />
       <AdvancedSettings settings={settings} onChange={onChange} />
     </section>

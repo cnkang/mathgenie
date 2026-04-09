@@ -65,6 +65,10 @@ export default {
     clickToStart: 'Haz clic en "{{generateButton}}" para comenzar',
     groupTitle: 'Grupo {{number}}',
     groupingInfo: '{{groups}} grupos, {{perGroup}} problemas cada uno',
+    copyAll: 'Copiar todo',
+    copied: 'Copiado',
+    copySuccess: 'Problemas copiados al portapapeles.',
+    copyError: 'Error al copiar. Copia manualmente.',
   },
   problems: {
     emptyGroup: 'Grupo {{group}} (sin problemas)',
@@ -140,6 +144,7 @@ export default {
     paperSizeSelect: 'Tamaño de papel para salida PDF',
     generateButton: 'Generar problemas de matemáticas con configuración actual',
     downloadButton: 'Descargar problemas generados como archivo PDF',
+    copyProblems: 'Copiar problemas generados',
     languageSelect: 'Seleccionar idioma de la interfaz',
     errorMessage: 'Mensaje de error',
     warningMessage: 'Mensaje de advertencia',
@@ -168,6 +173,7 @@ export default {
     title: 'Presets Rápidos',
     apply: 'Aplicar',
     clickToApply: 'Aplicar',
+    applied: 'Aplicado',
     beginner: {
       name: 'Principiante (1-10)',
       description: 'Suma y resta simples',

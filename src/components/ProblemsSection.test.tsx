@@ -1,8 +1,18 @@
 import type { Operation, Settings } from '@/types';
-import { render, screen } from '../../tests/helpers/testUtils';
+import { fireEvent, render, screen, waitFor } from '../../tests/helpers/testUtils';
+import { afterEach, vi } from 'vitest';
 import ProblemsSection from './ProblemsSection';
 
 describe.sequential('ProblemsSection', () => {
+  const originalClipboard = navigator.clipboard;
+
+  afterEach(() => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: originalClipboard,
+    });
+  });
+
   const t = (key: string, params?: Record<string, string | number>) => {
     if (key === 'results.title') {
       return `Generated Problems (${params?.count ?? 0})`;
@@ -151,5 +161,35 @@ describe.sequential('ProblemsSection', () => {
     const groupedSettings = { ...mockSettings, enableGrouping: true };
     render(<ProblemsSection t={t} problems={[]} settings={groupedSettings} />);
     expect(screen.queryByText(/groups/)).not.toBeInTheDocument();
+  });
+
+  test('disables copy button when there are no problems', () => {
+    render(<ProblemsSection t={t} problems={[]} settings={mockSettings} />);
+
+    const copyButton = screen.getByRole('button', { name: /copy generated problems/i });
+    expect(copyButton).toHaveAttribute('disabled');
+  });
+
+  test('copies generated problems to clipboard', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText },
+    });
+
+    const problems = [
+      { id: 1, text: '1 + 2 = ' },
+      { id: 2, text: '3 + 4 = ' },
+    ];
+
+    render(<ProblemsSection t={t} problems={problems as any} settings={mockSettings} />);
+
+    const copyButton = screen.getByRole('button', { name: /copy generated problems/i });
+    fireEvent.click(copyButton);
+
+    await waitFor(() => {
+      expect(writeText).toHaveBeenCalledWith('1. 1 + 2 =\n2. 3 + 4 =');
+    });
+    expect(screen.getByText('Problems copied to clipboard.')).toBeInTheDocument();
   });
 });

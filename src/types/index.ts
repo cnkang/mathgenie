@@ -56,6 +56,7 @@ export interface ProblemPreviewProps {
 
 export interface SettingsPresetsProps {
   onApplyPreset: (settings: Settings) => void;
+  currentSettings?: Settings;
 }
 
 export interface SettingsPreset {

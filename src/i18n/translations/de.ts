@@ -65,6 +65,10 @@ export default {
     clickToStart: 'Klicken Sie auf "{{generateButton}}", um zu beginnen',
     groupTitle: 'Gruppe {{number}}',
     groupingInfo: '{{groups}} Gruppen, {{perGroup}} Aufgaben pro Gruppe',
+    copyAll: 'Alle kopieren',
+    copied: 'Kopiert',
+    copySuccess: 'Aufgaben in die Zwischenablage kopiert.',
+    copyError: 'Kopieren fehlgeschlagen. Bitte manuell kopieren.',
   },
   problems: {
     emptyGroup: 'Gruppe {{group}} (keine Aufgaben)',
@@ -140,6 +144,7 @@ export default {
     paperSizeSelect: 'Papiergröße für PDF-Ausgabe',
     generateButton: 'Mathematikaufgaben mit aktuellen Einstellungen generieren',
     downloadButton: 'Generierte Aufgaben als PDF-Datei herunterladen',
+    copyProblems: 'Generierte Aufgaben kopieren',
     languageSelect: 'Oberflächensprache auswählen',
     errorMessage: 'Fehlermeldung',
     warningMessage: 'Warnmeldung',
@@ -168,6 +173,7 @@ export default {
     title: 'Schnellvorlagen',
     apply: 'Anwenden',
     clickToApply: 'Anwenden',
+    applied: 'Angewendet',
     beginner: {
       name: 'Anfänger (1-10)',
       description: 'Einfache Addition und Subtraktion',

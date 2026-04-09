@@ -66,6 +66,10 @@ export default {
     clickToStart: 'Cliquez sur "{{generateButton}}" pour commencer',
     groupTitle: 'Groupe {{number}}',
     groupingInfo: '{{groups}} groupes, {{perGroup}} problèmes chacun',
+    copyAll: 'Tout copier',
+    copied: 'Copié',
+    copySuccess: 'Problèmes copiés dans le presse-papiers.',
+    copyError: 'Échec de la copie. Copiez manuellement.',
   },
   problems: {
     emptyGroup: 'Groupe {{group}} (aucun problème)',
@@ -144,6 +148,7 @@ export default {
     paperSizeSelect: 'Taille du papier pour la sortie PDF',
     generateButton: 'Générer des problèmes de mathématiques avec les paramètres actuels',
     downloadButton: 'Télécharger les problèmes générés en tant que fichier PDF',
+    copyProblems: 'Copier les problèmes générés',
     languageSelect: "Sélectionner la langue de l'interface",
     errorMessage: "Message d'erreur",
     warningMessage: "Message d'avertissement",
@@ -172,6 +177,7 @@ export default {
     title: 'Préréglages rapides',
     apply: 'Appliquer',
     clickToApply: 'Appliquer',
+    applied: 'Appliqué',
     beginner: {
       name: 'Débutant (1-10)',
       description: 'Addition et soustraction simples',

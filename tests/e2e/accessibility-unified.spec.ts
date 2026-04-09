@@ -559,7 +559,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
         await createValidationError(page, 'count');
         await waitForErrorMessage(page);
 
-        const errorElement = page.locator('.error-message');
+        const errorElement = page.locator('[role="alert"]').first();
         await expect(errorElement).toBeVisible();
 
         const errorStyles = await errorElement.evaluate(el => {
@@ -812,7 +812,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
       await createValidationError(page, 'count');
       await waitForErrorMessage(page);
 
-      const errorElement = page.locator('.error-message');
+      const errorElement = page.locator('[role="alert"]').first();
       await expect(errorElement).toHaveAttribute('role', 'alert');
       await expect(errorElement).toHaveAttribute('aria-live', 'polite');
       await expect(errorElement).toHaveAttribute('aria-atomic', 'true');
@@ -906,7 +906,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
         await createValidationError(page, type);
         await waitForErrorMessage(page, expectedText);
 
-        const errorMessage = await page.locator('.error-message').textContent();
+        const errorMessage = await page.locator('[role="alert"]').first().textContent();
         expect(errorMessage).toBeTruthy();
         expect(errorMessage!.length).toBeGreaterThan(10);
 

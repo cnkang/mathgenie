@@ -65,6 +65,10 @@ export default {
     clickToStart: 'Click "{{generateButton}}" to start',
     groupTitle: 'Group {{number}}',
     groupingInfo: '{{groups}} groups, {{perGroup}} problems each',
+    copyAll: 'Copy All',
+    copied: 'Copied',
+    copySuccess: 'Problems copied to clipboard.',
+    copyError: 'Copy failed. Please copy manually.',
   },
   problems: {
     emptyGroup: 'Group {{group}} (no problems)',
@@ -135,6 +139,7 @@ export default {
     paperSizeSelect: 'Paper size for PDF output',
     generateButton: 'Generate math problems with current settings',
     downloadButton: 'Download generated problems as PDF file',
+    copyProblems: 'Copy generated problems',
     languageSelect: 'Select interface language',
     errorMessage: 'Error message',
     warningMessage: 'Warning message',
@@ -163,6 +168,7 @@ export default {
     title: 'Quick Presets',
     apply: 'Apply',
     clickToApply: 'Apply',
+    applied: 'Applied',
     beginner: {
       name: 'Beginner (1-10)',
       description: 'Simple addition and subtraction',
