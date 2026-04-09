@@ -160,8 +160,8 @@ button.preset-card.active:hover .preset-indicator {
   font-weight: 700;
   line-height: 1;
   color: #065f46;
-  background: rgb(16 185 129 / 16%);
-  border: 1px solid rgb(16 185 129 / 35%);
+  background: #d1fae5;
+  border: 1px solid #6ee7b7;
   border-radius: 999px;
 }
 
@@ -181,8 +181,8 @@ button.preset-card.active:hover .preset-indicator {
 
 .preset-indicator.active {
   color: #065f46;
-  background: rgb(16 185 129 / 14%);
-  border-color: rgb(16 185 129 / 35%);
+  background: #d1fae5;
+  border-color: #6ee7b7;
 }
 
 .preset-icon {
@@ -257,9 +257,9 @@ button.preset-card.active:hover .preset-indicator {
   }
 
   .preset-card:hover .preset-indicator {
-    color: #e2e8f0;
-    background: rgb(59 130 246 / 32%);
-    border-color: rgb(147 197 253 / 70%);
+    color: #f8fafc;
+    background: #1e3a8a;
+    border-color: #60a5fa;
   }
 
   .preset-indicator {
@@ -269,15 +269,15 @@ button.preset-card.active:hover .preset-indicator {
   }
 
   .preset-indicator.active {
-    color: #d1fae5;
-    background: rgb(16 185 129 / 30%);
-    border-color: rgb(110 231 183 / 55%);
+    color: #ecfdf5;
+    background: #065f46;
+    border-color: #34d399;
   }
 
   button.preset-card.active:hover .preset-indicator {
-    color: #d1fae5;
-    background: rgb(16 185 129 / 38%);
-    border-color: rgb(110 231 183 / 72%);
+    color: #ecfdf5;
+    background: #047857;
+    border-color: #6ee7b7;
   }
 }
 

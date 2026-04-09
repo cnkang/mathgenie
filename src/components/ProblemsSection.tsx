@@ -42,25 +42,6 @@ const ProblemsSection: React.FC<ProblemsSectionProps> = ({ t, problems, settings
     }, 2200);
   }, []);
 
-  const copyWithLegacyClipboard = React.useCallback((text: string): boolean => {
-    if (typeof document === 'undefined') {
-      return false;
-    }
-    const textArea = document.createElement('textarea');
-    textArea.value = text;
-    textArea.setAttribute('readonly', '');
-    textArea.style.position = 'fixed';
-    textArea.style.top = '-9999px';
-    textArea.style.opacity = '0';
-    document.body.appendChild(textArea);
-    textArea.select();
-    textArea.setSelectionRange(0, textArea.value.length);
-    const copied =
-      typeof document.execCommand === 'function' ? document.execCommand('copy') : false;
-    textArea.remove();
-    return copied;
-  }, []);
-
   const copyProblems = React.useCallback(async () => {
     if (problems.length === 0) {
       return;
@@ -72,7 +53,7 @@ const ProblemsSection: React.FC<ProblemsSectionProps> = ({ t, problems, settings
     try {
       if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(textToCopy);
-      } else if (!copyWithLegacyClipboard(textToCopy)) {
+      } else {
         throw new Error('clipboard_unavailable');
       }
       setCopyState('success');
@@ -81,7 +62,7 @@ const ProblemsSection: React.FC<ProblemsSectionProps> = ({ t, problems, settings
     } finally {
       scheduleCopyStateReset();
     }
-  }, [copyWithLegacyClipboard, problems, scheduleCopyStateReset]);
+  }, [problems, scheduleCopyStateReset]);
 
   const copyButtonText =
     copyState === 'success'

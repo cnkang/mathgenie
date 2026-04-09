@@ -26,8 +26,12 @@ const areOperationsEqual = (
   if (left.length !== right.length) {
     return false;
   }
-  const sortedLeft = [...left].sort();
-  const sortedRight = [...right].sort();
+  const sortedLeft = [...left].sort((operationA, operationB) =>
+    operationA.localeCompare(operationB)
+  );
+  const sortedRight = [...right].sort((operationA, operationB) =>
+    operationA.localeCompare(operationB)
+  );
   return sortedLeft.every((operation, index) => operation === sortedRight[index]);
 };
 

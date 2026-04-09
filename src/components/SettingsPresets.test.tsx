@@ -451,6 +451,6 @@ describe('SettingsPresets', () => {
     const buttons = screen.getAllByRole('button');
     fireEvent.click(buttons[0]);
 
-    expect(screen.getByText('Applied preset \"Beginner (1-10)\".')).toBeInTheDocument();
+    expect(screen.getByText('Applied preset "Beginner (1-10)".')).toBeInTheDocument();
   });
 });
