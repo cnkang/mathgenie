@@ -318,7 +318,7 @@ jobs:
           fi
 
           echo "✅ All browsers installed and verified successfully"
-        timeout-minutes: 15
+        timeout-minutes: 25
 
       - name: 🏗️ Build application
         run: pnpm build
@@ -476,7 +476,7 @@ jobs:
           fi
 
           echo "✅ Browser ${{ matrix.browser }} installed and verified successfully"
-        timeout-minutes: 15
+        timeout-minutes: 25
 
       - name: 🏗️ Build application
         run: pnpm build
