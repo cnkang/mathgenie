@@ -117,7 +117,7 @@
     "autoprefixer": "^10.5.0",
     "cssnano": "^7.1.5",
     "cssnano-preset-advanced": "^7.0.13",
-    "happy-dom": "^20.8.9",
+    "happy-dom": "^20.9.0",
     "husky": "^9.1.7",
     "identity-obj-proxy": "^3.0.0",
     "jiti": "^2.6.1",
