@@ -54,7 +54,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🗂️ Cache TypeScript
-        uses: actions/cache@v5.0.4
+        uses: actions/cache@v5.0.5
         with:
           path: |
             .tsbuildinfo
@@ -131,7 +131,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🗂️ Cache Vitest
-        uses: actions/cache@v5.0.4
+        uses: actions/cache@v5.0.5
         with:
           path: |
             node_modules/.vitest
@@ -227,7 +227,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🗂️ Cache build output
-        uses: actions/cache@v5.0.4
+        uses: actions/cache@v5.0.5
         with:
           path: |
             dist
@@ -291,7 +291,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🎭 Cache Playwright browsers
-        uses: actions/cache@v5.0.4
+        uses: actions/cache@v5.0.5
         id: playwright-cache
         with:
           path: |
@@ -318,7 +318,7 @@ jobs:
           fi
 
           echo "✅ All browsers installed and verified successfully"
-        timeout-minutes: 15
+        timeout-minutes: 25
 
       - name: 🏗️ Build application
         run: pnpm build
@@ -448,7 +448,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🎭 Cache Playwright browsers
-        uses: actions/cache@v5.0.4
+        uses: actions/cache@v5.0.5
         id: playwright-cache
         with:
           path: |
@@ -476,7 +476,7 @@ jobs:
           fi
 
           echo "✅ Browser ${{ matrix.browser }} installed and verified successfully"
-        timeout-minutes: 15
+        timeout-minutes: 25
 
       - name: 🏗️ Build application
         run: pnpm build
@@ -886,7 +886,7 @@ jobs:
 
     steps:
       - name: 🤖 Enable auto-merge (with direct merge fallback)
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const { owner, repo } = context.repo;

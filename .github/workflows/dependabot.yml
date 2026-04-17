@@ -41,7 +41,7 @@ jobs:
 
       - name: 🔍 Analyze Dependabot PR
         id: analysis
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           UPDATE_TYPE: ${{ steps.metadata.outputs.update-type }}
           DEPENDENCY_TYPE: ${{ steps.metadata.outputs.dependency-type }}
@@ -235,7 +235,7 @@ jobs:
       issues: write
     steps:
       - name: 📢 Request manual review
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           UPDATE_TYPE: ${{ needs.dependabot-analysis.outputs.update_type }}
         with:
@@ -303,7 +303,7 @@ jobs:
       issues: write
     steps:
       - name: ❌ Handle CI failure
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const pr = context.payload.pull_request;
