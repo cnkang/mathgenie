@@ -11,7 +11,8 @@ concurrency:
 
 env:
   NODE_VERSION: "24.14.1"
-  PNPM_VERSION: "10.30.1+sha512.3590e550d5384caa39bd5c7c739f72270234b2f6059e13018f975c313b1eb9fefcc09714048765d4d9efe961382c312e624572c0420762bdc5d5940cdf9be73a"
+  PNPM_VERSION: "10.30.1"
+  PNPM_PACKAGE_JSON_FILE: ".github/pnpm-action-setup.package.json"
 
 jobs:
   # Job 1: Dependabot PR Analysis
@@ -197,6 +198,7 @@ jobs:
         with:
           run_install: false
           version: ${{ env.PNPM_VERSION }}
+          package_json_file: ${{ env.PNPM_PACKAGE_JSON_FILE }}
           standalone: true
 
       - name: 📦 Setup Node.js
