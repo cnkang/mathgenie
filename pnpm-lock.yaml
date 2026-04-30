@@ -41,8 +41,8 @@ importers:
         version: 5.2.0
     devDependencies:
       '@axe-core/playwright':
-        specifier: ^4.11.2
-        version: 4.11.2(playwright-core@1.59.1)
+        specifier: ^4.11.3
+        version: 4.11.3(playwright-core@1.59.1)
       '@biomejs/biome':
         specifier: ^2.4.13
         version: 2.4.13
@@ -124,8 +124,8 @@ importers:
 
 packages:
 
-  '@axe-core/playwright@4.11.2':
-    resolution: {integrity: sha512-iP6hfNl9G0j/SEUSo8M7D80RbcDo9KRAAfDP4IT5OHB+Wm6zUHIrm8Y51BKI+Oyqduvipf9u1hcRy57zCBKzWQ==}
+  '@axe-core/playwright@4.11.3':
+    resolution: {integrity: sha512-h/kfksv4F0cVIDlKpT4700OehdRgpvuVskuQ2nb7/JmtWUXpe9ftHAPtwyXGvVSsa6SJ64A9ER7Zrzc/sIvC4w==}
     peerDependencies:
       playwright-core: '>= 1.0.0'
 
@@ -804,8 +804,8 @@ packages:
     peerDependencies:
       postcss: ^8.1.0
 
-  axe-core@4.11.3:
-    resolution: {integrity: sha512-zBQouZixDTbo3jMGqHKyePxYxr1e5W8UdTmBQ7sNtaA9M2bE32daxxPLS/jojhKOHxQ7LWwPjfiwf/fhaJWzlg==}
+  axe-core@4.11.4:
+    resolution: {integrity: sha512-KunSNx+TVpkAw/6ULfhnx+HWRecjqZGTOyquAoWHYLRSdK1tB5Ihce1ZW+UY3fj33bYAFWPu7W/GRSmmrCGuxA==}
     engines: {node: '>=4'}
 
   b4a@1.8.0:
@@ -2414,6 +2414,7 @@ packages:
 
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   vary@1.1.2:
@@ -2606,9 +2607,9 @@ packages:
 
 snapshots:
 
-  '@axe-core/playwright@4.11.2(playwright-core@1.59.1)':
+  '@axe-core/playwright@4.11.3(playwright-core@1.59.1)':
     dependencies:
-      axe-core: 4.11.3
+      axe-core: 4.11.4
       playwright-core: 1.59.1
 
   '@babel/code-frame@7.29.0':
@@ -3179,7 +3180,7 @@ snapshots:
       postcss: 8.5.12
       postcss-value-parser: 4.2.0
 
-  axe-core@4.11.3: {}
+  axe-core@4.11.4: {}
 
   b4a@1.8.0: {}
 
@@ -3996,7 +3997,7 @@ snapshots:
     dependencies:
       '@paulirish/trace_engine': 0.0.53
       '@sentry/node': 7.120.4
-      axe-core: 4.11.3
+      axe-core: 4.11.4
       chrome-launcher: 1.2.1
       configstore: 5.0.1
       csp_evaluator: 1.1.5
