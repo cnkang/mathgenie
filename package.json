@@ -121,7 +121,7 @@
     "husky": "^9.1.7",
     "identity-obj-proxy": "^3.0.0",
     "jiti": "^2.6.1",
-    "postcss": "^8.5.13",
+    "postcss": "^8.5.14",
     "terser": "^5.46.2",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3",
