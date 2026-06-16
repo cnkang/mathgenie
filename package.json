@@ -7,6 +7,23 @@
   "engines": {
     "node": "24.16.0"
   },
+  "pnpm": {
+    "overrides": {
+      "vite": "npm:@voidzero-dev/vite-plus-core@latest",
+      "vitest": "npm:@voidzero-dev/vite-plus-test@latest",
+      "glob": "^11.0.3",
+      "js-yaml": "^4.1.1",
+      "rimraf": "^6.0.1",
+      "chrome-launcher": "^1.2.0",
+      "tmp": "^0.2.5",
+      "os-tmpdir": "^2.0.0",
+      "punycode": "npm:punycode.js@^2.3.1",
+      "path-to-regexp": "^8.4.0",
+      "@babel/plugin-proposal-private-methods": "npm:@babel/plugin-transform-private-methods@^7.27.1",
+      "express": "^5.2.0",
+      "picomatch@>=4.0.0 <4.0.4": "4.0.4"
+    }
+  },
   "sideEffects": [
     "*.css",
     "./src/index.tsx",

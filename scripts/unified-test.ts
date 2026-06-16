@@ -69,7 +69,7 @@ function log(level: LogLevel, message: string): void {
  * Execute command safely using spawnSync with multiple fallback strategies
  * This provides maximum compatibility across different environments
  */
-function safeSpawn(command: string, args: string[], env: Record<string, string> = {}): void {
+function buildCleanEnv(callerEnv: Record<string, string>): Record<string, string> {
   // SONAR-SAFE (S4036): Use restricted PATH with fixed system directories and current Node bin.
   const restrictedPath =
     process.platform === "win32"
@@ -84,51 +84,53 @@ function safeSpawn(command: string, args: string[], env: Record<string, string> 
     cleanEnv.Path = restrictedPath;
   }
 
-  // Only merge caller-provided env onto sanitized base.
-  for (const [key, value] of Object.entries(env)) {
+  for (const [key, value] of Object.entries(callerEnv)) {
     if (typeof value === "string") {
       cleanEnv[key] = value;
     }
   }
+  return cleanEnv;
+}
 
-  // Strategy 1: Direct execution
+function tryExecutionStrategies(
+  command: string,
+  args: string[],
+  cleanEnv: Record<string, string>,
+): boolean {
   const executablePath = findExecutable(command);
   if (executablePath && tryExecution(process.execPath, [executablePath, ...args], cleanEnv)) {
-    return;
+    return true;
   }
-
-  // Strategy 2: direct executable (non-node fallback)
   if (executablePath && tryExecution(executablePath, args, cleanEnv)) {
-    return;
+    return true;
   }
 
-  // Strategy 3: Vite+ managed binary execution
   const vpExecutablePath = findExecutable("vp");
-  if (
-    command === "vitest" &&
-    vpExecutablePath &&
-    tryExecution(process.execPath, [vpExecutablePath, "test", ...args], cleanEnv)
-  ) {
-    return;
+  if (command === "vitest" && vpExecutablePath) {
+    if (tryExecution(process.execPath, [vpExecutablePath, "test", ...args], cleanEnv)) {
+      return true;
+    }
   }
-  if (
-    vpExecutablePath &&
-    tryExecution(process.execPath, [vpExecutablePath, "exec", command, ...args], cleanEnv)
-  ) {
-    return;
+  if (vpExecutablePath && tryExecution(process.execPath, [vpExecutablePath, "exec", command, ...args], cleanEnv)) {
+    return true;
   }
 
-  // Strategy 4: pnpm exec
   if (isCommandAvailable("pnpm") && tryExecution("pnpm", ["exec", command, ...args], cleanEnv)) {
-    return;
+    return true;
   }
-
-  // Strategy 5: npx
   if (isCommandAvailable("npx") && tryExecution("npx", [command, ...args], cleanEnv)) {
-    return;
+    return true;
   }
 
-  throw new Error(`Failed to execute ${command}`);
+  return false;
+}
+
+function safeSpawn(command: string, args: string[], env: Record<string, string> = {}): void {
+  const cleanEnv = buildCleanEnv(env);
+
+  if (!tryExecutionStrategies(command, args, cleanEnv)) {
+    throw new Error(`Failed to execute ${command}`);
+  }
 }
 
 function tryExecution(executable: string, args: string[], env: Record<string, string>): boolean {
