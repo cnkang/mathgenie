@@ -5,16 +5,16 @@
 
 // Browser detection utilities
 export const getBrowserInfo = () => {
-  if (typeof navigator === 'undefined') {
+  if (typeof navigator === "undefined") {
     return { isFirefox: false, isChrome: false, isSafari: false, isEdge: false };
   }
 
   const { userAgent } = navigator;
   return {
-    isFirefox: userAgent.includes('Firefox'),
-    isChrome: userAgent.includes('Chrome') && !userAgent.includes('Edg'), // Edge uses 'Edg' not 'Edge'
-    isSafari: userAgent.includes('Safari') && !userAgent.includes('Chrome'),
-    isEdge: userAgent.includes('Edg'), // Modern Edge uses 'Edg' in user agent
+    isFirefox: userAgent.includes("Firefox"),
+    isChrome: userAgent.includes("Chrome") && !userAgent.includes("Edg"), // Edge uses 'Edg' not 'Edge'
+    isSafari: userAgent.includes("Safari") && !userAgent.includes("Chrome"),
+    isEdge: userAgent.includes("Edg"), // Modern Edge uses 'Edg' in user agent
   };
 };
 
@@ -38,7 +38,7 @@ export const getFirefoxOptimizations = () => ({
     childList: true,
     subtree: false,
     attributes: true,
-    attributeFilter: ['style', 'class'],
+    attributeFilter: ["style", "class"],
   },
 
   // Use getBoundingClientRect instead of computed styles when possible
@@ -61,7 +61,7 @@ export const getChromeOptimizations = () => ({
     childList: true,
     subtree: true,
     attributes: true,
-    attributeFilter: ['style', 'class', 'hidden'],
+    attributeFilter: ["style", "class", "hidden"],
   },
   preferBoundingRect: false,
   batchStyleUpdates: false,
@@ -82,7 +82,7 @@ export const getBrowserOptimizations = () => {
 const logPerformanceWarning = (
   isFirefox: boolean,
   duration: number,
-  operationName: string
+  operationName: string,
 ): void => {
   if (isFirefox && duration > 10) {
     console.warn(`Firefox: Slow DOM operation "${operationName}" took ${duration.toFixed(2)}ms`);
@@ -105,7 +105,7 @@ const handleDOMOperationMeasurement = <T>(
   operation: () => T,
   operationName: string,
   isFirefox: boolean,
-  shouldMeasure: boolean
+  shouldMeasure: boolean,
 ): T => {
   if (!shouldMeasure) {
     return operation();
@@ -136,7 +136,7 @@ export const createPerformanceMonitor = () => {
 
 // Helper function to create Firefox-specific styles
 const createFirefoxStyles = (): HTMLStyleElement => {
-  const style = document.createElement('style');
+  const style = document.createElement("style");
   style.textContent = `
     /* Firefox-specific performance optimizations */
     * {
@@ -167,7 +167,7 @@ const createFirefoxStyles = (): HTMLStyleElement => {
 // Utility to apply browser-specific CSS optimizations
 export const applyBrowserSpecificStyles = () => {
   const { isFirefox } = getBrowserInfo();
-  const isDocumentAvailable = typeof document !== 'undefined';
+  const isDocumentAvailable = typeof document !== "undefined";
 
   if (isFirefox && isDocumentAvailable) {
     // Add Firefox-specific CSS optimizations

@@ -1,37 +1,37 @@
-import { act, renderHook } from '@testing-library/react';
-import { createSuspenseResource, useErrorRecovery, useReact19Features } from './useReact19Features';
+import { act, renderHook } from "@testing-library/react";
+import { createSuspenseResource, useErrorRecovery, useReact19Features } from "./useReact19Features";
 
-describe('useReact19Features', () => {
-  test('should provide optimistic state and transition utilities', () => {
+describe("useReact19Features", () => {
+  test("should provide optimistic state and transition utilities", () => {
     const { result } = renderHook(() => useReact19Features());
 
-    expect(typeof result.current.optimisticState).toBe('object');
-    expect(typeof result.current.updateOptimistic).toBe('function');
-    expect(typeof result.current.isPending).toBe('boolean');
-    expect(typeof result.current.startTransition).toBe('function');
+    expect(typeof result.current.optimisticState).toBe("object");
+    expect(typeof result.current.updateOptimistic).toBe("function");
+    expect(typeof result.current.isPending).toBe("boolean");
+    expect(typeof result.current.startTransition).toBe("function");
   });
 
-  test('should have optimistic state with initial values', () => {
+  test("should have optimistic state with initial values", () => {
     const { result } = renderHook(() => useReact19Features());
 
-    expect(result.current.optimisticState.data).toBe('initial');
+    expect(result.current.optimisticState.data).toBe("initial");
     expect(result.current.optimisticState.isPending).toBe(false);
 
     act(() => {
-      result.current.updateOptimistic('updated');
+      result.current.updateOptimistic("updated");
     });
 
-    expect(typeof result.current.updateOptimistic).toBe('function');
+    expect(typeof result.current.updateOptimistic).toBe("function");
   });
 
-  test('should provide transition utilities', () => {
+  test("should provide transition utilities", () => {
     const { result } = renderHook(() => useReact19Features());
 
-    expect(typeof result.current.isPending).toBe('boolean');
-    expect(typeof result.current.startTransition).toBe('function');
+    expect(typeof result.current.isPending).toBe("boolean");
+    expect(typeof result.current.startTransition).toBe("function");
   });
 
-  test('should execute startTransition callback', () => {
+  test("should execute startTransition callback", () => {
     const { result } = renderHook(() => useReact19Features());
 
     const mockCallback = vi.fn();
@@ -44,18 +44,18 @@ describe('useReact19Features', () => {
   });
 });
 
-describe('createSuspenseResource', () => {
-  test('should create suspense resource for resolved promise', async () => {
-    const promise = Promise.resolve('test data');
+describe("createSuspenseResource", () => {
+  test("should create suspense resource for resolved promise", async () => {
+    const promise = Promise.resolve("test data");
     const resource = createSuspenseResource(promise);
 
     await promise;
 
-    expect(resource.read()).toBe('test data');
+    expect(resource.read()).toBe("test data");
   });
 
-  test('should throw error for rejected promise', async () => {
-    const error = new Error('Test error');
+  test("should throw error for rejected promise", async () => {
+    const error = new Error("Test error");
     const promise = Promise.reject(error);
     const resource = createSuspenseResource(promise);
 
@@ -65,10 +65,10 @@ describe('createSuspenseResource', () => {
       // Expected to reject
     }
 
-    expect(() => resource.read()).toThrow('Test error');
+    expect(() => resource.read()).toThrow("Test error");
   });
 
-  test('should throw suspender for pending promise', () => {
+  test("should throw suspender for pending promise", () => {
     const promise = new Promise(() => {}); // Never resolves
     const resource = createSuspenseResource(promise);
 
@@ -76,15 +76,15 @@ describe('createSuspenseResource', () => {
   });
 });
 
-describe('useErrorRecovery', () => {
-  test('should provide error recovery utilities', () => {
+describe("useErrorRecovery", () => {
+  test("should provide error recovery utilities", () => {
     const { result } = renderHook(() => useErrorRecovery());
 
-    expect(typeof result.current.recoverFromError).toBe('function');
-    expect(typeof result.current.isRecovering).toBe('boolean');
+    expect(typeof result.current.recoverFromError).toBe("function");
+    expect(typeof result.current.isRecovering).toBe("boolean");
   });
 
-  test('should handle recovery action', () => {
+  test("should handle recovery action", () => {
     const { result } = renderHook(() => useErrorRecovery());
 
     const mockRecoveryAction = vi.fn();
@@ -96,12 +96,12 @@ describe('useErrorRecovery', () => {
     expect(mockRecoveryAction).toHaveBeenCalled();
   });
 
-  test('should handle recovery action errors gracefully', () => {
+  test("should handle recovery action errors gracefully", () => {
     const { result } = renderHook(() => useErrorRecovery());
 
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const errorAction = vi.fn(() => {
-      throw new Error('Recovery failed');
+      throw new Error("Recovery failed");
     });
 
     act(() => {
@@ -109,7 +109,7 @@ describe('useErrorRecovery', () => {
     });
 
     expect(errorAction).toHaveBeenCalled();
-    expect(consoleSpy).toHaveBeenCalledWith('Error recovery failed:', expect.any(Error));
+    expect(consoleSpy).toHaveBeenCalledWith("Error recovery failed:", expect.any(Error));
 
     consoleSpy.mockRestore();
   });

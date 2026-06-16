@@ -1,10 +1,10 @@
-import { describe, expect, it } from 'vitest';
-import type { Settings } from '../types';
-import { useSettingsValidation } from './useSettingsValidation';
+import { describe, expect, it } from "vite-plus/test";
+import type { Settings } from "../types";
+import { useSettingsValidation } from "./useSettingsValidation";
 
-describe('useSettingsValidation', () => {
+describe("useSettingsValidation", () => {
   const mockSettings: Settings = {
-    operations: ['+', '-'],
+    operations: ["+", "-"],
     numRange: [1, 10],
     resultRange: [0, 20],
     numProblems: 5,
@@ -13,31 +13,31 @@ describe('useSettingsValidation', () => {
     showAnswers: true,
     fontSize: 12,
     lineSpacing: 1.5,
-    paperSize: 'a4',
+    paperSize: "a4",
     enableGrouping: false,
     problemsPerGroup: 20,
     totalGroups: 1,
   };
 
-  it('should identify validation sensitive fields correctly', () => {
+  it("should identify validation sensitive fields correctly", () => {
     const { isValidationSensitiveField } = useSettingsValidation();
 
     // Validation sensitive fields
-    expect(isValidationSensitiveField('numProblems')).toBe(true);
-    expect(isValidationSensitiveField('numRange')).toBe(true);
-    expect(isValidationSensitiveField('resultRange')).toBe(true);
-    expect(isValidationSensitiveField('numOperandsRange')).toBe(true);
-    expect(isValidationSensitiveField('operations')).toBe(true);
+    expect(isValidationSensitiveField("numProblems")).toBe(true);
+    expect(isValidationSensitiveField("numRange")).toBe(true);
+    expect(isValidationSensitiveField("resultRange")).toBe(true);
+    expect(isValidationSensitiveField("numOperandsRange")).toBe(true);
+    expect(isValidationSensitiveField("operations")).toBe(true);
 
     // Non-validation sensitive fields
-    expect(isValidationSensitiveField('allowNegative')).toBe(false);
-    expect(isValidationSensitiveField('showAnswers')).toBe(false);
-    expect(isValidationSensitiveField('fontSize')).toBe(false);
-    expect(isValidationSensitiveField('lineSpacing')).toBe(false);
-    expect(isValidationSensitiveField('paperSize')).toBe(false);
+    expect(isValidationSensitiveField("allowNegative")).toBe(false);
+    expect(isValidationSensitiveField("showAnswers")).toBe(false);
+    expect(isValidationSensitiveField("fontSize")).toBe(false);
+    expect(isValidationSensitiveField("lineSpacing")).toBe(false);
+    expect(isValidationSensitiveField("paperSize")).toBe(false);
   });
 
-  it('should detect restrictive settings with small ranges and many problems', () => {
+  it("should detect restrictive settings with small ranges and many problems", () => {
     const { checkRestrictiveSettings } = useSettingsValidation();
 
     // Restrictive settings: small result range (< 10) and many problems (> 50)
@@ -50,7 +50,7 @@ describe('useSettingsValidation', () => {
     expect(checkRestrictiveSettings(restrictiveSettings)).toBe(true);
   });
 
-  it('should detect restrictive settings with small num range and many problems', () => {
+  it("should detect restrictive settings with small num range and many problems", () => {
     const { checkRestrictiveSettings } = useSettingsValidation();
 
     // Restrictive settings: small num range (< 5) and many problems (> 50)
@@ -63,7 +63,7 @@ describe('useSettingsValidation', () => {
     expect(checkRestrictiveSettings(restrictiveSettings)).toBe(true);
   });
 
-  it('should not detect restrictive settings with large ranges', () => {
+  it("should not detect restrictive settings with large ranges", () => {
     const { checkRestrictiveSettings } = useSettingsValidation();
 
     // Non-restrictive settings: large ranges
@@ -77,7 +77,7 @@ describe('useSettingsValidation', () => {
     expect(checkRestrictiveSettings(nonRestrictiveSettings)).toBe(false);
   });
 
-  it('should not detect restrictive settings with few problems', () => {
+  it("should not detect restrictive settings with few problems", () => {
     const { checkRestrictiveSettings } = useSettingsValidation();
 
     // Non-restrictive settings: few problems
@@ -91,7 +91,7 @@ describe('useSettingsValidation', () => {
     expect(checkRestrictiveSettings(nonRestrictiveSettings)).toBe(false);
   });
 
-  it('should handle edge cases for range sizes', () => {
+  it("should handle edge cases for range sizes", () => {
     const { checkRestrictiveSettings } = useSettingsValidation();
 
     // Edge case: exactly at the threshold
@@ -105,7 +105,7 @@ describe('useSettingsValidation', () => {
     expect(checkRestrictiveSettings(edgeCaseSettings)).toBe(false);
   });
 
-  it('should handle negative ranges correctly', () => {
+  it("should handle negative ranges correctly", () => {
     const { checkRestrictiveSettings } = useSettingsValidation();
 
     // Settings with negative ranges

@@ -1,20 +1,24 @@
-import { cpus } from 'os';
-import { resolve } from 'path';
-import { defineConfig } from 'vite';
+import { cpus } from "os";
+import { resolve } from "path";
+import { defineConfig } from "vite-plus";
 
 // CI环境专用的测试配置
 export default defineConfig({
   test: {
-    environment: 'happy-dom',
+    environment: "happy-dom",
     globals: true,
-    setupFiles: './src/setupTests.ts',
+    setupFiles: "./src/setupTests.ts",
     css: true,
 
     // CI环境优化配置
-    pool: 'threads',
-    // Vitest 4: poolOptions moved to top-level
-    maxThreads: Math.min(4, Math.ceil(cpus().length / 2)),
-    minThreads: 1,
+    pool: "threads",
+    // @ts-expect-error Vite+ config types lag Vitest's thread pool option shape.
+    poolOptions: {
+      threads: {
+        maxThreads: Math.min(4, Math.ceil(cpus().length / 2)),
+        minThreads: 1,
+      },
+    },
 
     // 适中的并发数以平衡速度和稳定性
     maxConcurrency: 4,
@@ -29,45 +33,45 @@ export default defineConfig({
     hookTimeout: 10000,
 
     exclude: [
-      '**/node_modules/**',
-      '**/dist/**',
-      '**/tests/e2e/**',
-      '**/tests/smoke/**',
-      '**/*.e2e.spec.ts',
-      '**/*.smoke.spec.ts',
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/tests/e2e/**",
+      "**/tests/smoke/**",
+      "**/*.e2e.spec.ts",
+      "**/*.smoke.spec.ts",
     ],
 
     coverage: {
-      enabled: process.env.VITEST_COVERAGE === '1',
-      provider: 'v8',
-      reporter: ['text', 'json', 'html', 'lcov'],
-      reportsDirectory: 'coverage',
+      enabled: process.env.VITEST_COVERAGE === "1",
+      provider: "v8",
+      reporter: ["text", "json", "html", "lcov"],
+      reportsDirectory: "coverage",
       exclude: [
-        '**/*.config.{js,ts,cjs}',
-        '**/*.test.{js,ts,jsx,tsx}',
-        '**/*.spec.{js,ts,jsx,tsx}',
-        '**/tests/**',
-        '**/coverage/**',
-        '**/dist/**',
-        '**/node_modules/**',
-        '**/scripts/**',
-        '**/src/index.tsx',
-        '**/src/setupTests.ts',
-        '**/src/reportWebVitals.ts',
-        '**/public/**',
-        '**/*.svg',
-        '**/*.css',
-        '**/src/i18n/translations/**',
-        '**/src/types/**',
-        '**/src/utils/serviceWorker.ts',
-        '**/lighthouserc.{js,ts,cjs}',
-        '**/playwright-report/**',
-        '**/test-results/**',
-        '**/postcss.config.cjs',
-        '**/vite.config.ts',
-        '**/vite/**',
-        'vite/**',
-        '**/dynamic-import-helper.js',
+        "**/*.config.{js,ts,cjs}",
+        "**/*.test.{js,ts,jsx,tsx}",
+        "**/*.spec.{js,ts,jsx,tsx}",
+        "**/tests/**",
+        "**/coverage/**",
+        "**/dist/**",
+        "**/node_modules/**",
+        "**/scripts/**",
+        "**/src/index.tsx",
+        "**/src/setupTests.ts",
+        "**/src/reportWebVitals.ts",
+        "**/public/**",
+        "**/*.svg",
+        "**/*.css",
+        "**/src/i18n/translations/**",
+        "**/src/types/**",
+        "**/src/utils/serviceWorker.ts",
+        "**/lighthouserc.{js,ts,cjs}",
+        "**/playwright-report/**",
+        "**/test-results/**",
+        "**/postcss.config.cjs",
+        "**/vite.config.ts",
+        "**/vite/**",
+        "vite/**",
+        "**/dynamic-import-helper.js",
       ],
       thresholds: {
         global: {
@@ -81,23 +85,23 @@ export default defineConfig({
   },
 
   resolve: {
-    extensions: ['.js', '.jsx', '.ts', '.tsx'],
+    extensions: [".js", ".jsx", ".ts", ".tsx"],
     alias: {
-      '@': resolve(__dirname, './src'),
-      '@/components': resolve(__dirname, './src/components'),
-      '@/hooks': resolve(__dirname, './src/hooks'),
-      '@/utils': resolve(__dirname, './src/utils'),
-      '@/i18n': resolve(__dirname, './src/i18n'),
-      '@/types': resolve(__dirname, './src/types'),
+      "@": resolve(__dirname, "./src"),
+      "@/components": resolve(__dirname, "./src/components"),
+      "@/hooks": resolve(__dirname, "./src/hooks"),
+      "@/utils": resolve(__dirname, "./src/utils"),
+      "@/i18n": resolve(__dirname, "./src/i18n"),
+      "@/types": resolve(__dirname, "./src/types"),
     },
   },
 
   // 优化依赖预构建
   optimizeDeps: {
-    include: ['react', 'react-dom', 'jspdf'],
-    exclude: ['@vercel/speed-insights'],
+    include: ["react", "react-dom", "jspdf"],
+    exclude: ["@vercel/speed-insights"],
     esbuildOptions: {
-      target: 'es2022',
+      target: "es2022",
     },
   },
 });

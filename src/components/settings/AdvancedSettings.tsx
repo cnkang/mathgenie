@@ -1,11 +1,11 @@
-import React from 'react';
-import { useTranslation } from '@/i18n';
-import type { Settings } from '@/types';
+import React from "react";
+import { useTranslation } from "@/i18n";
+import type { Settings } from "@/types";
 
 // Do not edit manually.
-const STR_ADVANCED_SETTINGS_CONTENT = 'advanced-settings-content' as const;
-const STR_ALLOWNEGATIVE = 'allowNegative' as const;
-const STR_SHOWANSWERS = 'showAnswers' as const;
+const STR_ADVANCED_SETTINGS_CONTENT = "advanced-settings-content" as const;
+const STR_ALLOWNEGATIVE = "allowNegative" as const;
+const STR_SHOWANSWERS = "showAnswers" as const;
 
 type OnChange = <K extends keyof Settings>(field: K, value: Settings[K]) => void;
 
@@ -15,18 +15,18 @@ type AdvancedSettingsProps = {
 };
 
 const SettingsIcon: React.FC = () => (
-  <svg viewBox='0 0 24 24' width='16' height='16' fill='none' aria-hidden='true'>
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
     <path
-      d='M12 9.5A2.5 2.5 0 1 0 12 14.5 2.5 2.5 0 0 0 12 9.5Z'
-      stroke='currentColor'
-      strokeWidth='2'
+      d="M12 9.5A2.5 2.5 0 1 0 12 14.5 2.5 2.5 0 0 0 12 9.5Z"
+      stroke="currentColor"
+      strokeWidth="2"
     />
     <path
-      d='M19.4 15a1 1 0 0 0 .2 1.1l.1.1a1 1 0 0 1 0 1.4l-1.1 1.1a1 1 0 0 1-1.4 0l-.1-.1a1 1 0 0 0-1.1-.2 1 1 0 0 0-.6.9V20a1 1 0 0 1-1 1h-1.8a1 1 0 0 1-1-1v-.2a1 1 0 0 0-.6-.9 1 1 0 0 0-1.1.2l-.1.1a1 1 0 0 1-1.4 0l-1.1-1.1a1 1 0 0 1 0-1.4l.1-.1a1 1 0 0 0 .2-1.1 1 1 0 0 0-.9-.6H4a1 1 0 0 1-1-1v-1.8a1 1 0 0 1 1-1h.2a1 1 0 0 0 .9-.6 1 1 0 0 0-.2-1.1l-.1-.1a1 1 0 0 1 0-1.4l1.1-1.1a1 1 0 0 1 1.4 0l.1.1a1 1 0 0 0 1.1.2 1 1 0 0 0 .6-.9V4a1 1 0 0 1 1-1h1.8a1 1 0 0 1 1 1v.2a1 1 0 0 0 .6.9 1 1 0 0 0 1.1-.2l.1-.1a1 1 0 0 1 1.4 0l1.1 1.1a1 1 0 0 1 0 1.4l-.1.1a1 1 0 0 0-.2 1.1 1 1 0 0 0 .9.6h.2a1 1 0 0 1 1 1v1.8a1 1 0 0 1-1 1h-.2a1 1 0 0 0-.9.6Z'
-      stroke='currentColor'
-      strokeWidth='1.6'
-      strokeLinecap='round'
-      strokeLinejoin='round'
+      d="M19.4 15a1 1 0 0 0 .2 1.1l.1.1a1 1 0 0 1 0 1.4l-1.1 1.1a1 1 0 0 1-1.4 0l-.1-.1a1 1 0 0 0-1.1-.2 1 1 0 0 0-.6.9V20a1 1 0 0 1-1 1h-1.8a1 1 0 0 1-1-1v-.2a1 1 0 0 0-.6-.9 1 1 0 0 0-1.1.2l-.1.1a1 1 0 0 1-1.4 0l-1.1-1.1a1 1 0 0 1 0-1.4l.1-.1a1 1 0 0 0 .2-1.1 1 1 0 0 0-.9-.6H4a1 1 0 0 1-1-1v-1.8a1 1 0 0 1 1-1h.2a1 1 0 0 0 .9-.6 1 1 0 0 0-.2-1.1l-.1-.1a1 1 0 0 1 0-1.4l1.1-1.1a1 1 0 0 1 1.4 0l.1.1a1 1 0 0 0 1.1.2 1 1 0 0 0 .6-.9V4a1 1 0 0 1 1-1h1.8a1 1 0 0 1 1 1v.2a1 1 0 0 0 .6.9 1 1 0 0 0 1.1-.2l.1-.1a1 1 0 0 1 1.4 0l1.1 1.1a1 1 0 0 1 0 1.4l-.1.1a1 1 0 0 0-.2 1.1 1 1 0 0 0 .9.6h.2a1 1 0 0 1 1 1v1.8a1 1 0 0 1-1 1h-.2a1 1 0 0 0-.9.6Z"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
   </svg>
 );
@@ -36,81 +36,81 @@ const AdvancedSettings: React.FC<AdvancedSettingsProps> = ({ settings, onChange 
 
   return (
     <details
-      className='advanced-settings'
-      onToggle={e => {
+      className="advanced-settings"
+      onToggle={(e) => {
         const isOpen = (e.target as HTMLDetailsElement).open;
         const announcement = isOpen
-          ? t('accessibility.advancedSettingsExpanded') || 'Advanced settings expanded'
-          : t('accessibility.advancedSettingsCollapsed') || 'Advanced settings collapsed';
+          ? t("accessibility.advancedSettingsExpanded") || "Advanced settings expanded"
+          : t("accessibility.advancedSettingsCollapsed") || "Advanced settings collapsed";
 
-        const announcer = document.createElement('div');
-        announcer.setAttribute('aria-live', 'polite');
-        announcer.setAttribute('aria-atomic', 'true');
-        announcer.className = 'sr-only';
+        const announcer = document.createElement("div");
+        announcer.setAttribute("aria-live", "polite");
+        announcer.setAttribute("aria-atomic", "true");
+        announcer.className = "sr-only";
         announcer.textContent = announcement;
         document.body.appendChild(announcer);
         setTimeout(() => announcer.remove(), 1000);
       }}
     >
       <summary
-        className='advanced-settings-toggle'
+        className="advanced-settings-toggle"
         aria-controls={STR_ADVANCED_SETTINGS_CONTENT}
-        aria-describedby='advanced-settings-desc'
-        onKeyDown={e => {
-          if (e.key === 'Escape' && (e.target as HTMLElement).closest('details')?.open) {
-            (e.target as HTMLElement).closest('details')?.removeAttribute('open');
+        aria-describedby="advanced-settings-desc"
+        onKeyDown={(e) => {
+          if (e.key === "Escape" && (e.target as HTMLElement).closest("details")?.open) {
+            (e.target as HTMLElement).closest("details")?.removeAttribute("open");
             e.preventDefault();
           }
         }}
       >
-        <span aria-hidden='true'>
+        <span aria-hidden="true">
           <SettingsIcon />
         </span>
-        <span>{t('settings.advanced')}</span>
-        <span className='toggle-indicator' aria-hidden='true'>
-          <span className='toggle-icon'>▼</span>
-          <span className='sr-only toggle-status'>
-            {t('accessibility.clickToExpand') || 'Click to expand'}
+        <span>{t("settings.advanced")}</span>
+        <span className="toggle-indicator" aria-hidden="true">
+          <span className="toggle-icon">▼</span>
+          <span className="sr-only toggle-status">
+            {t("accessibility.clickToExpand") || "Click to expand"}
           </span>
         </span>
       </summary>
       <section
         id={STR_ADVANCED_SETTINGS_CONTENT}
         className={STR_ADVANCED_SETTINGS_CONTENT}
-        aria-labelledby='advanced-settings-toggle'
+        aria-labelledby="advanced-settings-toggle"
       >
-        <div id='advanced-settings-desc' className='sr-only'>
-          {t('accessibility.advancedSettingsDesc') ||
-            'Advanced settings for problem generation including negative numbers and answer display options'}
+        <div id="advanced-settings-desc" className="sr-only">
+          {t("accessibility.advancedSettingsDesc") ||
+            "Advanced settings for problem generation including negative numbers and answer display options"}
         </div>
-        <div className='checkbox-item'>
+        <div className="checkbox-item">
           <input
-            type='checkbox'
+            type="checkbox"
             id={STR_ALLOWNEGATIVE}
             checked={settings.allowNegative}
-            onChange={e => onChange(STR_ALLOWNEGATIVE, e.target.checked)}
-            aria-label={t('accessibility.allowNegativeLabel')}
+            onChange={(e) => onChange(STR_ALLOWNEGATIVE, e.target.checked)}
+            aria-label={t("accessibility.allowNegativeLabel")}
           />
-          <div className='checkbox-content'>
-            <label htmlFor={STR_ALLOWNEGATIVE} className='checkbox-label'>
-              {t('settings.allowNegative')}
+          <div className="checkbox-content">
+            <label htmlFor={STR_ALLOWNEGATIVE} className="checkbox-label">
+              {t("settings.allowNegative")}
             </label>
-            <small className='checkbox-description'>{t('settings.allowNegativeDesc')}</small>
+            <small className="checkbox-description">{t("settings.allowNegativeDesc")}</small>
           </div>
         </div>
-        <div className='checkbox-item'>
+        <div className="checkbox-item">
           <input
-            type='checkbox'
+            type="checkbox"
             id={STR_SHOWANSWERS}
             checked={settings.showAnswers}
-            onChange={e => onChange(STR_SHOWANSWERS, e.target.checked)}
-            aria-label={t('accessibility.showAnswersLabel')}
+            onChange={(e) => onChange(STR_SHOWANSWERS, e.target.checked)}
+            aria-label={t("accessibility.showAnswersLabel")}
           />
-          <div className='checkbox-content'>
-            <label htmlFor={STR_SHOWANSWERS} className='checkbox-label'>
-              {t('settings.showAnswers')}
+          <div className="checkbox-content">
+            <label htmlFor={STR_SHOWANSWERS} className="checkbox-label">
+              {t("settings.showAnswers")}
             </label>
-            <small className='checkbox-description'>{t('settings.showAnswersDesc')}</small>
+            <small className="checkbox-description">{t("settings.showAnswersDesc")}</small>
           </div>
         </div>
       </section>

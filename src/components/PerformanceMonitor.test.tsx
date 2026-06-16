@@ -1,9 +1,9 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '../../tests/helpers/testUtils';
-import { setViteEnv, useViteEnv } from '../../tests/helpers/viteEnv';
-import PerformanceMonitor from './PerformanceMonitor';
+import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
+import { render, screen } from "../../tests/helpers/testUtils";
+import { setViteEnv, useViteEnv } from "../../tests/helpers/viteEnv";
+import PerformanceMonitor from "./PerformanceMonitor";
 
-const WINDOW_KEY = 'window' as const;
+const WINDOW_KEY = "window" as const;
 const setMockWindow = (value: unknown): void => {
   Object.defineProperty(globalThis, WINDOW_KEY, {
     value,
@@ -36,7 +36,7 @@ class MockPerformanceObserver {
 
 // PerformanceMonitor tests - now working with React DOM 19.2.0 + happy-dom
 // Fixed window availability issues in setupTests.ts
-describe('PerformanceMonitor', () => {
+describe("PerformanceMonitor", () => {
   let originalPerformanceObserver: typeof PerformanceObserver;
   let consoleLogSpy: ReturnType<typeof vi.spyOn>;
   let consoleWarnSpy: ReturnType<typeof vi.spyOn>;
@@ -47,8 +47,8 @@ describe('PerformanceMonitor', () => {
     originalPerformanceObserver = globalThis.PerformanceObserver;
     globalThis.PerformanceObserver = MockPerformanceObserver as any;
 
-    consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {}) as any;
-    consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {}) as any;
+    consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => {}) as any;
+    consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {}) as any;
 
     vi.useFakeTimers();
   });
@@ -60,35 +60,35 @@ describe('PerformanceMonitor', () => {
     vi.useRealTimers();
   });
 
-  it('renders children correctly', () => {
+  it("renders children correctly", () => {
     render(
       <PerformanceMonitor>
         <div>Test Child</div>
-      </PerformanceMonitor>
+      </PerformanceMonitor>,
     );
 
-    expect(screen.getByText('Test Child')).toBeInTheDocument();
+    expect(screen.getByText("Test Child")).toBeInTheDocument();
   });
 
-  it('renders with empty children', () => {
+  it("renders with empty children", () => {
     const { container } = render(<PerformanceMonitor>{null}</PerformanceMonitor>);
     expect(container.firstChild).toBeNull();
   });
 
-  it('sets up performance observer', () => {
+  it("sets up performance observer", () => {
     render(
       <PerformanceMonitor>
         <div>Test</div>
-      </PerformanceMonitor>
+      </PerformanceMonitor>,
     );
 
     expect(MockPerformanceObserver).toBeDefined();
   });
 
-  it.skip('handles performance observer errors gracefully', () => {
+  it.skip("handles performance observer errors gracefully", () => {
     class ErrorObserver {
       observe(): void {
-        throw new Error('Observer not supported');
+        throw new Error("Observer not supported");
       }
       disconnect(): void {
         /* simulated unsupported environment */
@@ -100,16 +100,16 @@ describe('PerformanceMonitor', () => {
     render(
       <PerformanceMonitor>
         <div>Test</div>
-      </PerformanceMonitor>
+      </PerformanceMonitor>,
     );
 
     expect(consoleWarnSpy).toHaveBeenCalledWith(
-      'Performance observer not fully supported:',
-      expect.any(Error)
+      "Performance observer not fully supported:",
+      expect.any(Error),
     );
   });
 
-  it('works without performance.memory support', () => {
+  it("works without performance.memory support", () => {
     const originalMemory = (performance as any).memory;
     delete (performance as any).memory;
 
@@ -117,19 +117,19 @@ describe('PerformanceMonitor', () => {
       render(
         <PerformanceMonitor>
           <div>Test</div>
-        </PerformanceMonitor>
+        </PerformanceMonitor>,
       );
     }).not.toThrow();
 
     (performance as any).memory = originalMemory;
   });
 
-  it('logs performance metrics in development', () => {
-    setViteEnv('development');
+  it("logs performance metrics in development", () => {
+    setViteEnv("development");
 
     const mockObserver = new MockPerformanceObserver(() => {});
     const mockEntry = {
-      name: 'test-metric',
+      name: "test-metric",
       value: 100,
     };
 
@@ -138,12 +138,12 @@ describe('PerformanceMonitor', () => {
     render(
       <PerformanceMonitor>
         <div>Test</div>
-      </PerformanceMonitor>
+      </PerformanceMonitor>,
     );
   });
 
-  it.skip('handles memory monitoring with interval', () => {
-    setViteEnv('development');
+  it.skip("handles memory monitoring with interval", () => {
+    setViteEnv("development");
 
     const mockMemory = {
       usedJSHeapSize: 50 * 1048576,
@@ -151,7 +151,7 @@ describe('PerformanceMonitor', () => {
       jsHeapSizeLimit: 200 * 1048576,
     };
 
-    Object.defineProperty(performance, 'memory', {
+    Object.defineProperty(performance, "memory", {
       value: mockMemory,
       configurable: true,
     });
@@ -159,23 +159,23 @@ describe('PerformanceMonitor', () => {
     const { unmount } = render(
       <PerformanceMonitor>
         <div>Test</div>
-      </PerformanceMonitor>
+      </PerformanceMonitor>,
     );
 
     // Fast-forward time to trigger memory logging
     vi.advanceTimersByTime(30000);
 
-    expect(consoleLogSpy).toHaveBeenCalledWith('Memory usage:', {
-      used: '50 MB',
-      total: '100 MB',
-      limit: '200 MB',
+    expect(consoleLogSpy).toHaveBeenCalledWith("Memory usage:", {
+      used: "50 MB",
+      total: "100 MB",
+      limit: "200 MB",
     });
 
     unmount();
   });
 
-  it('handles production environment with gtag', () => {
-    setViteEnv('production');
+  it("handles production environment with gtag", () => {
+    setViteEnv("production");
 
     const mockGtag = vi.fn();
     setMockWindow({ gtag: mockGtag });
@@ -183,21 +183,21 @@ describe('PerformanceMonitor', () => {
     render(
       <PerformanceMonitor>
         <div>Test</div>
-      </PerformanceMonitor>
+      </PerformanceMonitor>,
     );
 
     deleteMockWindow();
   });
 
-  it('handles entries without value property', () => {
-    setViteEnv('development');
+  it("handles entries without value property", () => {
+    setViteEnv("development");
 
     // Mock window for this test
     setMockWindow({});
 
     const mockObserver = new MockPerformanceObserver(() => {});
     const mockEntry = {
-      name: 'test-metric',
+      name: "test-metric",
       duration: 200,
     };
 
@@ -206,13 +206,13 @@ describe('PerformanceMonitor', () => {
     render(
       <PerformanceMonitor>
         <div>Test</div>
-      </PerformanceMonitor>
+      </PerformanceMonitor>,
     );
 
     deleteMockWindow();
   });
 
-  it.skip('cleans up memory interval on unmount', () => {
+  it.skip("cleans up memory interval on unmount", () => {
     // Mock window for this test
     setMockWindow({});
 
@@ -222,17 +222,17 @@ describe('PerformanceMonitor', () => {
       jsHeapSizeLimit: 200 * 1048576,
     };
 
-    Object.defineProperty(performance, 'memory', {
+    Object.defineProperty(performance, "memory", {
       value: mockMemory,
       configurable: true,
     });
 
-    const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval');
+    const clearIntervalSpy = vi.spyOn(globalThis, "clearInterval");
 
     const { unmount } = render(
       <PerformanceMonitor>
         <div>Test</div>
-      </PerformanceMonitor>
+      </PerformanceMonitor>,
     );
 
     unmount();
@@ -242,8 +242,8 @@ describe('PerformanceMonitor', () => {
     deleteMockWindow();
   });
 
-  it.skip('triggers performance observer callback in development', () => {
-    setViteEnv('development');
+  it.skip("triggers performance observer callback in development", () => {
+    setViteEnv("development");
 
     setMockWindow({});
 
@@ -267,12 +267,12 @@ describe('PerformanceMonitor', () => {
     render(
       <PerformanceMonitor>
         <div>Test</div>
-      </PerformanceMonitor>
+      </PerformanceMonitor>,
     );
 
     const mockEntries = [
-      { name: 'test-metric', value: 100 },
-      { name: 'test-duration', duration: 200 },
+      { name: "test-metric", value: 100 },
+      { name: "test-duration", duration: 200 },
     ];
 
     const mockList = {
@@ -283,14 +283,14 @@ describe('PerformanceMonitor', () => {
       observerCallback(mockList as any, {} as any);
     }
 
-    expect(consoleLogSpy).toHaveBeenCalledWith('test-metric: 100ms');
-    expect(consoleLogSpy).toHaveBeenCalledWith('test-duration: 200ms');
+    expect(consoleLogSpy).toHaveBeenCalledWith("test-metric: 100ms");
+    expect(consoleLogSpy).toHaveBeenCalledWith("test-duration: 200ms");
 
     deleteMockWindow();
   });
 
-  it.skip('triggers performance observer callback in production with gtag', () => {
-    setViteEnv('production');
+  it.skip("triggers performance observer callback in production with gtag", () => {
+    setViteEnv("production");
 
     const mockGtag = vi.fn();
     setMockWindow({ gtag: mockGtag });
@@ -315,10 +315,10 @@ describe('PerformanceMonitor', () => {
     render(
       <PerformanceMonitor>
         <div>Test</div>
-      </PerformanceMonitor>
+      </PerformanceMonitor>,
     );
 
-    const mockEntries = [{ name: 'test-metric', value: 150 }];
+    const mockEntries = [{ name: "test-metric", value: 150 }];
 
     const mockList = {
       getEntries: () => mockEntries,
@@ -328,9 +328,9 @@ describe('PerformanceMonitor', () => {
       observerCallback(mockList as any, {} as any);
     }
 
-    expect(mockGtag).toHaveBeenCalledWith('event', 'web_vitals', {
-      event_category: 'Performance',
-      event_label: 'test-metric',
+    expect(mockGtag).toHaveBeenCalledWith("event", "web_vitals", {
+      event_category: "Performance",
+      event_label: "test-metric",
       value: 150,
       non_interaction: true,
     });
@@ -338,8 +338,8 @@ describe('PerformanceMonitor', () => {
     deleteMockWindow();
   });
 
-  it('handles production environment without gtag', () => {
-    setViteEnv('production');
+  it("handles production environment without gtag", () => {
+    setViteEnv("production");
 
     setMockWindow({});
 
@@ -363,10 +363,10 @@ describe('PerformanceMonitor', () => {
     render(
       <PerformanceMonitor>
         <div>Test</div>
-      </PerformanceMonitor>
+      </PerformanceMonitor>,
     );
 
-    const mockEntries = [{ name: 'test-metric', value: 150 }];
+    const mockEntries = [{ name: "test-metric", value: 150 }];
 
     const mockList = {
       getEntries: () => mockEntries,
@@ -381,8 +381,8 @@ describe('PerformanceMonitor', () => {
     deleteMockWindow();
   });
 
-  it.skip('handles entries with undefined/null values', () => {
-    setViteEnv('production');
+  it.skip("handles entries with undefined/null values", () => {
+    setViteEnv("production");
 
     const mockGtag = vi.fn();
     setMockWindow({ gtag: mockGtag });
@@ -407,12 +407,12 @@ describe('PerformanceMonitor', () => {
     render(
       <PerformanceMonitor>
         <div>Test</div>
-      </PerformanceMonitor>
+      </PerformanceMonitor>,
     );
 
     const mockEntries = [
-      { name: 'test-metric', value: null },
-      { name: 'test-duration', duration: undefined },
+      { name: "test-metric", value: null },
+      { name: "test-duration", duration: undefined },
     ];
 
     const mockList = {
@@ -423,9 +423,9 @@ describe('PerformanceMonitor', () => {
       observerCallback(mockList as any, {} as any);
     }
 
-    expect(mockGtag).toHaveBeenCalledWith('event', 'web_vitals', {
-      event_category: 'Performance',
-      event_label: 'test-metric',
+    expect(mockGtag).toHaveBeenCalledWith("event", "web_vitals", {
+      event_category: "Performance",
+      event_label: "test-metric",
       value: 0,
       non_interaction: true,
     });

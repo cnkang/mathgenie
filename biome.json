@@ -26,17 +26,17 @@
   },
   "javascript": {
     "formatter": {
-      "quoteStyle": "single",
-      "jsxQuoteStyle": "single",
+      "quoteStyle": "double",
+      "jsxQuoteStyle": "double",
       "semicolons": "always",
-      "arrowParentheses": "asNeeded",
-      "trailingCommas": "es5",
+      "arrowParentheses": "always",
+      "trailingCommas": "all",
       "bracketSpacing": true
     }
   },
   "css": {
     "formatter": {
-      "quoteStyle": "single"
+      "quoteStyle": "double"
     }
   }
 }

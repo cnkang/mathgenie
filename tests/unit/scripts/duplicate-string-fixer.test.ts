@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { applyDuplicateStringFixesToContent } from '../../../scripts/lib/duplicate-string-fixer';
+import { describe, it, expect } from "vite-plus/test";
+import { applyDuplicateStringFixesToContent } from "../../../scripts/lib/duplicate-string-fixer";
 
 const tsxSample = `
 import React from 'react';
@@ -15,18 +15,26 @@ export default function Demo() {
 }
 `;
 
-describe('duplicate-string-fixer', () => {
-  it('detects duplicates via AST and fixes them with constants', () => {
-    const filePath = 'virtual/Demo.tsx';
-    const { updated, replacedCount, constsAdded } = applyDuplicateStringFixesToContent(filePath, tsxSample, {
-      minLength: 6,
-      minCount: 3,
-    });
+describe("duplicate-string-fixer", () => {
+  it("detects duplicates via AST and fixes them with constants", () => {
+    const filePath = "virtual/Demo.tsx";
+    const { updated, replacedCount, constsAdded } = applyDuplicateStringFixesToContent(
+      filePath,
+      tsxSample,
+      {
+        minLength: 6,
+        minCount: 3,
+      },
+    );
 
     expect(replacedCount).toBeGreaterThanOrEqual(3);
     expect(constsAdded).toBe(1);
-    expect(updated).toContain('// AUTO-GENERATED: duplicate strings extracted by sonar-check --fix');
-    expect(updated).toMatch(/const\s+STR_QUICK_ACTION_CARD\s*=\s*["']quick-action-card["']\s+as\s+const;/);
+    expect(updated).toContain(
+      "// AUTO-GENERATED: duplicate strings extracted by sonar-check --fix",
+    );
+    expect(updated).toMatch(
+      /const\s+STR_QUICK_ACTION_CARD\s*=\s*["']quick-action-card["']\s+as\s+const;/,
+    );
     expect(updated).not.toContain("'quick-action-card'");
   });
 });

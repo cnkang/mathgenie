@@ -1,44 +1,85 @@
-import react from '@vitejs/plugin-react';
-import { resolve } from 'path';
-import { defineConfig } from 'vite';
-import viteCompression from 'vite-plugin-compression';
+import react from "@vitejs/plugin-react";
+import { resolve } from "path";
+import { defineConfig } from "vite-plus";
+import viteCompression from "vite-plugin-compression";
 
 const reactChunkPackages = new Set([
-  'react',
-  'react-dom',
-  'react-is',
-  'scheduler',
-  'use-sync-external-store',
+  "react",
+  "react-dom",
+  "react-is",
+  "scheduler",
+  "use-sync-external-store",
 ]);
 
-const jspdfOptionalHtmlDeps = ['canvg', 'core-js', 'dompurify', 'html2canvas'];
+const jspdfOptionalHtmlDeps = ["canvg", "core-js", "dompurify", "html2canvas"];
 
 const getPackageName = (id: string): string | null => {
-  const nodeModulesIndex = id.lastIndexOf('node_modules/');
+  const nodeModulesIndex = id.lastIndexOf("node_modules/");
   if (nodeModulesIndex === -1) {
     return null;
   }
-  const modulePath = id.slice(nodeModulesIndex + 'node_modules/'.length);
-  if (modulePath.startsWith('@')) {
-    const [scope, name] = modulePath.split('/');
+  const modulePath = id.slice(nodeModulesIndex + "node_modules/".length);
+  if (modulePath.startsWith("@")) {
+    const [scope, name] = modulePath.split("/");
     return scope && name ? `${scope}/${name}` : null;
   }
-  const [name] = modulePath.split('/');
+  const [name] = modulePath.split("/");
   return name || null;
 };
 
 export default defineConfig(({ mode }) => ({
+  staged: {
+    "*": "vp check --fix --no-fmt",
+  },
+  fmt: {
+    ignorePatterns: [
+      ".amazonq/**",
+      ".git/**",
+      ".github/**",
+      ".kiro/**",
+      ".lighthouseci/**",
+      ".serena/**",
+      ".tmp/**",
+      ".vite-hooks/**",
+      ".vscode/**",
+      "coverage/**",
+      "dist/**",
+      "docs/**",
+      "node_modules/**",
+      "playwright-report/**",
+      "public/**",
+      "test-results/**",
+      "tests/e2e/**",
+      "*.md",
+      "*.pdf",
+      "*.png",
+      "*.xml",
+      "*.yml",
+      "*.json",
+      "*.cjs",
+    ],
+  },
+  lint: {
+    jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],
+    rules: {
+      "vite-plus/prefer-vite-plus-imports": "error",
+    },
+    options: {
+      typeAware: true,
+      typeCheck: true,
+    },
+  },
   plugins: [
     react({
       // Optimize JSX runtime for React 19.2
-      jsxRuntime: 'automatic',
+      jsxRuntime: "automatic",
       // Enable React 19.2 optimizations
       jsxImportSource: undefined, // Use default React JSX runtime
     }),
     // Brotli compression (better compression ratio)
     viteCompression({
-      algorithm: 'brotliCompress',
-      ext: '.br',
+      algorithm: "brotliCompress",
+      ext: ".br",
       threshold: 1024, // Only compress files larger than 1KB
       compressionOptions: {
         level: 11, // Highest compression level
@@ -48,8 +89,8 @@ export default defineConfig(({ mode }) => ({
     }),
     // Gzip compression (better compatibility)
     viteCompression({
-      algorithm: 'gzip',
-      ext: '.gz',
+      algorithm: "gzip",
+      ext: ".gz",
       threshold: 1024,
       compressionOptions: {
         level: 9, // Highest compression level
@@ -60,11 +101,11 @@ export default defineConfig(({ mode }) => ({
   ],
   build: {
     // Output directory
-    outDir: 'dist',
+    outDir: "dist",
     // Enable source maps (development environment only)
-    sourcemap: process.env.NODE_ENV !== 'production',
+    sourcemap: process.env.NODE_ENV !== "production",
     // Build target - optimized for React 19.2 and modern browsers
-    target: ['es2022', 'edge88', 'firefox78', 'chrome87', 'safari14'],
+    target: ["es2022", "edge88", "firefox78", "chrome87", "safari14"],
     // Enable CSS code splitting
     cssCodeSplit: true,
     // Set chunk size warning limit
@@ -77,13 +118,13 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         // Asset file naming
-        assetFileNames: 'assets/[name]-[hash].[ext]',
-        chunkFileNames: 'assets/[name]-[hash].js',
-        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: "assets/[name]-[hash].[ext]",
+        chunkFileNames: "assets/[name]-[hash].js",
+        entryFileNames: "assets/[name]-[hash].js",
         // Manual chunk splitting strategy
         manualChunks(id: string) {
           // Keep translation files as separate chunks for dynamic loading
-          if (id.includes('src/i18n/translations/')) {
+          if (id.includes("src/i18n/translations/")) {
             const langMatch = /translations\/([a-z]{2})\.ts$/.exec(id);
             if (langMatch) {
               return `i18n-${langMatch[1]}`; // Use prefixed chunk name to avoid conflicts
@@ -92,12 +133,12 @@ export default defineConfig(({ mode }) => ({
           const packageName = getPackageName(id);
           if (packageName) {
             if (reactChunkPackages.has(packageName)) {
-              return 'react-vendor';
+              return "react-vendor";
             }
-            if (packageName === 'jspdf') {
-              return 'jspdf';
+            if (packageName === "jspdf") {
+              return "jspdf";
             }
-            return 'vendor';
+            return "vendor";
           }
         },
       },
@@ -107,11 +148,11 @@ export default defineConfig(({ mode }) => ({
       external: jspdfOptionalHtmlDeps,
     },
     // Use terser for better compatibility
-    minify: 'terser',
+    minify: "terser",
     // Terser minification options
     terserOptions: {
       compress: {
-        drop_console: process.env.NODE_ENV === 'production',
+        drop_console: process.env.NODE_ENV === "production",
         drop_debugger: true,
         dead_code: true,
         passes: 2,
@@ -132,63 +173,57 @@ export default defineConfig(({ mode }) => ({
   preview: {
     port: 4173,
     strictPort: false, // Allow fallback to other ports if 4173 is occupied
-    host: process.env.CI ? '0.0.0.0' : 'localhost',
+    host: process.env.CI ? "0.0.0.0" : "localhost",
     cors: true,
     headers: {
-      'Cache-Control': 'no-cache',
+      "Cache-Control": "no-cache",
     },
   },
   resolve: {
-    extensions: ['.js', '.jsx', '.ts', '.tsx'],
+    extensions: [".js", ".jsx", ".ts", ".tsx"],
     alias: {
-      '@': resolve(__dirname, './src'),
-      '@/components': resolve(__dirname, './src/components'),
-      '@/hooks': resolve(__dirname, './src/hooks'),
-      '@/utils': resolve(__dirname, './src/utils'),
-      '@/i18n': resolve(__dirname, './src/i18n'),
-      '@/types': resolve(__dirname, './src/types'),
+      "@": resolve(__dirname, "./src"),
+      "@/components": resolve(__dirname, "./src/components"),
+      "@/hooks": resolve(__dirname, "./src/hooks"),
+      "@/utils": resolve(__dirname, "./src/utils"),
+      "@/i18n": resolve(__dirname, "./src/i18n"),
+      "@/types": resolve(__dirname, "./src/types"),
     },
   },
   // Optimize dependency pre-bundling for React 19.2
   optimizeDeps: {
-    include: ['react', 'react-dom', 'jspdf'],
-    exclude: ['@vercel/speed-insights', ...jspdfOptionalHtmlDeps],
-    esbuildOptions: {
-      target: 'es2022',
-      // Enable React 19.2 optimizations
-      jsx: 'automatic',
-      jsxDev: mode !== 'production',
-    },
+    include: ["react", "react-dom", "jspdf"],
+    exclude: ["@vercel/speed-insights", ...jspdfOptionalHtmlDeps],
   },
   // Environment variables
   define: {
-    __DEV__: mode !== 'production',
-    __PROD__: mode === 'production',
+    __DEV__: mode !== "production",
+    __PROD__: mode === "production",
     __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
     __BUILD_HASH__: JSON.stringify(Date.now().toString(36)),
-    global: 'globalThis',
+    global: "globalThis",
   },
   // CSS optimization
   css: {
-    devSourcemap: mode !== 'production',
+    devSourcemap: mode !== "production",
   },
   test: {
-    environment: 'happy-dom',
+    environment: "happy-dom",
     globals: true,
-    setupFiles: './src/setupTests.ts',
+    setupFiles: "./src/setupTests.ts",
     css: true,
     environmentOptions: {
       happyDOM: {
         settings: {
           navigator: {
             userAgent:
-              'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+              "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
           },
         },
       },
     },
     // 动态调整worker数量基于CPU核心数和环境
-    pool: 'threads',
+    pool: "threads",
     // Vitest 4: poolOptions moved to top-level
     maxThreads: process.env.CI ? 4 : 8,
     minThreads: process.env.CI ? 1 : 2,
@@ -200,46 +235,46 @@ export default defineConfig(({ mode }) => ({
     },
     fileParallelism: true,
     exclude: [
-      '**/node_modules/**',
-      '**/dist/**',
-      '**/tests/e2e/**',
-      '**/tests/smoke/**',
-      '**/*.e2e.spec.ts',
-      '**/*.smoke.spec.ts',
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/tests/e2e/**",
+      "**/tests/smoke/**",
+      "**/*.e2e.spec.ts",
+      "**/*.smoke.spec.ts",
     ],
     coverage: {
       // 现在内存问题已解决，可以简化coverage配置
-      enabled: process.env.VITEST_COVERAGE === '1',
-      provider: 'v8',
-      reporter: ['text', 'json', 'html', 'lcov', 'clover'],
-      reportsDirectory: 'coverage',
+      enabled: process.env.VITEST_COVERAGE === "1",
+      provider: "v8",
+      reporter: ["text", "json", "html", "lcov", "clover"],
+      reportsDirectory: "coverage",
       exclude: [
-        '**/*.config.{js,ts,cjs}',
-        '**/*.test.{js,ts,jsx,tsx}',
-        '**/*.spec.{js,ts,jsx,tsx}',
-        '**/tests/**',
-        '**/coverage/**',
-        '**/dist/**',
-        '**/node_modules/**',
-        '**/scripts/**',
-        '**/src/index.tsx',
-        '**/src/setupTests.ts',
-        '**/src/reportWebVitals.ts',
-        '**/public/**',
-        '**/*.svg',
-        '**/*.css',
-        '**/src/i18n/translations/**',
-        '**/src/types/**',
-        '**/src/utils/serviceWorker.ts',
-        '**/src/utils/testUtils.ts',
-        '**/lighthouserc.{js,ts,cjs}',
-        '**/playwright-report/**',
-        '**/test-results/**',
-        '**/postcss.config.cjs',
-        '**/vite.config.ts',
-        '**/vite/**',
-        'vite/**',
-        '**/dynamic-import-helper.js',
+        "**/*.config.{js,ts,cjs}",
+        "**/*.test.{js,ts,jsx,tsx}",
+        "**/*.spec.{js,ts,jsx,tsx}",
+        "**/tests/**",
+        "**/coverage/**",
+        "**/dist/**",
+        "**/node_modules/**",
+        "**/scripts/**",
+        "**/src/index.tsx",
+        "**/src/setupTests.ts",
+        "**/src/reportWebVitals.ts",
+        "**/public/**",
+        "**/*.svg",
+        "**/*.css",
+        "**/src/i18n/translations/**",
+        "**/src/types/**",
+        "**/src/utils/serviceWorker.ts",
+        "**/src/utils/testUtils.ts",
+        "**/lighthouserc.{js,ts,cjs}",
+        "**/playwright-report/**",
+        "**/test-results/**",
+        "**/postcss.config.cjs",
+        "**/vite.config.ts",
+        "**/vite/**",
+        "vite/**",
+        "**/dynamic-import-helper.js",
       ],
       thresholds: {
         global: {

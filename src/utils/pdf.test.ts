@@ -1,5 +1,5 @@
-import type { PaperSizeOptions, Problem, Settings } from '@/types';
-import { describe, expect, test, vi } from 'vitest';
+import type { PaperSizeOptions, Problem, Settings } from "@/types";
+import { describe, expect, test, vi } from "vite-plus/test";
 
 // Simple mock for jsPDF
 const mockJsPDFInstance = {
@@ -15,20 +15,20 @@ function MockJsPDF(_options?: any) {
 }
 
 // Mock the jsPDF module
-vi.mock('jspdf', () => {
+vi.mock("jspdf", () => {
   return {
     default: MockJsPDF,
   };
 });
 
 const paperSizes: PaperSizeOptions = {
-  a4: 'a4',
-  letter: 'letter',
-  legal: 'legal',
+  a4: "a4",
+  letter: "letter",
+  legal: "legal",
 };
 
 const baseSettings: Settings = {
-  operations: ['+'],
+  operations: ["+"],
   numProblems: 1,
   numRange: [1, 10],
   resultRange: [1, 10],
@@ -37,59 +37,59 @@ const baseSettings: Settings = {
   showAnswers: false,
   fontSize: 12,
   lineSpacing: 1.5,
-  paperSize: 'a4',
+  paperSize: "a4",
   enableGrouping: false,
   problemsPerGroup: 20,
   totalGroups: 1,
 };
 
-describe('pdf utils', () => {
-  test('loadJsPDF returns a function', async () => {
-    const { loadJsPDF } = await import('./pdf');
+describe("pdf utils", () => {
+  test("loadJsPDF returns a function", async () => {
+    const { loadJsPDF } = await import("./pdf");
     const jsPDF = await loadJsPDF();
-    expect(typeof jsPDF).toBe('function');
+    expect(typeof jsPDF).toBe("function");
   });
 
-  test('generatePdf executes without errors', async () => {
-    const { generatePdf } = await import('./pdf');
-    const problems: Problem[] = [{ id: 1, text: '1 + 1 =' }];
+  test("generatePdf executes without errors", async () => {
+    const { generatePdf } = await import("./pdf");
+    const problems: Problem[] = [{ id: 1, text: "1 + 1 =" }];
 
     // Test that the function executes without throwing
     await expect(
-      generatePdf(problems, baseSettings, paperSizes, 'test.pdf')
+      generatePdf(problems, baseSettings, paperSizes, "test.pdf"),
     ).resolves.toBeUndefined();
   });
 
-  test('generatePdf handles empty problems array', async () => {
-    const { generatePdf } = await import('./pdf');
+  test("generatePdf handles empty problems array", async () => {
+    const { generatePdf } = await import("./pdf");
     const problems: Problem[] = [];
 
     // Test that the function handles empty array without throwing
     await expect(
-      generatePdf(problems, baseSettings, paperSizes, 'test.pdf')
+      generatePdf(problems, baseSettings, paperSizes, "test.pdf"),
     ).resolves.toBeUndefined();
   });
 
-  test('generatePdf handles different paper sizes', async () => {
-    const { generatePdf } = await import('./pdf');
-    const problems: Problem[] = [{ id: 1, text: '1 + 1 =' }];
+  test("generatePdf handles different paper sizes", async () => {
+    const { generatePdf } = await import("./pdf");
+    const problems: Problem[] = [{ id: 1, text: "1 + 1 =" }];
 
-    const letterSettings = { ...baseSettings, paperSize: 'letter' as const };
+    const letterSettings = { ...baseSettings, paperSize: "letter" as const };
     await expect(
-      generatePdf(problems, letterSettings, paperSizes, 'test.pdf')
+      generatePdf(problems, letterSettings, paperSizes, "test.pdf"),
     ).resolves.toBeUndefined();
 
-    const legalSettings = { ...baseSettings, paperSize: 'legal' as const };
+    const legalSettings = { ...baseSettings, paperSize: "legal" as const };
     await expect(
-      generatePdf(problems, legalSettings, paperSizes, 'test.pdf')
+      generatePdf(problems, legalSettings, paperSizes, "test.pdf"),
     ).resolves.toBeUndefined();
   });
 
-  test('generatePdf handles grouping settings', async () => {
-    const { generatePdf } = await import('./pdf');
+  test("generatePdf handles grouping settings", async () => {
+    const { generatePdf } = await import("./pdf");
     const problems: Problem[] = [
-      { id: 1, text: '1 + 1 =' },
-      { id: 2, text: '2 + 2 =' },
+      { id: 1, text: "1 + 1 =" },
+      { id: 2, text: "2 + 2 =" },
     ];
 
     const groupingSettings: Settings = {

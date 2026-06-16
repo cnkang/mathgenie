@@ -1,20 +1,20 @@
-import { safeEvaluateExpression } from '@/components/quiz/expression';
-import type { Problem, QuizResult } from '@/types';
-import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from 'react';
+import { safeEvaluateExpression } from "@/components/quiz/expression";
+import type { Problem, QuizResult } from "@/types";
+import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from "react";
 
 export type Translator = (key: string, params?: Record<string, string | number>) => string;
 
 const mapProblemsWithAnswers = (problems: Problem[]): Problem[] =>
-  problems.map(problem => {
+  problems.map((problem) => {
     const expression = problem.text
-      .replaceAll(' = ', '')
-      .replaceAll(/[✖×]/g, '*')
-      .replaceAll(/[➗÷]/g, '/');
+      .replaceAll(" = ", "")
+      .replaceAll(/[✖×]/g, "*")
+      .replaceAll(/[➗÷]/g, "/");
     let correctAnswer: number;
     try {
       correctAnswer = safeEvaluateExpression(expression);
     } catch {
-      console.error('Error calculating answer for:', expression);
+      console.error("Error calculating answer for:", expression);
       correctAnswer = 0;
     }
     return {
@@ -27,23 +27,23 @@ const mapProblemsWithAnswers = (problems: Problem[]): Problem[] =>
   });
 
 const computeQuizResult = (problems: Problem[], t: Translator): QuizResult => {
-  const correctAnswers = problems.filter(p => p.isCorrect).length;
+  const correctAnswers = problems.filter((p) => p.isCorrect).length;
   const totalProblems = problems.length;
   const score = Math.round((correctAnswers / totalProblems) * 100);
-  let grade = t('quiz.grades.needsImprovement');
-  let feedback = t('quiz.feedback.needsImprovement');
+  let grade = t("quiz.grades.needsImprovement");
+  let feedback = t("quiz.feedback.needsImprovement");
   if (score >= 90) {
-    grade = t('quiz.grades.excellent');
-    feedback = t('quiz.feedback.excellent');
+    grade = t("quiz.grades.excellent");
+    feedback = t("quiz.feedback.excellent");
   } else if (score >= 80) {
-    grade = t('quiz.grades.good');
-    feedback = t('quiz.feedback.good');
+    grade = t("quiz.grades.good");
+    feedback = t("quiz.feedback.good");
   } else if (score >= 70) {
-    grade = t('quiz.grades.average');
-    feedback = t('quiz.feedback.average');
+    grade = t("quiz.grades.average");
+    feedback = t("quiz.feedback.average");
   } else if (score >= 60) {
-    grade = t('quiz.grades.passing');
-    feedback = t('quiz.feedback.passing');
+    grade = t("quiz.grades.passing");
+    feedback = t("quiz.feedback.passing");
   }
   return {
     totalProblems,
@@ -85,7 +85,7 @@ const useQuizTimer = () => {
   const [timeElapsed, setTimeElapsed] = useState(0);
 
   useEffect(() => {
-    const timer = setInterval(() => setTimeElapsed(prev => prev + 1), 1000);
+    const timer = setInterval(() => setTimeElapsed((prev) => prev + 1), 1000);
     return () => clearInterval(timer);
   }, []);
 
@@ -99,7 +99,7 @@ const useFinishQuiz = (
   t: Translator,
   onQuizComplete: (result: QuizResult) => void,
   setQuizResult: (value: QuizResult | null) => void,
-  setShowResults: (value: boolean) => void
+  setShowResults: (value: boolean) => void,
 ) => {
   return useCallback(
     (finalProblems?: Problem[]): void => {
@@ -109,7 +109,7 @@ const useFinishQuiz = (
       setShowResults(true);
       onQuizComplete(result);
     },
-    [quizProblems, t, onQuizComplete, setQuizResult, setShowResults]
+    [quizProblems, t, onQuizComplete, setQuizResult, setShowResults],
   );
 };
 
@@ -123,8 +123,8 @@ const useAnswerSubmission = (params: {
 
   return useCallback(
     (problemId: number, answer: number): void => {
-      setQuizProblems(prevProblems => {
-        const updatedProblems = prevProblems.map(problem =>
+      setQuizProblems((prevProblems) => {
+        const updatedProblems = prevProblems.map((problem) =>
           problem.id === problemId
             ? {
                 ...problem,
@@ -132,7 +132,7 @@ const useAnswerSubmission = (params: {
                 isCorrect: Math.abs(answer - (problem.correctAnswer || 0)) < 0.001,
                 isAnswered: true,
               }
-            : problem
+            : problem,
         );
 
         setTimeout(() => {
@@ -147,21 +147,21 @@ const useAnswerSubmission = (params: {
         return updatedProblems;
       });
     },
-    [currentProblemIndex, finishQuiz, setCurrentProblemIndex, setQuizProblems]
+    [currentProblemIndex, finishQuiz, setCurrentProblemIndex, setQuizProblems],
   );
 };
 
 const useQuizNavigation = (
   currentProblemIndex: number,
   setCurrentProblemIndex: Dispatch<SetStateAction<number>>,
-  quizProblemsLength: number
+  quizProblemsLength: number,
 ) => {
   const goToPrevious = useCallback((): void => {
-    setCurrentProblemIndex(idx => (idx > 0 ? idx - 1 : 0));
+    setCurrentProblemIndex((idx) => (idx > 0 ? idx - 1 : 0));
   }, [setCurrentProblemIndex]);
 
   const goToNext = useCallback((): void => {
-    setCurrentProblemIndex(idx => (idx < quizProblemsLength - 1 ? idx + 1 : idx));
+    setCurrentProblemIndex((idx) => (idx < quizProblemsLength - 1 ? idx + 1 : idx));
   }, [setCurrentProblemIndex, quizProblemsLength]);
 
   return { goToPrevious, goToNext };
@@ -197,7 +197,7 @@ const useQuizActions = ({
     translator,
     onQuizComplete,
     setQuizResult,
-    setShowResults
+    setShowResults,
   );
 
   const handleAnswerSubmit = useAnswerSubmission({
@@ -217,7 +217,7 @@ const useQuizActions = ({
 export const useQuizController = (
   problems: Problem[],
   t: Translator,
-  onQuizComplete: (result: QuizResult) => void
+  onQuizComplete: (result: QuizResult) => void,
 ) => {
   const problemState = useQuizProblemState(problems);
   const timerState = useQuizTimer();
@@ -225,7 +225,7 @@ export const useQuizController = (
   const navigation = useQuizNavigation(
     problemState.currentProblemIndex,
     problemState.setCurrentProblemIndex,
-    problemState.quizProblems.length
+    problemState.quizProblems.length,
   );
 
   const actions = useQuizActions({
@@ -244,7 +244,7 @@ export const useQuizController = (
   const formatTime = useCallback((seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   }, []);
 
   return {

@@ -1,6 +1,6 @@
-import { describe, expect, it, vi } from 'vitest';
-import { buildExpression, randomInt, randomNonZeroInt } from './problemUtils';
-import type { Settings } from '@/types';
+import { describe, expect, it, vi } from "vite-plus/test";
+import { buildExpression, randomInt, randomNonZeroInt } from "./problemUtils";
+import type { Settings } from "@/types";
 
 // Mock crypto for deterministic tests
 const mockCrypto = {
@@ -12,21 +12,21 @@ const mockCrypto = {
   }),
 };
 
-describe('problemUtils', () => {
-  it('randomInt returns number within range', () => {
+describe("problemUtils", () => {
+  it("randomInt returns number within range", () => {
     const value = randomInt(1, 5, mockCrypto as unknown as Crypto);
     expect(value).toBeGreaterThanOrEqual(1);
     expect(value).toBeLessThanOrEqual(5);
   });
 
-  it('randomNonZeroInt excludes zero', () => {
+  it("randomNonZeroInt excludes zero", () => {
     const value = randomNonZeroInt(-1, 1, mockCrypto as unknown as Crypto);
     expect(value).not.toBe(0);
   });
 
-  it('buildExpression constructs operands and operators', () => {
+  it("buildExpression constructs operands and operators", () => {
     const settings: Settings = {
-      operations: ['+'],
+      operations: ["+"],
       numProblems: 1,
       numRange: [1, 1],
       resultRange: [0, 10],
@@ -35,12 +35,12 @@ describe('problemUtils', () => {
       showAnswers: false,
       fontSize: 16,
       lineSpacing: 12,
-      paperSize: 'a4',
+      paperSize: "a4",
       enableGrouping: false,
       problemsPerGroup: 20,
       totalGroups: 1,
     };
     const expr = buildExpression(2, settings, randomInt, randomNonZeroInt);
-    expect(expr).toEqual({ operands: [1, 1], operators: ['+'] });
+    expect(expr).toEqual({ operands: [1, 1], operators: ["+"] });
   });
 });

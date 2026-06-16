@@ -7,42 +7,42 @@ import React, {
   useMemo,
   useState,
   useTransition,
-} from 'react';
-import type { I18nContextType, Language, Translations } from '../types';
+} from "react";
+import type { I18nContextType, Language, Translations } from "../types";
 
 // Do not edit manually.
-const STR_UNDEFINED = 'undefined' as const;
+const STR_UNDEFINED = "undefined" as const;
 
 const languages: Record<string, Language> = {
   en: {
-    code: 'en',
-    name: 'English',
-    flag: '🇺🇸',
+    code: "en",
+    name: "English",
+    flag: "🇺🇸",
   },
   zh: {
-    code: 'zh',
-    name: '中文',
-    flag: '🇨🇳',
+    code: "zh",
+    name: "中文",
+    flag: "🇨🇳",
   },
   es: {
-    code: 'es',
-    name: 'Español',
-    flag: '🇪🇸',
+    code: "es",
+    name: "Español",
+    flag: "🇪🇸",
   },
   fr: {
-    code: 'fr',
-    name: 'Français',
-    flag: '🇫🇷',
+    code: "fr",
+    name: "Français",
+    flag: "🇫🇷",
   },
   de: {
-    code: 'de',
-    name: 'Deutsch',
-    flag: '🇩🇪',
+    code: "de",
+    name: "Deutsch",
+    flag: "🇩🇪",
   },
   ja: {
-    code: 'ja',
-    name: '日本語',
-    flag: '🇯🇵',
+    code: "ja",
+    name: "日本語",
+    flag: "🇯🇵",
   },
 };
 
@@ -51,7 +51,7 @@ const I18nContext = createContext<I18nContextType | undefined>(undefined);
 export const useTranslation = (): I18nContextType => {
   const context = useContext(I18nContext);
   if (!context) {
-    throw new Error('useTranslation must be used within an I18nProvider');
+    throw new Error("useTranslation must be used within an I18nProvider");
   }
   return context;
 };
@@ -71,10 +71,10 @@ const safeT = (key: string, params: Record<string, string | number> = {}): strin
 };
 
 const getValueByKeyPath = (translations: Translations, key: string): unknown => {
-  const keys = key.split('.');
+  const keys = key.split(".");
   let value: unknown = translations;
   for (const k of keys) {
-    if (value && typeof value === 'object' && k in (value as Record<string, unknown>)) {
+    if (value && typeof value === "object" && k in (value as Record<string, unknown>)) {
       value = (value as Record<string, unknown>)[k];
     } else {
       return undefined;
@@ -88,7 +88,7 @@ const hasNoParams = (params: Record<string, string | number>): boolean => {
 };
 
 const replaceAllPlaceholders = (text: string, key: string, value: string | number): string => {
-  const placeholder = '{{' + key + '}}';
+  const placeholder = "{{" + key + "}}";
   let result = text;
   while (result.includes(placeholder)) {
     result = result.replace(placeholder, String(value));
@@ -110,93 +110,93 @@ export const interpolate = (template: string, params: Record<string, string | nu
 
 const getBrowserLanguage = (): string => {
   if (typeof navigator === STR_UNDEFINED) {
-    return 'en';
+    return "en";
   }
 
-  const browserLang = navigator.language || navigator.languages?.[0] || 'en';
-  const langCode = browserLang.split('-')[0];
-  return languages[langCode] ? langCode : 'en';
+  const browserLang = navigator.language || navigator.languages?.[0] || "en";
+  const langCode = browserLang.split("-")[0];
+  return languages[langCode] ? langCode : "en";
 };
 
 const createAppFallbacks = (): Record<string, string> => ({
-  'app.title': 'MathGenie',
-  'app.subtitle': 'Generate customized math problems for practice and learning',
-  'loading.translations': 'Loading translations...',
-  'loading.insights': 'Loading insights...',
+  "app.title": "MathGenie",
+  "app.subtitle": "Generate customized math problems for practice and learning",
+  "loading.translations": "Loading translations...",
+  "loading.insights": "Loading insights...",
 });
 
 const createButtonFallbacks = (): Record<string, string> => ({
-  'buttons.generate': 'Generate Problems',
-  'buttons.generateDescription': 'Create new math problems with your current settings',
-  'buttons.download': 'Download PDF',
-  'buttons.downloadDescription': 'Save your problems as a printable PDF file',
-  'buttons.quizDescription': 'Test your skills with an interactive quiz',
-  'buttons.downloadEmpty': 'Download PDF',
+  "buttons.generate": "Generate Problems",
+  "buttons.generateDescription": "Create new math problems with your current settings",
+  "buttons.download": "Download PDF",
+  "buttons.downloadDescription": "Save your problems as a printable PDF file",
+  "buttons.quizDescription": "Test your skills with an interactive quiz",
+  "buttons.downloadEmpty": "Download PDF",
 });
 
 const createSettingsFallbacks = (): Record<string, string> => ({
-  'settings.numProblems': 'Number of Problems',
-  'settings.numberRange': 'Number Range',
-  'settings.resultRange': 'Result Range',
-  'settings.operandsRange': 'Number of Operands',
-  'settings.allowNegative': 'Allow Negative Results',
-  'settings.showAnswers': 'Show Answers',
-  'settings.manager.title': 'Settings Manager',
-  'settings.manager.export': 'Export Settings',
-  'settings.manager.import': 'Import Settings',
-  'settings.importError': 'Error importing settings file',
+  "settings.numProblems": "Number of Problems",
+  "settings.numberRange": "Number Range",
+  "settings.resultRange": "Result Range",
+  "settings.operandsRange": "Number of Operands",
+  "settings.allowNegative": "Allow Negative Results",
+  "settings.showAnswers": "Show Answers",
+  "settings.manager.title": "Settings Manager",
+  "settings.manager.export": "Export Settings",
+  "settings.manager.import": "Import Settings",
+  "settings.importError": "Error importing settings file",
 });
 
 const createErrorFallbacks = (): Record<string, string> => ({
-  'errors.noOperations': 'Please select at least one operation.',
-  'errors.invalidProblemCount': 'Number of problems must be between 1 and 50,000.',
-  'errors.invalidTotalProblemCount': 'Total number of problems cannot exceed 50,000.',
-  'errors.invalidProblemsPerGroup': 'Problems per group must be between 1 and 1,000.',
-  'errors.invalidTotalGroups': 'Total groups must be between 1 and 100.',
-  'errors.invalidNumberRange': 'Number range minimum cannot be greater than maximum.',
-  'errors.invalidResultRange': 'Result range minimum cannot be greater than maximum.',
-  'errors.invalidOperandsRange':
-    'Invalid operands range: minimum must be at least 2 and not greater than maximum.',
-  'errors.noProblemsGenerated':
-    'No problems could be generated with current settings. Try adjusting the ranges.',
-  'errors.generationFailed': 'Failed to generate problems. Please try again.',
-  'errors.noProblemsToPdf': 'No problems to download. Generate problems first.',
-  'errors.pdfFailed': 'Failed to generate PDF. Please try again.',
+  "errors.noOperations": "Please select at least one operation.",
+  "errors.invalidProblemCount": "Number of problems must be between 1 and 50,000.",
+  "errors.invalidTotalProblemCount": "Total number of problems cannot exceed 50,000.",
+  "errors.invalidProblemsPerGroup": "Problems per group must be between 1 and 1,000.",
+  "errors.invalidTotalGroups": "Total groups must be between 1 and 100.",
+  "errors.invalidNumberRange": "Number range minimum cannot be greater than maximum.",
+  "errors.invalidResultRange": "Result range minimum cannot be greater than maximum.",
+  "errors.invalidOperandsRange":
+    "Invalid operands range: minimum must be at least 2 and not greater than maximum.",
+  "errors.noProblemsGenerated":
+    "No problems could be generated with current settings. Try adjusting the ranges.",
+  "errors.generationFailed": "Failed to generate problems. Please try again.",
+  "errors.noProblemsToPdf": "No problems to download. Generate problems first.",
+  "errors.pdfFailed": "Failed to generate PDF. Please try again.",
 });
 
 const createMessageFallbacks = (): Record<string, string> => ({
-  'messages.success.problemsGenerated': 'Successfully generated {{count}} problems!',
-  'messages.success.settingsImported': 'Settings imported successfully!',
-  'messages.success.settingsExported': 'Settings exported successfully!',
-  'messages.success.pdfGenerated': 'PDF downloaded successfully!',
+  "messages.success.problemsGenerated": "Successfully generated {{count}} problems!",
+  "messages.success.settingsImported": "Settings imported successfully!",
+  "messages.success.settingsExported": "Settings exported successfully!",
+  "messages.success.pdfGenerated": "PDF downloaded successfully!",
 });
 
 const createOtherFallbacks = (): Record<string, string> => ({
-  'results.title': 'Generated Problems',
-  'results.noProblems': 'No problems generated yet',
-  'results.copyAll': 'Copy All',
-  'results.copied': 'Copied',
-  'results.copySuccess': 'Problems copied to clipboard.',
-  'results.copyError': 'Copy failed. Please copy manually.',
-  'operations.title': 'Select Operations',
-  'pdf.title': 'PDF Settings',
-  'pdf.fontSize': 'Font Size (pt)',
-  'pdf.lineSpacing': 'Line Spacing (pt)',
-  'pdf.paperSize': 'Paper Size',
-  'presets.title': 'Quick Presets',
-  'presets.apply': 'Apply',
-  'presets.clickToApply': 'Click to apply',
-  'presets.applied': 'Applied',
-  'presets.beginner.name': 'Beginner (1-10)',
-  'presets.beginner.description': 'Simple addition and subtraction',
-  'presets.intermediate.name': 'Intermediate (1-50)',
-  'presets.intermediate.description': 'All operations with medium numbers',
-  'presets.advanced.name': 'Advanced (1-100)',
-  'presets.advanced.description': 'All operations including division',
-  'presets.multiplication.name': 'Multiplication Focus',
-  'presets.multiplication.description': 'Focus on multiplication tables',
-  'accessibility.copyProblems': 'Copy generated problems',
-  'language.select': 'Language',
+  "results.title": "Generated Problems",
+  "results.noProblems": "No problems generated yet",
+  "results.copyAll": "Copy All",
+  "results.copied": "Copied",
+  "results.copySuccess": "Problems copied to clipboard.",
+  "results.copyError": "Copy failed. Please copy manually.",
+  "operations.title": "Select Operations",
+  "pdf.title": "PDF Settings",
+  "pdf.fontSize": "Font Size (pt)",
+  "pdf.lineSpacing": "Line Spacing (pt)",
+  "pdf.paperSize": "Paper Size",
+  "presets.title": "Quick Presets",
+  "presets.apply": "Apply",
+  "presets.clickToApply": "Click to apply",
+  "presets.applied": "Applied",
+  "presets.beginner.name": "Beginner (1-10)",
+  "presets.beginner.description": "Simple addition and subtraction",
+  "presets.intermediate.name": "Intermediate (1-50)",
+  "presets.intermediate.description": "All operations with medium numbers",
+  "presets.advanced.name": "Advanced (1-100)",
+  "presets.advanced.description": "All operations including division",
+  "presets.multiplication.name": "Multiplication Focus",
+  "presets.multiplication.description": "Focus on multiplication tables",
+  "accessibility.copyProblems": "Copy generated problems",
+  "language.select": "Language",
 });
 
 // Fallback text for common keys when translations are not loaded yet
@@ -220,15 +220,15 @@ const loadTranslationFile = async (language: string): Promise<Translations> => {
 };
 
 const waitForRetry = async (attempt: number): Promise<void> => {
-  await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 100));
+  await new Promise((resolve) => setTimeout(resolve, Math.pow(2, attempt) * 100));
 };
 
 const loadFallbackTranslations = async (): Promise<Translations> => {
   try {
-    const fallback = await import('./translations/en');
+    const fallback = await import("./translations/en");
     return fallback.default;
   } catch (fallbackError) {
-    devError('🌐 Failed to load fallback English translations:', fallbackError);
+    devError("🌐 Failed to load fallback English translations:", fallbackError);
     return {};
   }
 };
@@ -237,7 +237,7 @@ const persistLanguageSelection = (language: string): void => {
   if (typeof globalThis === STR_UNDEFINED || !globalThis.localStorage) {
     return;
   }
-  globalThis.localStorage.setItem('mathgenie-language', language);
+  globalThis.localStorage.setItem("mathgenie-language", language);
 };
 
 const setDocumentLanguage = (language: string): void => {
@@ -251,7 +251,7 @@ const performLoadAttempt = async (
   attempt: number,
   action: () => Promise<Translations>,
   describe: (attempt: number) => void,
-  onSuccess: () => void
+  onSuccess: () => void,
 ): Promise<{ success: true; data: Translations } | { success: false; error: Error }> => {
   try {
     describe(attempt);
@@ -268,7 +268,7 @@ const loadWithRetry = async (
   describe: (attempt: number) => void,
   onSuccess: () => void,
   onAttemptFail: (attempt: number, error: unknown) => void,
-  maxRetries = 3
+  maxRetries = 3,
 ): Promise<Translations> => {
   let lastError: Error | null = null;
 
@@ -286,7 +286,7 @@ const loadWithRetry = async (
     }
   }
 
-  devError('🌐 All attempts failed. Last error:', lastError);
+  devError("🌐 All attempts failed. Last error:", lastError);
   return loadFallbackTranslations();
 };
 
@@ -298,15 +298,15 @@ const loadTranslations = async (language: string): Promise<Translations> => {
 
   return loadWithRetry(
     () => loadTranslationFile(language),
-    attempt => devLog(`🌐 Loading translations for "${language}" (attempt ${attempt})`),
+    (attempt) => devLog(`🌐 Loading translations for "${language}" (attempt ${attempt})`),
     () => devLog(`🌐 Successfully loaded translations for "${language}"`),
     (attempt, error) =>
-      devWarn(`🌐 Attempt ${attempt} failed to load translations for "${language}":`, error)
+      devWarn(`🌐 Attempt ${attempt} failed to load translations for "${language}":`, error),
   );
 };
 
 const useLanguageState = (
-  currentLanguage: string
+  currentLanguage: string,
 ): { translations: Translations; isLoading: boolean; isInitialized: boolean } => {
   const [translations, setTranslations] = useState<Translations>({});
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -327,7 +327,7 @@ const useLanguageState = (
         persistLanguageSelection(currentLanguage);
         setDocumentLanguage(currentLanguage);
       } catch (error) {
-        devError('🌐 Failed to load translations:', error);
+        devError("🌐 Failed to load translations:", error);
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -335,7 +335,7 @@ const useLanguageState = (
       }
     };
 
-    loadLanguage();
+    void loadLanguage();
     return () => {
       isMounted = false;
     };
@@ -352,7 +352,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   const [currentLanguage, setCurrentLanguage] = useState<string>(() => {
     // 优先使用用户保存的语言设置，只有在没有保存设置时才使用浏览器语言
     if (typeof globalThis !== STR_UNDEFINED && globalThis.localStorage) {
-      const savedLanguage = localStorage.getItem('mathgenie-language');
+      const savedLanguage = localStorage.getItem("mathgenie-language");
       return savedLanguage || getBrowserLanguage();
     }
     return getBrowserLanguage();
@@ -366,12 +366,12 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
         return safeT(key, params);
       }
       const value = getValueByKeyPath(translations, key);
-      if (typeof value === 'string') {
+      if (typeof value === "string") {
         return interpolate(value, params);
       }
       return safeT(key, params);
     },
-    [isInitialized, isLoading, translations]
+    [isInitialized, isLoading, translations],
   );
 
   const changeLanguage = (newLanguage: string): void => {
@@ -393,7 +393,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
       t,
       changeLanguage,
     }),
-    [currentLanguage, translations, isLoading, isPending, t]
+    [currentLanguage, translations, isLoading, isPending, t],
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;

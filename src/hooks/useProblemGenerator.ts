@@ -1,13 +1,13 @@
-import type { MessageValue, Problem, Settings } from '@/types';
-import { buildExpression, randomInt } from '@/utils/problemUtils';
-import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from 'react';
+import type { MessageValue, Problem, Settings } from "@/types";
+import { buildExpression, randomInt } from "@/utils/problemUtils";
+import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from "react";
 
 const applyOperation = (result: number, operator: string, operand: number): number | null => {
   const operations: Record<string, (a: number, b: number) => number | null> = {
-    '+': (a, b) => a + b,
-    '-': (a, b) => a - b,
-    '*': (a, b) => a * b,
-    '/': (a, b) => (b === 0 || a % b !== 0 ? null : a / b),
+    "+": (a, b) => a + b,
+    "-": (a, b) => a - b,
+    "*": (a, b) => a * b,
+    "/": (a, b) => (b === 0 || a % b !== 0 ? null : a / b),
   };
 
   const operation = operations[operator];
@@ -62,7 +62,7 @@ const isResultInvalid = (result: number | null, settings: Settings): boolean => 
 };
 
 const isAdditionOnlyInfeasible = (settings: Settings, numOperands: number): boolean => {
-  if (settings.operations.length === 0 || !settings.operations.every(op => op === '+')) {
+  if (settings.operations.length === 0 || !settings.operations.every((op) => op === "+")) {
     return false;
   }
 
@@ -76,8 +76,8 @@ const formatProblemExpression = (operands: number[], operators: string[]): strin
     .reduce((expression, operator, index) => {
       return `${expression} ${operator} ${operands[index + 1]}`;
     }, operands[0].toString())
-    .replaceAll('*', '✖')
-    .replaceAll('/', '➗');
+    .replaceAll("*", "✖")
+    .replaceAll("/", "➗");
 };
 
 const canGenerateProblem = (settings: Settings, numOperands: number): boolean => {
@@ -88,7 +88,7 @@ const createProblemText = (
   operands: number[],
   operators: string[],
   result: number,
-  settings: Settings
+  settings: Settings,
 ): string => {
   const formattedProblem = formatProblemExpression(operands, operators);
   return settings.showAnswers ? `${formattedProblem} = ${result}` : `${formattedProblem} = `;
@@ -134,7 +134,7 @@ export const generateProblem = (settings: Settings): string => {
   const numOperands = randomInt(settings.numOperandsRange[0], settings.numOperandsRange[1]);
 
   if (!canGenerateProblem(settings, numOperands)) {
-    return '';
+    return "";
   }
 
   const MAX_ATTEMPTS = 10000;
@@ -145,27 +145,27 @@ export const generateProblem = (settings: Settings): string => {
     }
   }
 
-  return '';
+  return "";
 };
 
-const getErrorMessage = (): MessageValue => ({ key: 'errors.noProblemsGenerated' });
+const getErrorMessage = (): MessageValue => ({ key: "errors.noProblemsGenerated" });
 
 const getWarningMessage = (generated: number, requested: number): MessageValue => ({
-  key: 'errors.partialGeneration',
+  key: "errors.partialGeneration",
   params: { generated, requested },
 });
 
 const getSuccessMessage = (count: number): MessageValue => ({
-  key: 'messages.success.problemsGenerated',
+  key: "messages.success.problemsGenerated",
   params: { count },
 });
 
-const getEmptyMessage = (): MessageValue => '';
+const getEmptyMessage = (): MessageValue => "";
 
 const evaluateGeneratedProblems = (
   generated: Problem[],
   requested: number,
-  showSuccessMessage: boolean
+  showSuccessMessage: boolean,
 ): {
   error: MessageValue;
   warning: MessageValue;
@@ -205,22 +205,22 @@ const createProblemsArray = (settings: Settings): Problem[] => {
     : settings.numProblems;
 
   return Array.from({ length: totalProblems }, () => generateProblem(settings))
-    .filter(problem => problem !== '')
+    .filter((problem) => problem !== "")
     .map((problem, index) => ({ id: index, text: problem }));
 };
 
 const handleGenerationError = (
   err: unknown,
   warning: MessageValue,
-  showSuccessMessage: boolean
+  showSuccessMessage: boolean,
 ) => {
   if (import.meta.env.DEV) {
-    console.error('Problem generation error:', err);
+    console.error("Problem generation error:", err);
   }
   return {
-    error: showSuccessMessage ? { key: 'errors.generationFailed' } : '',
+    error: showSuccessMessage ? { key: "errors.generationFailed" } : "",
     warning,
-    successMessage: '',
+    successMessage: "",
   };
 };
 
@@ -230,12 +230,12 @@ const processValidationError = (validationError: string) => ({
   successMessage: getEmptyMessage(),
 });
 
-const EMPTY_MESSAGES = { error: '', warning: '', successMessage: '' } as const;
+const EMPTY_MESSAGES = { error: "", warning: "", successMessage: "" } as const;
 
 const isLargeProblemCount = (numProblems: number): boolean => numProblems > 50;
 
 const createLargeProblemWarning = (numProblems: number): MessageValue => ({
-  key: 'warnings.largeNumberOfProblems',
+  key: "warnings.largeNumberOfProblems",
   params: { count: numProblems },
 });
 
@@ -298,14 +298,14 @@ const handleValidationError = (validationError: string) => processValidationErro
 const handleSuccessfulGeneration = (
   settings: Settings,
   showSuccessMessage: boolean,
-  setProblems: Dispatch<SetStateAction<Problem[]>>
+  setProblems: Dispatch<SetStateAction<Problem[]>>,
 ) => createGenerationOutcome({ settings, showSuccessMessage, setProblems });
 
 const processGenerationLogic = (
   settings: Settings,
   showSuccessMessage: boolean,
   setProblems: Dispatch<SetStateAction<Problem[]>>,
-  validateSettings: (settings: Settings) => string
+  validateSettings: (settings: Settings) => string,
 ) => {
   const validationError = validateSettings(settings);
   return validationError
@@ -316,20 +316,20 @@ const processGenerationLogic = (
 export const useProblemGenerator = (
   settings: Settings,
   isLoading: boolean,
-  validateSettings: (settings: Settings) => string
+  validateSettings: (settings: Settings) => string,
 ) => {
   const [problems, setProblems] = useState<Problem[]>([]);
 
   const processGeneration = useCallback(
     (showSuccessMessage: boolean) =>
       processGenerationLogic(settings, showSuccessMessage, setProblems, validateSettings),
-    [settings, validateSettings, setProblems]
+    [settings, validateSettings, setProblems],
   );
 
   const generateProblems = useCallback(
     (showSuccessMessage: boolean = true) =>
       isLoading ? { ...EMPTY_MESSAGES } : processGeneration(showSuccessMessage),
-    [isLoading, processGeneration]
+    [isLoading, processGeneration],
   );
 
   // Auto-regenerate problems when settings change (no success toast)

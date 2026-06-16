@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode } from "react";
 
 // Global build-time constants
 declare global {
@@ -7,8 +7,8 @@ declare global {
 }
 
 // Application types
-export type Operation = '+' | '-' | '*' | '/' | '×' | '÷';
-export type PaperSize = 'a4' | 'letter' | 'legal';
+export type Operation = "+" | "-" | "*" | "/" | "×" | "÷";
+export type PaperSize = "a4" | "letter" | "legal";
 
 export interface Settings {
   operations: Operation[];
@@ -46,7 +46,7 @@ export interface NumberInputProps {
   max?: number;
   required?: boolean;
   className?: string;
-  'data-testid'?: string;
+  "data-testid"?: string;
 }
 
 export interface ProblemPreviewProps {
@@ -75,7 +75,7 @@ export interface QuizResult {
 }
 
 export type PaperSizeOptions = {
-  [K in Settings['paperSize']]: K;
+  [K in Settings["paperSize"]]: K;
 };
 
 // Language and i18n types

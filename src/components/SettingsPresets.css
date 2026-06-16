@@ -19,7 +19,7 @@
   right: 0;
   left: 0;
   height: 4px;
-  content: '';
+  content: "";
   background: linear-gradient(90deg, var(--primary-color), var(--success-color));
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }

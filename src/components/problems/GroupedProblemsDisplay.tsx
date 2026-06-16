@@ -1,11 +1,11 @@
-import type { Problem, Settings } from '@/types';
+import type { Problem, Settings } from "@/types";
 import {
   getEmptyGroupText,
   getGroupTitle,
   hasProblems,
   splitProblemsIntoGroups,
-} from '@/utils/groupingUtils';
-import React from 'react';
+} from "@/utils/groupingUtils";
+import React from "react";
 
 type GroupedProblemsDisplayProps = {
   t: (key: string, params?: Record<string, string | number>) => string;
@@ -30,22 +30,22 @@ const GroupedProblemsDisplay: React.FC<GroupedProblemsDisplayProps> = ({
           : `empty-${settings.totalGroups}-${settings.problemsPerGroup}-${groupIndex + 1}`;
 
         return hasProblems(group) ? (
-          <div key={groupKey} className='problem-group'>
-            <h3 className='group-title'>{getGroupTitle(groupIndex, t)}</h3>
+          <div key={groupKey} className="problem-group">
+            <h3 className="group-title">{getGroupTitle(groupIndex, t)}</h3>
             <ol
-              className='problems-grid'
+              className="problems-grid"
               start={groupIndex * settings.problemsPerGroup + 1}
               aria-label={`${problemsListLabel} - ${getGroupTitle(groupIndex, t)}`}
             >
-              {group.map(p => (
-                <li key={p.id} className='problem-item'>
-                  <span className='problem-text'>{p.text}</span>
+              {group.map((p) => (
+                <li key={p.id} className="problem-item">
+                  <span className="problem-text">{p.text}</span>
                 </li>
               ))}
             </ol>
           </div>
         ) : (
-          <div key={groupKey} className='empty-group-placeholder'>
+          <div key={groupKey} className="empty-group-placeholder">
             {getEmptyGroupText(groupIndex, t)}
           </div>
         );

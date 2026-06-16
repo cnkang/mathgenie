@@ -18,7 +18,7 @@ interface WebVitalsModule {
 }
 
 const isValidReportHandler = (onPerfEntry?: ReportHandler): onPerfEntry is ReportHandler => {
-  return onPerfEntry != null && typeof onPerfEntry === 'function';
+  return onPerfEntry != null && typeof onPerfEntry === "function";
 };
 
 const setupWebVitalsReporting = (vitals: WebVitalsModule, onPerfEntry: ReportHandler): void => {
@@ -34,8 +34,8 @@ const reportWebVitals = (onPerfEntry?: ReportHandler): void => {
     return;
   }
 
-  import('web-vitals')
-    .then(webVitals => {
+  import("web-vitals")
+    .then((webVitals) => {
       const vitals = webVitals as unknown as WebVitalsModule;
       setupWebVitalsReporting(vitals, onPerfEntry);
     })

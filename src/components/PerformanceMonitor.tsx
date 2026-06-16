@@ -2,8 +2,8 @@ import {
   useConcurrentFeatures,
   useEnhancedCache,
   usePerformanceTracking,
-} from '@/hooks/usePerformance';
-import React, { useDeferredValue, useEffect, useState } from 'react';
+} from "@/hooks/usePerformance";
+import React, { useDeferredValue, useEffect, useState } from "react";
 
 interface PerformanceData {
   renderCount: number;
@@ -25,7 +25,7 @@ interface PerformanceMonitorProps {
  * - Better memory management
  */
 const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
-  enabled = process.env.NODE_ENV === 'development',
+  enabled = process.env.NODE_ENV === "development",
   showDetails = false,
   children,
 }) => {
@@ -38,7 +38,7 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
   const deferredMetrics = useDeferredValue(performanceMetrics);
 
   // Use React 19.2's enhanced caching for performance data
-  const cachedPerformanceData = useEnhancedCache<PerformanceData>('performance-data', () => ({
+  const cachedPerformanceData = useEnhancedCache<PerformanceData>("performance-data", () => ({
     ...deferredMetrics,
     memoryUsage: deferredMemoryInfo,
   }));
@@ -50,7 +50,7 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
 
     // Monitor memory usage if available (Chrome DevTools)
     if (
-      'memory' in performance &&
+      "memory" in performance &&
       (performance as { memory?: { usedJSHeapSize: number } }).memory
     ) {
       const { memory } = performance as { memory: { usedJSHeapSize: number } };
@@ -66,7 +66,7 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
       // Use concurrent features for better performance
       scheduleUpdate(() => {
         if (
-          'memory' in performance &&
+          "memory" in performance &&
           (performance as { memory?: { usedJSHeapSize: number } }).memory
         ) {
           const { memory } = performance as { memory: { usedJSHeapSize: number } };
@@ -86,23 +86,23 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
     <>
       {children}
       <div
-        className='performance-monitor'
+        className="performance-monitor"
         style={{
-          position: 'fixed',
-          top: '10px',
-          right: '10px',
-          background: 'rgba(0, 0, 0, 0.8)',
-          color: 'white',
-          padding: '8px 12px',
-          borderRadius: '4px',
-          fontSize: '12px',
-          fontFamily: 'monospace',
+          position: "fixed",
+          top: "10px",
+          right: "10px",
+          background: "rgba(0, 0, 0, 0.8)",
+          color: "white",
+          padding: "8px 12px",
+          borderRadius: "4px",
+          fontSize: "12px",
+          fontFamily: "monospace",
           zIndex: 9999,
-          minWidth: '200px',
+          minWidth: "200px",
         }}
       >
-        <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
-          React 19.2 Performance {isPending && '⏳'}
+        <div style={{ fontWeight: "bold", marginBottom: "4px" }}>
+          React 19.2 Performance {isPending && "⏳"}
         </div>
 
         <div>Renders: {cachedPerformanceData.renderCount}</div>
@@ -113,7 +113,7 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
             {cachedPerformanceData.memoryUsage && (
               <div>Memory: {(cachedPerformanceData.memoryUsage / 1024 / 1024).toFixed(2)}MB</div>
             )}
-            <div style={{ fontSize: '10px', marginTop: '4px', opacity: 0.7 }}>
+            <div style={{ fontSize: "10px", marginTop: "4px", opacity: 0.7 }}>
               Enhanced with React 19.2 concurrent features, batching & caching
             </div>
           </>

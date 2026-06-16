@@ -1,11 +1,11 @@
-import React from 'react';
-import { useTranslation } from '../i18n';
-import type { Problem, QuizResult } from '../types';
-import InteractiveProblem from './InteractiveProblem';
-import QuizResults from '@/components/quiz/QuizResults';
-import QuizHeader from '@/components/quiz/QuizHeader';
-import QuizNavigation from '@/components/quiz/QuizNavigation';
-import { useQuizController } from '@/components/quiz/useQuizController';
+import React from "react";
+import { useTranslation } from "../i18n";
+import type { Problem, QuizResult } from "../types";
+import InteractiveProblem from "./InteractiveProblem";
+import QuizResults from "@/components/quiz/QuizResults";
+import QuizHeader from "@/components/quiz/QuizHeader";
+import QuizNavigation from "@/components/quiz/QuizNavigation";
+import { useQuizController } from "@/components/quiz/useQuizController";
 
 // math evaluation moved to quiz/expression.ts
 
@@ -15,11 +15,11 @@ interface QuizModeProps {
   onExitQuiz: () => void;
 }
 
-const QUIZ_LOADING_KEY = 'quiz.loading';
+const QUIZ_LOADING_KEY = "quiz.loading";
 
 const renderLoadingState = (
-  translate: (key: string, params?: Record<string, string | number>) => string
-) => <div className='quiz-loading'>{translate(QUIZ_LOADING_KEY)}</div>;
+  translate: (key: string, params?: Record<string, string | number>) => string,
+) => <div className="quiz-loading">{translate(QUIZ_LOADING_KEY)}</div>;
 
 const renderResults = (params: {
   t: (key: string, params?: Record<string, string | number>) => string;
@@ -72,7 +72,7 @@ const renderQuizLayout = (params: {
   const progressPercentage = Math.round(progress);
 
   return (
-    <div className='quiz-mode'>
+    <div className="quiz-mode">
       <QuizHeader
         t={t}
         progressPercentage={progressPercentage}
@@ -83,9 +83,9 @@ const renderQuizLayout = (params: {
         onExit={onExitQuiz}
       />
 
-      <div className='quiz-content'>
-        <div className='current-problem'>
-          <h3>{t('quiz.problemNumber', { number: currentProblemIndex + 1 })}</h3>
+      <div className="quiz-content">
+        <div className="current-problem">
+          <h3>{t("quiz.problemNumber", { number: currentProblemIndex + 1 })}</h3>
           <InteractiveProblem
             problem={currentProblem}
             onAnswerSubmit={handleAnswerSubmit}
@@ -126,13 +126,13 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
   const resetQuizState = (): void => {
     setShowResults(false);
     setCurrentProblemIndex(0);
-    setQuizProblems(prev =>
-      prev.map(problem => ({
+    setQuizProblems((prev) =>
+      prev.map((problem) => ({
         ...problem,
         userAnswer: undefined,
         isCorrect: false,
         isAnswered: false,
-      }))
+      })),
     );
     setTimeElapsed(0);
   };

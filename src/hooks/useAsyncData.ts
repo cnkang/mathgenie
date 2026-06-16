@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 /**
  * Hook for handling Promise-based async data with React 19.2 optimizations
@@ -11,11 +11,11 @@ export const useAsyncData = <T>(promise: Promise<T>) => {
 
   React.useEffect(() => {
     promise
-      .then(result => {
+      .then((result) => {
         setData(result);
         setIsLoading(false);
       })
-      .catch(err => {
+      .catch((err) => {
         setError(err);
         setIsLoading(false);
       });

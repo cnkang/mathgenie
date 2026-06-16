@@ -12,58 +12,58 @@
  * - Uses timeouts and proper error handling
  */
 
-import { spawnNodeCli } from './exec-utils';
-import { existsSync, readdirSync, statSync } from 'node:fs';
-import { homedir, platform } from 'node:os';
-import { join } from 'node:path';
+import { spawnNodeCli } from "./exec-utils";
+import { existsSync, readdirSync, statSync } from "node:fs";
+import { homedir, platform } from "node:os";
+import { join } from "node:path";
 
 // Colors for output (respect NO_COLOR environment variable)
 const colors = {
-  red: process.env.NO_COLOR ? '' : '\u001b[0;31m',
-  green: process.env.NO_COLOR ? '' : '\u001b[0;32m',
-  yellow: process.env.NO_COLOR ? '' : '\u001b[1;33m',
-  blue: process.env.NO_COLOR ? '' : '\u001b[0;34m',
-  reset: process.env.NO_COLOR ? '' : '\u001b[0m',
+  red: process.env.NO_COLOR ? "" : "\u001b[0;31m",
+  green: process.env.NO_COLOR ? "" : "\u001b[0;32m",
+  yellow: process.env.NO_COLOR ? "" : "\u001b[1;33m",
+  blue: process.env.NO_COLOR ? "" : "\u001b[0;34m",
+  reset: process.env.NO_COLOR ? "" : "\u001b[0m",
 } as const;
 
 type ColorKey = keyof typeof colors;
-const MS_PLAYWRIGHT_DIR = 'ms-playwright' as const;
-const BROWSERS = ['chromium', 'firefox', 'webkit'] as const;
+const MS_PLAYWRIGHT_DIR = "ms-playwright" as const;
+const BROWSERS = ["chromium", "firefox", "webkit"] as const;
 
-function log(message: string, color: ColorKey = 'reset'): void {
+function log(message: string, color: ColorKey = "reset"): void {
   console.log(`${colors[color]}${message}${colors.reset}`);
 }
 
 function logInfo(message: string): void {
-  log(`[INFO] ${message}`, 'blue');
+  log(`[INFO] ${message}`, "blue");
 }
 
 function logSuccess(message: string): void {
-  log(`[SUCCESS] ${message}`, 'green');
+  log(`[SUCCESS] ${message}`, "green");
 }
 
 function logWarning(message: string): void {
-  log(`[WARNING] ${message}`, 'yellow');
+  log(`[WARNING] ${message}`, "yellow");
 }
 
 function logError(message: string): void {
-  log(`[ERROR] ${message}`, 'red');
+  log(`[ERROR] ${message}`, "red");
 }
 
 const PLAYWRIGHT_ALLOWED_ARGS = new Set([
-  '--version',
-  'install',
-  '--dry-run',
+  "--version",
+  "install",
+  "--dry-run",
   ...BROWSERS,
-  '--with-deps',
+  "--with-deps",
 ]);
 
 // Execute Playwright via Node with absolute CLI bin path
 function execPlaywright(
   args: string[],
-  opts: { stdio?: 'pipe' | 'inherit'; encoding?: 'utf8'; timeout?: number } = {}
+  opts: { stdio?: "pipe" | "inherit"; encoding?: "utf8"; timeout?: number } = {},
 ) {
-  const { stdio = 'pipe', encoding = 'utf8', timeout = 300000 } = opts; // default 5 min
+  const { stdio = "pipe", encoding = "utf8", timeout = 300000 } = opts; // default 5 min
 
   // Validate arguments to prevent code injection.
   for (const arg of args) {
@@ -73,7 +73,7 @@ function execPlaywright(
     }
   }
 
-  return spawnNodeCli('playwright', 'playwright', args, {
+  return spawnNodeCli("playwright", "playwright", args, {
     stdio,
     encoding,
     timeout,
@@ -87,18 +87,18 @@ function execPlaywright(
 function checkBrowsersInstalled(): boolean {
   try {
     // Try to get browser info - this will fail if browsers aren't installed
-    const result = execPlaywright(['--version'], { encoding: 'utf8', stdio: 'pipe' });
-    const ver = result.stdout?.toString() || '';
+    const result = execPlaywright(["--version"], { encoding: "utf8", stdio: "pipe" });
+    const ver = result.stdout?.toString() || "";
     logInfo(`Playwright version: ${ver.trim()}`);
 
     // Check if browsers are actually installed by trying to list them
     try {
-      const dry = execPlaywright(['install', '--dry-run', 'chromium', 'firefox', 'webkit'], {
-        encoding: 'utf8',
-        stdio: 'pipe',
+      const dry = execPlaywright(["install", "--dry-run", "chromium", "firefox", "webkit"], {
+        encoding: "utf8",
+        stdio: "pipe",
       });
       if (dry.status !== 0) {
-        throw new Error(dry.stderr?.toString() || 'Dry-run failed');
+        throw new Error(dry.stderr?.toString() || "Dry-run failed");
       }
       return true;
     } catch (dryRunError) {
@@ -121,20 +121,20 @@ function checkBrowsersInstalled(): boolean {
  * Install Playwright browsers
  */
 function installBrowsers(): boolean {
-  logInfo('Installing Playwright browsers...');
+  logInfo("Installing Playwright browsers...");
 
   try {
     // Install browsers with dependencies
-    const res = execPlaywright(['install', 'chromium', 'firefox', 'webkit', '--with-deps'], {
-      stdio: 'inherit',
-      encoding: 'utf8',
+    const res = execPlaywright(["install", "chromium", "firefox", "webkit", "--with-deps"], {
+      stdio: "inherit",
+      encoding: "utf8",
     });
     if (res.status !== 0) {
-      const stderr = res.stderr?.toString() || 'Unknown error';
+      const stderr = res.stderr?.toString() || "Unknown error";
       throw new Error(`Playwright install failed: ${stderr}`);
     }
 
-    logSuccess('Playwright browsers installed successfully');
+    logSuccess("Playwright browsers installed successfully");
     return true;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -148,16 +148,16 @@ function installBrowsers(): boolean {
  */
 function isCI(): boolean {
   const ciEnvironmentVariables = [
-    'CI',
-    'CONTINUOUS_INTEGRATION',
-    'BUILD_NUMBER',
-    'GITHUB_ACTIONS',
-    'GITLAB_CI',
-    'CIRCLECI',
-    'JENKINS_URL',
+    "CI",
+    "CONTINUOUS_INTEGRATION",
+    "BUILD_NUMBER",
+    "GITHUB_ACTIONS",
+    "GITLAB_CI",
+    "CIRCLECI",
+    "JENKINS_URL",
   ];
 
-  return ciEnvironmentVariables.some(variable => !!process.env[variable]);
+  return ciEnvironmentVariables.some((variable) => !!process.env[variable]);
 }
 
 /**
@@ -171,12 +171,12 @@ function getBrowserCacheDir(): string {
 
   // Default cache directories by platform
   switch (platform()) {
-    case 'win32':
-      return join(homedir(), 'AppData', 'Local', MS_PLAYWRIGHT_DIR);
-    case 'darwin':
-      return join(homedir(), 'Library', 'Caches', MS_PLAYWRIGHT_DIR);
+    case "win32":
+      return join(homedir(), "AppData", "Local", MS_PLAYWRIGHT_DIR);
+    case "darwin":
+      return join(homedir(), "Library", "Caches", MS_PLAYWRIGHT_DIR);
     default:
-      return join(homedir(), '.cache', MS_PLAYWRIGHT_DIR);
+      return join(homedir(), ".cache", MS_PLAYWRIGHT_DIR);
   }
 }
 
@@ -188,23 +188,23 @@ function checkBrowserCache(): boolean {
   logInfo(`Checking browser cache at: ${cacheDir}`);
 
   if (!existsSync(cacheDir)) {
-    logWarning('Browser cache directory does not exist');
+    logWarning("Browser cache directory does not exist");
     return false;
   }
 
   // Check if cache has browser directories
   try {
     const contents = readdirSync(cacheDir);
-    const hasBrowsers = contents.some(item => {
+    const hasBrowsers = contents.some((item) => {
       const itemPath = join(cacheDir, item);
-      return statSync(itemPath).isDirectory() && BROWSERS.some(browser => item.includes(browser));
+      return statSync(itemPath).isDirectory() && BROWSERS.some((browser) => item.includes(browser));
     });
 
     if (hasBrowsers) {
-      logSuccess('Browser cache found with installed browsers');
+      logSuccess("Browser cache found with installed browsers");
       return true;
     } else {
-      logWarning('Browser cache exists but no browsers found');
+      logWarning("Browser cache exists but no browsers found");
       return false;
     }
   } catch (error) {
@@ -219,12 +219,12 @@ function checkBrowserCache(): boolean {
  * @param ci - A boolean indicating if the environment is a CI environment.
  */
 function handleBrowserInstallation(ci: boolean): void {
-  logWarning('Playwright browsers are not installed or not detected');
+  logWarning("Playwright browsers are not installed or not detected");
 
   // In CI, we might want to fail fast if browsers aren't pre-installed
-  if (ci && process.env.PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD === '1') {
-    logError('Browser installation is disabled in CI (PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1)');
-    logError('Please ensure browsers are pre-installed in your CI environment');
+  if (ci && process.env.PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD === "1") {
+    logError("Browser installation is disabled in CI (PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1)");
+    logError("Please ensure browsers are pre-installed in your CI environment");
     process.exit(1);
   }
 
@@ -232,29 +232,29 @@ function handleBrowserInstallation(ci: boolean): void {
   const installSuccess = installBrowsers();
 
   if (!installSuccess) {
-    logError('Failed to install Playwright browsers');
+    logError("Failed to install Playwright browsers");
     process.exit(1);
   }
 
   // Verify installation
   const verifyInstalled = checkBrowsersInstalled();
   if (!verifyInstalled) {
-    logError('Browser installation verification failed');
+    logError("Browser installation verification failed");
     process.exit(1);
   }
 
-  logSuccess('Browser installation completed and verified');
+  logSuccess("Browser installation completed and verified");
 }
 
 /**
  * Main function
  */
 function main(): void {
-  logInfo('Checking Playwright browser installation...');
+  logInfo("Checking Playwright browser installation...");
 
   const ci = isCI();
   if (ci) {
-    logInfo('Running in CI environment');
+    logInfo("Running in CI environment");
   }
 
   // First check if browsers are in cache
@@ -264,7 +264,7 @@ function main(): void {
   const browsersInstalled = checkBrowsersInstalled();
 
   if (browsersInstalled && cacheExists) {
-    logSuccess('Playwright browsers are already installed and ready');
+    logSuccess("Playwright browsers are already installed and ready");
   } else {
     handleBrowserInstallation(ci);
   }

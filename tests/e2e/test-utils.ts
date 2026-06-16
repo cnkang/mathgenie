@@ -35,8 +35,8 @@ export async function waitForAppLoad(page: Page): Promise<void> {
     // Ensure all critical elements are interactive
     await page.waitForFunction(
       () => {
-        const operations = document.querySelector('#operations');
-        const numProblems = document.querySelector('#numProblems');
+        const operations = document.querySelector<HTMLElement>('#operations');
+        const numProblems = document.querySelector<HTMLElement>('#numProblems');
         return (
           operations && numProblems && operations.offsetHeight > 0 && numProblems.offsetHeight > 0
         );
@@ -60,7 +60,7 @@ export async function waitForPresetsLoad(page: Page): Promise<void> {
   // Wait for preset cards to be fully interactive
   await page.waitForFunction(
     () => {
-      const presetCards = document.querySelectorAll('.preset-card');
+      const presetCards = document.querySelectorAll<HTMLElement>('.preset-card');
       return (
         presetCards.length === 4 &&
         Array.from(presetCards).every(card => card.offsetHeight > 0 && card.offsetWidth > 0)

@@ -1,7 +1,7 @@
-import ErrorBoundary from '@/components/ErrorBoundary';
-import { useConcurrentFeatures } from '@/hooks/usePerformance';
-import { useErrorRecovery, useReact19Features } from '@/hooks/useReact19Features';
-import React, { Suspense, useDeferredValue, useTransition } from 'react';
+import ErrorBoundary from "@/components/ErrorBoundary";
+import { useConcurrentFeatures } from "@/hooks/usePerformance";
+import { useErrorRecovery, useReact19Features } from "@/hooks/useReact19Features";
+import React, { Suspense, useDeferredValue, useTransition } from "react";
 
 interface EnhancedSuspenseProps {
   children: React.ReactNode;
@@ -46,39 +46,39 @@ const EnhancedSuspense: React.FC<EnhancedSuspenseProps> = ({
 
       // Update optimistic state if enabled
       if (shouldUseOptimistic && updateOptimistic) {
-        updateOptimistic('error');
+        updateOptimistic("error");
       }
 
       // Attempt error recovery
       recoverFromError(() => {
-        console.log('Attempting to recover from error:', error.message);
+        console.log("Attempting to recover from error:", error.message);
       });
     },
-    [onError, scheduleUpdate, shouldUseOptimistic, updateOptimistic, recoverFromError]
+    [onError, scheduleUpdate, shouldUseOptimistic, updateOptimistic, recoverFromError],
   );
 
   const handleRetry = React.useCallback(() => {
     enhancedStartTransition(() => {
       if (shouldUseOptimistic && updateOptimistic) {
-        updateOptimistic('retry');
+        updateOptimistic("retry");
       }
     });
   }, [enhancedStartTransition, shouldUseOptimistic, updateOptimistic]);
 
   // Determine loading state
   const isLoading = isPending || isTransitioning || isRecovering;
-  const showOptimisticError = shouldUseOptimistic && optimisticState?.data === 'error';
+  const showOptimisticError = shouldUseOptimistic && optimisticState?.data === "error";
 
   // Enhanced fallback with loading states
   const enhancedFallback = (
     <div
       style={{
         opacity: isLoading ? 0.7 : 1,
-        transition: 'opacity 0.2s ease-in-out',
+        transition: "opacity 0.2s ease-in-out",
       }}
     >
       {showOptimisticError ? (
-        <div className='error-fallback'>
+        <div className="error-fallback">
           <p>Something went wrong</p>
           <button onClick={handleRetry}>Try Again</button>
         </div>
@@ -86,7 +86,7 @@ const EnhancedSuspense: React.FC<EnhancedSuspenseProps> = ({
         fallback
       )}
       {isRecovering && (
-        <div className='recovery-indicator'>
+        <div className="recovery-indicator">
           <small>Recovering...</small>
         </div>
       )}

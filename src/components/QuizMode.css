@@ -150,7 +150,7 @@
 
 .problem-expression {
   margin-bottom: var(--space-lg);
-  font-family: 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', monospace;
+  font-family: "SF Mono", Monaco, Inconsolata, "Roboto Mono", monospace;
   font-size: var(--font-size-2xl);
   font-weight: 700;
   color: var(--text-primary);
@@ -433,7 +433,7 @@
   gap: var(--space-md);
   align-items: center;
   padding: var(--space-md);
-  font-family: 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', monospace;
+  font-family: "SF Mono", Monaco, Inconsolata, "Roboto Mono", monospace;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);

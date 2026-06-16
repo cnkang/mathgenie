@@ -1,5 +1,5 @@
-import React from 'react';
-import './RangeInput.css';
+import React from "react";
+import "./RangeInput.css";
 
 type RangeInputProps = {
   id: string;
@@ -45,15 +45,15 @@ const RangeInput: React.FC<RangeInputProps> = ({
   };
 
   return (
-    <div className={className || 'range-input'}>
-      <label htmlFor={idFrom ?? `${id}-from`} className='range-label'>
+    <div className={className || "range-input"}>
+      <label htmlFor={idFrom ?? `${id}-from`} className="range-label">
         {label}
       </label>
-      <div className='range-fields'>
+      <div className="range-fields">
         <input
           id={idFrom ?? `${id}-from`}
-          type='number'
-          inputMode='numeric'
+          type="number"
+          inputMode="numeric"
           value={from}
           onChange={handleFrom}
           min={min}
@@ -61,15 +61,15 @@ const RangeInput: React.FC<RangeInputProps> = ({
           step={step}
           aria-label={ariaMinLabel || `${label} from`}
           placeholder={fromPlaceholder}
-          className='range-from'
+          className="range-from"
         />
-        <span className='range-sep' aria-hidden>
+        <span className="range-sep" aria-hidden>
           –
         </span>
         <input
           id={idTo ?? `${id}-to`}
-          type='number'
-          inputMode='numeric'
+          type="number"
+          inputMode="numeric"
           value={to}
           onChange={handleTo}
           min={min}
@@ -77,7 +77,7 @@ const RangeInput: React.FC<RangeInputProps> = ({
           step={step}
           aria-label={ariaMaxLabel || `${label} to`}
           placeholder={toPlaceholder}
-          className='range-to'
+          className="range-to"
         />
       </div>
     </div>

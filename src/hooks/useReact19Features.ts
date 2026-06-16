@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useOptimistic, useTransition } from 'react';
+import { useCallback, useMemo, useOptimistic, useTransition } from "react";
 
 /**
  * React 19.2 Features Hook
@@ -21,18 +21,18 @@ export const useReact19Features = (): UseReact19FeaturesReturn => {
   const [isPending, startTransition] = useTransition();
 
   const [optimisticState, addOptimistic] = useOptimistic(
-    { data: 'initial', isPending: false },
+    { data: "initial", isPending: false },
     (state: OptimisticState<string>, action: string | ((prev: string) => string)) => ({
-      data: typeof action === 'function' ? action(state.data) : action,
+      data: typeof action === "function" ? action(state.data) : action,
       isPending: true,
-    })
+    }),
   );
 
   const updateOptimistic = useCallback(
     (action: string | ((prev: string) => string)) => {
       addOptimistic(action);
     },
-    [addOptimistic]
+    [addOptimistic],
   );
 
   const enhancedStartTransition = useCallback(
@@ -41,11 +41,11 @@ export const useReact19Features = (): UseReact19FeaturesReturn => {
         try {
           callback();
         } catch (error) {
-          console.error('Transition error:', error);
+          console.error("Transition error:", error);
         }
       });
     },
-    [startTransition]
+    [startTransition],
   );
 
   return useMemo(
@@ -55,7 +55,7 @@ export const useReact19Features = (): UseReact19FeaturesReturn => {
       isPending,
       startTransition: enhancedStartTransition,
     }),
-    [optimisticState, updateOptimistic, isPending, enhancedStartTransition]
+    [optimisticState, updateOptimistic, isPending, enhancedStartTransition],
   );
 };
 
@@ -67,27 +67,27 @@ export interface SuspenseResource<T> {
 }
 
 export const createSuspenseResource = <T>(promise: Promise<T>): SuspenseResource<T> => {
-  let status = 'pending';
+  let status = "pending";
   let result: T;
   let error: unknown;
 
   const suspender = promise.then(
-    res => {
-      status = 'success';
+    (res) => {
+      status = "success";
       result = res;
     },
-    err => {
-      status = 'error';
+    (err) => {
+      status = "error";
       error = err;
-    }
+    },
   );
 
   return {
     read() {
-      if (status === 'pending') {
+      if (status === "pending") {
         throw suspender;
       }
-      if (status === 'error') {
+      if (status === "error") {
         throw error;
       }
       return result;
@@ -107,11 +107,11 @@ export const useErrorRecovery = () => {
         try {
           recoveryAction();
         } catch (err) {
-          console.error('Error recovery failed:', err);
+          console.error("Error recovery failed:", err);
         }
       });
     },
-    [startTransition]
+    [startTransition],
   );
 
   return { recoverFromError, isRecovering: isPending };

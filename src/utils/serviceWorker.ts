@@ -8,25 +8,25 @@ interface ServiceWorkerConfig {
 
 // SONAR-SAFE: The .exec() below is a regex method call, not OS command execution
 const isLocalhost = Boolean(
-  globalThis.location.hostname === 'localhost' ||
-    globalThis.location.hostname === '[::1]' ||
-    /^127(?:\.(?:25[0-5]|2[0-4]\d|[01]?\d\d?)){3}$/.exec(globalThis.location.hostname)
+  globalThis.location.hostname === "localhost" ||
+  globalThis.location.hostname === "[::1]" ||
+  /^127(?:\.(?:25[0-5]|2[0-4]\d|[01]?\d\d?)){3}$/.exec(globalThis.location.hostname),
 );
 
-const isServiceWorkerSupported = (): boolean => 'serviceWorker' in navigator;
+const isServiceWorkerSupported = (): boolean => "serviceWorker" in navigator;
 
 const isValidPublicUrl = (): boolean => {
-  const publicUrl = new URL(import.meta.env.VITE_PUBLIC_URL || '', globalThis.location.href);
+  const publicUrl = new URL(import.meta.env.VITE_PUBLIC_URL || "", globalThis.location.href);
   return publicUrl.origin === globalThis.location.origin;
 };
 
 const handleServiceWorkerLoad = (config?: ServiceWorkerConfig): void => {
-  const swUrl = `${import.meta.env.VITE_PUBLIC_URL || ''}/sw.js`;
+  const swUrl = `${import.meta.env.VITE_PUBLIC_URL || ""}/sw.js`;
 
   if (isLocalhost) {
     checkValidServiceWorker(swUrl, config);
-    navigator.serviceWorker.ready.then(() => {
-      console.log('This web app is being served cache-first by a service worker.');
+    void navigator.serviceWorker.ready.then(() => {
+      console.log("This web app is being served cache-first by a service worker.");
     });
   } else {
     registerValidSW(swUrl, config);
@@ -42,20 +42,20 @@ export function register(config?: ServiceWorkerConfig): void {
     return;
   }
 
-  globalThis.addEventListener('load', () => handleServiceWorkerLoad(config));
+  globalThis.addEventListener("load", () => handleServiceWorkerLoad(config));
 }
 
 const handleInstallingWorkerStateChange = (
   installingWorker: ServiceWorker,
   registration: ServiceWorkerRegistration,
-  config?: ServiceWorkerConfig
+  config?: ServiceWorkerConfig,
 ): void => {
-  if (installingWorker.state === 'installed') {
+  if (installingWorker.state === "installed") {
     if (navigator.serviceWorker.controller) {
-      console.log('New content is available and will be used when all tabs are closed.');
+      console.log("New content is available and will be used when all tabs are closed.");
       config?.onUpdate?.(registration);
     } else {
-      console.log('Content is cached for offline use.');
+      console.log("Content is cached for offline use.");
       config?.onSuccess?.(registration);
     }
   }
@@ -63,7 +63,7 @@ const handleInstallingWorkerStateChange = (
 
 const setupUpdateHandler = (
   registration: ServiceWorkerRegistration,
-  config?: ServiceWorkerConfig
+  config?: ServiceWorkerConfig,
 ): void => {
   registration.onupdatefound = (): void => {
     const installingWorker = registration.installing;
@@ -79,11 +79,11 @@ const setupUpdateHandler = (
 function registerValidSW(swUrl: string, config?: ServiceWorkerConfig): void {
   navigator.serviceWorker
     .register(swUrl)
-    .then(registration => {
+    .then((registration) => {
       setupUpdateHandler(registration, config);
     })
     .catch((error: Error) => {
-      console.error('Error during service worker registration:', error.message);
+      console.error("Error during service worker registration:", error.message);
     });
 }
 
@@ -92,14 +92,14 @@ const validateServiceWorkerUrl = (swUrl: string): boolean => {
     const url = new URL(swUrl, globalThis.location.origin);
     return url.origin === globalThis.location.origin;
   } catch {
-    console.error('Invalid service worker URL');
+    console.error("Invalid service worker URL");
     return false;
   }
 };
 
 const handleInvalidServiceWorker = (): void => {
-  navigator.serviceWorker.ready.then((registration: ServiceWorkerRegistration) => {
-    registration.unregister().then((): void => {
+  void navigator.serviceWorker.ready.then((registration: ServiceWorkerRegistration) => {
+    return registration.unregister().then((): void => {
       globalThis.location.reload();
     });
   });
@@ -108,11 +108,11 @@ const handleInvalidServiceWorker = (): void => {
 const processServiceWorkerResponse = (
   response: Response,
   swUrl: string,
-  config?: ServiceWorkerConfig
+  config?: ServiceWorkerConfig,
 ): void => {
-  const contentType = response.headers.get('content-type');
+  const contentType = response.headers.get("content-type");
   const isNotFound = response.status === 404;
-  const isNotJavaScript = contentType !== null && !contentType.includes('javascript');
+  const isNotJavaScript = contentType !== null && !contentType.includes("javascript");
 
   if (isNotFound || isNotJavaScript) {
     handleInvalidServiceWorker();
@@ -123,30 +123,30 @@ const processServiceWorkerResponse = (
 
 function checkValidServiceWorker(swUrl: string, config?: ServiceWorkerConfig): void {
   if (!validateServiceWorkerUrl(swUrl)) {
-    console.error('Service worker URL must be same-origin');
+    console.error("Service worker URL must be same-origin");
     return;
   }
 
   fetch(swUrl, {
-    headers: { 'Service-Worker': 'script' },
+    headers: { "Service-Worker": "script" },
   })
     .then((response: Response) => {
       processServiceWorkerResponse(response, swUrl, config);
     })
     .catch((): void => {
-      console.log('No internet connection found. App is running in offline mode.');
+      console.log("No internet connection found. App is running in offline mode.");
     });
 }
 
 export function unregister(): void {
-  if (!('serviceWorker' in navigator)) {
+  if (!("serviceWorker" in navigator)) {
     return;
   }
   navigator.serviceWorker.ready
-    .then(registration => {
-      registration.unregister();
+    .then((registration) => {
+      void registration.unregister();
     })
-    .catch(error => {
+    .catch((error) => {
       console.error(error.message);
     });
 }

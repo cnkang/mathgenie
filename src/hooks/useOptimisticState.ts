@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback } from "react";
 
 export const useOptimisticState = <T>(initialValue: T) => {
   const [actualState, setActualState] = useState<T>(initialValue);
@@ -36,7 +36,7 @@ export const useOptimisticState = <T>(initialValue: T) => {
         throw error;
       }
     },
-    [updateOptimistic, rollback]
+    [updateOptimistic, rollback],
   );
 
   return {

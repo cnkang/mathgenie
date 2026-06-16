@@ -19,7 +19,7 @@
   right: 0;
   left: 0;
   height: 3px;
-  content: '';
+  content: "";
   background: linear-gradient(90deg, var(--success-color), var(--primary-color));
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
@@ -38,7 +38,7 @@
   height: auto;
   font-size: var(--font-size-sm);
   font-weight: 700;
-  content: '#';
+  content: "#";
   background: none;
   border-radius: 0;
 }
@@ -52,7 +52,7 @@
   padding: var(--space-md);
   margin-bottom: var(--space-sm);
   contain: layout style;
-  font-family: 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', monospace;
+  font-family: "SF Mono", Monaco, Inconsolata, "Roboto Mono", monospace;
   font-size: var(--font-size-lg);
   font-weight: 500;
   color: var(--text-primary);

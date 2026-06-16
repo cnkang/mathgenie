@@ -1,8 +1,8 @@
-/// <reference types="vitest/globals" />
+/// <reference types="vite-plus/test/globals" />
 
 // Custom matchers for happy-dom testing environment
 // These are implemented in setupTests.ts and work with happy-dom
-declare module 'vitest' {
+declare module "vite-plus/test" {
   interface Assertion<T = unknown> {
     toBeInTheDocument(): T;
     toHaveTextContent(text: string): T;

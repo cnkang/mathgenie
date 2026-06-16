@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: "24.14.1"
+  NODE_VERSION: "24.16.0"
 
 jobs:
   # Job 1: Dependabot PR Analysis
@@ -202,20 +202,26 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: "pnpm"
 
+      - name: ⚡ Setup Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: true
+
       - name: 📋 Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: vp install --frozen-lockfile
 
       - name: 🔍 Run linting
-        run: pnpm lint
+        run: vp check --no-fmt
 
       - name: 🧪 Run tests
-        run: pnpm test:unit
+        run: vp test
 
       - name: 🏗️ Build application
-        run: pnpm build
+        run: vp run build
 
       - name: 🔒 Security audit
-        run: pnpm audit --audit-level moderate
+        run: vp pm audit --audit-level moderate
         continue-on-error: true
 
   # Job 3: Notify on manual review required

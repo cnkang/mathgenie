@@ -4,62 +4,62 @@
  * 统一测试脚本 - 智能选择最佳测试配置并支持多种测试类型
  */
 
-import { spawnSync } from 'node:child_process';
-import { cpus, freemem, totalmem } from 'node:os';
-import { delimiter, dirname } from 'node:path';
-import { buildSafeEnv, findExecutable, isCommandAvailable } from './exec-utils';
+import { spawnSync } from "node:child_process";
+import { cpus, freemem, totalmem } from "node:os";
+import { delimiter, dirname } from "node:path";
+import { buildSafeEnv, findExecutable, isCommandAvailable } from "./exec-utils";
 
 // 颜色输出 (支持 NO_COLOR 环境变量)
 const colors = process.env.NO_COLOR
   ? {}
   : {
-      red: '\u001b[0;31m',
-      green: '\u001b[0;32m',
-      yellow: '\u001b[1;33m',
-      blue: '\u001b[0;34m',
-      cyan: '\u001b[0;36m',
-      reset: '\u001b[0m',
+      red: "\u001b[0;31m",
+      green: "\u001b[0;32m",
+      yellow: "\u001b[1;33m",
+      blue: "\u001b[0;34m",
+      cyan: "\u001b[0;36m",
+      reset: "\u001b[0m",
     };
 
-const ALLOWED_E2E_PROJECTS = new Set(['chromium', 'firefox', 'webkit']);
+const ALLOWED_E2E_PROJECTS = new Set(["chromium", "firefox", "webkit"]);
 const ALLOWED_E2E_SUITES = new Set([
-  'basic',
-  'error-handling',
-  'localstorage-persistence',
-  'presets-functionality',
-  'integration',
-  'accessibility-unified',
+  "basic",
+  "error-handling",
+  "localstorage-persistence",
+  "presets-functionality",
+  "integration",
+  "accessibility-unified",
 ]);
 const ALLOWED_MOBILE_DEVICES = new Set([
-  'all',
-  'iphone',
-  'iphone16',
-  'iphone15',
-  'ipad',
-  'android',
-  'galaxy',
-  'pixel',
-  'latest',
+  "all",
+  "iphone",
+  "iphone16",
+  "iphone15",
+  "ipad",
+  "android",
+  "galaxy",
+  "pixel",
+  "latest",
 ]);
 const REPORTER_PATTERN = /^[a-zA-Z0-9._-]+$/;
 const EXEC_TIMEOUT_MS = 20 * 60 * 1000;
 
-type LogLevel = 'info' | 'success' | 'warning' | 'error' | 'system';
+type LogLevel = "info" | "success" | "warning" | "error" | "system";
 
 function log(level: LogLevel, message: string): void {
   const prefix =
     {
-      info: `${colors.blue || ''}[INFO]${colors.reset || ''}`,
-      success: `${colors.green || ''}[SUCCESS]${colors.reset || ''}`,
-      warning: `${colors.yellow || ''}[WARNING]${colors.reset || ''}`,
-      error: `${colors.red || ''}[ERROR]${colors.reset || ''}`,
-      system: `${colors.cyan || ''}[SYSTEM]${colors.reset || ''}`,
-    }[level] || '[LOG]';
+      info: `${colors.blue || ""}[INFO]${colors.reset || ""}`,
+      success: `${colors.green || ""}[SUCCESS]${colors.reset || ""}`,
+      warning: `${colors.yellow || ""}[WARNING]${colors.reset || ""}`,
+      error: `${colors.red || ""}[ERROR]${colors.reset || ""}`,
+      system: `${colors.cyan || ""}[SYSTEM]${colors.reset || ""}`,
+    }[level] || "[LOG]";
 
   // Sanitize message to prevent log injection (CWE-117)
   const sanitizedMessage = message
-    .replaceAll(/[\r\n\t]/g, ' ') // Remove line breaks and tabs
-    .replaceAll(/[^\x20-\x7E]/g, '?') // Replace non-printable chars
+    .replaceAll(/[\r\n\t]/g, " ") // Remove line breaks and tabs
+    .replaceAll(/[^\x20-\x7E]/g, "?") // Replace non-printable chars
     .substring(0, 500); // Limit length
 
   console.log(`${prefix} ${sanitizedMessage}`);
@@ -72,21 +72,21 @@ function log(level: LogLevel, message: string): void {
 function safeSpawn(command: string, args: string[], env: Record<string, string> = {}): void {
   // SONAR-SAFE (S4036): Use restricted PATH with fixed system directories and current Node bin.
   const restrictedPath =
-    process.platform === 'win32'
-      ? process.env.Path || process.env.PATH || ''
-      : ['/usr/local/bin', '/usr/bin', '/bin', dirname(process.execPath)].join(delimiter);
+    process.platform === "win32"
+      ? process.env.Path || process.env.PATH || ""
+      : ["/usr/local/bin", "/usr/bin", "/bin", dirname(process.execPath)].join(delimiter);
 
   const cleanEnv: Record<string, string> = {
     ...buildSafeEnv({ removePath: true }),
     PATH: restrictedPath,
   };
-  if (process.platform === 'win32') {
+  if (process.platform === "win32") {
     cleanEnv.Path = restrictedPath;
   }
 
   // Only merge caller-provided env onto sanitized base.
   for (const [key, value] of Object.entries(env)) {
-    if (typeof value === 'string') {
+    if (typeof value === "string") {
       cleanEnv[key] = value;
     }
   }
@@ -102,13 +102,29 @@ function safeSpawn(command: string, args: string[], env: Record<string, string> 
     return;
   }
 
-  // Strategy 3: pnpm exec
-  if (isCommandAvailable('pnpm') && tryExecution('pnpm', ['exec', command, ...args], cleanEnv)) {
+  // Strategy 3: Vite+ managed binary execution
+  const vpExecutablePath = findExecutable("vp");
+  if (
+    command === "vitest" &&
+    vpExecutablePath &&
+    tryExecution(process.execPath, [vpExecutablePath, "test", ...args], cleanEnv)
+  ) {
+    return;
+  }
+  if (
+    vpExecutablePath &&
+    tryExecution(process.execPath, [vpExecutablePath, "exec", command, ...args], cleanEnv)
+  ) {
     return;
   }
 
-  // Strategy 4: npx
-  if (isCommandAvailable('npx') && tryExecution('npx', [command, ...args], cleanEnv)) {
+  // Strategy 4: pnpm exec
+  if (isCommandAvailable("pnpm") && tryExecution("pnpm", ["exec", command, ...args], cleanEnv)) {
+    return;
+  }
+
+  // Strategy 5: npx
+  if (isCommandAvailable("npx") && tryExecution("npx", [command, ...args], cleanEnv)) {
     return;
   }
 
@@ -118,7 +134,7 @@ function safeSpawn(command: string, args: string[], env: Record<string, string> 
 function tryExecution(executable: string, args: string[], env: Record<string, string>): boolean {
   try {
     const result = spawnSync(executable, args, {
-      stdio: 'inherit',
+      stdio: "inherit",
       shell: false,
       timeout: EXEC_TIMEOUT_MS,
       windowsHide: true,
@@ -136,12 +152,13 @@ function tryExecution(executable: string, args: string[], env: Record<string, st
 function executeCommand(
   baseCommand: string,
   args: string[],
-  env: Record<string, string> = {}
+  env: Record<string, string> = {},
 ): void {
   try {
     safeSpawn(baseCommand, args, env);
   } catch (error: unknown) {
-    log('error', `Failed to execute ${baseCommand}: ${error}`);
+    const message = error instanceof Error ? error.message : String(error);
+    log("error", `Failed to execute ${baseCommand}: ${message}`);
     throw error;
   }
 }
@@ -164,7 +181,7 @@ function getSystemInfo(): SystemInfo {
     totalMemoryGB,
     freeMemoryGB,
     isCI: !!process.env.CI,
-    isCoverage: process.env.VITEST_COVERAGE === '1',
+    isCoverage: process.env.VITEST_COVERAGE === "1",
   };
 }
 
@@ -177,59 +194,59 @@ interface TestStrategy {
 
 function selectTestStrategy(systemInfo: SystemInfo): TestStrategy {
   const { cpuCount, totalMemoryGB, freeMemoryGB, isCI } = systemInfo;
-  const VITE_CONFIG = 'vite.config.ts';
+  const VITE_CONFIG = "vite.config.ts";
 
   // Only show system info if not running validate command
-  const isValidateCommand = process.argv.includes('validate');
+  const isValidateCommand = process.argv.includes("validate");
   if (!isValidateCommand) {
-    log('system', `${cpuCount} CPUs, ${totalMemoryGB}GB total memory, ${freeMemoryGB}GB free`);
+    log("system", `${cpuCount} CPUs, ${totalMemoryGB}GB total memory, ${freeMemoryGB}GB free`);
   }
 
   if (isCI) {
     if (!isValidateCommand) {
-      log('info', 'CI environment detected - using conservative settings');
+      log("info", "CI environment detected - using conservative settings");
     }
     return {
-      config: 'vitest.ci.config.ts',
+      config: "vitest.ci.config.ts",
       maxThreads: Math.min(4, Math.ceil(cpuCount / 2)),
       playwrightWorkers: Math.min(2, Math.ceil(cpuCount / 4)),
-      description: 'CI optimized configuration',
+      description: "CI optimized configuration",
     };
   }
 
   // 本地环境策略选择
   if (freeMemoryGB < 4) {
     if (!isValidateCommand) {
-      log('warning', 'Low memory detected - using conservative settings');
+      log("warning", "Low memory detected - using conservative settings");
     }
     return {
       config: VITE_CONFIG,
       maxThreads: Math.min(2, cpuCount),
       playwrightWorkers: 1,
-      description: 'Memory conservative configuration',
+      description: "Memory conservative configuration",
     };
   }
 
   if (cpuCount >= 8 && freeMemoryGB >= 8) {
     if (!isValidateCommand) {
-      log('info', 'High-performance system detected - using aggressive parallelization');
+      log("info", "High-performance system detected - using aggressive parallelization");
     }
     return {
       config: VITE_CONFIG,
       maxThreads: Math.min(cpuCount - 2, 12),
       playwrightWorkers: Math.min(6, Math.ceil(cpuCount / 2)),
-      description: 'High-performance configuration',
+      description: "High-performance configuration",
     };
   }
 
   if (!isValidateCommand) {
-    log('info', 'Balanced system detected - using standard settings');
+    log("info", "Balanced system detected - using standard settings");
   }
   return {
     config: VITE_CONFIG,
     maxThreads: Math.min(4, Math.ceil(cpuCount / 2)),
     playwrightWorkers: Math.min(4, Math.ceil(cpuCount / 3)),
-    description: 'Balanced configuration',
+    description: "Balanced configuration",
   };
 }
 
@@ -240,41 +257,41 @@ interface UnitTestOptions {
 }
 
 function runUnitTests(strategy: TestStrategy, options: UnitTestOptions = {}): void {
-  const { watch = false, coverage = true, reporter = 'default' } = options;
+  const { watch = false, coverage = true, reporter = "default" } = options;
 
-  const isVerbose = !process.env.CI && !process.argv.includes('validate');
+  const isVerbose = !process.env.CI && !process.argv.includes("validate");
 
   if (isVerbose) {
-    log('info', `Using ${strategy.description}`);
-    log('info', `Max threads: ${strategy.maxThreads}`);
+    log("info", `Using ${strategy.description}`);
+    log("info", `Max threads: ${strategy.maxThreads}`);
   }
 
-  const coverageFlag = coverage ? '--coverage' : '--no-coverage';
-  const watchFlag = watch ? '' : '--run';
-  const reporterFlag = reporter === 'default' ? '' : `--reporter=${reporter}`;
+  const coverageFlag = coverage ? "--coverage" : "--no-coverage";
+  const watchFlag = watch ? "" : "--run";
+  const reporterFlag = reporter === "default" ? "" : `--reporter=${reporter}`;
 
   const command =
     `vitest ${watchFlag} ${coverageFlag} ${reporterFlag} --config=${strategy.config}`.trim();
 
   if (isVerbose) {
-    log('info', `Running: ${command}`);
+    log("info", `Running: ${command}`);
   }
 
   const args = [watchFlag, coverageFlag, reporterFlag, `--config=${strategy.config}`]
-    .filter(arg => arg.trim() !== '')
-    .flatMap(arg => arg.split(' '))
-    .filter(arg => arg.trim() !== '');
+    .filter((arg) => arg.trim() !== "")
+    .flatMap((arg) => arg.split(" "))
+    .filter((arg) => arg.trim() !== "");
 
   try {
     // SONAR-SAFE: Using secure command execution with fallback strategies
-    executeCommand('vitest', args, {
+    executeCommand("vitest", args, {
       VITEST_MAX_THREADS: strategy.maxThreads.toString(),
     });
-    log('success', 'Unit tests completed successfully');
+    log("success", "Unit tests completed successfully");
   } catch (error: unknown) {
-    log('error', 'Unit tests failed');
+    log("error", "Unit tests failed");
     const exitCode =
-      error && typeof error === 'object' && 'status' in error
+      error && typeof error === "object" && "status" in error
         ? (error as { status?: number }).status
         : 1;
     process.exit(exitCode || 1);
@@ -292,7 +309,7 @@ interface E2ETestOptions {
 
 function runE2ETests(strategy: TestStrategy, options: E2ETestOptions = {}): void {
   const {
-    project = 'chromium',
+    project = "chromium",
     headed = false,
     debug = false,
     ui = false,
@@ -301,10 +318,10 @@ function runE2ETests(strategy: TestStrategy, options: E2ETestOptions = {}): void
   } = options;
 
   // Only show detailed info if not running validate command
-  const isValidateCommand = process.argv.includes('validate');
+  const isValidateCommand = process.argv.includes("validate");
   if (!isValidateCommand) {
-    log('info', `Using ${strategy.description} for E2E tests`);
-    log('info', `Playwright workers: ${strategy.playwrightWorkers}`);
+    log("info", `Using ${strategy.description} for E2E tests`);
+    log("info", `Playwright workers: ${strategy.playwrightWorkers}`);
   }
 
   const args = buildE2EArgs({ ui, suite, project, mobile, headed, debug });
@@ -321,10 +338,10 @@ function buildE2EArgs(options: {
   headed: boolean;
   debug: boolean;
 }): string[] {
-  const args = ['test'];
+  const args = ["test"];
 
   if (options.ui) {
-    args.push('--ui');
+    args.push("--ui");
     return args;
   }
 
@@ -335,12 +352,12 @@ function buildE2EArgs(options: {
     args.push(`--project=${options.project}`);
   }
   if (options.headed) {
-    args.push('--headed');
+    args.push("--headed");
   }
   if (options.debug) {
-    args.push('--debug');
+    args.push("--debug");
   }
-  if (options.mobile && options.mobile !== 'all') {
+  if (options.mobile && options.mobile !== "all") {
     args.push(`--grep=${options.mobile}`);
   }
 
@@ -352,13 +369,13 @@ function buildE2EEnv(strategy: TestStrategy, mobile: string | null): Record<stri
   const baseEnv = {
     ...safeEnv,
     PLAYWRIGHT_WORKERS: strategy.playwrightWorkers.toString(),
-    ...(mobile ? { MOBILE_TESTS: 'true' } : {}),
+    ...(mobile ? { MOBILE_TESTS: "true" } : {}),
   };
 
   // Filter out undefined values to ensure Record<string, string>
   const cleanEnv: Record<string, string> = {};
   for (const [key, value] of Object.entries(baseEnv)) {
-    if (typeof value === 'string') {
+    if (typeof value === "string") {
       cleanEnv[key] = value;
     }
   }
@@ -369,12 +386,12 @@ function buildE2EEnv(strategy: TestStrategy, mobile: string | null): Record<stri
 function executeE2ETests(args: string[], env: Record<string, string>): void {
   try {
     // SONAR-SAFE: Using secure command execution with fallback strategies
-    executeCommand('playwright', args, env);
-    log('success', 'E2E tests completed successfully');
+    executeCommand("playwright", args, env);
+    log("success", "E2E tests completed successfully");
   } catch (error: unknown) {
-    log('error', 'E2E tests failed');
+    log("error", "E2E tests failed");
     const exitCode =
-      error && typeof error === 'object' && 'status' in error
+      error && typeof error === "object" && "status" in error
         ? (error as { status?: number }).status
         : 1;
     process.exit(exitCode || 1);
@@ -434,14 +451,14 @@ interface ParsedArgs {
 
 function parseArgs(): ParsedArgs {
   const args = process.argv.slice(2);
-  const command = args[0] || 'help';
+  const command = args[0] || "help";
   const options: Record<string, string | boolean> = {};
 
   // 解析选项
   for (let i = 1; i < args.length; i++) {
     const arg = args[i];
-    if (arg.startsWith('--')) {
-      const [key, value] = arg.slice(2).split('=');
+    if (arg.startsWith("--")) {
+      const [key, value] = arg.slice(2).split("=");
       if (value) {
         options[key] = value;
       } else {
@@ -457,10 +474,10 @@ function parseArgs(): ParsedArgs {
 
 function getStringOption(
   options: Record<string, string | boolean>,
-  key: string
+  key: string,
 ): string | undefined {
   const value = options[key];
-  return typeof value === 'string' ? value : undefined;
+  return typeof value === "string" ? value : undefined;
 }
 
 function validateReporterOption(reporter?: string): string | undefined {
@@ -476,7 +493,7 @@ function validateReporterOption(reporter?: string): string | undefined {
 function validateAllowlistedOption(
   optionName: string,
   value: string | undefined,
-  allowlist: Set<string>
+  allowlist: Set<string>,
 ): string | undefined {
   if (!value) {
     return undefined;
@@ -491,23 +508,23 @@ function handleUnitCommands(
   command: string,
   options: Record<string, string | boolean>,
   strategy: TestStrategy,
-  systemInfo: SystemInfo
+  systemInfo: SystemInfo,
 ): boolean {
   switch (command) {
-    case 'unit':
+    case "unit":
       runUnitTests(strategy, {
-        coverage: !options['no-coverage'] && systemInfo.isCoverage,
-        reporter: validateReporterOption(getStringOption(options, 'reporter')),
+        coverage: !options["no-coverage"] && systemInfo.isCoverage,
+        reporter: validateReporterOption(getStringOption(options, "reporter")),
       });
       return true;
 
-    case 'unit:watch':
+    case "unit:watch":
       runUnitTests(strategy, { watch: true, coverage: false });
       return true;
 
-    case 'unit:ci': {
-      const ciStrategy: TestStrategy = { ...strategy, config: 'vitest.ci.config.ts' };
-      runUnitTests(ciStrategy, { coverage: true, reporter: 'verbose' });
+    case "unit:ci": {
+      const ciStrategy: TestStrategy = { ...strategy, config: "vitest.ci.config.ts" };
+      runUnitTests(ciStrategy, { coverage: true, reporter: "verbose" });
       return true;
     }
   }
@@ -517,78 +534,78 @@ function handleUnitCommands(
 function handleE2ECommands(
   command: string,
   options: Record<string, string | boolean>,
-  strategy: TestStrategy
+  strategy: TestStrategy,
 ): boolean {
   switch (command) {
-    case 'e2e':
+    case "e2e":
       runE2ETests(strategy, {
         project: validateAllowlistedOption(
-          'project',
-          getStringOption(options, 'project'),
-          ALLOWED_E2E_PROJECTS
+          "project",
+          getStringOption(options, "project"),
+          ALLOWED_E2E_PROJECTS,
         ),
         suite: validateAllowlistedOption(
-          'suite',
-          getStringOption(options, 'suite'),
-          ALLOWED_E2E_SUITES
+          "suite",
+          getStringOption(options, "suite"),
+          ALLOWED_E2E_SUITES,
         ),
         mobile: validateAllowlistedOption(
-          'mobile',
-          getStringOption(options, 'mobile'),
-          ALLOWED_MOBILE_DEVICES
+          "mobile",
+          getStringOption(options, "mobile"),
+          ALLOWED_MOBILE_DEVICES,
         ),
       });
       return true;
 
-    case 'e2e:ui':
+    case "e2e:ui":
       runE2ETests(strategy, { ui: true });
       return true;
 
-    case 'e2e:debug':
+    case "e2e:debug":
       runE2ETests(strategy, {
         debug: true,
         suite: validateAllowlistedOption(
-          'suite',
-          getStringOption(options, 'positional'),
-          ALLOWED_E2E_SUITES
+          "suite",
+          getStringOption(options, "positional"),
+          ALLOWED_E2E_SUITES,
         ),
         project:
           validateAllowlistedOption(
-            'project',
-            getStringOption(options, 'project'),
-            ALLOWED_E2E_PROJECTS
-          ) || 'chromium',
+            "project",
+            getStringOption(options, "project"),
+            ALLOWED_E2E_PROJECTS,
+          ) || "chromium",
       });
       return true;
 
-    case 'e2e:headed':
+    case "e2e:headed":
       runE2ETests(strategy, {
         headed: true,
         suite: validateAllowlistedOption(
-          'suite',
-          getStringOption(options, 'positional'),
-          ALLOWED_E2E_SUITES
+          "suite",
+          getStringOption(options, "positional"),
+          ALLOWED_E2E_SUITES,
         ),
         project:
           validateAllowlistedOption(
-            'project',
-            getStringOption(options, 'project'),
-            ALLOWED_E2E_PROJECTS
-          ) || 'chromium',
+            "project",
+            getStringOption(options, "project"),
+            ALLOWED_E2E_PROJECTS,
+          ) || "chromium",
       });
       return true;
 
-    case 'e2e:mobile':
+    case "e2e:mobile":
       if (!options.positional) {
-        log('error', 'Please specify a mobile device type');
+        log("error", "Please specify a mobile device type");
         showUsage();
         process.exit(1);
       }
       runE2ETests(strategy, {
         mobile: validateAllowlistedOption(
-          'mobile device',
-          getStringOption(options, 'positional'),
-          ALLOWED_MOBILE_DEVICES
+          "mobile device",
+          getStringOption(options, "positional"),
+          ALLOWED_MOBILE_DEVICES,
         ),
       });
       return true;
@@ -613,21 +630,21 @@ function main(): void {
 
   // Handle other commands
   switch (command) {
-    case 'validate':
-      log('info', 'Running full validation suite...');
+    case "validate":
+      log("info", "Running full validation suite...");
       runUnitTests(strategy, { coverage: true });
       runE2ETests(strategy, {});
-      log('success', 'Full validation completed successfully');
+      log("success", "Full validation completed successfully");
       break;
 
-    case 'help':
-    case '--help':
-    case '-h':
+    case "help":
+    case "--help":
+    case "-h":
       showUsage();
       break;
 
     default:
-      log('error', `Unknown command: ${command}`);
+      log("error", `Unknown command: ${command}`);
       showUsage();
       process.exit(1);
   }

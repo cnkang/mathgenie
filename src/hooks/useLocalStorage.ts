@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 /**
  * Custom hook for localStorage with JSON serialization and TypeScript support
@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
  */
 export const useLocalStorage = <T>(
   key: string,
-  defaultValue: T
+  defaultValue: T,
 ): [T, (value: T | ((prev: T) => T)) => void] => {
   const [value, setValue] = useState<T>(() => {
     try {
@@ -21,7 +21,7 @@ export const useLocalStorage = <T>(
   const setStoredValue = (newValue: T | ((prev: T) => T)): void => {
     try {
       const valueToStore =
-        typeof newValue === 'function' ? (newValue as (prev: T) => T)(value) : newValue;
+        typeof newValue === "function" ? (newValue as (prev: T) => T)(value) : newValue;
       setValue(valueToStore);
       globalThis.localStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {
@@ -54,8 +54,8 @@ export const useLocalStorage = <T>(
       }
     };
 
-    globalThis.addEventListener('storage', handleStorageChange);
-    return () => globalThis.removeEventListener('storage', handleStorageChange);
+    globalThis.addEventListener("storage", handleStorageChange);
+    return () => globalThis.removeEventListener("storage", handleStorageChange);
   }, [key]);
 
   return [value, setStoredValue];

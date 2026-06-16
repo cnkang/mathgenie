@@ -1,18 +1,18 @@
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from "vite-plus/test";
 
 // Mock the PDF utility using factory function
-vi.mock('@/utils/pdf', () => ({
+vi.mock("@/utils/pdf", () => ({
   generatePdf: vi.fn().mockResolvedValue(undefined),
 }));
 
-import type { Problem, Settings } from '@/types';
-import { act, renderHook, waitFor } from '@testing-library/react';
+import type { Problem, Settings } from "@/types";
+import { act, renderHook, waitFor } from "@testing-library/react";
 
-import { useAppHandlers, useInitialGeneration, useQuizHandlers } from './useAppLogic';
+import { useAppHandlers, useInitialGeneration, useQuizHandlers } from "./useAppLogic";
 
-describe('useAppLogic', () => {
+describe("useAppLogic", () => {
   const mockSettings: Settings = {
-    operations: ['+'],
+    operations: ["+"],
     numProblems: 10,
     numRange: [1, 10],
     resultRange: [0, 20],
@@ -21,29 +21,29 @@ describe('useAppLogic', () => {
     showAnswers: false,
     fontSize: 16,
     lineSpacing: 12,
-    paperSize: 'a4',
+    paperSize: "a4",
     enableGrouping: false,
     problemsPerGroup: 20,
     totalGroups: 1,
   };
 
   const mockProblems: Problem[] = [
-    { id: 1, text: '2 + 3 = ?', correctAnswer: 5 },
-    { id: 2, text: '4 + 5 = ?', correctAnswer: 9 },
+    { id: 1, text: "2 + 3 = ?", correctAnswer: 5 },
+    { id: 2, text: "4 + 5 = ?", correctAnswer: 9 },
   ];
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe('useInitialGeneration', () => {
-    test('should generate problems when i18n is ready and not already generated', () => {
+  describe("useInitialGeneration", () => {
+    test("should generate problems when i18n is ready and not already generated", () => {
       const mockGenerateProblems = vi.fn(() => ({
-        error: '',
-        warning: '',
-        successMessage: { key: 'success' },
+        error: "",
+        warning: "",
+        successMessage: { key: "success" },
       }));
-      const mockValidateSettings = vi.fn(() => '');
+      const mockValidateSettings = vi.fn(() => "");
       const mockSetHasInitialGenerated = vi.fn();
       const mockSetError = vi.fn();
       const mockSetWarning = vi.fn();
@@ -60,16 +60,16 @@ describe('useAppLogic', () => {
           setError: mockSetError,
           setWarning: mockSetWarning,
           setAndScheduleSuccess: mockSetAndScheduleSuccess,
-        })
+        }),
       );
 
       expect(mockValidateSettings).toHaveBeenCalledWith(mockSettings);
       expect(mockGenerateProblems).toHaveBeenCalledWith(true);
       expect(mockSetHasInitialGenerated).toHaveBeenCalledWith(true);
-      expect(mockSetAndScheduleSuccess).toHaveBeenCalledWith({ key: 'success' });
+      expect(mockSetAndScheduleSuccess).toHaveBeenCalledWith({ key: "success" });
     });
 
-    test('should not generate problems when i18n is not ready', () => {
+    test("should not generate problems when i18n is not ready", () => {
       const mockGenerateProblems = vi.fn();
       const mockValidateSettings = vi.fn();
       const mockSetHasInitialGenerated = vi.fn();
@@ -88,13 +88,13 @@ describe('useAppLogic', () => {
           setError: mockSetError,
           setWarning: mockSetWarning,
           setAndScheduleSuccess: mockSetAndScheduleSuccess,
-        })
+        }),
       );
 
       expect(mockGenerateProblems).not.toHaveBeenCalled();
     });
 
-    test('should not generate problems when already generated', () => {
+    test("should not generate problems when already generated", () => {
       const mockGenerateProblems = vi.fn();
       const mockValidateSettings = vi.fn();
       const mockSetHasInitialGenerated = vi.fn();
@@ -113,15 +113,15 @@ describe('useAppLogic', () => {
           setError: mockSetError,
           setWarning: mockSetWarning,
           setAndScheduleSuccess: mockSetAndScheduleSuccess,
-        })
+        }),
       );
 
       expect(mockGenerateProblems).not.toHaveBeenCalled();
     });
 
-    test('should set error when validation fails', () => {
+    test("should set error when validation fails", () => {
       const mockGenerateProblems = vi.fn();
-      const mockValidateSettings = vi.fn(() => 'validation.error');
+      const mockValidateSettings = vi.fn(() => "validation.error");
       const mockSetHasInitialGenerated = vi.fn();
       const mockSetError = vi.fn();
       const mockSetWarning = vi.fn();
@@ -138,18 +138,18 @@ describe('useAppLogic', () => {
           setError: mockSetError,
           setWarning: mockSetWarning,
           setAndScheduleSuccess: mockSetAndScheduleSuccess,
-        })
+        }),
       );
 
-      expect(mockSetError).toHaveBeenCalledWith({ key: 'validation.error' });
+      expect(mockSetError).toHaveBeenCalledWith({ key: "validation.error" });
       expect(mockGenerateProblems).not.toHaveBeenCalled();
     });
   });
 
   // usePdfDownload tests moved to src/hooks/usePdfDownload.test.ts for isolation and determinism
 
-  describe('useQuizHandlers', () => {
-    test('should start quiz mode when problems exist', async () => {
+  describe("useQuizHandlers", () => {
+    test("should start quiz mode when problems exist", async () => {
       const mockSetError = vi.fn();
       const mockSetIsQuizMode = vi.fn();
       const mockSetQuizResult = vi.fn();
@@ -160,14 +160,14 @@ describe('useAppLogic', () => {
           true, // isI18nReady
           mockSetError,
           mockSetIsQuizMode,
-          mockSetQuizResult
-        )
+          mockSetQuizResult,
+        ),
       );
 
       // Ensure the hook returns an object with the expected methods (wait for first render)
       await waitFor(() => expect(result.current).toBeTruthy());
-      expect(typeof result.current.startQuizMode).toBe('function');
-      expect(typeof result.current.exitQuizMode).toBe('function');
+      expect(typeof result.current.startQuizMode).toBe("function");
+      expect(typeof result.current.exitQuizMode).toBe("function");
 
       act(() => {
         result.current.startQuizMode();
@@ -177,7 +177,7 @@ describe('useAppLogic', () => {
       expect(mockSetQuizResult).toHaveBeenCalledWith(null);
     });
 
-    test('should set error when no problems exist and i18n is ready', async () => {
+    test("should set error when no problems exist and i18n is ready", async () => {
       const mockSetError = vi.fn();
       const mockSetIsQuizMode = vi.fn();
       const mockSetQuizResult = vi.fn();
@@ -188,23 +188,23 @@ describe('useAppLogic', () => {
           true, // isI18nReady
           mockSetError,
           mockSetIsQuizMode,
-          mockSetQuizResult
-        )
+          mockSetQuizResult,
+        ),
       );
 
       // Ensure the hook returns an object with the expected methods
       await waitFor(() => expect(result.current).toBeTruthy());
-      expect(typeof result.current.startQuizMode).toBe('function');
+      expect(typeof result.current.startQuizMode).toBe("function");
 
       act(() => {
         result.current.startQuizMode();
       });
 
-      expect(mockSetError).toHaveBeenCalledWith({ key: 'errors.noProblemsForQuiz' });
+      expect(mockSetError).toHaveBeenCalledWith({ key: "errors.noProblemsForQuiz" });
       expect(mockSetIsQuizMode).not.toHaveBeenCalled();
     });
 
-    test('should not set error when no problems exist and i18n is not ready', async () => {
+    test("should not set error when no problems exist and i18n is not ready", async () => {
       const mockSetError = vi.fn();
       const mockSetIsQuizMode = vi.fn();
       const mockSetQuizResult = vi.fn();
@@ -215,13 +215,13 @@ describe('useAppLogic', () => {
           false, // isI18nReady
           mockSetError,
           mockSetIsQuizMode,
-          mockSetQuizResult
-        )
+          mockSetQuizResult,
+        ),
       );
 
       // Ensure the hook returns an object with the expected methods
       await waitFor(() => expect(result.current).toBeTruthy());
-      expect(typeof result.current.startQuizMode).toBe('function');
+      expect(typeof result.current.startQuizMode).toBe("function");
 
       act(() => {
         result.current.startQuizMode();
@@ -231,13 +231,13 @@ describe('useAppLogic', () => {
       expect(mockSetIsQuizMode).not.toHaveBeenCalled();
     });
 
-    test('should exit quiz mode', () => {
+    test("should exit quiz mode", () => {
       const mockSetError = vi.fn();
       const mockSetIsQuizMode = vi.fn();
       const mockSetQuizResult = vi.fn();
 
       const { result } = renderHook(() =>
-        useQuizHandlers(mockProblems, true, mockSetError, mockSetIsQuizMode, mockSetQuizResult)
+        useQuizHandlers(mockProblems, true, mockSetError, mockSetIsQuizMode, mockSetQuizResult),
       );
 
       act(() => {
@@ -248,8 +248,8 @@ describe('useAppLogic', () => {
     });
   });
 
-  describe('useAppHandlers', () => {
-    test('should handle settings change', () => {
+  describe("useAppHandlers", () => {
+    test("should handle settings change", () => {
       const mockSetSettings = vi.fn();
       const mockClearMessages = vi.fn();
       const mockIsValidationSensitiveField = vi.fn(() => false);
@@ -271,22 +271,22 @@ describe('useAppLogic', () => {
           setError: mockSetError,
           setWarning: mockSetWarning,
           setSuccessMessage: mockSetSuccessMessage,
-        })
+        }),
       );
 
       act(() => {
-        result.current.handleChange('numProblems', 20);
+        result.current.handleChange("numProblems", 20);
       });
 
       expect(mockClearMessages).toHaveBeenCalled();
       expect(mockSetSettings).toHaveBeenCalledWith({ ...mockSettings, numProblems: 20 });
     });
 
-    test('should handle validation error on sensitive field change', () => {
+    test("should handle validation error on sensitive field change", () => {
       const mockSetSettings = vi.fn();
       const mockClearMessages = vi.fn();
       const mockIsValidationSensitiveField = vi.fn(() => true);
-      const mockValidateSettings = vi.fn(() => 'validation.error');
+      const mockValidateSettings = vi.fn(() => "validation.error");
       const mockCheckRestrictiveSettings = vi.fn(() => false);
       const mockSetError = vi.fn();
       const mockSetWarning = vi.fn();
@@ -304,21 +304,21 @@ describe('useAppLogic', () => {
           setError: mockSetError,
           setWarning: mockSetWarning,
           setSuccessMessage: mockSetSuccessMessage,
-        })
+        }),
       );
 
       act(() => {
-        result.current.handleChange('numProblems', 20);
+        result.current.handleChange("numProblems", 20);
       });
 
-      expect(mockSetError).toHaveBeenCalledWith({ key: 'validation.error' });
+      expect(mockSetError).toHaveBeenCalledWith({ key: "validation.error" });
     });
 
-    test('should skip validation when loading', () => {
+    test("should skip validation when loading", () => {
       const mockSetSettings = vi.fn();
       const mockClearMessages = vi.fn();
       const mockIsValidationSensitiveField = vi.fn(() => true);
-      const mockValidateSettings = vi.fn(() => 'validation.error');
+      const mockValidateSettings = vi.fn(() => "validation.error");
       const mockCheckRestrictiveSettings = vi.fn(() => false);
       const mockSetError = vi.fn();
       const mockSetWarning = vi.fn();
@@ -336,11 +336,11 @@ describe('useAppLogic', () => {
           setError: mockSetError,
           setWarning: mockSetWarning,
           setSuccessMessage: mockSetSuccessMessage,
-        })
+        }),
       );
 
       act(() => {
-        result.current.handleChange('numProblems', 20);
+        result.current.handleChange("numProblems", 20);
       });
 
       // Should not call validation functions when loading
@@ -349,11 +349,11 @@ describe('useAppLogic', () => {
       expect(mockSetSettings).toHaveBeenCalledWith({ ...mockSettings, numProblems: 20 });
     });
 
-    test('should handle restrictive settings warning', () => {
+    test("should handle restrictive settings warning", () => {
       const mockSetSettings = vi.fn();
       const mockClearMessages = vi.fn();
       const mockIsValidationSensitiveField = vi.fn(() => true);
-      const mockValidateSettings = vi.fn(() => '');
+      const mockValidateSettings = vi.fn(() => "");
       const mockCheckRestrictiveSettings = vi.fn(() => true);
       const mockSetError = vi.fn();
       const mockSetWarning = vi.fn();
@@ -371,17 +371,17 @@ describe('useAppLogic', () => {
           setError: mockSetError,
           setWarning: mockSetWarning,
           setSuccessMessage: mockSetSuccessMessage,
-        })
+        }),
       );
 
       act(() => {
-        result.current.handleChange('numProblems', 20);
+        result.current.handleChange("numProblems", 20);
       });
 
-      expect(mockSetWarning).toHaveBeenCalledWith({ key: 'warnings.restrictiveSettings' });
+      expect(mockSetWarning).toHaveBeenCalledWith({ key: "warnings.restrictiveSettings" });
     });
 
-    test('should apply preset settings', () => {
+    test("should apply preset settings", () => {
       const mockSetSettings = vi.fn();
       const mockClearMessages = vi.fn();
       const mockIsValidationSensitiveField = vi.fn();
@@ -403,7 +403,7 @@ describe('useAppLogic', () => {
           setError: mockSetError,
           setWarning: mockSetWarning,
           setSuccessMessage: mockSetSuccessMessage,
-        })
+        }),
       );
 
       const presetSettings = { ...mockSettings, numProblems: 50 };
@@ -415,12 +415,12 @@ describe('useAppLogic', () => {
       expect(mockSetSettings).toHaveBeenCalledWith(presetSettings);
       expect(mockClearMessages).toHaveBeenCalled();
       expect(mockSetSuccessMessage).toHaveBeenCalledWith({
-        key: 'messages.info.presetApplied',
-        params: { name: 'Preset' },
+        key: "messages.info.presetApplied",
+        params: { name: "Preset" },
       });
     });
 
-    test('should not show success message when loading', () => {
+    test("should not show success message when loading", () => {
       const mockSetSettings = vi.fn();
       const mockClearMessages = vi.fn();
       const mockIsValidationSensitiveField = vi.fn();
@@ -442,7 +442,7 @@ describe('useAppLogic', () => {
           setError: mockSetError,
           setWarning: mockSetWarning,
           setSuccessMessage: mockSetSuccessMessage,
-        })
+        }),
       );
 
       const presetSettings = { ...mockSettings, numProblems: 50 };

@@ -1,15 +1,15 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import App from './App';
-import { I18nProvider } from './i18n';
-import './index.css';
-import reportWebVitals from './reportWebVitals';
-import * as serviceWorker from './utils/serviceWorker';
-import { applyBrowserSpecificStyles, createPerformanceMonitor } from './utils/browserOptimizations';
+import React from "react";
+import { createRoot } from "react-dom/client";
+import App from "./App";
+import { I18nProvider } from "./i18n";
+import "./index.css";
+import reportWebVitals from "./reportWebVitals";
+import * as serviceWorker from "./utils/serviceWorker";
+import { applyBrowserSpecificStyles, createPerformanceMonitor } from "./utils/browserOptimizations";
 
-const rootElement = document.getElementById('root');
+const rootElement = document.getElementById("root");
 if (!rootElement) {
-  throw new Error('Root element not found');
+  throw new Error("Root element not found");
 }
 
 // Apply browser-specific optimizations
@@ -23,7 +23,7 @@ root.render(
     <I18nProvider>
       <App />
     </I18nProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );
 
 const devLog = (...args: unknown[]): void => {
@@ -33,10 +33,10 @@ const devLog = (...args: unknown[]): void => {
 };
 
 // Register service worker for offline functionality
-if ('serviceWorker' in navigator && import.meta.env.PROD) {
+if ("serviceWorker" in navigator && import.meta.env.PROD) {
   serviceWorker.register({
-    onSuccess: () => devLog('MathGenie is now available offline!'),
-    onUpdate: () => devLog('New version available! Please refresh the page.'),
+    onSuccess: () => devLog("MathGenie is now available offline!"),
+    onUpdate: () => devLog("New version available! Please refresh the page."),
   });
 }
 

@@ -1,33 +1,33 @@
-import * as wcag from './wcagEnforcement';
+import * as wcag from "./wcagEnforcement";
 
 const { enforceWCAGTouchTargets, setupWCAGEnforcement } = wcag;
 
 // Mock navigator for Firefox detection tests
 const mockNavigator = (userAgent: string) => {
-  Object.defineProperty(navigator, 'userAgent', {
+  Object.defineProperty(navigator, "userAgent", {
     value: userAgent,
     configurable: true,
   });
 };
 
-describe('WCAG Enforcement', () => {
-  test('removes resize listener and clears timeout on cleanup', () => {
+describe("WCAG Enforcement", () => {
+  test("removes resize listener and clears timeout on cleanup", () => {
     vi.useFakeTimers();
-    const addSpy = vi.spyOn(globalThis, 'addEventListener');
-    const removeSpy = vi.spyOn(globalThis, 'removeEventListener');
-    const enforceSpy = vi.spyOn(wcag, 'enforceWCAGTouchTargets');
+    const addSpy = vi.spyOn(globalThis, "addEventListener");
+    const removeSpy = vi.spyOn(globalThis, "removeEventListener");
+    const enforceSpy = vi.spyOn(wcag, "enforceWCAGTouchTargets");
 
     const cleanup = setupWCAGEnforcement();
 
-    const resizeCall = addSpy.mock.calls.find(call => String(call[0]) === 'resize');
+    const resizeCall = addSpy.mock.calls.find((call) => String(call[0]) === "resize");
     const handler = resizeCall?.[1] as EventListener;
 
     enforceSpy.mockClear();
-    globalThis.dispatchEvent(new Event('resize'));
+    globalThis.dispatchEvent(new Event("resize"));
     cleanup();
     vi.runAllTimers();
 
-    expect(removeSpy).toHaveBeenCalledWith('resize', handler);
+    expect(removeSpy).toHaveBeenCalledWith("resize", handler);
     expect(enforceSpy).not.toHaveBeenCalled();
 
     addSpy.mockRestore();
@@ -36,31 +36,31 @@ describe('WCAG Enforcement', () => {
     vi.useRealTimers();
   });
 
-  test('ignores elements hidden in different ways', () => {
-    const displayNoneButton = document.createElement('button');
-    displayNoneButton.style.display = 'none';
+  test("ignores elements hidden in different ways", () => {
+    const displayNoneButton = document.createElement("button");
+    displayNoneButton.style.display = "none";
 
-    const visibilityHiddenButton = document.createElement('button');
-    visibilityHiddenButton.style.visibility = 'hidden';
+    const visibilityHiddenButton = document.createElement("button");
+    visibilityHiddenButton.style.visibility = "hidden";
 
-    const zeroOpacityButton = document.createElement('button');
-    zeroOpacityButton.style.opacity = '0';
+    const zeroOpacityButton = document.createElement("button");
+    zeroOpacityButton.style.opacity = "0";
 
-    const visibleButton = document.createElement('button');
+    const visibleButton = document.createElement("button");
 
     document.body.append(
       displayNoneButton,
       visibilityHiddenButton,
       zeroOpacityButton,
-      visibleButton
+      visibleButton,
     );
 
     enforceWCAGTouchTargets();
 
-    expect(displayNoneButton.style.minHeight).toBe('');
-    expect(visibilityHiddenButton.style.minHeight).toBe('');
-    expect(zeroOpacityButton.style.minHeight).toBe('');
-    expect(visibleButton.style.minHeight).not.toBe('');
+    expect(displayNoneButton.style.minHeight).toBe("");
+    expect(visibilityHiddenButton.style.minHeight).toBe("");
+    expect(zeroOpacityButton.style.minHeight).toBe("");
+    expect(visibleButton.style.minHeight).not.toBe("");
 
     displayNoneButton.remove();
     visibilityHiddenButton.remove();
@@ -68,75 +68,75 @@ describe('WCAG Enforcement', () => {
     visibleButton.remove();
   });
 
-  test('applies min size when element is revealed', () => {
-    const button = document.createElement('button');
-    button.style.display = 'none';
+  test("applies min size when element is revealed", () => {
+    const button = document.createElement("button");
+    button.style.display = "none";
     document.body.appendChild(button);
 
     const cleanup = setupWCAGEnforcement();
 
-    button.style.display = 'block';
+    button.style.display = "block";
     enforceWCAGTouchTargets();
-    expect(button.style.minHeight).not.toBe('');
+    expect(button.style.minHeight).not.toBe("");
 
     cleanup();
     button.remove();
   });
 
-  test('wraps checkbox/radio inputs in parent with min size', () => {
-    const wrapper = document.createElement('label');
-    const input = document.createElement('input');
-    input.setAttribute('type', 'checkbox');
+  test("wraps checkbox/radio inputs in parent with min size", () => {
+    const wrapper = document.createElement("label");
+    const input = document.createElement("input");
+    input.setAttribute("type", "checkbox");
     wrapper.appendChild(input);
     document.body.appendChild(wrapper);
 
     enforceWCAGTouchTargets();
-    expect(wrapper.style.minHeight).not.toBe('');
+    expect(wrapper.style.minHeight).not.toBe("");
 
     wrapper.remove();
   });
 
-  test('mutation observer triggers enforcement when interactive added', () => {
+  test("mutation observer triggers enforcement when interactive added", () => {
     const cleanup = setupWCAGEnforcement();
 
-    const btn = document.createElement('button');
+    const btn = document.createElement("button");
     document.body.appendChild(btn);
 
     // Give chance for debounced handler (simple direct call as fallback)
     enforceWCAGTouchTargets();
-    expect(btn.style.minHeight).not.toBe('');
+    expect(btn.style.minHeight).not.toBe("");
 
     btn.remove();
     cleanup();
   });
 
-  test('applies device-specific min size for very small screens', () => {
+  test("applies device-specific min size for very small screens", () => {
     const originalWidth = globalThis.innerWidth;
     globalThis.innerWidth = 400; // small-mobile tier
-    const btn = document.createElement('button');
+    const btn = document.createElement("button");
     document.body.appendChild(btn);
 
     enforceWCAGTouchTargets();
-    expect(btn.style.getPropertyValue('min-height')).toBe('50px');
+    expect(btn.style.getPropertyValue("min-height")).toBe("50px");
 
     btn.remove();
     globalThis.innerWidth = originalWidth;
   });
 
-  test('uses Firefox-optimized selector when Firefox is detected', () => {
+  test("uses Firefox-optimized selector when Firefox is detected", () => {
     const originalUserAgent = navigator.userAgent;
-    mockNavigator('Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0');
+    mockNavigator("Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0");
 
-    const querySelectorAllSpy = vi.spyOn(document, 'querySelectorAll');
+    const querySelectorAllSpy = vi.spyOn(document, "querySelectorAll");
 
-    const btn = document.createElement('button');
+    const btn = document.createElement("button");
     document.body.appendChild(btn);
 
     enforceWCAGTouchTargets();
 
     // Verify Firefox-optimized selector was used
     expect(querySelectorAllSpy).toHaveBeenCalledWith(
-      'button, input, select, textarea, a[href], [role="button"]'
+      'button, input, select, textarea, a[href], [role="button"]',
     );
 
     btn.remove();
@@ -144,15 +144,15 @@ describe('WCAG Enforcement', () => {
     mockNavigator(originalUserAgent);
   });
 
-  test('uses standard selector for non-Firefox browsers', () => {
+  test("uses standard selector for non-Firefox browsers", () => {
     const originalUserAgent = navigator.userAgent;
     mockNavigator(
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/91.0.4472.124'
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/91.0.4472.124",
     );
 
-    const querySelectorAllSpy = vi.spyOn(document, 'querySelectorAll');
+    const querySelectorAllSpy = vi.spyOn(document, "querySelectorAll");
 
-    const btn = document.createElement('button');
+    const btn = document.createElement("button");
     document.body.appendChild(btn);
 
     enforceWCAGTouchTargets();
@@ -161,32 +161,32 @@ describe('WCAG Enforcement', () => {
     const calls = querySelectorAllSpy.mock.calls;
     // Find the call that matches our expected selector pattern
     const wcagCall = calls.find(
-      call => call[0] && typeof call[0] === 'string' && call[0].includes('button')
+      (call) => call[0] && typeof call[0] === "string" && call[0].includes("button"),
     );
     expect(wcagCall).toBeDefined();
     const selectorUsed = wcagCall?.[0];
-    expect(selectorUsed).toContain('[tabindex]');
-    expect(selectorUsed).toContain('[onclick]');
+    expect(selectorUsed).toContain("[tabindex]");
+    expect(selectorUsed).toContain("[onclick]");
 
     btn.remove();
     querySelectorAllSpy.mockRestore();
     mockNavigator(originalUserAgent);
   });
 
-  test('uses batched processing for Firefox with many elements', () => {
+  test("uses batched processing for Firefox with many elements", () => {
     const originalUserAgent = navigator.userAgent;
-    mockNavigator('Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0');
+    mockNavigator("Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0");
 
     // Create many buttons to trigger batched processing
     const buttons: HTMLButtonElement[] = [];
     for (let i = 0; i < 25; i++) {
-      const btn = document.createElement('button');
+      const btn = document.createElement("button");
       btn.textContent = `Button ${i}`;
       document.body.appendChild(btn);
       buttons.push(btn);
     }
 
-    const requestAnimationFrameSpy = vi.spyOn(globalThis, 'requestAnimationFrame');
+    const requestAnimationFrameSpy = vi.spyOn(globalThis, "requestAnimationFrame");
 
     enforceWCAGTouchTargets();
 
@@ -194,22 +194,22 @@ describe('WCAG Enforcement', () => {
     expect(requestAnimationFrameSpy).toHaveBeenCalled();
 
     // Clean up
-    buttons.forEach(btn => btn.remove());
+    buttons.forEach((btn) => btn.remove());
     requestAnimationFrameSpy.mockRestore();
     mockNavigator(originalUserAgent);
   });
 
-  test('uses getBoundingClientRect for Firefox performance optimization', () => {
+  test("uses getBoundingClientRect for Firefox performance optimization", () => {
     const originalUserAgent = navigator.userAgent;
-    mockNavigator('Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0');
+    mockNavigator("Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0");
 
-    const btn = document.createElement('button');
+    const btn = document.createElement("button");
     // Make button small to trigger size enforcement
-    btn.style.width = '20px';
-    btn.style.height = '20px';
+    btn.style.width = "20px";
+    btn.style.height = "20px";
     document.body.appendChild(btn);
 
-    const getBoundingClientRectSpy = vi.spyOn(btn, 'getBoundingClientRect');
+    const getBoundingClientRectSpy = vi.spyOn(btn, "getBoundingClientRect");
 
     enforceWCAGTouchTargets();
 
@@ -221,17 +221,17 @@ describe('WCAG Enforcement', () => {
     mockNavigator(originalUserAgent);
   });
 
-  test('applies Firefox-specific debounce delays in event listeners', () => {
+  test("applies Firefox-specific debounce delays in event listeners", () => {
     const originalUserAgent = navigator.userAgent;
-    mockNavigator('Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0');
+    mockNavigator("Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0");
 
     vi.useFakeTimers();
-    const addEventListenerSpy = vi.spyOn(globalThis, 'addEventListener');
+    const addEventListenerSpy = vi.spyOn(globalThis, "addEventListener");
 
     const cleanup = setupWCAGEnforcement();
 
     // Verify that event listeners were set up
-    expect(addEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function));
+    expect(addEventListenerSpy).toHaveBeenCalledWith("resize", expect.any(Function));
 
     cleanup();
     addEventListenerSpy.mockRestore();
@@ -239,34 +239,34 @@ describe('WCAG Enforcement', () => {
     mockNavigator(originalUserAgent);
   });
 
-  test('handles server-side rendering gracefully', () => {
+  test("handles server-side rendering gracefully", () => {
     const globalObj = globalThis as Record<string, unknown>;
-    const originalWindow = globalObj['window'];
-    const originalDocument = globalObj['document'];
+    const originalWindow = globalObj["window"];
+    const originalDocument = globalObj["document"];
 
     // Simulate SSR environment
-    delete globalObj['window'];
-    delete globalObj['document'];
+    delete globalObj["window"];
+    delete globalObj["document"];
 
     // Should not throw error
     expect(() => enforceWCAGTouchTargets()).not.toThrow();
     expect(() => setupWCAGEnforcement()).not.toThrow();
 
     // Restore environment
-    globalObj['window'] = originalWindow;
-    globalObj['document'] = originalDocument;
+    globalObj["window"] = originalWindow;
+    globalObj["document"] = originalDocument;
   });
 
-  test('applies Firefox optimizations without logging', () => {
+  test("applies Firefox optimizations without logging", () => {
     const originalUserAgent = navigator.userAgent;
     const originalEnv = import.meta.env.DEV;
 
-    mockNavigator('Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0');
+    mockNavigator("Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0");
     (import.meta.env as any).DEV = true;
 
-    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
-    const btn = document.createElement('button');
+    const btn = document.createElement("button");
     document.body.appendChild(btn);
 
     enforceWCAGTouchTargets();

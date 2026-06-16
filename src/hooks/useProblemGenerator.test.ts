@@ -1,7 +1,7 @@
-import type { Settings } from '@/types';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, renderHook } from '../../tests/helpers/testUtils';
-import { calculateExpression, generateProblem, useProblemGenerator } from './useProblemGenerator';
+import type { Settings } from "@/types";
+import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
+import { act, renderHook } from "../../tests/helpers/testUtils";
+import { calculateExpression, generateProblem, useProblemGenerator } from "./useProblemGenerator";
 
 // Mock crypto for deterministic results
 let mockCounter = 0;
@@ -15,28 +15,28 @@ const mockCrypto = {
   }),
 };
 
-Object.defineProperty(globalThis, 'crypto', {
+Object.defineProperty(globalThis, "crypto", {
   value: mockCrypto,
   writable: true,
 });
 
-describe('useProblemGenerator utilities', () => {
+describe("useProblemGenerator utilities", () => {
   beforeEach(() => {
     mockCounter = 0;
     vi.clearAllMocks();
   });
 
-  it('calculateExpression computes correctly', () => {
-    expect(calculateExpression([5, 3], ['+'])).toBe(8);
-    expect(calculateExpression([10, 4], ['-'])).toBe(6);
-    expect(calculateExpression([6, 7], ['*'])).toBe(42);
-    expect(calculateExpression([15, 3], ['/'])).toBe(5);
-    expect(calculateExpression([5, 3], ['%'])).toBeNull();
+  it("calculateExpression computes correctly", () => {
+    expect(calculateExpression([5, 3], ["+"])).toBe(8);
+    expect(calculateExpression([10, 4], ["-"])).toBe(6);
+    expect(calculateExpression([6, 7], ["*"])).toBe(42);
+    expect(calculateExpression([15, 3], ["/"])).toBe(5);
+    expect(calculateExpression([5, 3], ["%"])).toBeNull();
   });
 
-  it('generateProblem creates valid problems', () => {
+  it("generateProblem creates valid problems", () => {
     const settings: Settings = {
-      operations: ['+'],
+      operations: ["+"],
       numProblems: 1,
       numRange: [1, 5],
       resultRange: [0, 10],
@@ -45,7 +45,7 @@ describe('useProblemGenerator utilities', () => {
       showAnswers: true,
       fontSize: 16,
       lineSpacing: 12,
-      paperSize: 'a4',
+      paperSize: "a4",
       enableGrouping: false,
       problemsPerGroup: 20,
       totalGroups: 1,
@@ -55,14 +55,14 @@ describe('useProblemGenerator utilities', () => {
   });
 });
 
-describe('useProblemGenerator hook', () => {
+describe("useProblemGenerator hook", () => {
   beforeEach(() => {
     mockCounter = 0;
     vi.clearAllMocks();
   });
 
   const baseSettings: Settings = {
-    operations: ['+'],
+    operations: ["+"],
     numProblems: 2,
     numRange: [1, 5],
     resultRange: [0, 10],
@@ -71,23 +71,23 @@ describe('useProblemGenerator hook', () => {
     showAnswers: true,
     fontSize: 16,
     lineSpacing: 12,
-    paperSize: 'a4',
+    paperSize: "a4",
     enableGrouping: false,
     problemsPerGroup: 20,
     totalGroups: 1,
   };
 
-  it('generates problems and returns success message', () => {
-    const validateSettings = vi.fn(() => '');
+  it("generates problems and returns success message", () => {
+    const validateSettings = vi.fn(() => "");
     const { result } = renderHook(() => useProblemGenerator(baseSettings, false, validateSettings));
 
     // Wait for initial useEffect to complete
     expect(result.current.problems.length).toBeGreaterThanOrEqual(0);
 
     let messages: ReturnType<typeof result.current.generateProblems> = {
-      error: '',
-      warning: '',
-      successMessage: '',
+      error: "",
+      warning: "",
+      successMessage: "",
     };
 
     act(() => {
@@ -96,37 +96,37 @@ describe('useProblemGenerator hook', () => {
 
     expect(result.current.problems).toHaveLength(2);
     expect(messages.successMessage).toEqual({
-      key: 'messages.success.problemsGenerated',
+      key: "messages.success.problemsGenerated",
       params: { count: 2 },
     });
   });
 
-  it('handles validation errors', () => {
-    const validateSettings = vi.fn(() => 'errors.noOperations');
+  it("handles validation errors", () => {
+    const validateSettings = vi.fn(() => "errors.noOperations");
     const { result } = renderHook(() => useProblemGenerator(baseSettings, false, validateSettings));
 
     let messages: ReturnType<typeof result.current.generateProblems> = {
-      error: '',
-      warning: '',
-      successMessage: '',
+      error: "",
+      warning: "",
+      successMessage: "",
     };
 
     act(() => {
       messages = result.current.generateProblems();
     });
 
-    expect(messages.error).toEqual({ key: 'errors.noOperations' });
+    expect(messages.error).toEqual({ key: "errors.noOperations" });
   });
 
-  it('sets warning for large number of problems', () => {
+  it("sets warning for large number of problems", () => {
     const manySettings = { ...baseSettings, numProblems: 60 };
-    const validateSettings = vi.fn(() => '');
+    const validateSettings = vi.fn(() => "");
     const { result } = renderHook(() => useProblemGenerator(manySettings, false, validateSettings));
 
     let messages: ReturnType<typeof result.current.generateProblems> = {
-      error: '',
-      warning: '',
-      successMessage: '',
+      error: "",
+      warning: "",
+      successMessage: "",
     };
 
     act(() => {
@@ -134,26 +134,26 @@ describe('useProblemGenerator hook', () => {
     });
 
     expect(messages.warning).toEqual({
-      key: 'warnings.largeNumberOfProblems',
+      key: "warnings.largeNumberOfProblems",
       params: { count: 60 },
     });
   });
 
-  it('reports error when no problems can be generated', () => {
+  it("reports error when no problems can be generated", () => {
     const impossible: Settings = { ...baseSettings, resultRange: [100, 200] };
-    const validateSettings = vi.fn(() => '');
+    const validateSettings = vi.fn(() => "");
     const { result } = renderHook(() => useProblemGenerator(impossible, false, validateSettings));
 
     let messages: ReturnType<typeof result.current.generateProblems> = {
-      error: '',
-      warning: '',
-      successMessage: '',
+      error: "",
+      warning: "",
+      successMessage: "",
     };
 
     act(() => {
       messages = result.current.generateProblems();
     });
 
-    expect(messages.error).toEqual({ key: 'errors.noProblemsGenerated' });
+    expect(messages.error).toEqual({ key: "errors.noProblemsGenerated" });
   });
 });
