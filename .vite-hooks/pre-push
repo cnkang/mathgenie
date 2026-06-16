@@ -19,10 +19,10 @@ if [ "$current_branch" = "main" ] || [ "$current_branch" = "develop" ]; then
   echo "Consider using pull requests for better code review"
 fi
 
-# 运行类型检查
-echo "🔍 Running Vite+ checks..."
-if ! vp check --no-fmt; then
-  echo "❌ Vite+ checks failed"
+# 运行代码质量检查
+echo "🔍 Running lint and type checks..."
+if ! pnpm lint || ! pnpm type-check; then
+  echo "❌ Lint or type checks failed"
   exit 1
 fi
 
