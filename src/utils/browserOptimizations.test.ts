@@ -5,26 +5,26 @@ import {
   getBrowserOptimizations,
   getChromeOptimizations,
   getFirefoxOptimizations,
-} from './browserOptimizations';
+} from "./browserOptimizations";
 
 // Mock navigator for browser detection tests
 const mockNavigator = (userAgent: string) => {
-  Object.defineProperty(navigator, 'userAgent', {
+  Object.defineProperty(navigator, "userAgent", {
     value: userAgent,
     configurable: true,
   });
 };
 
-describe('Browser Optimizations', () => {
+describe("Browser Optimizations", () => {
   const originalUserAgent = navigator.userAgent;
 
   afterEach(() => {
     mockNavigator(originalUserAgent);
   });
 
-  describe('getBrowserInfo', () => {
-    test('detects Firefox correctly', () => {
-      mockNavigator('Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0');
+  describe("getBrowserInfo", () => {
+    test("detects Firefox correctly", () => {
+      mockNavigator("Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0");
       const info = getBrowserInfo();
       expect(info.isFirefox).toBe(true);
       expect(info.isChrome).toBe(false);
@@ -32,9 +32,9 @@ describe('Browser Optimizations', () => {
       expect(info.isEdge).toBe(false);
     });
 
-    test('detects Chrome correctly', () => {
+    test("detects Chrome correctly", () => {
       mockNavigator(
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
       );
       const info = getBrowserInfo();
       expect(info.isFirefox).toBe(false);
@@ -43,9 +43,9 @@ describe('Browser Optimizations', () => {
       expect(info.isEdge).toBe(false);
     });
 
-    test('detects Safari correctly', () => {
+    test("detects Safari correctly", () => {
       mockNavigator(
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15'
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15",
       );
       const info = getBrowserInfo();
       expect(info.isFirefox).toBe(false);
@@ -54,9 +54,9 @@ describe('Browser Optimizations', () => {
       expect(info.isEdge).toBe(false);
     });
 
-    test('detects Edge correctly', () => {
+    test("detects Edge correctly", () => {
       mockNavigator(
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.59'
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.59",
       );
       const info = getBrowserInfo();
       expect(info.isFirefox).toBe(false);
@@ -65,7 +65,7 @@ describe('Browser Optimizations', () => {
       expect(info.isEdge).toBe(true);
     });
 
-    test('handles undefined navigator gracefully', () => {
+    test("handles undefined navigator gracefully", () => {
       const originalNavigator = globalThis.navigator;
       delete (globalThis as any).navigator;
 
@@ -79,8 +79,8 @@ describe('Browser Optimizations', () => {
     });
   });
 
-  describe('getFirefoxOptimizations', () => {
-    test('returns Firefox-specific optimization settings', () => {
+  describe("getFirefoxOptimizations", () => {
+    test("returns Firefox-specific optimization settings", () => {
       const opts = getFirefoxOptimizations();
 
       expect(opts.domBatchSize).toBe(10);
@@ -92,18 +92,18 @@ describe('Browser Optimizations', () => {
       expect(opts.batchStyleUpdates).toBe(true);
     });
 
-    test('returns correct MutationObserver config for Firefox', () => {
+    test("returns correct MutationObserver config for Firefox", () => {
       const opts = getFirefoxOptimizations();
 
       expect(opts.mutationObserverConfig.childList).toBe(true);
       expect(opts.mutationObserverConfig.subtree).toBe(false);
       expect(opts.mutationObserverConfig.attributes).toBe(true);
-      expect(opts.mutationObserverConfig.attributeFilter).toEqual(['style', 'class']);
+      expect(opts.mutationObserverConfig.attributeFilter).toEqual(["style", "class"]);
     });
   });
 
-  describe('getChromeOptimizations', () => {
-    test('returns Chrome-specific optimization settings', () => {
+  describe("getChromeOptimizations", () => {
+    test("returns Chrome-specific optimization settings", () => {
       const opts = getChromeOptimizations();
 
       expect(opts.domBatchSize).toBe(25);
@@ -115,28 +115,28 @@ describe('Browser Optimizations', () => {
       expect(opts.batchStyleUpdates).toBe(false);
     });
 
-    test('returns correct MutationObserver config for Chrome', () => {
+    test("returns correct MutationObserver config for Chrome", () => {
       const opts = getChromeOptimizations();
 
       expect(opts.mutationObserverConfig.childList).toBe(true);
       expect(opts.mutationObserverConfig.subtree).toBe(true);
       expect(opts.mutationObserverConfig.attributes).toBe(true);
-      expect(opts.mutationObserverConfig.attributeFilter).toEqual(['style', 'class', 'hidden']);
+      expect(opts.mutationObserverConfig.attributeFilter).toEqual(["style", "class", "hidden"]);
     });
   });
 
-  describe('getBrowserOptimizations', () => {
-    test('returns Firefox optimizations when Firefox is detected', () => {
-      mockNavigator('Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0');
+  describe("getBrowserOptimizations", () => {
+    test("returns Firefox optimizations when Firefox is detected", () => {
+      mockNavigator("Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0");
 
       const opts = getBrowserOptimizations();
       expect(opts.domBatchSize).toBe(10); // Firefox-specific
       expect(opts.useSimplifiedSelectors).toBe(true); // Firefox-specific
     });
 
-    test('returns Chrome optimizations for non-Firefox browsers', () => {
+    test("returns Chrome optimizations for non-Firefox browsers", () => {
       mockNavigator(
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/91.0.4472.124'
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/91.0.4472.124",
       );
 
       const opts = getBrowserOptimizations();
@@ -145,55 +145,55 @@ describe('Browser Optimizations', () => {
     });
   });
 
-  describe('createPerformanceMonitor', () => {
+  describe("createPerformanceMonitor", () => {
     const createSlowOperation = (durationMs = 15): (() => string) => {
       return () => {
         const start = Date.now();
         while (Date.now() - start < durationMs) {
           // Simulate slow operation
         }
-        return 'result';
+        return "result";
       };
     };
 
-    test('measures DOM operations and returns result', () => {
+    test("measures DOM operations and returns result", () => {
       const monitor = createPerformanceMonitor();
-      const testOperation = () => 'test result';
+      const testOperation = () => "test result";
 
-      const result = monitor.measureDOMOperation(testOperation, 'test operation');
-      expect(result).toBe('test result');
+      const result = monitor.measureDOMOperation(testOperation, "test operation");
+      expect(result).toBe("test result");
     });
 
-    test('logs performance warnings for slow Firefox operations in dev mode', () => {
-      mockNavigator('Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0');
+    test("logs performance warnings for slow Firefox operations in dev mode", () => {
+      mockNavigator("Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0");
       const originalEnv = import.meta.env.DEV;
       (import.meta.env as any).DEV = true;
 
-      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
       const monitor = createPerformanceMonitor();
 
       const slowOperation = createSlowOperation();
 
-      monitor.measureDOMOperation(slowOperation, 'slow operation');
+      monitor.measureDOMOperation(slowOperation, "slow operation");
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Firefox: Slow DOM operation "slow operation"')
+        expect.stringContaining('Firefox: Slow DOM operation "slow operation"'),
       );
 
       consoleSpy.mockRestore();
       (import.meta.env as any).DEV = originalEnv;
     });
 
-    test('does not log warnings in production mode', () => {
+    test("does not log warnings in production mode", () => {
       const originalEnv = import.meta.env.DEV;
       (import.meta.env as any).DEV = false;
 
-      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
       const monitor = createPerformanceMonitor();
 
       const slowOperation = createSlowOperation();
 
-      monitor.measureDOMOperation(slowOperation, 'slow operation');
+      monitor.measureDOMOperation(slowOperation, "slow operation");
 
       expect(consoleSpy).not.toHaveBeenCalled();
 
@@ -201,11 +201,11 @@ describe('Browser Optimizations', () => {
       (import.meta.env as any).DEV = originalEnv;
     });
 
-    test('logBrowserInfo is silent (no console noise)', () => {
+    test("logBrowserInfo is silent (no console noise)", () => {
       const originalEnv = import.meta.env.DEV;
       (import.meta.env as any).DEV = true;
 
-      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
       const monitor = createPerformanceMonitor();
 
       monitor.logBrowserInfo();
@@ -217,11 +217,11 @@ describe('Browser Optimizations', () => {
       (import.meta.env as any).DEV = originalEnv;
     });
 
-    test('does not log browser info in production mode', () => {
+    test("does not log browser info in production mode", () => {
       const originalEnv = import.meta.env.DEV;
       (import.meta.env as any).DEV = false;
 
-      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
       const monitor = createPerformanceMonitor();
 
       monitor.logBrowserInfo();
@@ -233,15 +233,15 @@ describe('Browser Optimizations', () => {
     });
   });
 
-  describe('applyBrowserSpecificStyles', () => {
-    test('applies Firefox-specific styles when Firefox is detected', () => {
-      mockNavigator('Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0');
+  describe("applyBrowserSpecificStyles", () => {
+    test("applies Firefox-specific styles when Firefox is detected", () => {
+      mockNavigator("Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0");
 
       const originalHead = document.head;
       const mockHead = {
         appendChild: vi.fn(),
       };
-      Object.defineProperty(document, 'head', {
+      Object.defineProperty(document, "head", {
         value: mockHead,
         configurable: true,
       });
@@ -250,26 +250,26 @@ describe('Browser Optimizations', () => {
 
       expect(mockHead.appendChild).toHaveBeenCalledWith(
         expect.objectContaining({
-          textContent: expect.stringContaining('-moz-osx-font-smoothing'),
-        })
+          textContent: expect.stringContaining("-moz-osx-font-smoothing"),
+        }),
       );
 
-      Object.defineProperty(document, 'head', {
+      Object.defineProperty(document, "head", {
         value: originalHead,
         configurable: true,
       });
     });
 
-    test('does not apply styles for non-Firefox browsers', () => {
+    test("does not apply styles for non-Firefox browsers", () => {
       mockNavigator(
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/91.0.4472.124'
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/91.0.4472.124",
       );
 
       const originalHead = document.head;
       const mockHead = {
         appendChild: vi.fn(),
       };
-      Object.defineProperty(document, 'head', {
+      Object.defineProperty(document, "head", {
         value: mockHead,
         configurable: true,
       });
@@ -278,24 +278,24 @@ describe('Browser Optimizations', () => {
 
       expect(mockHead.appendChild).not.toHaveBeenCalled();
 
-      Object.defineProperty(document, 'head', {
+      Object.defineProperty(document, "head", {
         value: originalHead,
         configurable: true,
       });
     });
 
-    test('applies Firefox styles without logging in dev mode', () => {
-      mockNavigator('Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0');
+    test("applies Firefox styles without logging in dev mode", () => {
+      mockNavigator("Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0");
       const originalEnv = import.meta.env.DEV;
       (import.meta.env as any).DEV = true;
 
-      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
       const originalHead = document.head;
       const mockHead = {
         appendChild: vi.fn(),
       };
-      Object.defineProperty(document, 'head', {
+      Object.defineProperty(document, "head", {
         value: mockHead,
         configurable: true,
       });
@@ -306,15 +306,15 @@ describe('Browser Optimizations', () => {
       expect(mockHead.appendChild).toHaveBeenCalled();
 
       consoleSpy.mockRestore();
-      Object.defineProperty(document, 'head', {
+      Object.defineProperty(document, "head", {
         value: originalHead,
         configurable: true,
       });
       (import.meta.env as any).DEV = originalEnv;
     });
 
-    test('handles undefined document gracefully', () => {
-      mockNavigator('Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0');
+    test("handles undefined document gracefully", () => {
+      mockNavigator("Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0");
 
       const originalDocument = globalThis.document;
       delete (globalThis as any).document;

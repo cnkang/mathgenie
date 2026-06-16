@@ -1,12 +1,12 @@
-import type { Operation, Settings } from '@/types';
-import { calculateActualTotalProblems, isPositiveInteger } from '@/utils/groupingUtils';
-import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from 'react';
+import type { Operation, Settings } from "@/types";
+import { calculateActualTotalProblems, isPositiveInteger } from "@/utils/groupingUtils";
+import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from "react";
 
 // Constants to avoid duplicate strings
-const SETTINGS_STORAGE_KEY = 'mathgenie-settings';
+const SETTINGS_STORAGE_KEY = "mathgenie-settings";
 
 const defaultSettings: Settings = {
-  operations: ['+', '-'],
+  operations: ["+", "-"],
   numProblems: 20,
   numRange: [1, 20],
   resultRange: [0, 20],
@@ -15,7 +15,7 @@ const defaultSettings: Settings = {
   showAnswers: false,
   fontSize: 16,
   lineSpacing: 12,
-  paperSize: 'a4',
+  paperSize: "a4",
   // 分组设置默认值
   enableGrouping: false,
   problemsPerGroup: 20,
@@ -30,8 +30,8 @@ const isValidOperationArray = (value: unknown): value is Operation[] => {
   if (!Array.isArray(value)) {
     return false;
   }
-  const validOperations = new Set<Operation>(['+', '-', '*', '/', '×', '÷']);
-  return value.every(op => typeof op === 'string' && validOperations.has(op as Operation));
+  const validOperations = new Set<Operation>(["+", "-", "*", "/", "×", "÷"]);
+  return value.every((op) => typeof op === "string" && validOperations.has(op as Operation));
 };
 
 const validateAndMergeSettings = (parsed: unknown): Settings => {
@@ -66,7 +66,7 @@ const loadSettings = (): Settings => {
     return validateAndMergeSettings(parsed);
   } catch (error) {
     localStorage.removeItem(SETTINGS_STORAGE_KEY);
-    devWarn('Failed to load settings from localStorage:', error);
+    devWarn("Failed to load settings from localStorage:", error);
     return defaultSettings;
   }
 };
@@ -90,7 +90,7 @@ export const useSettings = (): UseSettingsResult => {
     try {
       localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
     } catch (error) {
-      devWarn('Failed to save settings to localStorage:', error);
+      devWarn("Failed to save settings to localStorage:", error);
     }
   }, [settings]);
 
@@ -99,14 +99,14 @@ export const useSettings = (): UseSettingsResult => {
     const actualTotalProblems = calculateActualTotalProblems(newSettings);
 
     const validations = [
-      { condition: newSettings.operations.length === 0, error: 'errors.noOperations' },
+      { condition: newSettings.operations.length === 0, error: "errors.noOperations" },
       {
         condition: newSettings.numProblems <= 0 || newSettings.numProblems > 50000,
-        error: 'errors.invalidProblemCount',
+        error: "errors.invalidProblemCount",
       },
       {
         condition: actualTotalProblems > 50000,
-        error: 'errors.invalidTotalProblemCount',
+        error: "errors.invalidTotalProblemCount",
       },
       {
         condition:
@@ -114,7 +114,7 @@ export const useSettings = (): UseSettingsResult => {
           (newSettings.problemsPerGroup <= 0 ||
             newSettings.problemsPerGroup > 1000 ||
             !isPositiveInteger(newSettings.problemsPerGroup)),
-        error: 'errors.invalidProblemsPerGroup',
+        error: "errors.invalidProblemsPerGroup",
       },
       {
         condition:
@@ -122,26 +122,26 @@ export const useSettings = (): UseSettingsResult => {
           (newSettings.totalGroups <= 0 ||
             newSettings.totalGroups > 100 ||
             !isPositiveInteger(newSettings.totalGroups)),
-        error: 'errors.invalidTotalGroups',
+        error: "errors.invalidTotalGroups",
       },
       {
         condition: newSettings.numRange[0] > newSettings.numRange[1],
-        error: 'errors.invalidNumberRange',
+        error: "errors.invalidNumberRange",
       },
       {
         condition: newSettings.resultRange[0] > newSettings.resultRange[1],
-        error: 'errors.invalidResultRange',
+        error: "errors.invalidResultRange",
       },
       {
         condition:
           newSettings.numOperandsRange[0] > newSettings.numOperandsRange[1] ||
           newSettings.numOperandsRange[0] < 2,
-        error: 'errors.invalidOperandsRange',
+        error: "errors.invalidOperandsRange",
       },
     ];
 
-    const failedValidation = validations.find(validation => validation.condition);
-    return failedValidation ? failedValidation.error : '';
+    const failedValidation = validations.find((validation) => validation.condition);
+    return failedValidation ? failedValidation.error : "";
   }, []);
 
   return { settings, setSettings, validateSettings };

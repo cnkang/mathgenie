@@ -1,4 +1,4 @@
-import { useCallback, useDeferredValue, useMemo, useRef, useTransition } from 'react';
+import { useCallback, useDeferredValue, useMemo, useRef, useTransition } from "react";
 
 /**
  * Hook for tracking component performance metrics
@@ -20,7 +20,7 @@ export const usePerformanceTracking = () => {
       lastRenderTime: Date.now(),
       averageRenderTime: 0,
     }),
-    []
+    [],
   );
 
   return {
@@ -73,16 +73,16 @@ export const useConcurrentFeatures = () => {
     (callback: () => void) => {
       startTransition(callback);
     },
-    [startTransition]
+    [startTransition],
   );
 
   const batchUpdates = useCallback(
     (updates: (() => void)[]) => {
       startTransition(() => {
-        updates.forEach(update => update());
+        updates.forEach((update) => update());
       });
     },
-    [startTransition]
+    [startTransition],
   );
 
   return {

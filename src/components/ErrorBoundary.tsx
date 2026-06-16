@@ -1,5 +1,5 @@
-import React, { Component, type ReactNode } from 'react';
-import type { ErrorBoundaryProps, ErrorInfo } from '../types';
+import React, { Component, type ReactNode } from "react";
+import type { ErrorBoundaryProps, ErrorInfo } from "../types";
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -35,7 +35,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     }
 
     if (import.meta.env.DEV) {
-      console.error('ErrorBoundary caught an error:', error, errorInfo);
+      console.error("ErrorBoundary caught an error:", error, errorInfo);
     }
   }
 
@@ -45,25 +45,25 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
   render(): React.ReactElement {
     const fallbackContent: ReactNode = this.props.fallback ?? (
-      <div className='error-boundary'>
-        <div className='error-content'>
+      <div className="error-boundary">
+        <div className="error-content">
           <h2>🚨 Something went wrong</h2>
           <p>We&apos;re sorry, but something unexpected happened.</p>
 
           {import.meta.env.DEV && this.state.error && (
-            <details className='error-details'>
+            <details className="error-details">
               <summary>Error Details (Development)</summary>
               <pre>{this.state.error.toString()}</pre>
               {this.state.errorInfo && <pre>{this.state.errorInfo.componentStack}</pre>}
             </details>
           )}
 
-          <div className='error-actions'>
-            <button onClick={this.handleRetry} className='retry-button'>
+          <div className="error-actions">
+            <button onClick={this.handleRetry} className="retry-button">
               🔄 Try Again
             </button>
 
-            <button onClick={() => globalThis.location.reload()} className='reload-button'>
+            <button onClick={() => globalThis.location.reload()} className="reload-button">
               🔃 Reload Page
             </button>
           </div>
@@ -99,7 +99,7 @@ export const useErrorHandler = (): ErrorHandlerReturn => {
 
     if (import.meta.env.PROD) {
       // Safe logging - only log error message, not full object
-      console.error('Application error:', error.message);
+      console.error("Application error:", error.message);
     }
   }, []);
 

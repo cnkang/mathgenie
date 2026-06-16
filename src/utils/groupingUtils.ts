@@ -1,4 +1,4 @@
-import type { Problem, Settings } from '@/types';
+import type { Problem, Settings } from "@/types";
 
 /**
  * Shared grouping utilities for consistent behavior across components
@@ -60,9 +60,9 @@ export const hasProblems = (group: Problem[]): boolean => {
  */
 export const getGroupTitle = (
   groupIndex: number,
-  t: (key: string, params?: Record<string, string | number>) => string
+  t: (key: string, params?: Record<string, string | number>) => string,
 ): string => {
-  return t('results.groupTitle', { number: groupIndex + 1 }) || `Group ${groupIndex + 1}`;
+  return t("results.groupTitle", { number: groupIndex + 1 }) || `Group ${groupIndex + 1}`;
 };
 
 /**
@@ -70,9 +70,9 @@ export const getGroupTitle = (
  */
 export const getEmptyGroupText = (
   groupIndex: number,
-  t: (key: string, params?: Record<string, string | number>) => string
+  t: (key: string, params?: Record<string, string | number>) => string,
 ): string => {
   return (
-    t('problems.emptyGroup', { group: groupIndex + 1 }) || `Group ${groupIndex + 1} (no problems)`
+    t("problems.emptyGroup", { group: groupIndex + 1 }) || `Group ${groupIndex + 1} (no problems)`
   );
 };

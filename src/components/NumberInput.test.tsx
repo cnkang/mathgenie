@@ -1,17 +1,17 @@
-import React from 'react';
-import { vi } from 'vitest';
-import { act, fireEvent, render } from '../../tests/helpers/testUtils';
-import NumberInput from './NumberInput';
+import React from "react";
+import { vi } from "vite-plus/test";
+import { act, fireEvent, render } from "../../tests/helpers/testUtils";
+import NumberInput from "./NumberInput";
 
 // Test component to verify basic rendering works
 const TestComponent: React.FC = () => {
-  return <div data-testid='test-component'>Test works</div>;
+  return <div data-testid="test-component">Test works</div>;
 };
 
-describe.sequential('NumberInput', () => {
+describe.sequential("NumberInput", () => {
   const defaultProps = {
-    id: 'test-input',
-    label: 'Test Input',
+    id: "test-input",
+    label: "Test Input",
     value: 10,
     onChange: vi.fn(),
     min: 1,
@@ -26,32 +26,32 @@ describe.sequential('NumberInput', () => {
     vi.clearAllTimers();
   });
 
-  test('basic rendering works', () => {
+  test("basic rendering works", () => {
     const { getByTestId } = render(<TestComponent />);
-    expect(getByTestId('test-component')).toBeInTheDocument();
+    expect(getByTestId("test-component")).toBeInTheDocument();
   });
 
-  test('renders with basic props', () => {
+  test("renders with basic props", () => {
     const { container } = render(<NumberInput {...defaultProps} />);
 
-    const input = container.querySelector('input');
-    const label = container.querySelector('label');
+    const input = container.querySelector("input");
+    const label = container.querySelector("label");
 
     expect(input).not.toBeNull();
     expect(label).not.toBeNull();
   });
 
-  test('calls onChange when value changes', async () => {
+  test("calls onChange when value changes", async () => {
     const onChange = vi.fn();
     const { container } = render(<NumberInput {...defaultProps} onChange={onChange} />);
 
-    const input = container.querySelector('input') as HTMLInputElement;
+    const input = container.querySelector("input") as HTMLInputElement;
     expect(input).not.toBeNull();
 
     // Use React.startTransition to wrap the state update
     await act(async () => {
       React.startTransition(() => {
-        fireEvent.change(input, { target: { value: '25' } });
+        fireEvent.change(input, { target: { value: "25" } });
       });
     });
 
@@ -59,40 +59,40 @@ describe.sequential('NumberInput', () => {
     expect(onChange).toHaveBeenCalled();
   });
 
-  test('handles empty input', async () => {
+  test("handles empty input", async () => {
     const onChange = vi.fn();
     const { container } = render(<NumberInput {...defaultProps} onChange={onChange} />);
 
-    const input = container.querySelector('input') as HTMLInputElement;
+    const input = container.querySelector("input") as HTMLInputElement;
     expect(input).not.toBeNull();
 
     await act(async () => {
       React.startTransition(() => {
-        fireEvent.change(input, { target: { value: '' } });
+        fireEvent.change(input, { target: { value: "" } });
       });
     });
 
     expect(onChange).toHaveBeenCalledWith(1);
   });
 
-  test('shows required indicator when required', () => {
+  test("shows required indicator when required", () => {
     const { container } = render(<NumberInput {...defaultProps} required />);
 
     expect(container.querySelector('[aria-label="required"]')).toBeDefined();
   });
 
-  test('applies placeholder when provided', () => {
-    const { container } = render(<NumberInput {...defaultProps} placeholder='Enter number' />);
+  test("applies placeholder when provided", () => {
+    const { container } = render(<NumberInput {...defaultProps} placeholder="Enter number" />);
 
-    const input = container.querySelector('input') as HTMLInputElement;
+    const input = container.querySelector("input") as HTMLInputElement;
     expect(input).not.toBeNull();
-    expect(input.getAttribute('placeholder')).toBe('Enter number');
+    expect(input.getAttribute("placeholder")).toBe("Enter number");
   });
 
-  test('handles blur event', () => {
+  test("handles blur event", () => {
     const onChange = vi.fn();
     const { container } = render(<NumberInput {...defaultProps} onChange={onChange} />);
-    const input = container.querySelector('input') as HTMLInputElement;
+    const input = container.querySelector("input") as HTMLInputElement;
 
     if (input) {
       fireEvent.blur(input);
@@ -102,15 +102,15 @@ describe.sequential('NumberInput', () => {
     }
   });
 
-  test('handles invalid number input', async () => {
+  test("handles invalid number input", async () => {
     const onChange = vi.fn();
     const { container } = render(<NumberInput {...defaultProps} onChange={onChange} />);
-    const input = container.querySelector('input') as HTMLInputElement;
+    const input = container.querySelector("input") as HTMLInputElement;
 
     if (input) {
       await act(async () => {
         React.startTransition(() => {
-          fireEvent.change(input, { target: { value: 'abc' } });
+          fireEvent.change(input, { target: { value: "abc" } });
         });
       });
 
@@ -121,38 +121,38 @@ describe.sequential('NumberInput', () => {
     }
   });
 
-  test('has correct accessibility attributes', () => {
+  test("has correct accessibility attributes", () => {
     const { container } = render(<NumberInput {...defaultProps} />);
 
-    const input = container.querySelector('input') as HTMLInputElement;
+    const input = container.querySelector("input") as HTMLInputElement;
     expect(input).not.toBeNull();
     // Use native DOM properties instead of jest-dom matchers
-    expect(input.getAttribute('aria-label')).toBe('Test Input (1 to 100)');
-    expect(input.getAttribute('inputmode')).toBe('numeric');
-    expect(input.getAttribute('type')).toBe('number');
+    expect(input.getAttribute("aria-label")).toBe("Test Input (1 to 100)");
+    expect(input.getAttribute("inputmode")).toBe("numeric");
+    expect(input.getAttribute("type")).toBe("number");
   });
 
-  test('passes through additional props', () => {
+  test("passes through additional props", () => {
     const { container } = render(
-      <NumberInput {...defaultProps} className='custom-class' data-testid='custom-input' />
+      <NumberInput {...defaultProps} className="custom-class" data-testid="custom-input" />,
     );
 
     const input = container.querySelector('input[data-testid="custom-input"]') as HTMLElement;
     expect(input).not.toBeNull();
     // Use native DOM properties instead of jest-dom matchers
-    expect((input as HTMLInputElement).className).toContain('custom-class');
-    expect(input.dataset.testid).toBe('custom-input');
+    expect((input as HTMLInputElement).className).toContain("custom-class");
+    expect(input.dataset.testid).toBe("custom-input");
   });
 
-  test('renders without label when not provided', () => {
+  test("renders without label when not provided", () => {
     const propsWithoutLabel = { ...defaultProps, label: undefined };
     const { container } = render(<NumberInput {...propsWithoutLabel} />);
 
-    const input = container.querySelector('input');
+    const input = container.querySelector("input");
     expect(input).toBeDefined();
 
     // Should not have a label element if no label provided
-    const label = container.querySelector('label');
-    expect(label?.textContent).not.toBe('Test Input');
+    const label = container.querySelector("label");
+    expect(label?.textContent).not.toBe("Test Input");
   });
 });

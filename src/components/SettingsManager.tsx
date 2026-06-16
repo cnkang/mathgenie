@@ -1,6 +1,6 @@
-import React, { ChangeEvent, useCallback, useRef, useState } from 'react';
-import { useTranslation } from '../i18n';
-import type { Settings } from '../types';
+import React, { ChangeEvent, useCallback, useRef, useState } from "react";
+import { useTranslation } from "../i18n";
+import type { Settings } from "../types";
 import {
   createDownloadBlob,
   createSettingsData,
@@ -8,8 +8,8 @@ import {
   parseSettingsFile,
   serializeSettings,
   SettingsParseError,
-} from '../utils/settingsManager';
-import './SettingsManager.css';
+} from "../utils/settingsManager";
+import "./SettingsManager.css";
 
 interface SettingsManagerProps {
   settings: Settings;
@@ -20,25 +20,25 @@ type TFunc = (key: string, params?: Record<string, string | number>) => string;
 type ImportErrorReporter = (message: string) => void;
 
 const ExportIcon: React.FC = () => (
-  <svg viewBox='0 0 24 24' width='18' height='18' fill='none' aria-hidden='true'>
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
     <path
-      d='M12 3v10m0 0 4-4m-4 4-4-4M4 19h16'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
+      d="M12 3v10m0 0 4-4m-4 4-4-4M4 19h16"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
   </svg>
 );
 
 const ImportIcon: React.FC = () => (
-  <svg viewBox='0 0 24 24' width='18' height='18' fill='none' aria-hidden='true'>
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
     <path
-      d='M12 21V11m0 0 4 4m-4-4-4 4M4 5h16'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
+      d="M12 21V11m0 0 4 4m-4-4-4 4M4 5h16"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
   </svg>
 );
@@ -49,7 +49,7 @@ const exportSettingsToFile = (settings: Settings): void => {
   const dataBlob = createDownloadBlob(dataStr);
 
   const url = URL.createObjectURL(dataBlob);
-  const link = document.createElement('a');
+  const link = document.createElement("a");
   link.href = url;
   link.download = generateFilename();
   document.body.appendChild(link);
@@ -62,16 +62,16 @@ const handleImportedContent = (
   rawContent: string,
   t: TFunc,
   onImportSettings: (settings: Settings) => void,
-  onImportError: ImportErrorReporter
+  onImportError: ImportErrorReporter,
 ): void => {
   try {
     const importedData = parseSettingsFile(rawContent);
     onImportSettings(importedData.settings);
   } catch (error) {
-    const message = t('settings.importError') || 'Error importing settings file';
+    const message = t("settings.importError") || "Error importing settings file";
     onImportError(message);
     if (!(error instanceof SettingsParseError)) {
-      console.error('Settings import error:', JSON.stringify(error));
+      console.error("Settings import error:", JSON.stringify(error));
     }
   }
 };
@@ -80,17 +80,17 @@ const importSettingsFromFile = async (
   file: File,
   t: TFunc,
   onImportSettings: (settings: Settings) => void,
-  onImportError: ImportErrorReporter
+  onImportError: ImportErrorReporter,
 ): Promise<void> => {
   try {
     const result = await file.text();
-    if (typeof result !== 'string') {
-      onImportError(t('settings.importError') || 'Invalid settings file format');
+    if (typeof result !== "string") {
+      onImportError(t("settings.importError") || "Invalid settings file format");
       return;
     }
     handleImportedContent(result, t, onImportSettings, onImportError);
   } catch {
-    onImportError(t('settings.importError') || 'Invalid settings file format');
+    onImportError(t("settings.importError") || "Invalid settings file format");
   }
 };
 
@@ -101,7 +101,7 @@ const importSettingsFromFile = async (
 const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onImportSettings }) => {
   const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [importError, setImportError] = useState('');
+  const [importError, setImportError] = useState("");
 
   const exportSettings = (): void => exportSettingsToFile(settings);
 
@@ -110,35 +110,35 @@ const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onImportSet
   }, []);
 
   const clearImportError = useCallback((): void => {
-    setImportError('');
+    setImportError("");
   }, []);
 
   const importSettings = (event: ChangeEvent<HTMLInputElement>): void => {
     const file = event.target.files?.[0];
     if (!file) {
-      event.target.value = '';
+      event.target.value = "";
       return;
     }
     clearImportError();
     void importSettingsFromFile(file, t, onImportSettings, showImportError);
 
     // Reset file input
-    event.target.value = '';
+    event.target.value = "";
   };
 
   return (
-    <div className='settings-manager'>
-      <h3>{t('settings.manager.title') || 'Settings Manager'}</h3>
-      <div className='settings-actions'>
+    <div className="settings-manager">
+      <h3>{t("settings.manager.title") || "Settings Manager"}</h3>
+      <div className="settings-actions">
         <button
           onClick={exportSettings}
-          className='export-button'
-          aria-label={t('settings.manager.exportLabel') || 'Export current settings'}
+          className="export-button"
+          aria-label={t("settings.manager.exportLabel") || "Export current settings"}
         >
-          <span className='settings-button-icon' aria-hidden='true'>
+          <span className="settings-button-icon" aria-hidden="true">
             <ExportIcon />
           </span>
-          {t('settings.manager.export') || 'Export Settings'}
+          {t("settings.manager.export") || "Export Settings"}
         </button>
 
         <button
@@ -146,25 +146,25 @@ const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onImportSet
             clearImportError();
             fileInputRef.current?.click();
           }}
-          className='import-button'
-          aria-label={t('settings.manager.importLabel') || 'Import settings from file'}
+          className="import-button"
+          aria-label={t("settings.manager.importLabel") || "Import settings from file"}
         >
-          <span className='settings-button-icon' aria-hidden='true'>
+          <span className="settings-button-icon" aria-hidden="true">
             <ImportIcon />
           </span>
-          {t('settings.manager.import') || 'Import Settings'}
+          {t("settings.manager.import") || "Import Settings"}
         </button>
 
         <input
           ref={fileInputRef}
-          type='file'
-          accept='.json'
+          type="file"
+          accept=".json"
           onChange={importSettings}
-          className='visually-hidden'
+          className="visually-hidden"
         />
       </div>
       {importError && (
-        <p className='settings-manager-alert' role='alert' aria-live='assertive' aria-atomic='true'>
+        <p className="settings-manager-alert" role="alert" aria-live="assertive" aria-atomic="true">
           {importError}
         </p>
       )}

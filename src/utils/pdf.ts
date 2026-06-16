@@ -1,18 +1,18 @@
-import type { PaperSizeOptions, Problem, Settings } from '@/types';
-import { hasProblems, splitProblemsIntoGroups } from '@/utils/groupingUtils';
-import type { jsPDF } from 'jspdf';
+import type { PaperSizeOptions, Problem, Settings } from "@/types";
+import { hasProblems, splitProblemsIntoGroups } from "@/utils/groupingUtils";
+import type { jsPDF } from "jspdf";
 
-let jsPDFModule: typeof import('jspdf').default | null = null;
+let jsPDFModule: typeof import("jspdf").default | null = null;
 
-const loadJsPDF = async (): Promise<typeof import('jspdf').default> => {
+const loadJsPDF = async (): Promise<typeof import("jspdf").default> => {
   // In test environment, always reload to ensure mocks work
-  if (process.env.NODE_ENV === 'test') {
-    const { default: jsPDF } = await import('jspdf');
+  if (process.env.NODE_ENV === "test") {
+    const { default: jsPDF } = await import("jspdf");
     return jsPDF;
   }
 
   if (!jsPDFModule) {
-    const { default: jsPDF } = await import('jspdf');
+    const { default: jsPDF } = await import("jspdf");
     jsPDFModule = jsPDF;
   }
   return jsPDFModule;
@@ -27,19 +27,19 @@ const shouldAddNewPage = (currentY: number, spacing: number, pageHeight: number)
   return currentY + spacing > pageHeight;
 };
 
-const resetColumns = (state: Record<'left' | 'right', number>, marginTop: number): void => {
+const resetColumns = (state: Record<"left" | "right", number>, marginTop: number): void => {
   state.left = marginTop;
   state.right = marginTop;
 };
 
-const getColumnKey = (index: number): 'left' | 'right' => (index % 2 === 0 ? 'left' : 'right');
+const getColumnKey = (index: number): "left" | "right" => (index % 2 === 0 ? "left" : "right");
 
 const getTextXPosition = (
-  column: 'left' | 'right',
+  column: "left" | "right",
   marginLeft: number,
-  colWidth: number
+  colWidth: number,
 ): number => {
-  return column === 'left' ? marginLeft : marginLeft + colWidth + marginLeft;
+  return column === "left" ? marginLeft : marginLeft + colWidth + marginLeft;
 };
 
 interface RenderConfig {
@@ -56,9 +56,9 @@ interface RenderConfig {
 const renderProblem = (
   doc: jsPDF,
   problem: Problem,
-  columnKey: 'left' | 'right',
-  columnState: Record<'left' | 'right', number>,
-  config: RenderConfig
+  columnKey: "left" | "right",
+  columnState: Record<"left" | "right", number>,
+  config: RenderConfig,
 ): void => {
   if (shouldAddNewPage(columnState[columnKey], config.lineSpacing, config.pageHeight)) {
     doc.addPage();
@@ -69,7 +69,7 @@ const renderProblem = (
   doc.text(
     problem.text,
     getTextXPosition(columnKey, config.marginLeft, config.colWidth),
-    yPosition
+    yPosition,
   );
   columnState[columnKey] = yPosition + config.lineSpacing;
 };
@@ -81,8 +81,8 @@ const generateGroupedProblems = (
   doc: jsPDF,
   problems: Problem[],
   settings: Settings,
-  columnState: Record<'left' | 'right', number>,
-  config: RenderConfig
+  columnState: Record<"left" | "right", number>,
+  config: RenderConfig,
 ): void => {
   const groups = splitProblemsIntoGroups(problems, settings);
 
@@ -119,8 +119,8 @@ const generateGroupedProblems = (
 const generateContinuousProblems = (
   doc: jsPDF,
   problems: Problem[],
-  columnState: Record<'left' | 'right', number>,
-  config: RenderConfig
+  columnState: Record<"left" | "right", number>,
+  config: RenderConfig,
 ): void => {
   for (const [index, problem] of problems.entries()) {
     const columnKey = getColumnKey(index);
@@ -135,7 +135,7 @@ export const generatePdf = async (
   problems: Problem[],
   settings: Settings,
   paperSizes: PaperSizeOptions,
-  filename = 'problems.pdf'
+  filename = "problems.pdf",
 ): Promise<void> => {
   const jsPDF = await loadJsPDF();
   const doc = new jsPDF({ format: paperSizes[settings.paperSize] });
@@ -143,7 +143,7 @@ export const generatePdf = async (
   // Handle empty problems array
   if (!problems || problems.length === 0) {
     doc.setFontSize(settings.fontSize);
-    doc.text('No problems are available.', 20, 30);
+    doc.text("No problems are available.", 20, 30);
     doc.save(filename);
     return;
   }
@@ -157,7 +157,7 @@ export const generatePdf = async (
   const lineSpacing = settings.lineSpacing;
   const colWidth = (pageWidth - 3 * marginLeft) / 2;
 
-  const columnState: Record<'left' | 'right', number> = { left: marginTop, right: marginTop };
+  const columnState: Record<"left" | "right", number> = { left: marginTop, right: marginTop };
 
   const renderConfig: RenderConfig = {
     marginLeft,

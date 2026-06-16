@@ -1,4 +1,4 @@
-import type { Settings } from '../types';
+import type { Settings } from "../types";
 
 interface UseSettingsValidationReturn {
   isValidationSensitiveField: (field: keyof Settings) => boolean;
@@ -7,14 +7,14 @@ interface UseSettingsValidationReturn {
 
 export const useSettingsValidation = (): UseSettingsValidationReturn => {
   const VALIDATION_SENSITIVE_FIELDS = new Set<keyof Settings>([
-    'numProblems',
-    'numRange',
-    'resultRange',
-    'numOperandsRange',
-    'operations',
-    'enableGrouping',
-    'problemsPerGroup',
-    'totalGroups',
+    "numProblems",
+    "numRange",
+    "resultRange",
+    "numOperandsRange",
+    "operations",
+    "enableGrouping",
+    "problemsPerGroup",
+    "totalGroups",
   ]);
 
   const isValidationSensitiveField = (field: keyof Settings): boolean => {

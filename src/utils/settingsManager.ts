@@ -1,4 +1,4 @@
-import type { Settings } from '../types';
+import type { Settings } from "../types";
 
 export interface SettingsData {
   version: string;
@@ -7,7 +7,7 @@ export interface SettingsData {
 }
 
 export const createSettingsData = (settings: Settings): SettingsData => ({
-  version: '1.0',
+  version: "1.0",
   timestamp: new Date().toISOString(),
   settings,
 });
@@ -19,22 +19,22 @@ export const serializeSettings = (settingsData: SettingsData): string =>
   JSON.stringify(settingsData, null, 2);
 
 export class SettingsParseError extends Error {
-  constructor(message = 'Invalid settings file format') {
+  constructor(message = "Invalid settings file format") {
     super(message);
-    this.name = 'SettingsParseError';
+    this.name = "SettingsParseError";
   }
 }
 
 const isValidObject = (data: unknown): data is Record<string, unknown> => {
-  return data !== null && typeof data === 'object';
+  return data !== null && typeof data === "object";
 };
 
 const hasSettingsProperty = (data: Record<string, unknown>): boolean => {
-  return 'settings' in data;
+  return "settings" in data;
 };
 
 const hasValidSettingsObject = (data: Record<string, unknown>): boolean => {
-  return typeof data.settings === 'object' && data.settings !== null;
+  return typeof data.settings === "object" && data.settings !== null;
 };
 
 export const validateSettingsData = (data: unknown): data is SettingsData => {
@@ -54,15 +54,15 @@ export const parseSettingsFile = (content: string): SettingsData => {
   try {
     data = JSON.parse(content);
   } catch {
-    throw new SettingsParseError('Settings file contains invalid JSON syntax');
+    throw new SettingsParseError("Settings file contains invalid JSON syntax");
   }
 
   if (!validateSettingsData(data)) {
-    throw new SettingsParseError('Settings file structure is invalid');
+    throw new SettingsParseError("Settings file structure is invalid");
   }
 
   return data;
 };
 
 export const createDownloadBlob = (data: string): Blob =>
-  new Blob([data], { type: 'application/json' });
+  new Blob([data], { type: "application/json" });

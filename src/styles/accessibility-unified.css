@@ -15,7 +15,7 @@
 
 /* Component-first touch target contract */
 button,
-[role='button'],
+[role="button"],
 summary,
 input,
 select,
@@ -41,7 +41,7 @@ a[href],
 /* Keep mobile tap targets comfortable without forcing padding/margins globally */
 @media (width <= 768px) {
   button,
-  [role='button'],
+  [role="button"],
   summary,
   input,
   select,
@@ -55,13 +55,13 @@ a[href],
 
 /* Visible keyboard focus without blanket overrides */
 button:focus-visible,
-[role='button']:focus-visible,
+[role="button"]:focus-visible,
 summary:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 a[href]:focus-visible,
-[tabindex]:not([tabindex='-1']):focus-visible {
+[tabindex]:not([tabindex="-1"]):focus-visible {
   outline: 3px solid var(--primary-color);
   outline-offset: 2px;
   box-shadow: 0 0 0 2px var(--bg-primary);
@@ -69,13 +69,13 @@ a[href]:focus-visible,
 
 /* Avoid extra rings for pointer-only focus */
 button:focus:not(:focus-visible),
-[role='button']:focus:not(:focus-visible),
+[role="button"]:focus:not(:focus-visible),
 summary:focus:not(:focus-visible),
 input:focus:not(:focus-visible),
 select:focus:not(:focus-visible),
 textarea:focus:not(:focus-visible),
 a[href]:focus:not(:focus-visible),
-[tabindex]:not([tabindex='-1']):focus:not(:focus-visible) {
+[tabindex]:not([tabindex="-1"]):focus:not(:focus-visible) {
   outline: none;
   box-shadow: none;
 }
@@ -98,13 +98,13 @@ a[href]:focus:not(:focus-visible),
   input,
   select,
   textarea,
-  [role='button'] {
+  [role="button"] {
     border-width: 2px;
     border-color: currentcolor;
   }
 
   button:focus-visible,
-  [role='button']:focus-visible,
+  [role="button"]:focus-visible,
   input:focus-visible,
   select:focus-visible,
   textarea:focus-visible,
@@ -128,7 +128,7 @@ a[href]:focus:not(:focus-visible),
   }
 
   /* Harden WebKit number input contrast under dark scheme in CI/mobile */
-  input[type='number'] {
+  input[type="number"] {
     color: var(--text-primary, #f8fafc) !important;
     background-color: var(--bg-primary, #0b1220) !important;
     border-color: var(--border-color, #334155) !important;

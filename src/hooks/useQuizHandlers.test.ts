@@ -1,26 +1,26 @@
-import { act, renderHook } from '@testing-library/react';
-import { describe, expect, test, vi } from 'vitest';
-import type { Problem } from '@/types';
-import { useQuizHandlers } from './useAppLogic';
+import { act, renderHook } from "@testing-library/react";
+import { describe, expect, test, vi } from "vite-plus/test";
+import type { Problem } from "@/types";
+import { useQuizHandlers } from "./useAppLogic";
 
 const mockProblems: Problem[] = [
-  { id: 1, text: '2 + 3 = ?', correctAnswer: 5 },
-  { id: 2, text: '4 + 5 = ?', correctAnswer: 9 },
+  { id: 1, text: "2 + 3 = ?", correctAnswer: 5 },
+  { id: 2, text: "4 + 5 = ?", correctAnswer: 9 },
 ];
 
-describe('useQuizHandlers (isolated)', () => {
-  test('should start quiz mode when problems exist', () => {
+describe("useQuizHandlers (isolated)", () => {
+  test("should start quiz mode when problems exist", () => {
     const mockSetError = vi.fn();
     const mockSetIsQuizMode = vi.fn();
     const mockSetQuizResult = vi.fn();
 
     const { result } = renderHook(() =>
-      useQuizHandlers(mockProblems, true, mockSetError, mockSetIsQuizMode, mockSetQuizResult)
+      useQuizHandlers(mockProblems, true, mockSetError, mockSetIsQuizMode, mockSetQuizResult),
     );
 
     expect(result.current).toBeTruthy();
-    expect(typeof result.current.startQuizMode).toBe('function');
-    expect(typeof result.current.exitQuizMode).toBe('function');
+    expect(typeof result.current.startQuizMode).toBe("function");
+    expect(typeof result.current.exitQuizMode).toBe("function");
 
     act(() => {
       result.current.startQuizMode();
@@ -30,37 +30,37 @@ describe('useQuizHandlers (isolated)', () => {
     expect(mockSetQuizResult).toHaveBeenCalledWith(null);
   });
 
-  test('should set error when no problems exist and i18n is ready', () => {
+  test("should set error when no problems exist and i18n is ready", () => {
     const mockSetError = vi.fn();
     const mockSetIsQuizMode = vi.fn();
     const mockSetQuizResult = vi.fn();
 
     const { result } = renderHook(() =>
-      useQuizHandlers([], true, mockSetError, mockSetIsQuizMode, mockSetQuizResult)
+      useQuizHandlers([], true, mockSetError, mockSetIsQuizMode, mockSetQuizResult),
     );
 
     expect(result.current).toBeTruthy();
-    expect(typeof result.current.startQuizMode).toBe('function');
+    expect(typeof result.current.startQuizMode).toBe("function");
 
     act(() => {
       result.current.startQuizMode();
     });
 
-    expect(mockSetError).toHaveBeenCalledWith({ key: 'errors.noProblemsForQuiz' });
+    expect(mockSetError).toHaveBeenCalledWith({ key: "errors.noProblemsForQuiz" });
     expect(mockSetIsQuizMode).not.toHaveBeenCalled();
   });
 
-  test('should not set error when no problems exist and i18n is not ready', () => {
+  test("should not set error when no problems exist and i18n is not ready", () => {
     const mockSetError = vi.fn();
     const mockSetIsQuizMode = vi.fn();
     const mockSetQuizResult = vi.fn();
 
     const { result } = renderHook(() =>
-      useQuizHandlers([], false, mockSetError, mockSetIsQuizMode, mockSetQuizResult)
+      useQuizHandlers([], false, mockSetError, mockSetIsQuizMode, mockSetQuizResult),
     );
 
     expect(result.current).toBeTruthy();
-    expect(typeof result.current.startQuizMode).toBe('function');
+    expect(typeof result.current.startQuizMode).toBe("function");
 
     act(() => {
       result.current.startQuizMode();
@@ -70,13 +70,13 @@ describe('useQuizHandlers (isolated)', () => {
     expect(mockSetIsQuizMode).not.toHaveBeenCalled();
   });
 
-  test('should exit quiz mode', () => {
+  test("should exit quiz mode", () => {
     const mockSetError = vi.fn();
     const mockSetIsQuizMode = vi.fn();
     const mockSetQuizResult = vi.fn();
 
     const { result } = renderHook(() =>
-      useQuizHandlers(mockProblems, true, mockSetError, mockSetIsQuizMode, mockSetQuizResult)
+      useQuizHandlers(mockProblems, true, mockSetError, mockSetIsQuizMode, mockSetQuizResult),
     );
 
     act(() => {

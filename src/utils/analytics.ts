@@ -32,10 +32,10 @@ declare global {
 export const trackEvent = (eventName: string, properties: EventProperties = {}): void => {
   let optOut = false;
   try {
-    optOut = Boolean(localStorage.getItem('analytics-opt-out'));
+    optOut = Boolean(localStorage.getItem("analytics-opt-out"));
   } catch (error) {
     // Handle localStorage errors gracefully
-    console.warn('Analytics: localStorage access failed', error);
+    console.warn("Analytics: localStorage access failed", error);
     optOut = true;
   }
 
@@ -59,19 +59,19 @@ export const trackEvent = (eventName: string, properties: EventProperties = {}):
 
   // In development: log to console and skip external services
   if (!import.meta.env.PROD) {
-    console.log('Analytics Event:', event);
+    console.log("Analytics Event:", event);
     return;
   }
 
   // Send to analytics service (if configured)
   if (globalThis.gtag) {
-    globalThis.gtag('event', eventName, properties);
+    globalThis.gtag("event", eventName, properties);
   }
 };
 
 export const trackProblemGeneration = (settings: Settings, problemCount: number): void => {
-  trackEvent('problems_generated', {
-    operations: settings.operations.join(','),
+  trackEvent("problems_generated", {
+    operations: settings.operations.join(","),
     problem_count: problemCount,
     number_range: `${settings.numRange[0]}-${settings.numRange[1]}`,
     allow_negative: settings.allowNegative,
@@ -80,22 +80,22 @@ export const trackProblemGeneration = (settings: Settings, problemCount: number)
 };
 
 export const trackPdfDownload = (problemCount: number, settings: Settings): void => {
-  trackEvent('pdf_downloaded', {
+  trackEvent("pdf_downloaded", {
     problem_count: problemCount,
-    paper_size: settings.paperSize || 'a4',
+    paper_size: settings.paperSize || "a4",
     font_size: settings.fontSize || 12,
   });
 };
 
 export const trackLanguageChange = (fromLanguage: string, toLanguage: string): void => {
-  trackEvent('language_changed', {
+  trackEvent("language_changed", {
     from: fromLanguage,
     to: toLanguage,
   });
 };
 
 export const trackPresetUsed = (presetId: string): void => {
-  trackEvent('preset_applied', {
+  trackEvent("preset_applied", {
     preset: presetId,
   });
 };

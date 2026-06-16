@@ -1,6 +1,6 @@
-import React, { Suspense, useDeferredValue, useMemo } from 'react';
-import { useTranslation } from '../i18n';
-import type { Problem, ProblemPreviewProps } from '../types';
+import React, { Suspense, useDeferredValue, useMemo } from "react";
+import { useTranslation } from "../i18n";
+import type { Problem, ProblemPreviewProps } from "../types";
 
 /**
  * Problem Preview Component - Enhanced with React 19 features and TypeScript
@@ -36,26 +36,26 @@ const ProblemPreview: React.FC<ProblemPreviewProps> = ({ settings, generateSampl
   }, [deferredSettings, generateSampleProblem]);
 
   return (
-    <div className='problem-preview'>
-      <h3>{t('preview.title') || 'Preview'}</h3>
+    <div className="problem-preview">
+      <h3>{t("preview.title") || "Preview"}</h3>
       <Suspense
         fallback={
-          <div className='preview-loading'>
-            <div className='loading-spinner' aria-hidden='true'></div>
+          <div className="preview-loading">
+            <div className="loading-spinner" aria-hidden="true"></div>
             <span>Generating preview...</span>
           </div>
         }
       >
-        <div className='preview-container'>
-          <div className='preview-problems'>
-            {sampleProblems.map(problem => (
-              <div key={problem.id} className='preview-problem'>
+        <div className="preview-container">
+          <div className="preview-problems">
+            {sampleProblems.map((problem) => (
+              <div key={problem.id} className="preview-problem">
                 {problem.text}
               </div>
             ))}
           </div>
-          <div className='preview-info'>
-            <small>{t('preview.info') || 'Sample problems based on current settings'}</small>
+          <div className="preview-info">
+            <small>{t("preview.info") || "Sample problems based on current settings"}</small>
           </div>
         </div>
       </Suspense>

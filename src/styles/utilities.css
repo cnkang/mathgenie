@@ -71,7 +71,7 @@
 .error-message::before {
   margin-right: var(--space-sm);
   font-size: var(--font-size-lg);
-  content: '!';
+  content: "!";
 }
 
 .success-message {
@@ -89,7 +89,7 @@
 .success-message::before {
   margin-right: var(--space-sm);
   font-size: var(--font-size-lg);
-  content: '✓';
+  content: "✓";
 }
 
 /* Settings group */
@@ -110,7 +110,7 @@
   right: 0;
   left: 0;
   height: 3px;
-  content: '';
+  content: "";
   background: linear-gradient(90deg, var(--primary-color), var(--success-color));
 }
 
@@ -128,7 +128,7 @@
   width: auto;
   height: auto;
   font-size: var(--font-size-lg);
-  content: '•';
+  content: "•";
   background: none;
   border-radius: 0;
 }
@@ -166,7 +166,7 @@
 
 .tips-list li::before {
   flex-shrink: 0;
-  content: '•';
+  content: "•";
 }
 
 /* Progress section */

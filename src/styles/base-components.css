@@ -223,7 +223,7 @@ small,
   color: var(--text-secondary);
 }
 
-.checkbox-item input[type='checkbox'] {
+.checkbox-item input[type="checkbox"] {
   flex-shrink: 0;
   width: 1.125rem;
   height: 1.125rem;

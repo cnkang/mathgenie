@@ -1,6 +1,6 @@
-import type { MessageValue, PaperSizeOptions, Problem, QuizResult, Settings } from '@/types';
-import { generatePdf } from '@/utils/pdf';
-import { useCallback, useEffect } from 'react';
+import type { MessageValue, PaperSizeOptions, Problem, QuizResult, Settings } from "@/types";
+import { generatePdf } from "@/utils/pdf";
+import { useCallback, useEffect } from "react";
 
 type UseInitialGenerationArgs = {
   isI18nReady: boolean;
@@ -64,22 +64,22 @@ export const usePdfDownload = (
   showSuccessMessage: (msg: MessageValue) => void,
   setError: (msg: MessageValue) => void,
   clearMessages: () => void,
-  isDev: boolean
+  isDev: boolean,
 ) => {
   const handlePdfError = useCallback(
     (err: unknown) => {
-      const pdfFailedMessage = { key: 'errors.pdfFailed' } as const;
+      const pdfFailedMessage = { key: "errors.pdfFailed" } as const;
       setError(pdfFailedMessage);
       if (isDev) {
-        console.error('PDF generation error:', JSON.stringify(err));
+        console.error("PDF generation error:", JSON.stringify(err));
       }
     },
-    [setError, isDev]
+    [setError, isDev],
   );
 
   return useCallback(async (): Promise<void> => {
-    const emptyProblemsMessage = { key: 'errors.noProblemsToPdf' } as const;
-    const pdfGeneratedMessage = { key: 'messages.success.pdfGenerated' } as const;
+    const emptyProblemsMessage = { key: "errors.noProblemsToPdf" } as const;
+    const pdfGeneratedMessage = { key: "messages.success.pdfGenerated" } as const;
 
     if (problems.length === 0) {
       setError(emptyProblemsMessage);
@@ -110,7 +110,7 @@ const startQuizModeLogic = (
   isI18nReady: boolean,
   setError: (msg: MessageValue) => void,
   setIsQuizMode: (v: boolean) => void,
-  setQuizResult: (v: QuizResult | null) => void
+  setQuizResult: (v: QuizResult | null) => void,
 ): void => {
   if (hasProblems) {
     setIsQuizMode(true);
@@ -119,7 +119,7 @@ const startQuizModeLogic = (
   }
 
   if (isI18nReady) {
-    setError({ key: 'errors.noProblemsForQuiz' });
+    setError({ key: "errors.noProblemsForQuiz" });
   }
 };
 
@@ -128,7 +128,7 @@ export const useQuizHandlers = (
   isI18nReady: boolean,
   setError: (msg: MessageValue) => void,
   setIsQuizMode: (v: boolean) => void,
-  setQuizResult: (v: QuizResult | null) => void
+  setQuizResult: (v: QuizResult | null) => void,
 ) => {
   const startQuizMode = useCallback((): void => {
     const hasProblems = problems.length > 0;
@@ -156,17 +156,17 @@ const useValidationFeedback = (
   validateSettings: (s: Settings) => string,
   checkRestrictiveSettings: (s: Settings) => boolean,
   setError: (msg: MessageValue) => void,
-  setWarning: (msg: MessageValue) => void
+  setWarning: (msg: MessageValue) => void,
 ) => {
   const handleValidationError = useCallback(
     (validationError: string) => {
       setError({ key: validationError });
     },
-    [setError]
+    [setError],
   );
 
   const handleRestrictiveWarning = useCallback(() => {
-    setWarning({ key: 'warnings.restrictiveSettings' });
+    setWarning({ key: "warnings.restrictiveSettings" });
   }, [setWarning]);
 
   return useCallback(
@@ -182,7 +182,7 @@ const useValidationFeedback = (
         handleRestrictiveWarning();
       }
     },
-    [validateSettings, checkRestrictiveSettings, handleValidationError, handleRestrictiveWarning]
+    [validateSettings, checkRestrictiveSettings, handleValidationError, handleRestrictiveWarning],
   );
 };
 
@@ -196,13 +196,13 @@ const useValidationFeedback = (
  */
 const useFieldValidation = (
   isLoading: boolean,
-  isValidationSensitiveField: (field: keyof Settings) => boolean
+  isValidationSensitiveField: (field: keyof Settings) => boolean,
 ) => {
   return useCallback(
     (field: keyof Settings): boolean => {
       return !isLoading && isValidationSensitiveField(field);
     },
-    [isLoading, isValidationSensitiveField]
+    [isLoading, isValidationSensitiveField],
   );
 };
 
@@ -211,7 +211,7 @@ const useSettingsChangeHandler = (
   setSettings: (s: Settings) => void,
   clearMessages: () => void,
   shouldValidateField: (field: keyof Settings) => boolean,
-  provideValidationFeedback: (settings: Settings) => void
+  provideValidationFeedback: (settings: Settings) => void,
 ) => {
   return useCallback(
     <K extends keyof Settings>(field: K, value: Settings[K]): void => {
@@ -224,7 +224,7 @@ const useSettingsChangeHandler = (
 
       setSettings(newSettings);
     },
-    [settings, clearMessages, shouldValidateField, provideValidationFeedback, setSettings]
+    [settings, clearMessages, shouldValidateField, provideValidationFeedback, setSettings],
   );
 };
 
@@ -233,7 +233,7 @@ const applyPresetSettings = (
   setSettings: (s: Settings) => void,
   clearMessages: () => void,
   isLoading: boolean,
-  setSuccessMessage: (msg: MessageValue) => void
+  setSuccessMessage: (msg: MessageValue) => void,
 ): void => {
   setSettings(presetSettings);
   clearMessages();
@@ -242,20 +242,20 @@ const applyPresetSettings = (
     return;
   }
 
-  setSuccessMessage({ key: 'messages.info.presetApplied', params: { name: 'Preset' } });
+  setSuccessMessage({ key: "messages.info.presetApplied", params: { name: "Preset" } });
 };
 
 const usePresetHandler = (
   setSettings: (s: Settings) => void,
   clearMessages: () => void,
   isLoading: boolean,
-  setSuccessMessage: (msg: MessageValue) => void
+  setSuccessMessage: (msg: MessageValue) => void,
 ) => {
   return useCallback(
     (presetSettings: Settings): void => {
       applyPresetSettings(presetSettings, setSettings, clearMessages, isLoading, setSuccessMessage);
     },
-    [setSettings, clearMessages, isLoading, setSuccessMessage]
+    [setSettings, clearMessages, isLoading, setSuccessMessage],
   );
 };
 
@@ -288,7 +288,7 @@ export const useAppHandlers = ({
     validateSettings,
     checkRestrictiveSettings,
     setError,
-    setWarning
+    setWarning,
   );
 
   const shouldValidateField = useFieldValidation(isLoading, isValidationSensitiveField);
@@ -298,14 +298,14 @@ export const useAppHandlers = ({
     setSettings,
     clearMessages,
     shouldValidateField,
-    provideValidationFeedback
+    provideValidationFeedback,
   );
 
   const handleApplyPreset = usePresetHandler(
     setSettings,
     clearMessages,
     isLoading,
-    setSuccessMessage
+    setSuccessMessage,
   );
 
   return { handleChange, handleApplyPreset } as const;

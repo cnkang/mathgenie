@@ -3,30 +3,30 @@
  * 专注于 HIGH 级别的 SonarQube 规则检查
  */
 
-import { readFileSync } from 'node:fs';
-import { readdir } from 'node:fs/promises';
-import { join } from 'node:path';
-import ts from 'typescript';
+import { readFileSync } from "node:fs";
+import { readdir } from "node:fs/promises";
+import { join } from "node:path";
+import ts from "typescript";
 
 // ANSI color codes
 const colors = {
-  reset: '\x1b[0m',
-  red: '\x1b[31m',
-  yellow: '\x1b[33m',
-  green: '\x1b[32m',
-  blue: '\x1b[34m',
-  cyan: '\x1b[36m',
-  bold: '\x1b[1m',
+  reset: "\x1b[0m",
+  red: "\x1b[31m",
+  yellow: "\x1b[33m",
+  green: "\x1b[32m",
+  blue: "\x1b[34m",
+  cyan: "\x1b[36m",
+  bold: "\x1b[1m",
 };
 
 // Constants for priority levels and common strings to avoid duplication
 const PRIORITY_LEVELS = {
-  HIGH: 'HIGH' as const,
-  MEDIUM: 'MEDIUM' as const,
-  LOW: 'LOW' as const,
+  HIGH: "HIGH" as const,
+  MEDIUM: "MEDIUM" as const,
+  LOW: "LOW" as const,
 } as const;
 
-const SONAR_SAFE_COMMENT = 'SONAR-SAFE';
+const SONAR_SAFE_COMMENT = "SONAR-SAFE";
 
 interface SonarIssue {
   file: string;
@@ -34,8 +34,8 @@ interface SonarIssue {
   rule: string;
   sonarRule: string;
   message: string;
-  severity: 'error' | 'warning' | 'info';
-  priority: 'HIGH' | 'MEDIUM' | 'LOW';
+  severity: "error" | "warning" | "info";
+  priority: "HIGH" | "MEDIUM" | "LOW";
 }
 
 interface FunctionMetrics {
@@ -64,7 +64,7 @@ class SonarChecker {
   async run(): Promise<void> {
     console.log(`${colors.cyan}🔍 Enhanced SonarQube Local Checker${colors.reset}`);
     console.log(
-      `${colors.blue}Focusing on ${this.showOnlyHigh ? 'HIGH priority' : 'all'} rules${colors.reset}\n`
+      `${colors.blue}Focusing on ${this.showOnlyHigh ? "HIGH priority" : "all"} rules${colors.reset}\n`,
     );
 
     await this.checkAllRules();
@@ -72,7 +72,7 @@ class SonarChecker {
   }
 
   private async checkAllRules(): Promise<void> {
-    const files = await this.collectSourceFiles('src');
+    const files = await this.collectSourceFiles("src");
 
     console.log(`📊 Analyzing ${files.length} files...\n`);
 
@@ -81,7 +81,7 @@ class SonarChecker {
     }
 
     // Check unused variables using ESLint
-    console.log('🗑️ Checking for unused variables...');
+    console.log("🗑️ Checking for unused variables...");
     await this.checkUnusedVariables();
   }
 
@@ -93,8 +93,8 @@ class SonarChecker {
     } catch (error) {
       if (
         error instanceof Error &&
-        'code' in error &&
-        (error as NodeJS.ErrnoException).code === 'ENOENT'
+        "code" in error &&
+        (error as NodeJS.ErrnoException).code === "ENOENT"
       ) {
         return [];
       }
@@ -118,15 +118,15 @@ class SonarChecker {
   }
 
   private shouldAnalyzeFile(filePath: string): boolean {
-    const normalizedPath = filePath.replaceAll('\\', '/');
-    const isTsFile = normalizedPath.endsWith('.ts') || normalizedPath.endsWith('.tsx');
+    const normalizedPath = filePath.replaceAll("\\", "/");
+    const isTsFile = normalizedPath.endsWith(".ts") || normalizedPath.endsWith(".tsx");
     const isTestFile = /\.(test|spec)\.(ts|tsx)$/.test(normalizedPath);
     const isTranslationFile = /^src\/i18n\/translations\/[^/]+\.ts$/.test(normalizedPath);
     return isTsFile && !isTestFile && !isTranslationFile;
   }
 
   private async analyzeFile(filePath: string): Promise<void> {
-    const content = readFileSync(filePath, 'utf8');
+    const content = readFileSync(filePath, "utf8");
     const functions = this.extractFunctions(content);
 
     for (const func of functions) {
@@ -157,14 +157,14 @@ class SonarChecker {
     const spawnPattern = /\bspawn\s*\(/g;
 
     const patterns = [
-      { pattern: execSyncPattern, name: 'execSync' },
-      { pattern: spawnPattern, name: 'spawn' },
+      { pattern: execSyncPattern, name: "execSync" },
+      { pattern: spawnPattern, name: "spawn" },
     ];
 
     patterns.forEach(({ pattern, name: _name }) => {
       let match;
       while ((match = pattern.exec(content)) !== null) {
-        const lineNumber = content.substring(0, match.index).split('\n').length;
+        const lineNumber = content.substring(0, match.index).split("\n").length;
         const contextStart = Math.max(0, match.index - 200);
         const contextEnd = Math.min(content.length, match.index + 200);
         const context = content.substring(contextStart, contextEnd);
@@ -173,7 +173,7 @@ class SonarChecker {
         const hasPathRestriction = /PATH:\s*\[/.test(context) || /PATH.*filter.*join/.test(context);
         const hasSonarSafe = new RegExp(
           `${SONAR_SAFE_COMMENT}.*PATH|PATH.*${SONAR_SAFE_COMMENT}`,
-          'i'
+          "i",
         ).test(context);
         const isAbsolutePath = /\/usr\/|\.\/node_modules\/|pnpm exec|npx/.test(match[0]);
 
@@ -181,10 +181,10 @@ class SonarChecker {
           this.addIssue(
             filePath,
             lineNumber,
-            'typescript:S4036',
+            "typescript:S4036",
             'Make sure the "PATH" variable only contains fixed, unwriteable directories. Searching OS commands in PATH is security-sensitive',
-            'error',
-            PRIORITY_LEVELS.HIGH
+            "error",
+            PRIORITY_LEVELS.HIGH,
           );
         }
       }
@@ -194,14 +194,14 @@ class SonarChecker {
     const execPattern = /(?<!\.)(?<!\w)\bexec\s*\(/g;
     let match;
     while ((match = execPattern.exec(content)) !== null) {
-      const lineNumber = content.substring(0, match.index).split('\n').length;
+      const lineNumber = content.substring(0, match.index).split("\n").length;
       const contextStart = Math.max(0, match.index - 200);
       const contextEnd = Math.min(content.length, match.index + 200);
       const context = content.substring(contextStart, contextEnd);
 
       // Skip if it's clearly a method call
       const beforeMatch = content.substring(Math.max(0, match.index - 10), match.index);
-      if (beforeMatch.includes('.') || beforeMatch.includes(']')) {
+      if (beforeMatch.includes(".") || beforeMatch.includes("]")) {
         continue;
       }
 
@@ -209,7 +209,7 @@ class SonarChecker {
       const hasPathRestriction = /PATH:\s*\[/.test(context) || /PATH.*filter.*join/.test(context);
       const hasSonarSafe = new RegExp(
         `${SONAR_SAFE_COMMENT}.*PATH|PATH.*${SONAR_SAFE_COMMENT}`,
-        'i'
+        "i",
       ).test(context);
       const isAbsolutePath = /\/usr\/|\.\/node_modules\/|pnpm exec|npx/.test(match[0]);
 
@@ -217,10 +217,10 @@ class SonarChecker {
         this.addIssue(
           filePath,
           lineNumber,
-          'typescript:S4036',
+          "typescript:S4036",
           'Make sure the "PATH" variable only contains fixed, unwriteable directories. Searching OS commands in PATH is security-sensitive',
-          'error',
-          PRIORITY_LEVELS.HIGH
+          "error",
+          PRIORITY_LEVELS.HIGH,
         );
       }
     }
@@ -232,7 +232,7 @@ class SonarChecker {
 
     let match;
     while ((match = randomPattern.exec(content)) !== null) {
-      const lineNumber = content.substring(0, match.index).split('\n').length;
+      const lineNumber = content.substring(0, match.index).split("\n").length;
       const contextStart = Math.max(0, match.index - 100);
       const contextEnd = Math.min(content.length, match.index + 100);
       const context = content.substring(contextStart, contextEnd);
@@ -242,7 +242,7 @@ class SonarChecker {
         /\.(test|spec)\.(ts|tsx|js|jsx)$/.test(filePath) || /setupTests\.(ts|js)$/.test(filePath);
       const hasSonarSafe = new RegExp(
         `${SONAR_SAFE_COMMENT}.*random|random.*${SONAR_SAFE_COMMENT}`,
-        'i'
+        "i",
       ).test(context);
       const hasSecurityComment = /not.*security|test.*purpose|UI.*animation|mock/i.test(context);
 
@@ -250,10 +250,10 @@ class SonarChecker {
         this.addIssue(
           filePath,
           lineNumber,
-          'typescript:S2245',
-          'Make sure that using this pseudorandom number generator is safe here. Using pseudorandom number generators (PRNGs) is security-sensitive',
-          'error',
-          PRIORITY_LEVELS.HIGH
+          "typescript:S2245",
+          "Make sure that using this pseudorandom number generator is safe here. Using pseudorandom number generators (PRNGs) is security-sensitive",
+          "error",
+          PRIORITY_LEVELS.HIGH,
         );
       }
     }
@@ -294,7 +294,7 @@ class SonarChecker {
   }
 
   private checkAccessibilityPatterns(filePath: string, content: string): void {
-    const lines = content.split('\n');
+    const lines = content.split("\n");
 
     lines.forEach((line, index) => {
       const normalize = line.toLowerCase();
@@ -306,49 +306,49 @@ class SonarChecker {
         this.addIssue(
           filePath,
           index + 1,
-          'typescript:a11y-role-group',
+          "typescript:a11y-role-group",
           'Avoid using role="group" when a semantic container such as <fieldset> or <details> is available.',
-          'warning',
-          PRIORITY_LEVELS.MEDIUM
+          "warning",
+          PRIORITY_LEVELS.MEDIUM,
         );
       }
 
       if (
         (normalize.includes('tabindex="0"') ||
           normalize.includes("tabindex='0'") ||
-          normalize.includes('tabindex={0}')) &&
-        !normalize.includes('[tabindex')
+          normalize.includes("tabindex={0}")) &&
+        !normalize.includes("[tabindex")
       ) {
         // Check for SONAR-SAFE comment in current line or previous 3 lines
         const contextLines = lines.slice(Math.max(0, index - 3), index + 1);
-        const hasContextSonarSafe = contextLines.some(contextLine =>
-          contextLine.includes(SONAR_SAFE_COMMENT)
+        const hasContextSonarSafe = contextLines.some((contextLine) =>
+          contextLine.includes(SONAR_SAFE_COMMENT),
         );
 
         if (!hasContextSonarSafe) {
           this.addIssue(
             filePath,
             index + 1,
-            'typescript:a11y-tabindex',
+            "typescript:a11y-tabindex",
             'tabIndex="0" should be reserved for interactive elements; verify that the element is keyboard-focusable.',
-            'warning',
-            PRIORITY_LEVELS.MEDIUM
+            "warning",
+            PRIORITY_LEVELS.MEDIUM,
           );
         }
       }
 
       if (
         (normalize.includes("role='status'") || normalize.includes('role="status"')) &&
-        !content.toLowerCase().includes('<output') &&
+        !content.toLowerCase().includes("<output") &&
         !line.includes(SONAR_SAFE_COMMENT)
       ) {
         this.addIssue(
           filePath,
           index + 1,
-          'typescript:a11y-status-role',
+          "typescript:a11y-status-role",
           'Prefer semantic <output> elements or aria-live regions instead of role="status" on non-interactive elements.',
-          'warning',
-          PRIORITY_LEVELS.LOW
+          "warning",
+          PRIORITY_LEVELS.LOW,
         );
       }
     });
@@ -360,7 +360,7 @@ class SonarChecker {
       content,
       ts.ScriptTarget.Latest,
       true,
-      ts.ScriptKind.TSX
+      ts.ScriptKind.TSX,
     );
 
     const visit = (node: ts.Node): void => {
@@ -377,10 +377,10 @@ class SonarChecker {
           this.addIssue(
             filePath,
             line + 1,
-            'typescript:S107',
+            "typescript:S107",
             `Function "${functionName}" has ${parameterCount} parameters (maximum allowed is 7).`,
-            'error',
-            PRIORITY_LEVELS.HIGH
+            "error",
+            PRIORITY_LEVELS.HIGH,
           );
         }
       }
@@ -410,7 +410,7 @@ class SonarChecker {
       return node.name.text;
     }
 
-    return '<anonymous>';
+    return "<anonymous>";
   }
 
   private async checkUnusedVariables(): Promise<void> {
@@ -422,8 +422,8 @@ class SonarChecker {
     line: number,
     rule: string,
     message: string,
-    severity: 'error' | 'warning' | 'info',
-    priority: 'HIGH' | 'MEDIUM' | 'LOW'
+    severity: "error" | "warning" | "info",
+    priority: "HIGH" | "MEDIUM" | "LOW",
   ): void {
     this.issues.push({
       file,
@@ -438,7 +438,7 @@ class SonarChecker {
 
   private reportResults(): void {
     console.log(`\n${colors.bold}📊 Enhanced SonarQube Issue Report${colors.reset}`);
-    console.log('============================================================');
+    console.log("============================================================");
 
     if (this.issues.length === 0) {
       console.log(`${colors.green}✅ No issues found!${colors.reset}`);
@@ -446,7 +446,7 @@ class SonarChecker {
     }
 
     const filteredIssues = this.showOnlyHigh
-      ? this.issues.filter(issue => issue.priority === PRIORITY_LEVELS.HIGH)
+      ? this.issues.filter((issue) => issue.priority === PRIORITY_LEVELS.HIGH)
       : this.issues;
 
     if (filteredIssues.length === 0) {
@@ -454,20 +454,20 @@ class SonarChecker {
       return;
     }
 
-    const errorCount = filteredIssues.filter(issue => issue.severity === 'error').length;
-    const warningCount = filteredIssues.filter(issue => issue.severity === 'warning').length;
+    const errorCount = filteredIssues.filter((issue) => issue.severity === "error").length;
+    const warningCount = filteredIssues.filter((issue) => issue.severity === "warning").length;
 
     console.log(`Found ${filteredIssues.length} issues:`);
     console.log(`  🔴 Errors: ${errorCount}`);
     console.log(`  🟡 Warnings: ${warningCount}`);
 
     const priorityBreakdown = {
-      HIGH: filteredIssues.filter(issue => issue.priority === PRIORITY_LEVELS.HIGH).length,
-      MEDIUM: filteredIssues.filter(issue => issue.priority === PRIORITY_LEVELS.MEDIUM).length,
-      LOW: filteredIssues.filter(issue => issue.priority === PRIORITY_LEVELS.LOW).length,
+      HIGH: filteredIssues.filter((issue) => issue.priority === PRIORITY_LEVELS.HIGH).length,
+      MEDIUM: filteredIssues.filter((issue) => issue.priority === PRIORITY_LEVELS.MEDIUM).length,
+      LOW: filteredIssues.filter((issue) => issue.priority === PRIORITY_LEVELS.LOW).length,
     };
 
-    console.log('\nPriority breakdown:');
+    console.log("\nPriority breakdown:");
     console.log(`  🚨 HIGH: ${priorityBreakdown.HIGH}`);
     console.log(`  ⚠️  MEDIUM: ${priorityBreakdown.MEDIUM}`);
     console.log(`  ℹ️  LOW: ${priorityBreakdown.LOW}`);
@@ -477,22 +477,22 @@ class SonarChecker {
     for (const [file, issues] of Object.entries(groupedIssues)) {
       console.log(`\n📁 ${file}`);
       for (const issue of issues) {
-        const icon = issue.severity === 'error' ? '🔴' : '🟡';
-        let priorityIcon = 'ℹ️';
+        const icon = issue.severity === "error" ? "🔴" : "🟡";
+        let priorityIcon = "ℹ️";
         if (issue.priority === PRIORITY_LEVELS.HIGH) {
-          priorityIcon = '🚨';
+          priorityIcon = "🚨";
         } else if (issue.priority === PRIORITY_LEVELS.MEDIUM) {
-          priorityIcon = '⚠️';
+          priorityIcon = "⚠️";
         }
         console.log(`  ${icon} ${priorityIcon} Line ${issue.line}: ${issue.message}`);
         console.log(`     Rule: ${issue.rule}`);
       }
     }
 
-    console.log('\n💡 Tips:');
-    console.log('  • Focus on HIGH priority issues first');
-    console.log('  • Use --high flag to see only HIGH priority issues');
-    console.log('  • Use --verbose flag to see rule details');
+    console.log("\n💡 Tips:");
+    console.log("  • Focus on HIGH priority issues first");
+    console.log("  • Use --high flag to see only HIGH priority issues");
+    console.log("  • Use --verbose flag to see rule details");
 
     process.exit(1);
   }
@@ -511,8 +511,8 @@ class SonarChecker {
 
 // Parse command line arguments
 const args = new Set(process.argv.slice(2));
-const showOnlyHigh = args.has('--high');
-const verbose = args.has('--verbose');
+const showOnlyHigh = args.has("--high");
+const verbose = args.has("--verbose");
 
 // Run the checker
 const checker = new SonarChecker({ highOnly: showOnlyHigh, verbose });

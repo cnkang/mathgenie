@@ -1,17 +1,17 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
-import EnhancedSuspense from './EnhancedSuspense';
+import { act, render, screen, waitFor } from "@testing-library/react";
+import EnhancedSuspense from "./EnhancedSuspense";
 
 // Mock the hooks
-vi.mock('@/hooks/usePerformance', () => ({
+vi.mock("@/hooks/usePerformance", () => ({
   useConcurrentFeatures: () => ({
     isPending: false,
     scheduleUpdate: vi.fn(),
   }),
 }));
 
-vi.mock('@/hooks/useReact19Features', () => ({
+vi.mock("@/hooks/useReact19Features", () => ({
   useReact19Features: () => ({
-    optimisticState: { data: 'initial', isPending: false },
+    optimisticState: { data: "initial", isPending: false },
     updateOptimistic: vi.fn(),
     isPending: false,
     startTransition: vi.fn((cb: () => void) => cb()),
@@ -22,18 +22,18 @@ vi.mock('@/hooks/useReact19Features', () => ({
   }),
 }));
 
-describe('EnhancedSuspense', () => {
-  test('should render children when not suspended', () => {
+describe("EnhancedSuspense", () => {
+  test("should render children when not suspended", () => {
     render(
       <EnhancedSuspense>
         <div>Test Content</div>
-      </EnhancedSuspense>
+      </EnhancedSuspense>,
     );
 
-    expect(screen.getByText('Test Content')).toBeInTheDocument();
+    expect(screen.getByText("Test Content")).toBeInTheDocument();
   });
 
-  test('should render fallback when suspended', () => {
+  test("should render fallback when suspended", () => {
     const SuspendingComponent = () => {
       throw new Promise(() => {}); // Never resolves
     };
@@ -41,13 +41,13 @@ describe('EnhancedSuspense', () => {
     render(
       <EnhancedSuspense fallback={<div>Loading...</div>}>
         <SuspendingComponent />
-      </EnhancedSuspense>
+      </EnhancedSuspense>,
     );
 
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
-  test('should render custom fallback', () => {
+  test("should render custom fallback", () => {
     const SuspendingComponent = () => {
       throw new Promise(() => {}); // Never resolves
     };
@@ -55,27 +55,27 @@ describe('EnhancedSuspense', () => {
     render(
       <EnhancedSuspense fallback={<div>Custom Loading</div>}>
         <SuspendingComponent />
-      </EnhancedSuspense>
+      </EnhancedSuspense>,
     );
 
-    expect(screen.getByText('Custom Loading')).toBeInTheDocument();
+    expect(screen.getByText("Custom Loading")).toBeInTheDocument();
   });
 
-  test.skip('should handle error callback', async () => {
+  test.skip("should handle error callback", async () => {
     const onError = vi.fn();
     const ErrorComponent = () => {
-      throw new Error('Test error');
+      throw new Error("Test error");
     };
 
     // Suppress console.error for this test
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
     // In React 19.2, we need to wrap in act and handle the error differently
     await act(async () => {
       render(
         <EnhancedSuspense onError={onError}>
           <ErrorComponent />
-        </EnhancedSuspense>
+        </EnhancedSuspense>,
       );
     });
 
@@ -85,19 +85,19 @@ describe('EnhancedSuspense', () => {
       () => {
         expect(onError).toHaveBeenCalledWith(expect.any(Error));
       },
-      { timeout: 2000 }
+      { timeout: 2000 },
     );
 
     consoleSpy.mockRestore();
   });
 
-  test.skip('should enable optimistic updates when requested', () => {
+  test.skip("should enable optimistic updates when requested", () => {
     render(
       <EnhancedSuspense enableOptimisticUpdates>
         <div>Optimistic Content</div>
-      </EnhancedSuspense>
+      </EnhancedSuspense>,
     );
 
-    expect(screen.getByText('Optimistic Content')).toBeInTheDocument();
+    expect(screen.getByText("Optimistic Content")).toBeInTheDocument();
   });
 });

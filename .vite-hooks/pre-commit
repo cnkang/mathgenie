@@ -15,15 +15,15 @@ else
   exit 1
 fi
 
-# 检查pnpm是否可用
-if ! command -v pnpm >/dev/null 2>&1; then
-  echo "❌ pnpm not found. Please install pnpm first."
+# 检查 Vite+ 是否可用
+if ! command -v vp >/dev/null 2>&1; then
+  echo "❌ vp not found. Please install Vite+ first."
   exit 1
 fi
 
-echo "🔍 Running Biome lint + format checks..."
-if ! pnpm lint; then
-  echo "❌ Biome checks failed"
+echo "🔍 Running Vite+ staged checks..."
+if ! vp staged; then
+  echo "❌ Vite+ staged checks failed"
   exit 1
 fi
 

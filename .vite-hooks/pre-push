@@ -20,37 +20,29 @@ if [ "$current_branch" = "main" ] || [ "$current_branch" = "develop" ]; then
 fi
 
 # 运行类型检查
-echo "🔍 Running TypeScript type check..."
-if ! pnpm type-check; then
-  echo "❌ TypeScript type check failed"
+echo "🔍 Running Vite+ checks..."
+if ! vp check --no-fmt; then
+  echo "❌ Vite+ checks failed"
   exit 1
 fi
 
 # 运行国际化检查
 echo "🌍 Running i18n checks..."
-if ! pnpm i18n:check; then
+if ! vp run i18n:check; then
   echo "❌ i18n checks failed"
-  exit 1
-fi
-
-# 运行 Biome 质量检查（lint + format）
-echo "🎨 Running Biome checks..."
-if ! pnpm lint; then
-  echo "❌ Biome checks failed"
-  echo "💡 Run 'pnpm lint:fix' to auto-fix issues"
   exit 1
 fi
 
 # 运行测试
 echo "🧪 Running tests..."
-if ! pnpm test:unit; then
-  echo "❌ Unit tests failed"
+if ! vp test; then
+  echo "❌ Tests failed"
   exit 1
 fi
 
 # 检查构建
 echo "🏗️  Checking build..."
-if ! pnpm build; then
+if ! vp run build; then
   echo "❌ Build failed"
   exit 1
 fi

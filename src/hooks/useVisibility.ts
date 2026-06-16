@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState } from "react";
 
 /**
  * Hook for managing component visibility state
@@ -19,8 +19,8 @@ export const useVisibility = (initialVisible: boolean = true) => {
   }, []);
 
   const toggle = useCallback(() => {
-    setIsVisible(prev => !prev);
-    setIsHidden(prev => !prev);
+    setIsVisible((prev) => !prev);
+    setIsHidden((prev) => !prev);
   }, []);
 
   return {

@@ -1,21 +1,21 @@
-import { saveQuizResult } from './resultsStorage';
+import { saveQuizResult } from "./resultsStorage";
 
-describe.sequential('resultsStorage', () => {
-  const baseResult = { score: 10, total: 10, grade: 'A+' } as any;
+describe.sequential("resultsStorage", () => {
+  const baseResult = { score: 10, total: 10, grade: "A+" } as any;
   const baseSettings = { allowNegative: false } as any;
 
   beforeEach(() => {
     localStorage.clear();
   });
 
-  test('saves result and trims to last 20 entries', () => {
+  test("saves result and trims to last 20 entries", () => {
     for (let i = 0; i < 25; i++) {
       saveQuizResult({ ...baseResult, score: i }, baseSettings, false);
     }
-    const raw = localStorage.getItem('mathgenie-quiz-results');
+    const raw = localStorage.getItem("mathgenie-quiz-results");
     expect(raw).not.toBeNull();
     if (raw === null) {
-      throw new Error('Expected quiz results in localStorage');
+      throw new Error("Expected quiz results in localStorage");
     }
     const arr = JSON.parse(raw);
     expect(arr.length).toBe(20);
@@ -23,11 +23,11 @@ describe.sequential('resultsStorage', () => {
     expect(arr[0].score).toBe(5);
   });
 
-  test('swallows storage errors and warns in dev', () => {
-    const setSpy = vi.spyOn(globalThis.localStorage, 'setItem').mockImplementation(() => {
-      throw new Error('boom');
+  test("swallows storage errors and warns in dev", () => {
+    const setSpy = vi.spyOn(globalThis.localStorage, "setItem").mockImplementation(() => {
+      throw new Error("boom");
     });
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
 
     saveQuizResult(baseResult, baseSettings, true);
 

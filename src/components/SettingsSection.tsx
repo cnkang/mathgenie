@@ -1,18 +1,18 @@
-import type { Settings } from '@/types';
-import React from 'react';
-import SettingsPresets from './SettingsPresets';
-import './SettingsSection.css';
-import RangeInput from './form/RangeInput';
-import AdvancedSettings from './settings/AdvancedSettings';
-import GroupingSettings from './settings/GroupingSettings';
-import PdfSettings from './settings/PdfSettings';
-import ProblemCountSettings from './settings/ProblemCountSettings';
+import type { Settings } from "@/types";
+import React from "react";
+import SettingsPresets from "./SettingsPresets";
+import "./SettingsSection.css";
+import RangeInput from "./form/RangeInput";
+import AdvancedSettings from "./settings/AdvancedSettings";
+import GroupingSettings from "./settings/GroupingSettings";
+import PdfSettings from "./settings/PdfSettings";
+import ProblemCountSettings from "./settings/ProblemCountSettings";
 
 // Do not edit manually.
-const STR_OPERATIONS = 'operations' as const;
+const STR_OPERATIONS = "operations" as const;
 
-const STR_FROM = 'From' as const;
-const STR_TO = 'To' as const;
+const STR_FROM = "From" as const;
+const STR_TO = "To" as const;
 
 type OnChange = <K extends keyof Settings>(field: K, value: Settings[K]) => void;
 
@@ -31,65 +31,65 @@ const SettingsSection: React.FC<SettingsSectionProps> = ({
   onApplyPreset,
   paperSizeOptions,
 }) => {
-  const MIN_LABEL = t('settings.from') || STR_FROM;
-  const MAX_LABEL = t('settings.to') || STR_TO;
-  const settingsTitle = t('settings.title');
-  const sectionLabel = settingsTitle === 'settings.title' ? 'Settings' : settingsTitle;
+  const MIN_LABEL = t("settings.from") || STR_FROM;
+  const MAX_LABEL = t("settings.to") || STR_TO;
+  const settingsTitle = t("settings.title");
+  const sectionLabel = settingsTitle === "settings.title" ? "Settings" : settingsTitle;
 
   return (
-    <section className='settings-section' aria-label={sectionLabel}>
-      <div className='field'>
-        <label htmlFor={STR_OPERATIONS} className='field-label'>
-          {t('operations.title')}
+    <section className="settings-section" aria-label={sectionLabel}>
+      <div className="field">
+        <label htmlFor={STR_OPERATIONS} className="field-label">
+          {t("operations.title")}
         </label>
         <select
           id={STR_OPERATIONS}
           multiple
-          aria-label={t('accessibility.selectOperations')}
+          aria-label={t("accessibility.selectOperations")}
           value={settings.operations}
-          onChange={e => {
+          onChange={(e) => {
             const options = Array.from(e.target.selectedOptions).map(
-              o => o.value as Settings['operations'][number]
+              (o) => o.value as Settings["operations"][number],
             );
             onChange(STR_OPERATIONS, options);
           }}
         >
-          <option value='+'>{t('operations.addition') || 'Addition (+)'}</option>
-          <option value='-'>{t('operations.subtraction') || 'Subtraction (-)'}</option>
-          <option value='*'>{t('operations.multiplication') || 'Multiplication (×)'}</option>
-          <option value='/'>{t('operations.division') || 'Division (÷)'}</option>
+          <option value="+">{t("operations.addition") || "Addition (+)"}</option>
+          <option value="-">{t("operations.subtraction") || "Subtraction (-)"}</option>
+          <option value="*">{t("operations.multiplication") || "Multiplication (×)"}</option>
+          <option value="/">{t("operations.division") || "Division (÷)"}</option>
         </select>
-        <small className='field-help'>{t('operations.help')}</small>
+        <small className="field-help">{t("operations.help")}</small>
       </div>
 
       <GroupingSettings t={t} settings={settings} onChange={onChange} />
       <ProblemCountSettings t={t} settings={settings} onChange={onChange} />
 
       <RangeInput
-        id='numRange'
-        idFrom='numRangeFrom'
-        idTo='numRangeTo'
-        label={t('settings.numberRange')}
+        id="numRange"
+        idFrom="numRangeFrom"
+        idTo="numRangeTo"
+        label={t("settings.numberRange")}
         value={settings.numRange}
-        onChange={next => onChange('numRange', next)}
+        onChange={(next) => onChange("numRange", next)}
         ariaMinLabel={MIN_LABEL}
         ariaMaxLabel={MAX_LABEL}
       />
 
       <RangeInput
-        id='result-range'
-        label={t('settings.resultRange')}
+        id="result-range"
+        label={t("settings.resultRange")}
         value={settings.resultRange}
-        onChange={next => onChange('resultRange', next)}
+        onChange={(next) => onChange("resultRange", next)}
         ariaMinLabel={MIN_LABEL}
         ariaMaxLabel={MAX_LABEL}
       />
 
       <RangeInput
-        id='operands-range'
-        label={t('settings.operandsRange')}
+        id="operands-range"
+        label={t("settings.operandsRange")}
         value={settings.numOperandsRange}
-        onChange={next => onChange('numOperandsRange', next)}
+        onChange={(next) => onChange("numOperandsRange", next)}
         ariaMinLabel={MIN_LABEL}
         ariaMaxLabel={MAX_LABEL}
       />

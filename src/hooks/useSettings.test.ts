@@ -1,8 +1,8 @@
-import type { Settings } from '@/types';
-import { describe, expect, it, vi } from 'vitest';
-import { act, renderHook } from '../../tests/helpers/testUtils';
-import { ConsoleMock } from '../../tests/helpers/consoleMock';
-import { useSettings } from './useSettings';
+import type { Settings } from "@/types";
+import { describe, expect, it, vi } from "vite-plus/test";
+import { act, renderHook } from "../../tests/helpers/testUtils";
+import { ConsoleMock } from "../../tests/helpers/consoleMock";
+import { useSettings } from "./useSettings";
 
 const localStorageMock = {
   getItem: vi.fn(),
@@ -11,22 +11,22 @@ const localStorageMock = {
   clear: vi.fn(),
 };
 
-Object.defineProperty(globalThis, 'localStorage', {
+Object.defineProperty(globalThis, "localStorage", {
   value: localStorageMock,
 });
 
-describe('useSettings', () => {
+describe("useSettings", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('loads default settings when none are saved', () => {
+  it("loads default settings when none are saved", () => {
     localStorageMock.getItem.mockReturnValue(null);
     const { result } = renderHook(() => useSettings());
-    expect(result.current.settings.operations).toEqual(['+', '-']);
+    expect(result.current.settings.operations).toEqual(["+", "-"]);
   });
 
-  it('auto-saves settings to localStorage', () => {
+  it("auto-saves settings to localStorage", () => {
     localStorageMock.getItem.mockReturnValue(null);
     const { result } = renderHook(() => useSettings());
     const newSettings: Settings = {
@@ -37,34 +37,34 @@ describe('useSettings', () => {
       result.current.setSettings(newSettings);
     });
     expect(localStorageMock.setItem).toHaveBeenCalledWith(
-      'mathgenie-settings',
-      JSON.stringify(newSettings)
+      "mathgenie-settings",
+      JSON.stringify(newSettings),
     );
   });
 
-  it('validates settings', () => {
+  it("validates settings", () => {
     localStorageMock.getItem.mockReturnValue(null);
     const { result } = renderHook(() => useSettings());
     expect(result.current.validateSettings({ ...result.current.settings, operations: [] })).toEqual(
-      'errors.noOperations'
+      "errors.noOperations",
     );
     expect(result.current.validateSettings({ ...result.current.settings, numProblems: 0 })).toEqual(
-      'errors.invalidProblemCount'
+      "errors.invalidProblemCount",
     );
     expect(
-      result.current.validateSettings({ ...result.current.settings, numRange: [5, 1] })
-    ).toEqual('errors.invalidNumberRange');
+      result.current.validateSettings({ ...result.current.settings, numRange: [5, 1] }),
+    ).toEqual("errors.invalidNumberRange");
     expect(
-      result.current.validateSettings({ ...result.current.settings, resultRange: [5, 1] })
-    ).toEqual('errors.invalidResultRange');
+      result.current.validateSettings({ ...result.current.settings, resultRange: [5, 1] }),
+    ).toEqual("errors.invalidResultRange");
     expect(
-      result.current.validateSettings({ ...result.current.settings, numOperandsRange: [5, 2] })
-    ).toEqual('errors.invalidOperandsRange');
+      result.current.validateSettings({ ...result.current.settings, numOperandsRange: [5, 2] }),
+    ).toEqual("errors.invalidOperandsRange");
   });
 
-  it('loads saved settings from storage', () => {
+  it("loads saved settings from storage", () => {
     const saved: Settings = {
-      operations: ['*'],
+      operations: ["*"],
       numProblems: 5,
       numRange: [2, 3],
       resultRange: [0, 20],
@@ -73,7 +73,7 @@ describe('useSettings', () => {
       showAnswers: true,
       fontSize: 18,
       lineSpacing: 14,
-      paperSize: 'letter',
+      paperSize: "letter",
       enableGrouping: false,
       problemsPerGroup: 20,
       totalGroups: 1,
@@ -83,19 +83,19 @@ describe('useSettings', () => {
     expect(result.current.settings).toMatchObject(saved);
   });
 
-  it('clears corrupted settings from storage', () => {
+  it("clears corrupted settings from storage", () => {
     const consoleMock = new ConsoleMock();
-    consoleMock.mockConsole(['error']);
-    localStorageMock.getItem.mockReturnValue('not-json');
+    consoleMock.mockConsole(["error"]);
+    localStorageMock.getItem.mockReturnValue("not-json");
     const { result } = renderHook(() => useSettings());
-    expect(localStorageMock.removeItem).toHaveBeenCalledWith('mathgenie-settings');
-    expect(result.current.settings.operations).toEqual(['+', '-']);
+    expect(localStorageMock.removeItem).toHaveBeenCalledWith("mathgenie-settings");
+    expect(result.current.settings.operations).toEqual(["+", "-"]);
     consoleMock.restoreConsole();
   });
 
-  it('handles invalid operations array gracefully', () => {
+  it("handles invalid operations array gracefully", () => {
     const invalidSettings = {
-      operations: ['invalid', 'operations'],
+      operations: ["invalid", "operations"],
       numProblems: 20,
       numRange: [1, 10],
       resultRange: [0, 20],
@@ -104,7 +104,7 @@ describe('useSettings', () => {
       showAnswers: false,
       fontSize: 16,
       lineSpacing: 12,
-      paperSize: 'a4',
+      paperSize: "a4",
       enableGrouping: false,
       problemsPerGroup: 20,
       totalGroups: 1,
@@ -112,14 +112,14 @@ describe('useSettings', () => {
     localStorageMock.getItem.mockReturnValue(JSON.stringify(invalidSettings));
     const { result } = renderHook(() => useSettings());
     // Should fallback to default operations when invalid operations are provided
-    expect(result.current.settings.operations).toEqual(['+', '-']);
+    expect(result.current.settings.operations).toEqual(["+", "-"]);
     // Other valid settings should be preserved
     expect(result.current.settings.numProblems).toBe(20);
   });
 
-  it('preserves valid operations array', () => {
+  it("preserves valid operations array", () => {
     const validSettings = {
-      operations: ['*', '/'],
+      operations: ["*", "/"],
       numProblems: 15,
       numRange: [1, 20],
       resultRange: [0, 50],
@@ -128,7 +128,7 @@ describe('useSettings', () => {
       showAnswers: true,
       fontSize: 14,
       lineSpacing: 10,
-      paperSize: 'a4',
+      paperSize: "a4",
       enableGrouping: false,
       problemsPerGroup: 20,
       totalGroups: 1,
@@ -136,17 +136,17 @@ describe('useSettings', () => {
     localStorageMock.getItem.mockReturnValue(JSON.stringify(validSettings));
     const { result } = renderHook(() => useSettings());
     // Should preserve valid operations from localStorage
-    expect(result.current.settings.operations).toEqual(['*', '/']);
+    expect(result.current.settings.operations).toEqual(["*", "/"]);
     expect(result.current.settings.numProblems).toBe(15);
   });
 
-  it('handles corrupted JSON gracefully', () => {
+  it("handles corrupted JSON gracefully", () => {
     const consoleMock = new ConsoleMock();
-    consoleMock.mockConsole(['error']);
-    localStorageMock.getItem.mockReturnValue('not-json');
+    consoleMock.mockConsole(["error"]);
+    localStorageMock.getItem.mockReturnValue("not-json");
     const { result } = renderHook(() => useSettings());
     // Should fallback to default operations when localStorage has invalid JSON
-    expect(result.current.settings.operations).toEqual(['+', '-']);
+    expect(result.current.settings.operations).toEqual(["+", "-"]);
     consoleMock.restoreConsole();
   });
 });

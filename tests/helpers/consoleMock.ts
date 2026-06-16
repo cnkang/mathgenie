@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi } from "vite-plus/test";
 
 /**
  * Test helper for mocking console methods consistently across the test suite
@@ -9,7 +9,7 @@ export class ConsoleMock {
   /**
    * Mock console methods to suppress output during tests
    */
-  mockConsole(methods: Array<keyof Console> = ['warn', 'error']) {
+  mockConsole(methods: Array<keyof Console> = ["warn", "error"]) {
     for (const method of methods) {
       const spy = vi.spyOn(console, method as any).mockImplementation(() => {});
       this.spies.push({ method, spy });
@@ -39,7 +39,7 @@ export class ConsoleMock {
  */
 export function withConsoleMock<T>(
   methods: Array<keyof Console>,
-  testFn: (consoleMock: ConsoleMock) => T
+  testFn: (consoleMock: ConsoleMock) => T,
 ): T {
   const consoleMock = new ConsoleMock();
   consoleMock.mockConsole(methods);

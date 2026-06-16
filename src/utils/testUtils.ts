@@ -1,5 +1,5 @@
-import type { Problem, Settings } from '@/types';
-import { getDefaultGroupingValues } from '@/utils/groupingUtils';
+import type { Problem, Settings } from "@/types";
+import { getDefaultGroupingValues } from "@/utils/groupingUtils";
 
 /**
  * Shared test utilities for consistent test setup across the application
@@ -12,7 +12,7 @@ export const createTestSettings = (overrides: Partial<Settings> = {}): Settings 
   const defaultGrouping = getDefaultGroupingValues();
 
   return {
-    operations: ['+', '-'],
+    operations: ["+", "-"],
     numProblems: 20,
     numRange: [1, 20],
     resultRange: [0, 20],
@@ -21,7 +21,7 @@ export const createTestSettings = (overrides: Partial<Settings> = {}): Settings 
     showAnswers: false,
     fontSize: 16,
     lineSpacing: 12,
-    paperSize: 'a4',
+    paperSize: "a4",
     ...defaultGrouping,
     ...overrides,
   };
@@ -44,7 +44,7 @@ export const createTestProblems = (count: number = 10): Problem[] => {
 export const createGroupedTestSettings = (
   problemsPerGroup: number = 5,
   totalGroups: number = 2,
-  overrides: Partial<Settings> = {}
+  overrides: Partial<Settings> = {},
 ): Settings => {
   return createTestSettings({
     enableGrouping: true,
@@ -73,16 +73,16 @@ export const mockTranslation = (key: string, params?: Record<string, string | nu
  * Create mock settings with validation errors for testing
  */
 export const createInvalidTestSettings = (
-  errorType: 'noOperations' | 'invalidGrouping' | 'invalidRange'
+  errorType: "noOperations" | "invalidGrouping" | "invalidRange",
 ): Settings => {
   const base = createTestSettings();
 
   switch (errorType) {
-    case 'noOperations':
+    case "noOperations":
       return { ...base, operations: [] };
-    case 'invalidGrouping':
+    case "invalidGrouping":
       return { ...base, enableGrouping: true, problemsPerGroup: 0, totalGroups: 0 };
-    case 'invalidRange':
+    case "invalidRange":
       return { ...base, numRange: [20, 1] }; // Invalid range
     default:
       return base;

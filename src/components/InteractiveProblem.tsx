@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useTranslation } from '../i18n';
-import type { Problem } from '../types';
+import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "../i18n";
+import type { Problem } from "../types";
 
 interface InteractiveProblemProps {
   problem: Problem;
@@ -10,14 +10,14 @@ interface InteractiveProblemProps {
 }
 
 const CorrectIcon: React.FC = () => (
-  <svg viewBox='0 0 24 24' width='18' height='18' fill='none' aria-hidden='true'>
-    <path d='m5 12 4 4L19 6' stroke='currentColor' strokeWidth='2.2' strokeLinecap='round' />
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+    <path d="m5 12 4 4L19 6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
   </svg>
 );
 
 const IncorrectIcon: React.FC = () => (
-  <svg viewBox='0 0 24 24' width='18' height='18' fill='none' aria-hidden='true'>
-    <path d='m7 7 10 10M17 7 7 17' stroke='currentColor' strokeWidth='2.2' strokeLinecap='round' />
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+    <path d="m7 7 10 10M17 7 7 17" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
   </svg>
 );
 
@@ -28,7 +28,7 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
   disabled = false,
 }) => {
   const { t } = useTranslation();
-  const [userInput, setUserInput] = useState<string>('');
+  const [userInput, setUserInput] = useState<string>("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const currentProblemId = useRef<number | null>(null);
 
@@ -38,7 +38,7 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
       currentProblemId.current = problem.id;
 
       if (problem.userAnswer === undefined) {
-        setUserInput('');
+        setUserInput("");
         setIsSubmitted(false);
       } else {
         setUserInput(problem.userAnswer.toString());
@@ -49,7 +49,7 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
 
   const handleSubmit = (e: React.SyntheticEvent): void => {
     e.preventDefault();
-    if (userInput.trim() === '' || isSubmitted || disabled) {
+    if (userInput.trim() === "" || isSubmitted || disabled) {
       return;
     }
 
@@ -57,67 +57,67 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
     if (!Number.isNaN(answer)) {
       onAnswerSubmit(problem.id, answer);
       setIsSubmitted(true);
-      setUserInput(''); // Clear input after submission
+      setUserInput(""); // Clear input after submission
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleSubmit(e);
     }
   };
 
   const canShowResult = showResult && problem.isAnswered;
-  let resultClass = '';
+  let resultClass = "";
   let resultIcon: React.ReactNode = null;
   if (canShowResult) {
     if (problem.isCorrect) {
-      resultClass = 'correct';
+      resultClass = "correct";
       resultIcon = <CorrectIcon />;
     } else {
-      resultClass = 'incorrect';
+      resultClass = "incorrect";
       resultIcon = <IncorrectIcon />;
     }
   }
 
   return (
     <div className={`interactive-problem ${resultClass}`}>
-      <div className='problem-expression'>{problem.text}</div>
+      <div className="problem-expression">{problem.text}</div>
 
-      <form onSubmit={handleSubmit} className='answer-form'>
-        <div className='answer-input-group'>
+      <form onSubmit={handleSubmit} className="answer-form">
+        <div className="answer-input-group">
           <input
-            type='number'
+            type="number"
             value={userInput}
-            onChange={e => setUserInput(e.target.value)}
+            onChange={(e) => setUserInput(e.target.value)}
             onKeyDown={handleKeyPress}
-            placeholder={t('quiz.enterAnswer') || 'Enter answer'}
+            placeholder={t("quiz.enterAnswer") || "Enter answer"}
             disabled={isSubmitted || disabled}
-            className='answer-input'
-            step='any'
+            className="answer-input"
+            step="any"
           />
           <button
-            type='submit'
-            disabled={isSubmitted || disabled || userInput.trim() === ''}
-            className='submit-answer-btn'
+            type="submit"
+            disabled={isSubmitted || disabled || userInput.trim() === ""}
+            className="submit-answer-btn"
           >
-            {isSubmitted ? t('quiz.submitted') || 'Submitted' : t('quiz.submit') || 'Submit'}
+            {isSubmitted ? t("quiz.submitted") || "Submitted" : t("quiz.submit") || "Submit"}
           </button>
         </div>
       </form>
 
       {canShowResult && (
-        <div className='answer-result'>
-          <span className='result-icon' aria-hidden='true'>
+        <div className="answer-result">
+          <span className="result-icon" aria-hidden="true">
             {resultIcon}
           </span>
-          <span className='result-text'>
+          <span className="result-text">
             {problem.isCorrect ? (
-              t('quiz.correct') || 'Correct!'
+              t("quiz.correct") || "Correct!"
             ) : (
               <>
-                {t('quiz.incorrect') || 'Incorrect.'}{' '}
-                {t('quiz.correctAnswer', { answer: problem.correctAnswer ?? 0 }) ||
+                {t("quiz.incorrect") || "Incorrect."}{" "}
+                {t("quiz.correctAnswer", { answer: problem.correctAnswer ?? 0 }) ||
                   `The correct answer is ${problem.correctAnswer ?? 0}`}
               </>
             )}

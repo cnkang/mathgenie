@@ -1,33 +1,33 @@
-import { describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '../../tests/helpers/testUtils';
-import type { Settings } from '../types';
-import SettingsManager from './SettingsManager';
+import { describe, expect, it, vi } from "vite-plus/test";
+import { fireEvent, render, screen, waitFor } from "../../tests/helpers/testUtils";
+import type { Settings } from "../types";
+import SettingsManager from "./SettingsManager";
 
 // Mock translation hook
-vi.mock('../i18n', () => ({
+vi.mock("../i18n", () => ({
   useTranslation: () => ({
     t: (key: string) => key,
   }),
 }));
 
 // Mock settingsManager utilities
-vi.mock('../utils/settingsManager', () => ({
-  createSettingsData: vi.fn(settings => ({ settings, version: '1.0.0' })),
-  generateFilename: vi.fn(() => 'settings.json'),
-  serializeSettings: vi.fn(data => JSON.stringify(data)),
-  parseSettingsFile: vi.fn(content => JSON.parse(content)),
-  createDownloadBlob: vi.fn(() => new Blob(['test'], { type: 'application/json' })),
+vi.mock("../utils/settingsManager", () => ({
+  createSettingsData: vi.fn((settings) => ({ settings, version: "1.0.0" })),
+  generateFilename: vi.fn(() => "settings.json"),
+  serializeSettings: vi.fn((data) => JSON.stringify(data)),
+  parseSettingsFile: vi.fn((content) => JSON.parse(content)),
+  createDownloadBlob: vi.fn(() => new Blob(["test"], { type: "application/json" })),
   SettingsParseError: class extends Error {
     constructor(message: string) {
       super(message);
-      this.name = 'SettingsParseError';
+      this.name = "SettingsParseError";
     }
   },
 }));
 
-describe('SettingsManager Component', () => {
+describe("SettingsManager Component", () => {
   const mockSettings: Settings = {
-    operations: ['+', '-'],
+    operations: ["+", "-"],
     numProblems: 10,
     numRange: [1, 10],
     resultRange: [0, 20],
@@ -36,7 +36,7 @@ describe('SettingsManager Component', () => {
     showAnswers: true,
     fontSize: 12,
     lineSpacing: 18,
-    paperSize: 'a4' as const,
+    paperSize: "a4" as const,
     enableGrouping: false,
     problemsPerGroup: 20,
     totalGroups: 1,
@@ -44,64 +44,64 @@ describe('SettingsManager Component', () => {
 
   const mockOnImportSettings = vi.fn();
 
-  it('renders settings manager component', () => {
+  it("renders settings manager component", () => {
     render(<SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />);
 
-    expect(screen.getByText('settings.manager.title')).toBeInTheDocument();
-    expect(screen.getByText('settings.manager.export')).toBeInTheDocument();
-    expect(screen.getByText('settings.manager.import')).toBeInTheDocument();
+    expect(screen.getByText("settings.manager.title")).toBeInTheDocument();
+    expect(screen.getByText("settings.manager.export")).toBeInTheDocument();
+    expect(screen.getByText("settings.manager.import")).toBeInTheDocument();
   });
 
-  it('renders export button with correct attributes', () => {
+  it("renders export button with correct attributes", () => {
     const { container } = render(
-      <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />
+      <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />,
     );
 
-    const exportButton = container.querySelector('.export-button');
+    const exportButton = container.querySelector(".export-button");
     expect(exportButton).toBeInTheDocument();
-    expect(exportButton?.getAttribute('aria-label')).toBe('settings.manager.exportLabel');
+    expect(exportButton?.getAttribute("aria-label")).toBe("settings.manager.exportLabel");
   });
 
-  it('renders import button with correct attributes', () => {
+  it("renders import button with correct attributes", () => {
     const { container } = render(
-      <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />
+      <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />,
     );
 
-    const importButton = container.querySelector('.import-button');
+    const importButton = container.querySelector(".import-button");
     expect(importButton).toBeInTheDocument();
-    expect(importButton?.getAttribute('aria-label')).toBe('settings.manager.importLabel');
+    expect(importButton?.getAttribute("aria-label")).toBe("settings.manager.importLabel");
   });
 
-  it('renders hidden file input with correct attributes', () => {
+  it("renders hidden file input with correct attributes", () => {
     render(<SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />);
 
     const fileInput = document.querySelector('input[type="file"]');
     expect(fileInput).toBeInTheDocument();
-    expect(fileInput?.getAttribute('accept')).toBe('.json');
+    expect(fileInput?.getAttribute("accept")).toBe(".json");
   });
 
-  it('handles export button click without errors', () => {
+  it("handles export button click without errors", () => {
     const { container } = render(
-      <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />
+      <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />,
     );
 
-    const exportButton = container.querySelector('.export-button');
+    const exportButton = container.querySelector(".export-button");
 
     // Just verify the button exists and can be clicked without throwing
     expect(exportButton).toBeInTheDocument();
     expect(() => (exportButton as HTMLButtonElement)?.click()).not.toThrow();
   });
 
-  it('handles import button click', () => {
+  it("handles import button click", () => {
     const { container } = render(
-      <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />
+      <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />,
     );
 
-    const importButton = container.querySelector('.import-button');
+    const importButton = container.querySelector(".import-button");
     const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
 
     // Mock click method
-    const clickSpy = vi.spyOn(fileInput, 'click').mockImplementation(() => {});
+    const clickSpy = vi.spyOn(fileInput, "click").mockImplementation(() => {});
 
     (importButton as HTMLButtonElement)?.click();
 
@@ -109,102 +109,102 @@ describe('SettingsManager Component', () => {
     clickSpy.mockRestore();
   });
 
-  it('renders file input for import functionality', () => {
+  it("renders file input for import functionality", () => {
     render(<SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />);
 
     const fileInput = document.querySelector('input[type="file"]');
     expect(fileInput).toBeInTheDocument();
-    expect(fileInput).toHaveAttribute('accept', '.json');
-    expect(fileInput).toHaveClass('visually-hidden');
+    expect(fileInput).toHaveAttribute("accept", ".json");
+    expect(fileInput).toHaveClass("visually-hidden");
   });
 
-  it('has proper component structure', () => {
+  it("has proper component structure", () => {
     const { container } = render(
-      <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />
+      <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />,
     );
 
-    expect(container.querySelector('.settings-manager')).toBeInTheDocument();
-    expect(container.querySelector('.settings-actions')).toBeInTheDocument();
-    expect(container.querySelector('.export-button')).toBeInTheDocument();
-    expect(container.querySelector('.import-button')).toBeInTheDocument();
+    expect(container.querySelector(".settings-manager")).toBeInTheDocument();
+    expect(container.querySelector(".settings-actions")).toBeInTheDocument();
+    expect(container.querySelector(".export-button")).toBeInTheDocument();
+    expect(container.querySelector(".import-button")).toBeInTheDocument();
   });
 
-  it('renders with proper heading structure', () => {
+  it("renders with proper heading structure", () => {
     const { container } = render(
-      <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />
+      <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />,
     );
 
-    const heading = container.querySelector('h3');
+    const heading = container.querySelector("h3");
     expect(heading).toBeInTheDocument();
-    expect(heading).toHaveTextContent('settings.manager.title');
+    expect(heading).toHaveTextContent("settings.manager.title");
   });
 
-  it('renders buttons with svg icons', () => {
+  it("renders buttons with svg icons", () => {
     const { container } = render(
-      <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />
+      <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />,
     );
 
-    const exportButton = container.querySelector('.export-button');
-    const importButton = container.querySelector('.import-button');
+    const exportButton = container.querySelector(".export-button");
+    const importButton = container.querySelector(".import-button");
 
     expect(exportButton).toBeInTheDocument();
     expect(importButton).toBeInTheDocument();
-    expect(exportButton?.querySelector('svg')).toBeInTheDocument();
-    expect(importButton?.querySelector('svg')).toBeInTheDocument();
+    expect(exportButton?.querySelector("svg")).toBeInTheDocument();
+    expect(importButton?.querySelector("svg")).toBeInTheDocument();
   });
 
-  it('tests file input functionality exists', () => {
+  it("tests file input functionality exists", () => {
     render(<SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />);
 
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     expect(fileInput).toBeInTheDocument();
 
     // Test that the input can receive files (basic functionality)
-    expect(fileInput.accept).toBe('.json');
-    expect(fileInput.type).toBe('file');
+    expect(fileInput.accept).toBe(".json");
+    expect(fileInput.type).toBe("file");
   });
 
-  it('verifies export functionality exists', () => {
+  it("verifies export functionality exists", () => {
     const { container } = render(
-      <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />
+      <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />,
     );
 
-    const exportButton = container.querySelector('.export-button');
+    const exportButton = container.querySelector(".export-button");
     expect(exportButton).toBeInTheDocument();
 
     // Test that clicking doesn't throw errors
     expect(() => (exportButton as HTMLButtonElement)?.click()).not.toThrow();
   });
 
-  it('verifies import functionality structure', () => {
+  it("verifies import functionality structure", () => {
     const { container } = render(
-      <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />
+      <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />,
     );
 
     const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
     expect(fileInput).toBeInTheDocument();
-    expect(fileInput.accept).toBe('.json');
+    expect(fileInput.accept).toBe(".json");
 
     // Verify the input has proper attributes for file handling
-    expect(fileInput.type).toBe('file');
-    expect(fileInput).toHaveClass('visually-hidden');
+    expect(fileInput.type).toBe("file");
+    expect(fileInput).toHaveClass("visually-hidden");
   });
 
-  it('tests component with mock utilities', () => {
+  it("tests component with mock utilities", () => {
     // Verify that the component renders with mocked utilities
     const { container } = render(
-      <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />
+      <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />,
     );
 
     // Component should render successfully with mocked dependencies
-    const title = container.querySelector('h3');
+    const title = container.querySelector("h3");
     expect(title).toBeInTheDocument();
-    expect(title?.textContent).toBe('settings.manager.title');
+    expect(title?.textContent).toBe("settings.manager.title");
   });
 
-  it('renders with different settings configurations', () => {
+  it("renders with different settings configurations", () => {
     const alternativeSettings: Settings = {
-      operations: ['×', '÷'],
+      operations: ["×", "÷"],
       numProblems: 20,
       numRange: [5, 15],
       resultRange: [10, 50],
@@ -213,23 +213,23 @@ describe('SettingsManager Component', () => {
       showAnswers: false,
       fontSize: 14,
       lineSpacing: 20,
-      paperSize: 'letter' as const,
+      paperSize: "letter" as const,
       enableGrouping: true,
       problemsPerGroup: 10,
       totalGroups: 2,
     };
 
     const { container } = render(
-      <SettingsManager settings={alternativeSettings} onImportSettings={mockOnImportSettings} />
+      <SettingsManager settings={alternativeSettings} onImportSettings={mockOnImportSettings} />,
     );
 
     // Component should render regardless of settings values
-    expect(container.querySelector('.settings-manager')).toBeInTheDocument();
-    expect(container.querySelector('.export-button')).toBeInTheDocument();
-    expect(container.querySelector('.import-button')).toBeInTheDocument();
+    expect(container.querySelector(".settings-manager")).toBeInTheDocument();
+    expect(container.querySelector(".export-button")).toBeInTheDocument();
+    expect(container.querySelector(".import-button")).toBeInTheDocument();
   });
 
-  it('verifies component props are used correctly', () => {
+  it("verifies component props are used correctly", () => {
     const customOnImport = vi.fn();
     const customSettings = { ...mockSettings, numProblems: 25 };
 
@@ -240,27 +240,27 @@ describe('SettingsManager Component', () => {
     expect(customSettings.numProblems).toBe(25);
   });
 
-  it('tests component accessibility attributes', () => {
+  it("tests component accessibility attributes", () => {
     const { container } = render(
-      <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />
+      <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />,
     );
 
-    const exportButton = container.querySelector('.export-button');
-    const importButton = container.querySelector('.import-button');
+    const exportButton = container.querySelector(".export-button");
+    const importButton = container.querySelector(".import-button");
 
     // Verify accessibility attributes are present
-    expect(exportButton?.getAttribute('aria-label')).toBeTruthy();
-    expect(importButton?.getAttribute('aria-label')).toBeTruthy();
+    expect(exportButton?.getAttribute("aria-label")).toBeTruthy();
+    expect(importButton?.getAttribute("aria-label")).toBeTruthy();
   });
 
-  it('handles invalid file content without importing settings', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+  it("handles invalid file content without importing settings", async () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const { container } = render(
-      <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />
+      <SettingsManager settings={mockSettings} onImportSettings={mockOnImportSettings} />,
     );
 
     const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
-    const file = new File(['not-json'], 'settings.json', { type: 'application/json' });
+    const file = new File(["not-json"], "settings.json", { type: "application/json" });
     fireEvent.change(fileInput, { target: { files: [file] } });
 
     await waitFor(() => {

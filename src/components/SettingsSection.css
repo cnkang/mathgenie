@@ -16,7 +16,7 @@
   color: var(--text-primary, #1e293b);
 }
 
-input[type='number'],
+input[type="number"],
 select {
   min-height: 44px; /* WCAG 2.2 AAA */
   padding: 8px 12px;
@@ -27,7 +27,7 @@ select {
   border-radius: var(--radius-md, 8px);
 }
 
-input[type='number']:focus,
+input[type="number"]:focus,
 select:focus {
   outline: none;
   border-color: var(--primary-color, #4f46e5);
@@ -94,7 +94,7 @@ select:focus {
 }
 
 .checkbox-indicator::after {
-  content: '';
+  content: "";
   width: 16px;
   height: 16px;
   border: 2px solid transparent;
@@ -212,7 +212,7 @@ select:focus {
 .calculation-formula {
   font-size: var(--font-size-sm, 0.875rem);
   color: var(--success-color, #10b981);
-  font-family: 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', monospace;
+  font-family: "SF Mono", Monaco, Inconsolata, "Roboto Mono", monospace;
 }
 
 .single-mode-field {

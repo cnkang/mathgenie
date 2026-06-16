@@ -1,39 +1,39 @@
 //
-import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import './App.css';
+import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import "./App.css";
 //
-import './components/ProblemsDisplay.css';
-import './components/QuizMode.css';
+import "./components/ProblemsDisplay.css";
+import "./components/QuizMode.css";
 //
-import ActionCards from '@/components/ActionCards';
-import AppHeader from '@/components/AppHeader';
-import ErrorMessage from '@/components/ErrorMessage';
-import InfoPanel from '@/components/InfoPanel';
-import ProblemsSection from '@/components/ProblemsSection';
-import QuizMode from '@/components/QuizMode';
-import SettingsSection from '@/components/SettingsSection';
-import { NUMERIC_CONSTANTS } from '@/constants/appConstants';
+import ActionCards from "@/components/ActionCards";
+import AppHeader from "@/components/AppHeader";
+import ErrorMessage from "@/components/ErrorMessage";
+import InfoPanel from "@/components/InfoPanel";
+import ProblemsSection from "@/components/ProblemsSection";
+import QuizMode from "@/components/QuizMode";
+import SettingsSection from "@/components/SettingsSection";
+import { NUMERIC_CONSTANTS } from "@/constants/appConstants";
 import {
   useAppHandlers,
   useInitialGeneration,
   usePdfDownload,
   useQuizHandlers,
-} from '@/hooks/useAppLogic';
-import { saveQuizResult } from '@/utils/resultsStorage';
-import PerformanceMonitor from './components/PerformanceMonitor';
-import TranslationLoader from './components/TranslationLoader';
-import { useAppMessages } from './hooks/useAppMessages';
-import { usePerformanceTracking } from './hooks/usePerformance';
-import { useProblemGenerator } from './hooks/useProblemGenerator';
-import { useSettings } from './hooks/useSettings';
-import { useSettingsValidation } from './hooks/useSettingsValidation';
-import { useTranslation } from './i18n';
-import './styles/components.css';
-import type { MessageValue, PaperSizeOptions, Problem, QuizResult, Settings } from './types';
-import { setupWCAGEnforcement } from './utils/wcagEnforcement';
+} from "@/hooks/useAppLogic";
+import { saveQuizResult } from "@/utils/resultsStorage";
+import PerformanceMonitor from "./components/PerformanceMonitor";
+import TranslationLoader from "./components/TranslationLoader";
+import { useAppMessages } from "./hooks/useAppMessages";
+import { usePerformanceTracking } from "./hooks/usePerformance";
+import { useProblemGenerator } from "./hooks/useProblemGenerator";
+import { useSettings } from "./hooks/useSettings";
+import { useSettingsValidation } from "./hooks/useSettingsValidation";
+import { useTranslation } from "./i18n";
+import "./styles/components.css";
+import type { MessageValue, PaperSizeOptions, Problem, QuizResult, Settings } from "./types";
+import { setupWCAGEnforcement } from "./utils/wcagEnforcement";
 
 const SpeedInsights = React.lazy(() =>
-  import('@vercel/speed-insights/react').then(module => ({ default: module.SpeedInsights }))
+  import("@vercel/speed-insights/react").then((module) => ({ default: module.SpeedInsights })),
 );
 
 interface MessagesContainerProps {
@@ -53,10 +53,10 @@ const MessagesContainer: React.FC<MessagesContainerProps> = ({
   onDismissWarning,
   onDismissSuccess,
 }) => (
-  <div className='messages-container'>
-    <ErrorMessage error={error} type='error' onDismiss={onDismissError} />
-    <ErrorMessage error={warning} type='warning' onDismiss={onDismissWarning} />
-    <ErrorMessage error={successMessage} type='info' onDismiss={onDismissSuccess} />
+  <div className="messages-container">
+    <ErrorMessage error={error} type="error" onDismiss={onDismissError} />
+    <ErrorMessage error={warning} type="warning" onDismiss={onDismissWarning} />
+    <ErrorMessage error={successMessage} type="info" onDismiss={onDismissSuccess} />
   </div>
 );
 
@@ -96,7 +96,7 @@ const MainContent: React.FC<MainContentProps> = ({
   }
 
   return (
-    <div className='container'>
+    <div className="container">
       <SettingsSection
         t={t}
         settings={settings}
@@ -105,7 +105,7 @@ const MainContent: React.FC<MainContentProps> = ({
         paperSizeOptions={paperSizeOptions}
       />
 
-      <div className='results-section'>
+      <div className="results-section">
         <ActionCards
           t={t}
           problemsCount={problems.length}
@@ -123,11 +123,11 @@ const MainContent: React.FC<MainContentProps> = ({
 };
 
 const LoadingScreen: React.FC<{ title: string; message: string }> = ({ title, message }) => (
-  <div className='App'>
-    <div className='loading-container'>
+  <div className="App">
+    <div className="loading-container">
       <h1>{title}</h1>
       <p>{message}</p>
-      <div className='loading-spinner' aria-label='Loading...'></div>
+      <div className="loading-spinner" aria-label="Loading..."></div>
     </div>
   </div>
 );
@@ -150,11 +150,11 @@ const useAppState = () => {
 const useAppConstants = (isLoading: boolean) => {
   const paperSizeOptions: PaperSizeOptions = useMemo(
     () => ({
-      a4: 'a4',
-      letter: 'letter',
-      legal: 'legal',
+      a4: "a4",
+      letter: "letter",
+      legal: "legal",
     }),
-    []
+    [],
   );
 
   const isDev = import.meta.env.DEV;
@@ -168,7 +168,7 @@ const useAppDependencies = (isLoading: boolean) => {
   const problemState = useProblemGenerator(
     settingsState.settings,
     isLoading,
-    settingsState.validateSettings
+    settingsState.validateSettings,
   );
   const validationState = useSettingsValidation();
   const appState = useAppState();
@@ -184,7 +184,7 @@ const useAppDependencies = (isLoading: boolean) => {
 };
 
 const useSuccessMessageManager = (
-  setSuccessMessage: (message: MessageValue) => void
+  setSuccessMessage: (message: MessageValue) => void,
 ): {
   scheduleSuccessMessage: (message: MessageValue) => void;
   dismissSuccessMessage: () => void;
@@ -192,7 +192,7 @@ const useSuccessMessageManager = (
   const successTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clearSuccessTimeout = useCallback(() => {
-    if (successTimeoutRef.current !== null && typeof globalThis !== 'undefined') {
+    if (successTimeoutRef.current !== null && typeof globalThis !== "undefined") {
       globalThis.clearTimeout(successTimeoutRef.current);
     }
     successTimeoutRef.current = null;
@@ -203,23 +203,23 @@ const useSuccessMessageManager = (
   const scheduleSuccessMessage = useCallback(
     (message: MessageValue): void => {
       setSuccessMessage(message);
-      if (!message || typeof globalThis === 'undefined') {
+      if (!message || typeof globalThis === "undefined") {
         clearSuccessTimeout();
         return;
       }
 
       clearSuccessTimeout();
       successTimeoutRef.current = globalThis.setTimeout(() => {
-        setSuccessMessage('');
+        setSuccessMessage("");
         successTimeoutRef.current = null;
       }, NUMERIC_CONSTANTS.SUCCESS_MESSAGE_TIMEOUT);
     },
-    [clearSuccessTimeout, setSuccessMessage]
+    [clearSuccessTimeout, setSuccessMessage],
   );
 
   const dismissSuccessMessage = useCallback(() => {
     clearSuccessTimeout();
-    setSuccessMessage('');
+    setSuccessMessage("");
   }, [clearSuccessTimeout, setSuccessMessage]);
 
   return { scheduleSuccessMessage, dismissSuccessMessage };
@@ -228,11 +228,11 @@ const useSuccessMessageManager = (
 const useMessagesController = () => {
   const messageState = useAppMessages();
   const { scheduleSuccessMessage, dismissSuccessMessage } = useSuccessMessageManager(
-    messageState.setSuccessMessage
+    messageState.setSuccessMessage,
   );
 
-  const dismissError = useCallback(() => messageState.setError(''), [messageState]);
-  const dismissWarning = useCallback(() => messageState.setWarning(''), [messageState]);
+  const dismissError = useCallback(() => messageState.setError(""), [messageState]);
+  const dismissWarning = useCallback(() => messageState.setWarning(""), [messageState]);
 
   return {
     state: {
@@ -293,7 +293,7 @@ const useAppInitialization = (params: {
 
   useEffect(() => {
     const shouldEnableRuntimeEnforcement =
-      import.meta.env.DEV && import.meta.env.VITE_WCAG_RUNTIME_ENFORCEMENT === 'true';
+      import.meta.env.DEV && import.meta.env.VITE_WCAG_RUNTIME_ENFORCEMENT === "true";
     if (!shouldEnableRuntimeEnforcement) {
       return;
     }
@@ -349,7 +349,7 @@ const useGenerateProblemHandlers = (params: {
     messageActions.showSuccessMessage,
     messageActions.setError,
     messageActions.clearMessages,
-    isDev
+    isDev,
   );
 
   useAppInitialization({
@@ -383,7 +383,7 @@ const useQuizControls = (params: {
     isI18nReady,
     setError,
     setIsQuizMode,
-    setQuizResult
+    setQuizResult,
   );
 
   const handleQuizComplete = useCallback(
@@ -391,7 +391,7 @@ const useQuizControls = (params: {
       setQuizResult(result);
       saveQuizResult(result, settings, isDev);
     },
-    [setQuizResult, settings, isDev]
+    [setQuizResult, settings, isDev],
   );
 
   return { startQuizMode, exitQuizMode, handleQuizComplete } as const;
@@ -458,7 +458,7 @@ const useMainContent = (params: {
       settings,
       startQuizMode,
       t,
-    ]
+    ],
   );
 };
 
@@ -569,8 +569,8 @@ const useProblemAndFormHandlers = (params: {
 }): {
   handleGenerateProblems: () => void;
   downloadPdf: ReturnType<typeof usePdfDownload>;
-  handleChange: ReturnType<typeof useAppHandlers>['handleChange'];
-  handleApplyPreset: ReturnType<typeof useAppHandlers>['handleApplyPreset'];
+  handleChange: ReturnType<typeof useAppHandlers>["handleChange"];
+  handleApplyPreset: ReturnType<typeof useAppHandlers>["handleApplyPreset"];
 } => {
   const {
     problemState,
@@ -634,7 +634,7 @@ interface AppViewModel {
 
 const useAppDependenciesAndActions = (
   isLoading: boolean,
-  messagesController: ReturnType<typeof useMessagesController>
+  messagesController: ReturnType<typeof useMessagesController>,
 ) => {
   const dependencies = useAppDependencies(isLoading);
   const messageActions = createMessageActions(messagesController);
@@ -645,7 +645,7 @@ const useAppMainHandlers = (
   dependencies: ReturnType<typeof useAppDependenciesAndActions>,
   isLoading: boolean,
   hasInitialGenerated: boolean,
-  setHasInitialGenerated: (value: boolean) => void
+  setHasInitialGenerated: (value: boolean) => void,
 ): ReturnType<typeof useProblemAndFormHandlers> & ReturnType<typeof useQuizControlsBundle> => {
   const { settingsState, problemState, validationState, constants, messageActions } = dependencies;
   const { paperSizeOptions, isDev, isI18nReady } = constants;
@@ -678,7 +678,7 @@ const useAppMainHandlers = (
 const useAppMainContentProps = (
   translate: (key: string, params?: Record<string, string | number>) => string,
   isLoading: boolean,
-  messagesController: ReturnType<typeof useMessagesController>
+  messagesController: ReturnType<typeof useMessagesController>,
 ) => {
   const dependencies = useAppDependenciesAndActions(isLoading, messagesController);
   const { appState } = dependencies;
@@ -688,7 +688,7 @@ const useAppMainContentProps = (
     dependencies,
     isLoading,
     hasInitialGenerated,
-    setHasInitialGenerated
+    setHasInitialGenerated,
   );
 
   const mainContentProps = useComposeMainContentProps({
@@ -711,8 +711,8 @@ const useAppMainContentProps = (
     mainContentProps,
     showSpeedInsights: import.meta.env.PROD,
     loadingMessages: {
-      title: translate('app.title'),
-      message: translate('loading.translations'),
+      title: translate("app.title"),
+      message: translate("loading.translations"),
     },
   } as const;
 };
@@ -750,10 +750,10 @@ function App(): React.JSX.Element {
 
   return (
     <TranslationLoader>
-      <div className='App'>
+      <div className="App">
         <AppHeader t={t} />
 
-        <main className='main-content'>
+        <main className="main-content">
           <MessagesContainer
             error={messages.error}
             warning={messages.warning}
@@ -773,7 +773,7 @@ function App(): React.JSX.Element {
         </main>
 
         {/* React 19.2 Performance Monitor */}
-        <PerformanceMonitor enabled={process.env.NODE_ENV === 'development'} showDetails />
+        <PerformanceMonitor enabled={process.env.NODE_ENV === "development"} showDetails />
       </div>
     </TranslationLoader>
   );

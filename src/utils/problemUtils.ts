@@ -1,19 +1,19 @@
-import type { Settings } from '@/types';
+import type { Settings } from "@/types";
 
 const getCrypto = (): Crypto => {
   // Prefer globalThis.crypto which is available in modern browsers and Node 22+
-  if (typeof globalThis !== 'undefined') {
+  if (typeof globalThis !== "undefined") {
     const maybeCrypto = (globalThis as typeof globalThis & { crypto?: Crypto }).crypto;
-    if (typeof maybeCrypto?.getRandomValues === 'function') {
+    if (typeof maybeCrypto?.getRandomValues === "function") {
       return maybeCrypto;
     }
   }
   // Legacy IE fallback (unlikely used):
   const w = globalThis as typeof globalThis & { msCrypto?: Crypto };
-  if (typeof w.msCrypto?.getRandomValues === 'function') {
+  if (typeof w.msCrypto?.getRandomValues === "function") {
     return w.msCrypto;
   }
-  throw new Error('Secure crypto.getRandomValues is not available');
+  throw new Error("Secure crypto.getRandomValues is not available");
 };
 
 export const randomInt = (min: number, max: number, cryptoObj: Crypto = getCrypto()): number => {
@@ -26,7 +26,7 @@ export const randomInt = (min: number, max: number, cryptoObj: Crypto = getCrypt
 export const randomNonZeroInt = (
   min: number,
   max: number,
-  cryptoObj: Crypto = getCrypto()
+  cryptoObj: Crypto = getCrypto(),
 ): number | null => {
   const values: number[] = [];
   for (let i = min; i <= max; i++) {
@@ -45,7 +45,7 @@ export const buildExpression = (
   count: number,
   settings: Settings,
   rng: typeof randomInt = randomInt,
-  rngNonZero: typeof randomNonZeroInt = randomNonZeroInt
+  rngNonZero: typeof randomNonZeroInt = randomNonZeroInt,
 ): { operands: number[]; operators: string[] } | null => {
   const operands = [rng(settings.numRange[0], settings.numRange[1])];
   const operators: string[] = [];
@@ -53,7 +53,7 @@ export const buildExpression = (
     const operator = settings.operations[rng(0, settings.operations.length - 1)];
     operators.push(operator);
     const next =
-      operator === '/'
+      operator === "/"
         ? rngNonZero(settings.numRange[0], settings.numRange[1])
         : rng(settings.numRange[0], settings.numRange[1]);
     if (next === null) {

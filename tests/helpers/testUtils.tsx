@@ -3,4 +3,4 @@
 
 // 直接重新导出 @testing-library/react
 // 让全局的 setupTests.ts 处理清理工作
-export * from '@testing-library/react';
+export * from "@testing-library/react";

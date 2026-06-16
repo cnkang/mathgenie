@@ -1,19 +1,19 @@
-import React from 'react';
-import { render, screen, fireEvent } from '../../tests/helpers/testUtils';
-import ActionCards from './ActionCards';
+import React from "react";
+import { render, screen, fireEvent } from "../../tests/helpers/testUtils";
+import ActionCards from "./ActionCards";
 
 const t = (key: string, params?: Record<string, string | number>) => {
   let result = key;
   if (params) {
     Object.entries(params).forEach(([k, v]) => {
-      result = result.replaceAll(new RegExp(String.raw`\{\{${k}\}\}`, 'g'), String(v));
+      result = result.replaceAll(new RegExp(String.raw`\{\{${k}\}\}`, "g"), String(v));
     });
   }
   return result;
 };
 
-describe.sequential('ActionCards', () => {
-  test('renders buttons and labels', () => {
+describe.sequential("ActionCards", () => {
+  test("renders buttons and labels", () => {
     render(
       <ActionCards
         t={t}
@@ -21,20 +21,20 @@ describe.sequential('ActionCards', () => {
         onGenerate={() => {}}
         onDownload={() => {}}
         onStartQuiz={() => {}}
-      />
+      />,
     );
 
     expect(
-      screen.getByRole('group', { name: /infoPanel\.quickActions\.title/i })
+      screen.getByRole("group", { name: /infoPanel\.quickActions\.title/i }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /buttons\.generate/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /buttons\.download/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /buttons\.generate/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /buttons\.download/i })).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: /infoPanel\.quickActions\.startQuiz/i })
+      screen.getByRole("button", { name: /infoPanel\.quickActions\.startQuiz/i }),
     ).toBeInTheDocument();
   });
 
-  test('disables download and quiz when no problems', () => {
+  test("disables download and quiz when no problems", () => {
     render(
       <ActionCards
         t={t}
@@ -42,13 +42,13 @@ describe.sequential('ActionCards', () => {
         onGenerate={() => {}}
         onDownload={() => {}}
         onStartQuiz={() => {}}
-      />
+      />,
     );
 
-    const download = screen.getByRole('button', {
+    const download = screen.getByRole("button", {
       name: /buttons\.download/i,
     }) as HTMLButtonElement;
-    const quiz = screen.getByRole('button', {
+    const quiz = screen.getByRole("button", {
       name: /infoPanel\.quickActions\.startQuiz/i,
     }) as HTMLButtonElement;
 
@@ -56,7 +56,7 @@ describe.sequential('ActionCards', () => {
     expect(quiz.disabled).toBe(true);
   });
 
-  test('fires callbacks when clicked', () => {
+  test("fires callbacks when clicked", () => {
     const onGenerate = vi.fn();
     const onDownload = vi.fn();
     const onStartQuiz = vi.fn();
@@ -68,20 +68,20 @@ describe.sequential('ActionCards', () => {
         onGenerate={onGenerate}
         onDownload={onDownload}
         onStartQuiz={onStartQuiz}
-      />
+      />,
     );
 
-    fireEvent.click(screen.getByRole('button', { name: /buttons\.generate/i }));
-    fireEvent.click(screen.getByRole('button', { name: /buttons\.download/i }));
-    fireEvent.click(screen.getByRole('button', { name: /infoPanel\.quickActions\.startQuiz/i }));
+    fireEvent.click(screen.getByRole("button", { name: /buttons\.generate/i }));
+    fireEvent.click(screen.getByRole("button", { name: /buttons\.download/i }));
+    fireEvent.click(screen.getByRole("button", { name: /infoPanel\.quickActions\.startQuiz/i }));
 
     expect(onGenerate).toHaveBeenCalledTimes(1);
     expect(onDownload).toHaveBeenCalledTimes(1);
     expect(onStartQuiz).toHaveBeenCalledTimes(1);
   });
 
-  test('handles rejected download promise without throwing', () => {
-    const onDownload = vi.fn(() => Promise.reject(new Error('fail')));
+  test("handles rejected download promise without throwing", () => {
+    const onDownload = vi.fn(() => Promise.reject(new Error("fail")));
     render(
       <ActionCards
         t={t}
@@ -89,9 +89,9 @@ describe.sequential('ActionCards', () => {
         onGenerate={() => {}}
         onDownload={onDownload}
         onStartQuiz={() => {}}
-      />
+      />,
     );
-    fireEvent.click(screen.getByRole('button', { name: /buttons\.download/i }));
+    fireEvent.click(screen.getByRole("button", { name: /buttons\.download/i }));
     expect(onDownload).toHaveBeenCalledTimes(1);
   });
 });
