@@ -30,7 +30,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6.0.3
 
       - name: 🧾 Fetch Dependabot metadata
         id: metadata
@@ -189,7 +189,7 @@ jobs:
 
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6.0.3
 
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@008330803749db0355799c700092d9a85fd074e9 # v6.0.9
