@@ -36,7 +36,7 @@
     "jspdf": "^4.2.1",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "web-vitals": "^5.3.0"
+    "web-vitals": "^6.0.0"
   },
   "scripts": {
     "dev": "vp dev",
