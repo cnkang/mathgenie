@@ -138,7 +138,7 @@
     "autoprefixer": "^10.5.4",
     "cssnano": "^8.0.2",
     "cssnano-preset-advanced": "^8.0.2",
-    "happy-dom": "^20.11.0",
+    "happy-dom": "^20.11.1",
     "identity-obj-proxy": "^3.0.0",
     "jiti": "^2.7.0",
     "postcss": "^8.5.21",
