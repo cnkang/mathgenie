@@ -48,94 +48,104 @@ function makeConstName(base: string, used: Set<string>): string {
   return name;
 }
 
-export function findDuplicateStringsInSource(
-  source: string,
-  filePath = "inline.tsx",
-  options: FindOptions = DEFAULT_OPTIONS,
-): { duplicates: DuplicateString[] } {
-  let autoStartPos = -1;
-  let autoEndPos = -1;
-  {
-    const startMarker = "// AUTO-GENERATED: duplicate strings extracted by sonar-check --fix";
-    const lines = source.split(/\r?\n/);
-    const startIdx = lines.findIndex((l) => l.includes(startMarker));
-    if (startIdx !== -1) {
-      let pos = 0;
-      for (let i = 0; i < startIdx; i++) pos += lines[i].length + 1;
-      autoStartPos = pos;
-      let endLine = startIdx + 1;
-      while (endLine < lines.length && /^const\s+STR_[A-Z\d_]+\s*=/.test(lines[endLine].trim())) {
-        endLine++;
-      }
-      for (let i = startIdx; i < endLine; i++) pos += lines[i].length + 1;
-      autoEndPos = pos;
-    }
+function findAutoBlockRange(source: string): { start: number; end: number } {
+  const startMarker = "// AUTO-GENERATED: duplicate strings extracted by sonar-check --fix";
+  const lines = source.split(/\r?\n/);
+  const startIdx = lines.findIndex((l) => l.includes(startMarker));
+  if (startIdx === -1) {
+    return { start: -1, end: -1 };
   }
+  let pos = 0;
+  for (let i = 0; i < startIdx; i++) pos += lines[i].length + 1;
+  const autoStart = pos;
+  let endLine = startIdx + 1;
+  while (endLine < lines.length && /^const\s+STR_[A-Z\d_]+\s*=/.test(lines[endLine].trim())) {
+    endLine++;
+  }
+  for (let i = startIdx; i < endLine; i++) pos += lines[i].length + 1;
+  return { start: autoStart, end: pos };
+}
 
+interface TokenInfo {
+  text: string;
+  start: number;
+  end: number;
+  line: number;
+}
+
+function collectStringTokens(
+  source: string,
+  filePath: string,
+  autoBlock: { start: number; end: number },
+  options: FindOptions,
+): TokenInfo[] {
   const languageVariant = filePath.endsWith(".tsx") ? LanguageVariant.JSX : LanguageVariant.Standard;
   const scanner = createScanner(true, languageVariant, source);
-
-  const strings: Array<{
-    text: string;
-    start: number;
-    end: number;
-    line: number;
-  }> = [];
-
-  let inImport = false;
-  let inExport = false;
+  const tokens: TokenInfo[] = [];
+  const ctx = { inImport: false, inExport: false };
   let prevTokenKind = SyntaxKind.Unknown;
 
-  let tokenKind = scanner.scan();
-  while (tokenKind !== SyntaxKind.EndOfFile) {
-    const tokenValue = scanner.getTokenValue();
-    const tokenStart = scanner.getTokenStart();
-    const tokenEnd = scanner.getTokenEnd();
-
-    if (tokenKind === SyntaxKind.ImportKeyword) {
-      inImport = true;
-    } else if (tokenKind === SyntaxKind.ExportKeyword) {
-      inExport = true;
-    } else if (tokenKind === SyntaxKind.SemicolonToken) {
-      inImport = false;
-      inExport = false;
+  for (let tokenKind = scanner.scan(); tokenKind !== SyntaxKind.EndOfFile; tokenKind = scanner.scan()) {
+    updateContext(tokenKind, ctx);
+    if (isStringToken(tokenKind) && !isInAutoBlock(scanner.getTokenStart(), autoBlock)) {
+      collectIfValid(scanner, source, options, prevTokenKind, ctx.inImport, ctx.inExport, tokens);
     }
-
-    if (tokenKind === SyntaxKind.StringLiteral || tokenKind === SyntaxKind.NoSubstitutionTemplateLiteral) {
-      if (
-        autoStartPos !== -1 &&
-        autoEndPos !== -1 &&
-        tokenStart >= autoStartPos &&
-        tokenStart < autoEndPos
-      ) {
-        prevTokenKind = tokenKind;
-        tokenKind = scanner.scan();
-        continue;
-      }
-
-      const isModuleSpecifier =
-        (inImport || inExport) && prevTokenKind === SyntaxKind.FromKeyword;
-      const isSideEffectImport = prevTokenKind === SyntaxKind.ImportKeyword;
-
-      if (!isModuleSpecifier && !isSideEffectImport) {
-        const text = tokenValue;
-        if (text.length >= options.minLength && !EXCLUDED_STRINGS.has(text)) {
-          const line = computeLineOfPos(source, tokenStart);
-          strings.push({ text, start: tokenStart, end: tokenEnd, line });
-        }
-      }
-    }
-
     prevTokenKind = tokenKind;
-    tokenKind = scanner.scan();
   }
+  return tokens;
+}
 
+function updateContext(
+  tokenKind: number,
+  ctx: { inImport: boolean; inExport: boolean },
+): void {
+  if (tokenKind === SyntaxKind.ImportKeyword) ctx.inImport = true;
+  else if (tokenKind === SyntaxKind.ExportKeyword) ctx.inExport = true;
+  else if (tokenKind === SyntaxKind.SemicolonToken) {
+    ctx.inImport = false;
+    ctx.inExport = false;
+  }
+}
+
+function isStringToken(tokenKind: number): boolean {
+  return tokenKind === SyntaxKind.StringLiteral || tokenKind === SyntaxKind.NoSubstitutionTemplateLiteral;
+}
+
+function isInAutoBlock(pos: number, autoBlock: { start: number; end: number }): boolean {
+  return autoBlock.start !== -1 && autoBlock.end !== -1 && pos >= autoBlock.start && pos < autoBlock.end;
+}
+
+function collectIfValid(
+  scanner: ReturnType<typeof createScanner>,
+  source: string,
+  options: FindOptions,
+  prevTokenKind: number,
+  inImport: boolean,
+  inExport: boolean,
+  tokens: TokenInfo[],
+): void {
+  const isModuleSpecifier = (inImport || inExport) && prevTokenKind === SyntaxKind.FromKeyword;
+  const isSideEffectImport = prevTokenKind === SyntaxKind.ImportKeyword;
+  if (isModuleSpecifier || isSideEffectImport) return;
+
+  const text = scanner.getTokenValue();
+  if (text.length >= options.minLength && !EXCLUDED_STRINGS.has(text)) {
+    tokens.push({
+      text,
+      start: scanner.getTokenStart(),
+      end: scanner.getTokenEnd(),
+      line: computeLineOfPos(source, scanner.getTokenStart()),
+    });
+  }
+}
+
+function countByString(tokens: TokenInfo[]): Map<string, DuplicateString> {
   const counts = new Map<string, DuplicateString>();
-  for (const s of strings) {
-    const item = counts.get(s.text);
-    if (item) {
-      item.count += 1;
-      item.occurrences.push({ start: s.start, end: s.end, wrapWithBraces: false });
+  for (const s of tokens) {
+    const existing = counts.get(s.text);
+    if (existing) {
+      existing.count += 1;
+      existing.occurrences.push({ start: s.start, end: s.end, wrapWithBraces: false });
     } else {
       counts.set(s.text, {
         text: s.text,
@@ -146,7 +156,17 @@ export function findDuplicateStringsInSource(
       });
     }
   }
+  return counts;
+}
 
+export function findDuplicateStringsInSource(
+  source: string,
+  filePath = "inline.tsx",
+  options: FindOptions = DEFAULT_OPTIONS,
+): { duplicates: DuplicateString[] } {
+  const autoBlock = findAutoBlockRange(source);
+  const tokens = collectStringTokens(source, filePath, autoBlock, options);
+  const counts = countByString(tokens);
   const duplicates = Array.from(counts.values()).filter((d) => d.count >= options.minCount);
   return { duplicates };
 }
@@ -161,7 +181,7 @@ function removeExistingAutoBlock(source: string): string {
     endIdx++;
   }
   const kept = lines.slice(0, startIdx);
-  if (kept.length > 0 && kept[kept.length - 1].trim() === "") {
+  if (kept.length > 0 && kept.at(-1)?.trim() === "") {
     kept.pop();
   }
   kept.push(...lines.slice(endIdx));
