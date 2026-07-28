@@ -36,8 +36,14 @@
     "playwright.config.ts",
     "playwright.e2e.config.ts",
     "playwright.test.config.ts",
-    "src/types/vitest.d.ts",
-    "scripts/**/*"
+    "src/types/vitest.d.ts"
   ],
-  "exclude": ["node_modules", "dist", "coverage", "tests/e2e/**/*"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "coverage",
+    "tests/e2e/**/*",
+    "tests/unit/scripts/**/*",
+    "scripts/**/*"
+  ]
 }
