@@ -1,7 +1,12 @@
 // localStorage persistence e2e tests
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
-import { ensureElementVisible, expandAdvancedSettings, expandPdfSettings } from './test-utils';
+import {
+  changeLanguage,
+  ensureElementVisible,
+  expandAdvancedSettings,
+  expandPdfSettings,
+} from './test-utils';
 
 test.describe('localStorage Persistence', () => {
   test.beforeEach(async ({ page }: { page: Page }) => {
@@ -158,9 +163,11 @@ test.describe('localStorage Persistence', () => {
   });
 
   test('should persist language selection', async ({ page }: { page: Page }) => {
-    // Change language
-    await page.selectOption('#language-select', 'zh');
-    await expect(page.locator('#language-select')).toHaveValue('zh');
+    // Change language and wait for translations to load. The localStorage write
+    // (persistLanguageSelection) happens inside an async effect after the
+    // translation file is imported, so we must wait for the translation to
+    // actually load before reading localStorage.
+    await changeLanguage(page, 'zh');
 
     // Verify language is saved
     const savedLanguage = await page.evaluate(() => {

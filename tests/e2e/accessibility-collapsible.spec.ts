@@ -88,22 +88,37 @@ test.describe('Collapsible UI Accessibility', () => {
     // Add timeout for Firefox compatibility
     test.setTimeout(90000); // Increased timeout for Firefox compatibility (doubled from 45s)
 
-    // Tab through the interface
-    await page.keyboard.press('Tab'); // Language select
+    // Tab through the interface, asserting each key landmark is reachable.
+    // We don't hardcode the exact number of Tabs because intermediate focusable
+    // elements (e.g. a dismissable success/warning message) may or may not be
+    // present. Instead, Tab until the target landmark becomes focused.
+    const tabUntilFocused = async (selector: string, maxTabs = 10): Promise<void> => {
+      for (let i = 0; i < maxTabs; i++) {
+        if (await page.locator(selector).evaluate(el => el === document.activeElement)) {
+          return;
+        }
+        await page.keyboard.press('Tab');
+      }
+      await expect(page.locator(selector)).toBeFocused();
+    };
+
+    // First Tab reaches the language select.
+    await page.keyboard.press('Tab');
     await expect(page.locator('#language-select')).toBeFocused();
-    await page.keyboard.press('Tab'); // First preset card
-    await page.keyboard.press('Tab'); // Second preset card
-    await page.keyboard.press('Tab'); // Third preset card
-    await page.keyboard.press('Tab'); // Fourth preset card
-    await page.keyboard.press('Tab'); // Operations select
+
+    // Continue tabbing to the operations select (first field in SettingsSection).
+    await tabUntilFocused('#operations');
     await expect(page.locator('#operations')).toBeFocused();
-    await page.keyboard.press('Tab'); // Number of problems
+
+    // Continue to the number of problems input.
+    await tabUntilFocused('#numProblems');
     await expect(page.locator('#numProblems')).toBeFocused();
 
-    // Should be able to reach advanced settings toggle with timeout protection
+    // Should be able to reach advanced settings toggle with timeout protection.
+    // Tab through remaining focusable elements (ranges, preset cards, pdf settings).
     let focusedElement = await page.evaluate(() => document.activeElement?.className);
     let tabCount = 0;
-    const maxTabs = 20; // Prevent infinite loop in Firefox
+    const maxTabs = 30; // Prevent infinite loop in Firefox
 
     while (
       focusedElement &&
