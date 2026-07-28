@@ -1,22 +1,8 @@
 #!/usr/bin/env tsx
-/**
- * Duplicate string literal finder and fixer (AST-based)
- * - Detects repeated string literals within a file
- * - Optionally injects file-local constants and replaces occurrences
- *
- * Heuristics:
- * - Ignores import/export module specifiers and import type nodes
- * - Ignores strings shorter than minLength
- * - Fix triggers only when occurrence count >= minCount
- *
- * Security:
- * - All regex patterns use bounded quantifiers to prevent ReDoS attacks
- * - Character classes are limited to reasonable lengths (e.g., {0,200}, {1,100})
- * - Whitespace matching uses specific character classes [ \t] instead of \s
- */
+/// <reference types="node" />
 
 import { readFileSync, writeFileSync } from "node:fs";
-import * as ts from "typescript";
+import { createScanner, SyntaxKind, LanguageVariant } from "typescript/unstable/ast";
 
 export type DuplicateString = {
   text: string;
@@ -34,65 +20,23 @@ export type FindOptions = {
 const DEFAULT_OPTIONS: FindOptions = { minLength: 6, minCount: 3 } as const;
 const EXCLUDED_STRINGS = new Set<string>(["undefined"]);
 
-function isStringNode(node: ts.Node): node is ts.StringLiteral | ts.NoSubstitutionTemplateLiteral {
-  return ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node);
-}
-
-function isInImportOrExport(node: ts.Node): boolean {
-  let current: ts.Node | undefined = node.parent;
-  while (current) {
-    if (
-      ts.isImportDeclaration(current) ||
-      ts.isExportDeclaration(current) ||
-      ts.isImportEqualsDeclaration(current)
-    ) {
-      return true;
-    }
-    if (ts.isSourceFile(current)) {
-      break;
-    }
-    current = current.parent;
-  }
-  return false;
-}
-
-function isInTypeOrModuleSpecifier(node: ts.Node): boolean {
-  let current: ts.Node | undefined = node.parent;
-  while (current) {
-    if (
-      ts.isTypeReferenceNode(current) ||
-      ts.isLiteralTypeNode(current) ||
-      ts.isImportTypeNode(current)
-    ) {
-      return true;
-    }
-    if (ts.isSourceFile(current)) {
-      break;
-    }
-    current = current.parent;
-  }
-  return false;
-}
-
-function computeLineOfPos(sf: ts.SourceFile, pos: number): number {
-  const { line } = sf.getLineAndCharacterOfPosition(pos);
-  return line + 1;
+function computeLineOfPos(source: string, pos: number): number {
+  return source.slice(0, pos).split("\n").length;
 }
 
 function makeConstName(base: string, used: Set<string>): string {
-  // Derive from content: uppercase alnum with underscores
   const cleaned = base
     .trim()
     .slice(0, 80)
-    .replaceAll(/[ \t\n\r]{1,10}/g, "_")
-    .replaceAll(/[^A-Za-z0-9_-]/g, "_")
-    .replaceAll(/-{1,10}/g, "_")
-    .replaceAll(/^_{1,10}/g, "")
-    .replaceAll(/_$/g, "")
+    .replace(/[^a-zA-Z0-9\s_-]/g, "")
+    .trim()
+    .replace(/[\s-]+/g, "_")
     .toUpperCase();
-
-  let candidate = cleaned ? `STR_${cleaned}` : "STR_CONST";
-  if (/^\d/.test(candidate)) {
+  let candidate = `STR_${cleaned}`;
+  if (!/^STR_[A-Z][A-Z0-9_]*$/.test(candidate)) {
+    candidate = `STR_${cleaned.replace(/[^A-Z0-9_]/g, "") || "VAL"}`;
+  }
+  if (!candidate.startsWith('STR_')) {
     candidate = `STR_${candidate}`;
   }
   let name = candidate;
@@ -104,130 +48,169 @@ function makeConstName(base: string, used: Set<string>): string {
   return name;
 }
 
+function findAutoBlockRange(source: string): { start: number; end: number } {
+  const startMarker = "// AUTO-GENERATED: duplicate strings extracted by sonar-check --fix";
+  const lines = source.split(/\r?\n/);
+  const startIdx = lines.findIndex((l) => l.includes(startMarker));
+  if (startIdx === -1) {
+    return { start: -1, end: -1 };
+  }
+  let pos = 0;
+  for (let i = 0; i < startIdx; i++) pos += lines[i].length + 1;
+  const autoStart = pos;
+  let endLine = startIdx + 1;
+  while (endLine < lines.length && /^const\s+STR_[A-Z\d_]+\s*=/.test(lines[endLine].trim())) {
+    endLine++;
+  }
+  for (let i = startIdx; i < endLine; i++) pos += lines[i].length + 1;
+  return { start: autoStart, end: pos };
+}
+
+interface TokenInfo {
+  text: string;
+  start: number;
+  end: number;
+  line: number;
+}
+
+function collectStringTokens(
+  source: string,
+  filePath: string,
+  autoBlock: { start: number; end: number },
+  options: FindOptions,
+): TokenInfo[] {
+  const languageVariant = filePath.endsWith(".tsx") ? LanguageVariant.JSX : LanguageVariant.Standard;
+  const scanner = createScanner(true, languageVariant, source);
+  const tokens: TokenInfo[] = [];
+  const ctx = { inImport: false, inExport: false };
+  let prevTokenKind = SyntaxKind.Unknown;
+
+  for (let tokenKind = scanner.scan(); tokenKind !== SyntaxKind.EndOfFile; tokenKind = scanner.scan()) {
+    updateContext(tokenKind, ctx);
+    if (isStringToken(tokenKind) && !isInAutoBlock(scanner.getTokenStart(), autoBlock)) {
+      collectIfValid(scanner, source, options, prevTokenKind, ctx.inImport, ctx.inExport, tokens);
+    }
+    prevTokenKind = tokenKind;
+  }
+  return tokens;
+}
+
+function updateContext(
+  tokenKind: number,
+  ctx: { inImport: boolean; inExport: boolean },
+): void {
+  if (tokenKind === SyntaxKind.ImportKeyword) ctx.inImport = true;
+  else if (tokenKind === SyntaxKind.ExportKeyword) ctx.inExport = true;
+  else if (tokenKind === SyntaxKind.SemicolonToken) {
+    ctx.inImport = false;
+    ctx.inExport = false;
+  }
+}
+
+function isStringToken(tokenKind: number): boolean {
+  return tokenKind === SyntaxKind.StringLiteral || tokenKind === SyntaxKind.NoSubstitutionTemplateLiteral;
+}
+
+function isInAutoBlock(pos: number, autoBlock: { start: number; end: number }): boolean {
+  return autoBlock.start !== -1 && autoBlock.end !== -1 && pos >= autoBlock.start && pos < autoBlock.end;
+}
+
+function collectIfValid(
+  scanner: ReturnType<typeof createScanner>,
+  source: string,
+  options: FindOptions,
+  prevTokenKind: number,
+  inImport: boolean,
+  inExport: boolean,
+  tokens: TokenInfo[],
+): void {
+  const isModuleSpecifier = (inImport || inExport) && prevTokenKind === SyntaxKind.FromKeyword;
+  const isSideEffectImport = prevTokenKind === SyntaxKind.ImportKeyword;
+  if (isModuleSpecifier || isSideEffectImport) return;
+
+  const text = scanner.getTokenValue();
+  if (text.length >= options.minLength && !EXCLUDED_STRINGS.has(text)) {
+    tokens.push({
+      text,
+      start: scanner.getTokenStart(),
+      end: scanner.getTokenEnd(),
+      line: computeLineOfPos(source, scanner.getTokenStart()),
+    });
+  }
+}
+
+function countByString(tokens: TokenInfo[]): Map<string, DuplicateString> {
+  const counts = new Map<string, DuplicateString>();
+  for (const s of tokens) {
+    const existing = counts.get(s.text);
+    if (existing) {
+      existing.count += 1;
+      existing.occurrences.push({ start: s.start, end: s.end, wrapWithBraces: false });
+    } else {
+      counts.set(s.text, {
+        text: s.text,
+        count: 1,
+        line: s.line,
+        preview: `'${s.text}'`,
+        occurrences: [{ start: s.start, end: s.end, wrapWithBraces: false }],
+      });
+    }
+  }
+  return counts;
+}
+
 export function findDuplicateStringsInSource(
   source: string,
   filePath = "inline.tsx",
   options: FindOptions = DEFAULT_OPTIONS,
 ): { duplicates: DuplicateString[] } {
-  const sf = ts.createSourceFile(
-    filePath,
-    source,
-    ts.ScriptTarget.Latest,
-    true,
-    filePath.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
-  );
-
-  // Determine autogenerated constants block range (to ignore duplicates within it)
-  let autoStartPos = -1;
-  let autoEndPos = -1;
-  {
-    const startMarker = "// AUTO-GENERATED: duplicate strings extracted by sonar-check --fix";
-    const lines = source.split(/\r?\n/);
-    const startIdx = lines.findIndex((l) => l.includes(startMarker));
-    if (startIdx !== -1) {
-      let pos = 0;
-      for (let i = 0; i < startIdx; i++) pos += lines[i].length + 1;
-      autoStartPos = pos;
-      let endLine = startIdx + 1;
-      while (endLine < lines.length && /^const\s+STR_[A-Z\d_]+\s*=/.test(lines[endLine].trim())) {
-        endLine++;
-      }
-      for (let i = startIdx; i < endLine; i++) pos += lines[i].length + 1;
-      autoEndPos = pos;
-    }
-  }
-
-  const counts = new Map<string, DuplicateString>();
-
-  const visit = (node: ts.Node): void => {
-    if (isStringNode(node)) {
-      const nodeStart = node.getStart(sf);
-      if (
-        autoStartPos !== -1 &&
-        autoEndPos !== -1 &&
-        nodeStart >= autoStartPos &&
-        nodeStart < autoEndPos
-      ) {
-        // Skip literals inside autogenerated block
-        return;
-      }
-      if (isInImportOrExport(node) || isInTypeOrModuleSpecifier(node)) {
-        return;
-      }
-      const { text } = node as ts.StringLiteralLike;
-      if (text.length < options.minLength) {
-        return;
-      }
-      if (EXCLUDED_STRINGS.has(text)) {
-        return;
-      }
-
-      const start = node.getStart(sf);
-      const end = node.getEnd();
-      const { parent } = node;
-      const wrapWithBraces =
-        ts.isJsxAttribute(parent) && parent.initializer != null && parent.initializer == node;
-      const item = counts.get(text);
-      if (item) {
-        item.count += 1;
-        item.occurrences.push({ start, end, wrapWithBraces });
-      } else {
-        counts.set(text, {
-          text,
-          count: 1,
-          line: computeLineOfPos(sf, node.getStart(sf)),
-          preview: `'${text}'`,
-          occurrences: [{ start, end, wrapWithBraces }],
-        });
-      }
-    }
-    ts.forEachChild(node, visit);
-  };
-
-  visit(sf);
-
+  const autoBlock = findAutoBlockRange(source);
+  const tokens = collectStringTokens(source, filePath, autoBlock, options);
+  const counts = countByString(tokens);
   const duplicates = Array.from(counts.values()).filter((d) => d.count >= options.minCount);
   return { duplicates };
-}
-
-export function findDuplicateStringsInFile(
-  filePath: string,
-  options: FindOptions = DEFAULT_OPTIONS,
-): { duplicates: DuplicateString[]; source: string } {
-  const source = readFileSync(filePath, "utf8");
-  const { duplicates } = findDuplicateStringsInSource(source, filePath, options);
-  return { duplicates, source };
 }
 
 function removeExistingAutoBlock(source: string): string {
   const startMarker = "// AUTO-GENERATED: duplicate strings extracted by sonar-check --fix";
   const lines = source.split(/\r?\n/);
   const startIdx = lines.findIndex((l) => l.includes(startMarker));
-  if (startIdx === -1) {
-    return source;
-  }
+  if (startIdx === -1) return source;
   let endIdx = startIdx + 1;
-  while (
-    endIdx < lines.length &&
-    /^const[ \t]{1,10}STR_[A-Z\d_]{1,100}[ \t]{0,10}=/.test(lines[endIdx].trim())
-  ) {
+  while (endIdx < lines.length && /^const\s+STR_[A-Z\d_]+\s*=/.test(lines[endIdx].trim())) {
     endIdx++;
   }
-  lines.splice(startIdx, endIdx - startIdx);
-  return lines.join("\n");
+  const kept = lines.slice(0, startIdx);
+  if (kept.length > 0 && kept.at(-1)?.trim() === "") {
+    kept.pop();
+  }
+  kept.push(...lines.slice(endIdx));
+  return kept.join("\n");
 }
 
-function findInsertPosAfterImports(sf: ts.SourceFile): number {
-  let lastImportEnd = 0;
-  for (const stmt of sf.statements) {
-    if (ts.isImportDeclaration(stmt) || ts.isImportEqualsDeclaration(stmt)) {
-      lastImportEnd = stmt.getEnd();
-      continue;
+function findInsertPosAfterImports(source: string): number {
+  const scanner = createScanner(true, LanguageVariant.Standard, source);
+  let insertPos = 0;
+  let tokenKind = scanner.scan();
+
+  while (tokenKind !== SyntaxKind.EndOfFile) {
+    if (tokenKind === SyntaxKind.ImportKeyword) {
+      do {
+        tokenKind = scanner.scan();
+      } while (tokenKind !== SyntaxKind.EndOfFile && tokenKind !== SyntaxKind.SemicolonToken);
+
+      if (tokenKind === SyntaxKind.SemicolonToken) {
+        insertPos = scanner.getTokenEnd();
+        tokenKind = scanner.scan();
+        continue;
+      }
+      break;
     }
-    // stop at first non-import
+
     break;
   }
-  return lastImportEnd;
+
+  return insertPos;
 }
 
 export function applyDuplicateStringFixesToContent(
@@ -235,7 +218,6 @@ export function applyDuplicateStringFixesToContent(
   source: string,
   options: FindOptions = DEFAULT_OPTIONS,
 ): { updated: string; replacedCount: number; constsAdded: number; constNames: string[] } {
-  // Ensure idempotency by removing previous generated block first
   let updated = removeExistingAutoBlock(source);
   const { duplicates } = findDuplicateStringsInSource(updated, filePath, options);
   if (duplicates.length === 0) {
@@ -243,103 +225,78 @@ export function applyDuplicateStringFixesToContent(
   }
   const usedNames = new Set<string>();
 
-  // Prepare replacements
   type Replacement = { start: number; end: number; name: string; wrapWithBraces: boolean };
   const replacements: Replacement[] = [];
   const constDecls: string[] = [];
+  const constNames: string[] = [];
 
   for (const d of duplicates) {
-    const constName = makeConstName(d.text, usedNames);
-    const decl = `const ${constName} = ${JSON.stringify(d.text)} as const;`;
-    constDecls.push(decl);
+    const name = makeConstName(d.text, usedNames);
+    constNames.push(name);
+    constDecls.push(`const ${name} = ${JSON.stringify(d.text)} as const;`);
     for (const occ of d.occurrences) {
-      replacements.push({
-        start: occ.start,
-        end: occ.end,
-        name: constName,
-        wrapWithBraces: occ.wrapWithBraces,
-      });
+      replacements.push({ start: occ.start, end: occ.end, name, wrapWithBraces: occ.wrapWithBraces });
     }
   }
 
-  // Sort by start DESC to avoid shifting positions
   replacements.sort((a, b) => b.start - a.start);
 
-  // Apply token-level replacements on the current updated string using original positions.
   for (const r of replacements) {
     const replacementText = r.wrapWithBraces ? `{${r.name}}` : r.name;
     updated = updated.slice(0, r.start) + replacementText + updated.slice(r.end);
   }
 
-  // Re-parse to compute a safe insertion point after imports
-  const sf2 = ts.createSourceFile(
-    filePath,
-    updated,
-    ts.ScriptTarget.Latest,
-    true,
-    filePath.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
-  );
-  const insertPos = findInsertPosAfterImports(sf2);
+  const insertPos = findInsertPosAfterImports(updated);
   const header =
     "\n\n// AUTO-GENERATED: duplicate strings extracted by sonar-check --fix\n// Do not edit manually.\n";
   const constBlock = constDecls.join("\n") + "\n";
-
   const before = updated.slice(0, insertPos);
   const after = updated.slice(insertPos);
   updated = before + header + constBlock + after;
 
-  // Post-process: ensure JSX attributes using bare identifiers are wrapped with braces
   if (filePath.endsWith(".tsx")) {
-    // Only within JSX tag attribute lists: capture up to attribute, keep tag prefix intact
     const jsxAttrBareIdInTag =
       /(<[^>]{0,200}\b)([A-Za-z_:][A-Za-z\d_:.-]{0,50}[ \t]{0,10}=)[ \t]{0,10}(STR_[A-Z\d_]{1,100})(?![A-Za-z\d_])/g;
     updated = updated.replaceAll(
       jsxAttrBareIdInTag,
-      (_m, p0: string, p1: string, p2: string) => `${p0}${p1}{${p2}}`,
+      (_m: string, p0: string, p1: string, p2: string) => `${p0}${p1}{${p2}}`,
     );
-    // Repair accidental braces on DOM property assignments (not JSX)
     const domClassNameBrace = /(\.className[ \t]{0,10}=)[ \t]{0,10}{(STR_[A-Z0-9_]{1,100})}/g;
-    updated = updated.replaceAll(domClassNameBrace, (_m, p1: string, p2: string) => `${p1} ${p2}`);
+    updated = updated.replaceAll(domClassNameBrace, (_m: string, p1: string, p2: string) => `${p1} ${p2}`);
   }
 
-  return {
-    updated,
-    replacedCount: replacements.length,
-    constsAdded: constDecls.length,
-    constNames: constDecls.map((d) =>
-      d
-        .split("=")[0]
-        .trim()
-        .replace(/^const[ \t]{1,10}/, ""),
-    ),
-  };
+  let replacedCount = 0;
+  for (const d of duplicates) {
+    replacedCount += d.occurrences.length;
+  }
+
+  return { updated, replacedCount, constsAdded: constDecls.length, constNames };
 }
 
 export function applyDuplicateStringFixesToFile(
   filePath: string,
   options: FindOptions = DEFAULT_OPTIONS,
 ): { changed: boolean; replacedCount: number; constsAdded: number } {
-  const input = readFileSync(filePath, "utf8");
-  const res = applyDuplicateStringFixesToContent(filePath, input, options);
-  if (res.updated !== input) {
+  const source = readFileSync(filePath, "utf8");
+  if (!source.includes("// AUTO-GENERATED:")) {
+    const { duplicates } = findDuplicateStringsInSource(source, filePath, options);
+    if (duplicates.length === 0) {
+      return { changed: false, replacedCount: 0, constsAdded: 0 };
+    }
+  }
+  const res = applyDuplicateStringFixesToContent(filePath, source, options);
+  if (res.replacedCount > 0) {
     writeFileSync(filePath, res.updated, "utf8");
     return { changed: true, replacedCount: res.replacedCount, constsAdded: res.constsAdded };
   }
-  // Even if duplicates were not found, ensure JSX repair in case of previous runs
   if (filePath.endsWith(".tsx")) {
     const jsxAttrBareIdInTag =
       /(<[^>]{0,200}\b)([A-Za-z_:][A-Za-z\d_:.-]{0,50}[ \t]{0,10}=)[ \t]{0,10}(STR_[A-Z\d_]{1,100})(?![A-Za-z\d_])/g;
-    let repaired = input.replaceAll(
-      jsxAttrBareIdInTag,
-      (_m, p0: string, p1: string, p2: string) => `${p0}${p1}{${p2}}`,
-    );
+    const patched = source.replaceAll(jsxAttrBareIdInTag, "$1$2{$3}");
     const domClassNameBrace = /(\.className[ \t]{0,10}=)[ \t]{0,10}{(STR_[A-Z0-9_]{1,100})}/g;
-    repaired = repaired.replaceAll(
-      domClassNameBrace,
-      (_m, p1: string, p2: string) => `${p1} ${p2}`,
-    );
-    if (repaired !== input) {
-      writeFileSync(filePath, repaired, "utf8");
+    const final = patched.replaceAll(domClassNameBrace, "$1 $2");
+    if (final !== source) {
+      writeFileSync(filePath, final, "utf8");
       return { changed: true, replacedCount: 0, constsAdded: 0 };
     }
   }
