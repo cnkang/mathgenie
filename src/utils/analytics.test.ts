@@ -59,10 +59,7 @@ describe("Analytics Utils", () => {
     });
 
     test("should handle empty properties", () => {
-      trackEvent("test-event");
-
-      // Should not throw error
-      expect(true).toBe(true);
+      expect(() => trackEvent("test-event")).not.toThrow();
     });
 
     test("should handle various property types", () => {
@@ -73,7 +70,6 @@ describe("Analytics Utils", () => {
           boolean: true,
         }),
       ).not.toThrow();
-      expect(true).toBe(true);
     });
 
     test("should handle localStorage errors gracefully", () => {

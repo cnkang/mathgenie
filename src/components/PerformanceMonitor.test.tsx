@@ -189,6 +189,7 @@ describe("PerformanceMonitor", () => {
       </PerformanceMonitor>,
     );
 
+    expect(screen.getByText("Test")).toBeInTheDocument();
     deleteMockWindow();
   });
 
@@ -212,6 +213,7 @@ describe("PerformanceMonitor", () => {
       </PerformanceMonitor>,
     );
 
+    expect(screen.getByText("Test")).toBeInTheDocument();
     deleteMockWindow();
   });
 

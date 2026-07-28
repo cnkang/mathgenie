@@ -1,12 +1,13 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
 import EnhancedSuspense from "./EnhancedSuspense";
+import { useConcurrentFeatures } from "@/hooks/usePerformance";
 
 // Mock the hooks
 vi.mock("@/hooks/usePerformance", () => ({
-  useConcurrentFeatures: () => ({
+  useConcurrentFeatures: vi.fn(() => ({
     isPending: false,
-    scheduleUpdate: vi.fn(),
-  }),
+    scheduleUpdate: vi.fn((cb: () => void) => cb()),
+  })),
 }));
 
 vi.mock("@/hooks/useReact19Features", () => ({
@@ -61,7 +62,7 @@ describe("EnhancedSuspense", () => {
     expect(screen.getByText("Custom Loading")).toBeInTheDocument();
   });
 
-  test.skip("should handle error callback", async () => {
+  test("should handle error callback", async () => {
     const onError = vi.fn();
     const ErrorComponent = () => {
       throw new Error("Test error");
@@ -89,7 +90,7 @@ describe("EnhancedSuspense", () => {
     consoleSpy.mockRestore();
   });
 
-  test.skip("should enable optimistic updates when requested", () => {
+  test("should enable optimistic updates when requested", () => {
     render(
       <EnhancedSuspense enableOptimisticUpdates>
         <div>Optimistic Content</div>
