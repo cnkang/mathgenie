@@ -45,7 +45,7 @@ const QuizHeader: React.FC<Props> = ({
       </span>
       <span className="timer-text">{formatTime(timeElapsed)}</span>
     </div>
-    <button onClick={onExit} className="exit-quiz-btn-small">
+    <button type="button" onClick={onExit} className="exit-quiz-btn-small">
       {t("quiz.exit")}
     </button>
   </div>

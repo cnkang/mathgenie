@@ -24,7 +24,7 @@ const LoadingButton: React.FC<LoadingButtonProps> = ({
   };
 
   return (
-    <button {...props} disabled={disabled || isLoading} onClick={handleClick}>
+    <button type="button" {...props} disabled={disabled || isLoading} onClick={handleClick}>
       {isLoading ? loadingContent : children}
     </button>
   );

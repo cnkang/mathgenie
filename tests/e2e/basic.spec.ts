@@ -33,10 +33,7 @@ test.describe('MathGenie Basic Functionality', () => {
     // Change number of problems
     await page.fill('#numProblems', '5');
 
-    // Wait for regeneration
-    await page.waitForTimeout(1000);
-
-    // Check if problems updated
+    // Check if problems updated (Playwright auto-waits for the count)
     const problems = page.locator('.problem-item');
     await expect(problems).toHaveCount(5);
   });
@@ -65,13 +62,11 @@ test.describe('MathGenie Basic Functionality', () => {
     // Wait for language selector to be available
     await page.waitForSelector('#language-select', { timeout: 10000 });
 
-    // Switch to Chinese
+    // Switch to Chinese and verify language selector updated
     await page.selectOption('#language-select', 'zh');
+    await expect(page.locator('#language-select')).toHaveValue('zh');
 
-    // Wait for translation to load
-    await page.waitForTimeout(2000);
-
-    // Check if UI is translated (assuming Chinese translations exist)
+    // Check if UI is still functional after language change
     const title = await page.locator('h1').textContent();
     expect(title).toBeTruthy();
   });
@@ -85,10 +80,7 @@ test.describe('MathGenie Basic Functionality', () => {
     // The input should show the optimistic value immediately
     await expect(page.locator('#numProblems')).toHaveValue('10');
 
-    // Wait for the transition to complete
-    await page.waitForTimeout(500);
-
-    // Check if problems updated
+    // Check if problems updated (Playwright auto-waits)
     const problems = page.locator('.problem-item');
     await expect(problems).toHaveCount(10);
   });
@@ -96,12 +88,6 @@ test.describe('MathGenie Basic Functionality', () => {
   test('should show loading states during transitions', async ({ page }: { page: Page }) => {
     // Change settings that trigger transitions
     await page.selectOption('#operations', ['+', '-', '*']);
-
-    // Should show some form of loading/pending state
-    await page.waitForTimeout(100);
-
-    // Wait for transition to complete
-    await page.waitForTimeout(1000);
 
     // Verify the change took effect
     const selectedOptions = await page.locator('#operations option:checked').count();
@@ -133,16 +119,12 @@ test.describe('MathGenie Basic Functionality', () => {
     // Rapidly change settings
     for (let i = 5; i <= 15; i += 5) {
       await page.fill('#numProblems', i.toString());
-      await page.waitForTimeout(50); // Quick changes
     }
-
-    // Wait for all updates to settle
-    await page.waitForTimeout(2000);
 
     // Final value should be applied
     await expect(page.locator('#numProblems')).toHaveValue('15');
 
-    // Problems should be generated
+    // Problems should be generated (Playwright auto-waits)
     const problems = page.locator('.problem-item');
     await expect(problems).toHaveCount(15);
   });

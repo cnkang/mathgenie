@@ -108,10 +108,10 @@ const QuizResults: React.FC<Props> = ({
         </div>
 
         <div className="results-actions">
-          <button onClick={onExitQuiz} className="exit-quiz-btn">
+          <button type="button" onClick={onExitQuiz} className="exit-quiz-btn">
             {t("quiz.backToPractice")}
           </button>
-          <button onClick={onRetry} className="retry-quiz-btn">
+          <button type="button" onClick={onRetry} className="retry-quiz-btn">
             {t("quiz.retry")}
           </button>
         </div>

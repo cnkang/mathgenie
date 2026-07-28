@@ -40,9 +40,6 @@ test.describe('WebKit (Safari) Specific Tests', () => {
       // Verify the preset was applied
       const expectedValues = ['15', '20', '25', '30'];
       await expect(page.locator('#numProblems')).toHaveValue(expectedValues[i], { timeout: 8000 });
-
-      // Wait a bit between preset changes for WebKit
-      await page.waitForTimeout(200);
     }
   });
 
@@ -102,11 +99,11 @@ test.describe('WebKit (Safari) Specific Tests', () => {
   test('should handle scrolling and viewport changes', async ({ page }: { page: Page }) => {
     // Test scrolling behavior in WebKit
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await page.waitForTimeout(500);
+    await expect(page.locator('body')).toBeVisible();
 
     // Scroll back to top
     await page.evaluate(() => window.scrollTo(0, 0));
-    await page.waitForTimeout(500);
+    await expect(page.locator('body')).toBeVisible();
 
     // Ensure presets are still functional after scrolling
     await waitForPresetsLoad(page);

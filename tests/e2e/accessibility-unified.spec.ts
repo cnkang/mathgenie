@@ -325,7 +325,7 @@ const applyThemeAndReload = async (page: Page, theme: Theme): Promise<void> => {
   await page.emulateMedia({ colorScheme: theme });
   await page.goto('/');
   await waitForAppLoad(page);
-  await page.waitForTimeout(300);
+  await expect(page.locator('h1')).toBeVisible();
 };
 
 test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
@@ -368,7 +368,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
       await expandAdvancedSettings(page);
       await page.check('#allowNegative');
       await page.click('.generate-card');
-      await page.waitForTimeout(1000);
+      await expect(page.locator('.problem-item').first()).toBeVisible({ timeout: 10000 });
 
       const accessibilityScanResults = await new AxeBuilder({ page })
         .withTags(['wcag2a', 'wcag2aa', 'wcag2aaa', 'wcag22aa', 'wcag22aaa'])
@@ -422,7 +422,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
 
         // Wait for the page to fully load with a more reasonable timeout
         await page.waitForLoadState('networkidle');
-        await page.waitForTimeout(1000); // Reduced from 4000ms total
+        await expect(page.locator('h1')).toBeVisible();
 
         // Use a more efficient batch approach to check touch targets
         const touchTargetResults = await page.evaluate(() => {
@@ -575,7 +575,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
 
         // Clear error for next theme
         await page.fill('#numProblems', '20');
-        await page.waitForTimeout(500);
+        await expect(page.locator('#numProblems')).toHaveValue('20');
       }
     });
 
@@ -622,7 +622,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
       // Wait for the app to fully load and dismiss any messages
       await page.waitForSelector('#numProblems', { timeout: 10000 });
       await page.waitForSelector('.generate-card', { timeout: 10000 });
-      await page.waitForTimeout(2000);
+      await expect(page.locator('#numProblems')).toBeVisible();
 
       // Dismiss any error/success messages that might be blocking elements
       // Use a more robust approach that handles element instability
@@ -635,7 +635,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
             // Wait for the button to be stable before clicking
             await button.waitFor({ state: 'visible', timeout: 2000 });
             await button.click({ timeout: 3000, force: true });
-            await page.waitForTimeout(300);
+            await expect(button).toBeHidden({ timeout: 5000 });
           } catch (e) {
             // Button might have auto-dismissed or be transiently unclickable.
             console.debug('Dismiss button skip:', e);
@@ -646,8 +646,6 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
         // No dismiss buttons found or they disappeared.
         console.debug('Dismiss button query failed:', e);
       }
-
-      await page.waitForTimeout(500);
 
       // Ensure page has focus before tabbing
       await page.locator('body').click({ position: { x: 1, y: 1 } });
@@ -680,7 +678,6 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
       for (let i = 0; i < 20 && currentElement; i++) {
         focusableElements.push(currentElement);
         await page.keyboard.press('Tab');
-        await page.waitForTimeout(100); // Small delay to ensure focus has moved
 
         const nextElement = await page.evaluate(() => {
           const active = document.activeElement;
@@ -729,7 +726,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
 
     test('should support keyboard interaction with buttons', async ({ page }: { page: Page }) => {
       // Wait for the page to fully load
-      await page.waitForTimeout(3000);
+      await page.waitForSelector('.generate-card', { timeout: 10000 });
 
       // Try multiple selectors to find the generate button
       const generateButton = page.locator('button:has-text("Generate Problems")').first();
@@ -737,7 +734,6 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
 
       await generateButton.focus();
       await page.keyboard.press('Enter');
-      await page.waitForTimeout(2000);
 
       const problems = page.locator('.problem-item');
       await expect(problems.first()).toBeVisible();
@@ -842,13 +838,12 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
   test.describe('Accessibility Preferences', () => {
     test('should support reduced motion preferences', async ({ page }: { page: Page }) => {
       await page.emulateMedia({ reducedMotion: 'reduce' });
-      await page.waitForTimeout(1000);
+      await expect(page.locator('#numProblems')).toBeVisible();
 
       await page.fill('#numProblems', '8');
       await expect(page.locator('#numProblems')).toHaveValue('8');
 
       await page.click('.generate-card');
-      await page.waitForTimeout(2000);
 
       const problems = page.locator('.problem-item');
       await expect(problems.first()).toBeVisible();
@@ -867,8 +862,6 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
         reducedMotion: 'reduce',
       });
 
-      await page.waitForTimeout(1000);
-
       await expect(page.locator('h1')).toBeVisible();
       await expect(page.locator('#operations')).toBeVisible();
       await expect(page.locator('#numProblems')).toBeVisible();
@@ -879,7 +872,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
 
     test('should not rely solely on color for information', async ({ page }: { page: Page }) => {
       await page.click('.generate-card');
-      await page.waitForTimeout(2000);
+      await expect(page.locator('.problem-item').first()).toBeVisible({ timeout: 10000 });
 
       await createValidationError(page, 'count');
       await waitForErrorMessage(page);
@@ -918,8 +911,6 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
         } else if (type === 'operations') {
           await page.locator('#operations').selectOption(['+', '-']);
         }
-
-        await page.waitForTimeout(500);
       }
     });
 

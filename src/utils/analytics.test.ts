@@ -66,13 +66,13 @@ describe("Analytics Utils", () => {
     });
 
     test("should handle various property types", () => {
-      trackEvent("test-event", {
-        string: "value",
-        number: 42,
-        boolean: true,
-      });
-
-      // Should not throw error
+      expect(() =>
+        trackEvent("test-event", {
+          string: "value",
+          number: 42,
+          boolean: true,
+        }),
+      ).not.toThrow();
       expect(true).toBe(true);
     });
 

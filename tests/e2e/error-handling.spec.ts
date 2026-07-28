@@ -198,9 +198,9 @@ test.describe('Error Handling and Validation', () => {
     // Wait for error message to appear
     await expect(page.locator('.error-message')).toBeVisible({ timeout: 5000 });
 
-    // Change language
+    // Change language and wait for UI to update
     await page.selectOption('#language-select', 'zh');
-    await page.waitForTimeout(2000);
+    await expect(page.locator('#language-select')).toHaveValue('zh');
 
     // Error message should still be visible (possibly in different language)
     await expect(page.locator('.error-message')).toBeVisible({ timeout: 5000 });

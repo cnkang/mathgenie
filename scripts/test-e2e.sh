@@ -83,7 +83,7 @@ check_dependencies() {
 # Downloads and installs Chromium, Firefox, and WebKit browsers for testing
 install_browsers() {
     print_status "Installing Playwright browsers..."
-    npx playwright install
+    pnpm exec --ignore-scripts playwright install
     print_success "Playwright browsers installed."
     return 0
 }
@@ -162,43 +162,43 @@ run_mobile_tests() {
     
     case $device_type in
         "all")
-            MOBILE_TESTS=true npx playwright test --config=$config
+            MOBILE_TESTS=true pnpm exec --ignore-scripts playwright test --config=$config
             ;;
         "iphone")
-            MOBILE_TESTS=true npx playwright test --config=$config --grep="iPhone"
+            MOBILE_TESTS=true pnpm exec --ignore-scripts playwright test --config=$config --grep="iPhone"
             ;;
         "iphone16")
-            MOBILE_TESTS=true npx playwright test --config=$config --grep="iPhone 16"
+            MOBILE_TESTS=true pnpm exec --ignore-scripts playwright test --config=$config --grep="iPhone 16"
             ;;
         "iphone15")
-            MOBILE_TESTS=true npx playwright test --config=$config --grep="iPhone 15"
+            MOBILE_TESTS=true pnpm exec --ignore-scripts playwright test --config=$config --grep="iPhone 15"
             ;;
         "ipad")
-            MOBILE_TESTS=true npx playwright test --config=$config --grep="iPad"
+            MOBILE_TESTS=true pnpm exec --ignore-scripts playwright test --config=$config --grep="iPad"
             ;;
         "android")
-            MOBILE_TESTS=true npx playwright test --config=$config --grep="Galaxy|Pixel|OnePlus"
+            MOBILE_TESTS=true pnpm exec --ignore-scripts playwright test --config=$config --grep="Galaxy|Pixel|OnePlus"
             ;;
         "android-phones")
-            MOBILE_TESTS=true npx playwright test --config=$config --grep="Galaxy S24|Pixel 8|OnePlus 12"
+            MOBILE_TESTS=true pnpm exec --ignore-scripts playwright test --config=$config --grep="Galaxy S24|Pixel 8|OnePlus 12"
             ;;
         "android-tablets")
-            MOBILE_TESTS=true npx playwright test --config=$config --grep="Galaxy Tab|Pixel Tablet"
+            MOBILE_TESTS=true pnpm exec --ignore-scripts playwright test --config=$config --grep="Galaxy Tab|Pixel Tablet"
             ;;
         "galaxy")
-            MOBILE_TESTS=true npx playwright test --config=$config --grep="Galaxy"
+            MOBILE_TESTS=true pnpm exec --ignore-scripts playwright test --config=$config --grep="Galaxy"
             ;;
         "pixel")
-            MOBILE_TESTS=true npx playwright test --config=$config --grep="Pixel"
+            MOBILE_TESTS=true pnpm exec --ignore-scripts playwright test --config=$config --grep="Pixel"
             ;;
         "portrait")
-            MOBILE_TESTS=true npx playwright test --config=$config --grep="Portrait"
+            MOBILE_TESTS=true pnpm exec --ignore-scripts playwright test --config=$config --grep="Portrait"
             ;;
         "landscape")
-            MOBILE_TESTS=true npx playwright test --config=$config --grep="Landscape"
+            MOBILE_TESTS=true pnpm exec --ignore-scripts playwright test --config=$config --grep="Landscape"
             ;;
         "latest")
-            MOBILE_TESTS=true npx playwright test --config=$config --grep="iPhone 16|iPhone 15 Pro Max|Galaxy S24|Pixel 8"
+            MOBILE_TESTS=true pnpm exec --ignore-scripts playwright test --config=$config --grep="iPhone 16|iPhone 15 Pro Max|Galaxy S24|Pixel 8"
             ;;
         *)
             print_error "Unknown mobile device type: $device_type"
@@ -222,37 +222,37 @@ run_test_suite() {
     
     case $suite in
         "error-handling")
-            npx playwright test tests/e2e/error-handling.spec.ts --project=$browser
+            pnpm exec --ignore-scripts playwright test tests/e2e/error-handling.spec.ts --project=$browser
             ;;
         "localstorage")
-            npx playwright test tests/e2e/localstorage-persistence.spec.ts --project=$browser
+            pnpm exec --ignore-scripts playwright test tests/e2e/localstorage-persistence.spec.ts --project=$browser
             ;;
         "presets")
-            npx playwright test tests/e2e/presets-functionality.spec.ts --project=$browser
+            pnpm exec --ignore-scripts playwright test tests/e2e/presets-functionality.spec.ts --project=$browser
             ;;
         "integration")
-            npx playwright test tests/e2e/integration.spec.ts --project=$browser
+            pnpm exec --ignore-scripts playwright test tests/e2e/integration.spec.ts --project=$browser
             ;;
         "accessibility")
-            npx playwright test tests/e2e/accessibility-unified.spec.ts --project=$browser
+            pnpm exec --ignore-scripts playwright test tests/e2e/accessibility-unified.spec.ts --project=$browser
             ;;
         "accessibility-comprehensive")
-            npx playwright test tests/e2e/accessibility-unified.spec.ts --project=$browser
+            pnpm exec --ignore-scripts playwright test tests/e2e/accessibility-unified.spec.ts --project=$browser
             ;;
         "accessibility-mobile")
-            npx playwright test tests/e2e/accessibility-unified.spec.ts --project=$browser
+            pnpm exec --ignore-scripts playwright test tests/e2e/accessibility-unified.spec.ts --project=$browser
             ;;
         "accessibility-themes")
-            npx playwright test tests/e2e/accessibility-unified.spec.ts --project=$browser
+            pnpm exec --ignore-scripts playwright test tests/e2e/accessibility-unified.spec.ts --project=$browser
             ;;
         "accessibility-all")
-            npx playwright test tests/e2e/accessibility-unified.spec.ts --project=$browser
+            pnpm exec --ignore-scripts playwright test tests/e2e/accessibility-unified.spec.ts --project=$browser
             ;;
         "basic")
-            npx playwright test tests/e2e/basic.spec.ts --project=$browser
+            pnpm exec --ignore-scripts playwright test tests/e2e/basic.spec.ts --project=$browser
             ;;
         "all")
-            npx playwright test tests/e2e/ --project=$browser
+            pnpm exec --ignore-scripts playwright test tests/e2e/ --project=$browser
             ;;
         *)
             print_error "Unknown test suite: $suite"
@@ -277,15 +277,15 @@ run_tests() {
     case $mode in
         "headed")
             print_status "Running tests in headed mode..."
-            npx playwright test tests/e2e/ --project=$browser --headed
+            pnpm exec --ignore-scripts playwright test tests/e2e/ --project=$browser --headed
             ;;
         "debug")
             print_status "Running tests in debug mode..."
-            npx playwright test tests/e2e/ --project=$browser --debug
+            pnpm exec --ignore-scripts playwright test tests/e2e/ --project=$browser --debug
             ;;
         "ui")
             print_status "Opening Playwright UI..."
-            npx playwright test --ui
+            pnpm exec --ignore-scripts playwright test --ui
             ;;
         "suite")
             run_test_suite $suite $browser
@@ -317,7 +317,7 @@ run_tests() {
 # Opens the Playwright HTML test report in the default browser
 generate_report() {
     print_status "Generating test report..."
-    npx playwright show-report
+    pnpm exec --ignore-scripts playwright show-report
     return 0
 }
 

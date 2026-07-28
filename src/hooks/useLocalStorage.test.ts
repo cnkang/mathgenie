@@ -144,7 +144,7 @@ describe("useLocalStorage", () => {
 
     const { result } = renderHook(() => useLocalStorage("test-key", "default"));
 
-    expect(result.current[0]).toBe(null);
+    expect(result.current[0]).toBeNull();
   });
 
   test("should handle undefined initial value", () => {
@@ -152,7 +152,7 @@ describe("useLocalStorage", () => {
 
     const { result } = renderHook(() => useLocalStorage("test-key", undefined));
 
-    expect(result.current[0]).toBe(undefined);
+    expect(result.current[0]).toBeUndefined();
   });
 
   test("should persist across re-renders", () => {

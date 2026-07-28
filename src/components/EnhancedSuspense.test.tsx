@@ -70,14 +70,12 @@ describe("EnhancedSuspense", () => {
     // Suppress console.error for this test
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
-    // In React 19.2, we need to wrap in act and handle the error differently
-    await act(async () => {
-      render(
-        <EnhancedSuspense onError={onError}>
-          <ErrorComponent />
-        </EnhancedSuspense>,
-      );
-    });
+    // In React 19.2, render() in testing-library already wraps in act
+    render(
+      <EnhancedSuspense onError={onError}>
+        <ErrorComponent />
+      </EnhancedSuspense>,
+    );
 
     // React 19.2 may handle errors synchronously in some cases
     // Wait for error boundary to catch and process the error

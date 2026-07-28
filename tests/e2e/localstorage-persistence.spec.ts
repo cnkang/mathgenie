@@ -18,10 +18,10 @@ test.describe('localStorage Persistence', () => {
   test('should persist basic settings in localStorage', async ({ page }: { page: Page }) => {
     // Change basic settings
     await page.fill('#numProblems', '25');
-    await page.waitForTimeout(500); // Wait for debounced save
+    await expect(page.locator('#numProblems')).toHaveValue('25');
 
     await page.selectOption('#operations', ['+', '-', '*']);
-    await page.waitForTimeout(500);
+    await expect(page.locator('#operations')).toHaveValues(['+', '-', '*']);
 
     // Verify settings are saved in localStorage
     const savedSettings = await page.evaluate(() => {
@@ -38,11 +38,11 @@ test.describe('localStorage Persistence', () => {
     // Change range settings
     await page.fill('#numRangeFrom', '5');
     await page.fill('#numRangeTo', '15');
-    await page.waitForTimeout(500);
+    await expect(page.locator('#numRangeFrom')).toHaveValue('5');
 
     await page.fill('#result-range-from', '0');
     await page.fill('#result-range-to', '30');
-    await page.waitForTimeout(500);
+    await expect(page.locator('#result-range-from')).toHaveValue('0');
 
     // Verify range settings are saved
     const savedSettings = await page.evaluate(() => {
@@ -59,10 +59,10 @@ test.describe('localStorage Persistence', () => {
     // Change checkbox settings
     await expandAdvancedSettings(page);
     await page.check('#allowNegative');
-    await page.waitForTimeout(500);
+    await expect(page.locator('#allowNegative')).toBeChecked();
 
     await page.check('#showAnswers');
-    await page.waitForTimeout(500);
+    await expect(page.locator('#showAnswers')).toBeChecked();
 
     // Verify checkbox settings are saved
     const savedSettings = await page.evaluate(() => {
@@ -79,13 +79,13 @@ test.describe('localStorage Persistence', () => {
     // Change PDF settings
     await expandPdfSettings(page);
     await page.fill('#fontSize', '18');
-    await page.waitForTimeout(500);
+    await expect(page.locator('#fontSize')).toHaveValue('18');
 
     await page.fill('#lineSpacing', '14');
-    await page.waitForTimeout(500);
+    await expect(page.locator('#lineSpacing')).toHaveValue('14');
 
     await page.selectOption('#paperSize', 'letter');
-    await page.waitForTimeout(500);
+    await expect(page.locator('#paperSize')).toHaveValue('letter');
 
     // Verify PDF settings are saved
     const savedSettings = await page.evaluate(() => {
@@ -108,7 +108,9 @@ test.describe('localStorage Persistence', () => {
     await expandPdfSettings(page);
     await page.fill('#fontSize', '20');
     await page.selectOption('#paperSize', 'legal');
-    await page.waitForTimeout(1000); // Wait for all saves to complete
+    // Verify all form values are set before reload
+    await expect(page.locator('#numProblems')).toHaveValue('30');
+    await expect(page.locator('#fontSize')).toHaveValue('20');
 
     // Reload the page
     await page.reload();
@@ -143,7 +145,7 @@ test.describe('localStorage Persistence', () => {
 
     // Should be able to save new settings
     await page.fill('#numProblems', '15');
-    await page.waitForTimeout(500);
+    await expect(page.locator('#numProblems')).toHaveValue('15');
 
     // Verify new settings are saved correctly
     const savedSettings = await page.evaluate(() => {
@@ -158,7 +160,7 @@ test.describe('localStorage Persistence', () => {
   test('should persist language selection', async ({ page }: { page: Page }) => {
     // Change language
     await page.selectOption('#language-select', 'zh');
-    await page.waitForTimeout(2000); // Wait for language to load
+    await expect(page.locator('#language-select')).toHaveValue('zh');
 
     // Verify language is saved
     const savedLanguage = await page.evaluate(() => {
@@ -184,7 +186,8 @@ test.describe('localStorage Persistence', () => {
     await beginnerPreset.scrollIntoViewIfNeeded();
     await beginnerPreset.click();
 
-    await page.waitForTimeout(1000); // Wait for settings to be saved
+    // Verify preset was applied
+    await expect(page.locator('#numProblems')).toHaveValue('15', { timeout: 5000 });
 
     // Verify preset settings are saved in localStorage
     const savedSettings = await page.evaluate(() => {
@@ -221,7 +224,7 @@ test.describe('localStorage Persistence', () => {
 
     // Try to save settings
     await page.fill('#numProblems', '25');
-    await page.waitForTimeout(500);
+    await expect(page.locator('#numProblems')).toHaveValue('25');
 
     // App should still function even if localStorage save fails
     await expect(page.locator('#numProblems')).toHaveValue('25');
@@ -253,7 +256,7 @@ test.describe('localStorage Persistence', () => {
     await page1.fill('#numProblems', '35');
     await expandAdvancedSettings(page1);
     await page1.check('#allowNegative');
-    await page1.waitForTimeout(1000);
+    await expect(page1.locator('#allowNegative')).toBeChecked();
 
     // Reload second tab
     await page2.reload();
@@ -275,7 +278,7 @@ test.describe('localStorage Persistence', () => {
     await page.fill('#numProblems', '40');
     await expandAdvancedSettings(page);
     await page.check('#showAnswers');
-    await page.waitForTimeout(500);
+    await expect(page.locator('#showAnswers')).toBeChecked();
 
     // Settings should still be saved locally
     const savedSettings = await page.evaluate(() => {

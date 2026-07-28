@@ -442,7 +442,7 @@ describe("SettingsPresets", () => {
     const activeButtons = buttons.filter(
       (button) => button.getAttribute("aria-pressed") === "true",
     );
-    expect(activeButtons.length).toBe(1);
+    expect(activeButtons).toHaveLength(1);
     expect(activeButtons[0]?.className).toContain("active");
     expect(screen.getAllByText("Applied").length).toBeGreaterThan(0);
   });

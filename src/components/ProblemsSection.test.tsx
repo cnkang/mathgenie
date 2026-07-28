@@ -53,7 +53,7 @@ describe.sequential("ProblemsSection", () => {
 
     expect(screen.getByRole("heading", { name: /generated problems \(2\)/i })).toBeInTheDocument();
     const items = screen.getAllByText(/=\s*$/);
-    expect(items.length).toBe(2);
+    expect(items).toHaveLength(2);
   });
 
   test("renders grouped problems when grouping is enabled", () => {

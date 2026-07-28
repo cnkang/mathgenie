@@ -171,6 +171,7 @@ const SettingsPresets: React.FC<SettingsPresetsProps> = ({ onApplyPreset, curren
           const isActive = activePresetName === preset.name;
           return (
             <button
+              type="button"
               key={preset.name}
               className={`preset-card clickable-card${isActive ? " active" : ""}`}
               onClick={() => handleApplyPreset(preset.settings, preset.name)}

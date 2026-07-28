@@ -29,7 +29,7 @@ test.describe('Integration Tests', () => {
 
     // Change to valid value
     await page.fill('#numProblems', '15');
-    await page.waitForTimeout(500);
+    await expect(page.locator('#numProblems')).toHaveValue('15');
 
     // Error should clear and settings should be saved
     await expect(page.locator('.error-message')).not.toBeVisible();
@@ -60,7 +60,6 @@ test.describe('Integration Tests', () => {
     // Apply beginner preset
     const beginnerPreset = page.locator('.settings-section .preset-card').first();
     await beginnerPreset.click();
-    await page.waitForTimeout(1000);
 
     // Verify preset is applied and saved
     await expect(page.locator('#numProblems')).toHaveValue('15');
@@ -105,16 +104,16 @@ test.describe('Integration Tests', () => {
     // Wait for error message
     await expect(page.locator('.error-message')).toBeVisible({ timeout: 5000 });
 
-    // Change language
+    // Change language and verify selection
     await page.selectOption('#language-select', 'zh');
-    await page.waitForTimeout(3000);
+    await expect(page.locator('#language-select')).toHaveValue('zh');
 
     // Error should still be visible (possibly in different language)
     await expect(page.locator('.error-message')).toBeVisible();
 
     // Fix the error
     await page.fill('#numProblems', '20');
-    await page.waitForTimeout(500);
+    await expect(page.locator('#numProblems')).toHaveValue('20');
 
     // Error should clear
     await expect(page.locator('.error-message')).not.toBeVisible();
@@ -160,7 +159,6 @@ test.describe('Integration Tests', () => {
     // Wait for preset settings to be applied first
     await expect(page.locator('#numRangeFrom')).toHaveValue('1');
     await expect(page.locator('#numRangeTo')).toHaveValue('10');
-    await page.waitForTimeout(1000);
 
     // Error should be cleared by preset application
     await expect(page.locator('.error-message')).not.toBeVisible();
@@ -184,7 +182,6 @@ test.describe('Integration Tests', () => {
     const intermediatePreset = page.locator('.preset-card:has-text("Intermediate")');
     await intermediatePreset.scrollIntoViewIfNeeded();
     await intermediatePreset.click();
-    await page.waitForTimeout(1000);
 
     // Verify preset is applied
     await expect(page.locator('#numProblems')).toHaveValue('20');
@@ -193,7 +190,7 @@ test.describe('Integration Tests', () => {
     await page.fill('#numProblems', '35');
     await expandAdvancedSettings(page);
     await page.check('#allowNegative');
-    await page.waitForTimeout(500);
+    await expect(page.locator('#allowNegative')).toBeChecked();
 
     // Step 3: Create an error
     await page.fill('#result-range-from', '100');
@@ -205,7 +202,7 @@ test.describe('Integration Tests', () => {
 
     // Step 4: Fix the error
     await page.fill('#result-range-to', '150');
-    await page.waitForTimeout(500);
+    await expect(page.locator('#result-range-to')).toHaveValue('150');
 
     // Error should clear
     await expect(page.locator('.error-message')).not.toBeVisible();
@@ -271,7 +268,6 @@ test.describe('Integration Tests', () => {
     await expect(page.locator('#numProblems')).toHaveValue('25');
     await expect(page.locator('#numRangeFrom')).toHaveValue('1');
     await expect(page.locator('#numRangeTo')).toHaveValue('100');
-    await page.waitForTimeout(1000);
 
     // All errors should be cleared
     await expect(page.locator('.error-message')).not.toBeVisible();
@@ -310,7 +306,6 @@ test.describe('Integration Tests', () => {
     const beginnerPreset1 = page1.locator('.settings-section .preset-card').first();
     await beginnerPreset1.scrollIntoViewIfNeeded();
     await beginnerPreset1.click();
-    await page1.waitForTimeout(1000);
 
     // Reload second tab
     await page2.reload();
@@ -347,9 +342,6 @@ test.describe('Integration Tests', () => {
     await page.check('#allowNegative'); // Custom change
     await expandPdfSettings(page);
     await page.fill('#fontSize', '24'); // Another custom change
-
-    // Wait for all changes to settle
-    await page.waitForTimeout(2000);
 
     // Final state should be consistent
     await expect(page.locator('#numProblems')).toHaveValue('20'); // Intermediate preset value

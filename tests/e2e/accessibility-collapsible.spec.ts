@@ -88,21 +88,17 @@ test.describe('Collapsible UI Accessibility', () => {
     // Add timeout for Firefox compatibility
     test.setTimeout(90000); // Increased timeout for Firefox compatibility (doubled from 45s)
 
-    // Tab through the interface with delays for Firefox
+    // Tab through the interface
     await page.keyboard.press('Tab'); // Language select
-    await page.waitForTimeout(100); // Small delay for Firefox
+    await expect(page.locator('#language-select')).toBeFocused();
     await page.keyboard.press('Tab'); // First preset card
-    await page.waitForTimeout(100);
     await page.keyboard.press('Tab'); // Second preset card
-    await page.waitForTimeout(100);
     await page.keyboard.press('Tab'); // Third preset card
-    await page.waitForTimeout(100);
     await page.keyboard.press('Tab'); // Fourth preset card
-    await page.waitForTimeout(100);
     await page.keyboard.press('Tab'); // Operations select
-    await page.waitForTimeout(100);
+    await expect(page.locator('#operations')).toBeFocused();
     await page.keyboard.press('Tab'); // Number of problems
-    await page.waitForTimeout(100);
+    await expect(page.locator('#numProblems')).toBeFocused();
 
     // Should be able to reach advanced settings toggle with timeout protection
     let focusedElement = await page.evaluate(() => document.activeElement?.className);
@@ -115,7 +111,6 @@ test.describe('Collapsible UI Accessibility', () => {
       tabCount < maxTabs
     ) {
       await page.keyboard.press('Tab');
-      await page.waitForTimeout(100); // Small delay for Firefox
       focusedElement = await page.evaluate(() => document.activeElement?.className);
       tabCount++;
     }

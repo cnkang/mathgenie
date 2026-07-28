@@ -140,6 +140,9 @@ describe("PerformanceMonitor", () => {
         <div>Test</div>
       </PerformanceMonitor>,
     );
+
+    // Verify component renders without errors in development with observer
+    expect(screen.getByText("Test")).toBeInTheDocument();
   });
 
   it.skip("handles memory monitoring with interval", () => {

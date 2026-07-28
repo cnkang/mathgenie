@@ -10,10 +10,10 @@ type Props = {
 
 const QuizNavigation: React.FC<Props> = ({ t, canPrev, canNext, onPrev, onNext }) => (
   <div className="quiz-navigation">
-    <button onClick={onPrev} disabled={!canPrev} className="nav-btn prev-btn">
+    <button type="button" onClick={onPrev} disabled={!canPrev} className="nav-btn prev-btn">
       {t("quiz.previousProblem")}
     </button>
-    <button onClick={onNext} disabled={!canNext} className="nav-btn next-btn">
+    <button type="button" onClick={onNext} disabled={!canNext} className="nav-btn next-btn">
       {t("quiz.nextProblem")}
     </button>
   </div>

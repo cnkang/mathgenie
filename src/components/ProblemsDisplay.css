@@ -221,8 +221,7 @@
   font-weight: 600;
   color: var(--text-primary, #1e293b);
   text-align: center;
-  word-break: break-word;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   cursor: default;
   user-select: text;
   background: var(--bg-secondary, #f8fafc);

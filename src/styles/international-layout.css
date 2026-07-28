@@ -161,7 +161,6 @@ html[lang="es"] .action-card-content {
   hyphens: auto;
   white-space: normal;
   max-width: 100%;
-  word-break: break-word; /* Fallback */
   overflow-wrap: anywhere;
 }
 

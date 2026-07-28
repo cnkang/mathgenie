@@ -53,7 +53,7 @@ done
 
 echo ""
 echo "🧪 Running installation verification:"
-if pnpm exec playwright install --dry-run chromium firefox webkit; then
+if pnpm exec --ignore-scripts playwright install --dry-run chromium firefox webkit; then
     echo "✅ All browsers are properly installed and ready"
 else
     echo "❌ Browser installation verification failed"
@@ -61,7 +61,7 @@ else
     pnpm playwright:install:ci
     
     echo "🔍 Re-running verification..."
-    if pnpm exec playwright install --dry-run chromium firefox webkit; then
+    if pnpm exec --ignore-scripts playwright install --dry-run chromium firefox webkit; then
         echo "✅ Reinstallation successful"
     else
         echo "❌ Reinstallation failed - manual intervention required"

@@ -131,6 +131,7 @@ const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onImportSet
       <h3>{t("settings.manager.title") || "Settings Manager"}</h3>
       <div className="settings-actions">
         <button
+          type="button"
           onClick={exportSettings}
           className="export-button"
           aria-label={t("settings.manager.exportLabel") || "Export current settings"}
@@ -142,6 +143,7 @@ const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onImportSet
         </button>
 
         <button
+          type="button"
           onClick={() => {
             clearImportError();
             fileInputRef.current?.click();

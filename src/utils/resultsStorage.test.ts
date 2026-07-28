@@ -18,7 +18,7 @@ describe.sequential("resultsStorage", () => {
       throw new Error("Expected quiz results in localStorage");
     }
     const arr = JSON.parse(raw);
-    expect(arr.length).toBe(20);
+    expect(arr).toHaveLength(20);
     // Oldest trimmed, so first element should have score 5
     expect(arr[0].score).toBe(5);
   });
