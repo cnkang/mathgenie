@@ -22,7 +22,7 @@
   color: var(--text-primary);
 }
 
-/* WCAG来解决2.2 AAA + Apple-style action card */
+/* WCAG 2.2 AAA + Apple-style action card */
 .action-card {
   position: relative;
   z-index: 11;
@@ -460,5 +460,26 @@ button.action-card:active {
   .action-icon,
   .action-arrow {
     color: buttontext;
+  }
+
+  .action-card:disabled {
+    background: canvas;
+    border-color: graytext;
+  }
+
+  .action-card:disabled .action-indicator {
+    background: canvas;
+    border-color: graytext;
+  }
+
+  .action-card:disabled .action-arrow {
+    color: graytext;
+  }
+
+  .action-card:disabled .action-icon,
+  .action-card:disabled .action-text h3,
+  .action-card:disabled .action-text p {
+    color: graytext;
+    opacity: 1;
   }
 }
