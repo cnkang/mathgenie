@@ -146,8 +146,10 @@
     --bg-tertiary: #e8e8e8;
     --bg-accent: #ebebeb;
   }
+}
 
-  @media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark) {
+  @media (prefers-reduced-transparency: reduce) {
     :root {
       --bg-primary: #0b1220;
       --bg-secondary: #111a2b;
