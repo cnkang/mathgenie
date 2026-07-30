@@ -145,6 +145,13 @@
     --bg-secondary: #f5f5f5;
     --bg-tertiary: #e8e8e8;
     --bg-accent: #ebebeb;
+    --primary-light: #bfdbfe;
+    --success-light: #bbf7d0;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 10%);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 15%), 0 2px 4px -2px rgb(0 0 0 / 15%);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 15%), 0 4px 6px -4px rgb(0 0 0 / 15%);
+    --shadow-lift: 0 8px 24px -8px rgb(0 0 0 / 20%), 0 2px 8px -4px rgb(0 0 0 / 12%);
+    --shadow-pressed: 0 1px 1px 0 rgb(0 0 0 / 10%), 0 1px 2px -1px rgb(0 0 0 / 8%);
   }
 }
 
@@ -155,6 +162,13 @@
       --bg-secondary: #111a2b;
       --bg-tertiary: #17243a;
       --bg-accent: #1c2f4a;
+      --primary-light: rgb(147 197 253 / 40%);
+      --success-light: rgb(74 222 128 / 40%);
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 40%);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 50%), 0 2px 4px -1px rgb(0 0 0 / 40%);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 60%), 0 4px 6px -2px rgb(0 0 0 / 50%);
+      --shadow-lift: 0 8px 24px -8px rgb(0 0 0 / 65%), 0 2px 8px -4px rgb(0 0 0 / 55%);
+      --shadow-pressed: 0 1px 1px 0 rgb(0 0 0 / 30%);
     }
   }
 }

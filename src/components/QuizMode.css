@@ -513,7 +513,8 @@
   transition:
     background-color var(--transition-spring),
     border-color var(--transition-spring),
-    transform var(--transition-spring);
+    transform var(--transition-spring),
+    box-shadow var(--transition-spring);
 }
 
 .problem-review.correct {
