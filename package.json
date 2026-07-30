@@ -10,7 +10,7 @@
   "pnpm": {
     "overrides": {
       "glob": "^11.0.3",
-      "js-yaml": "^4.1.1",
+      "js-yaml": "^4.3.0",
       "rimraf": "^6.0.1",
       "chrome-launcher": "^1.2.0",
       "tmp": "^0.2.5",
@@ -20,7 +20,7 @@
       "@babel/plugin-proposal-private-methods": "npm:@babel/plugin-transform-private-methods@^7.27.1",
       "express": "^5.2.0",
       "picomatch@>=4.0.0 <4.0.4": "4.0.4",
-      "svgo": "^4.0.1",
+      "svgo": "^4.0.2",
       "uuid": "^14.0.0",
       "esbuild": "0.28.1"
     }
