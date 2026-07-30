@@ -437,10 +437,6 @@ button.action-card:active {
     box-shadow: none;
   }
 
-  .action-card::before {
-    display: none;
-  }
-
   .action-card:hover,
   .action-card:focus,
   .action-card:focus-visible {

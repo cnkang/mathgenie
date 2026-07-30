@@ -578,17 +578,6 @@
     background: #b91c1c;
   }
 
-  .exit-quiz-btn {
-    color: var(--text-primary);
-    background: var(--bg-secondary);
-    border-color: var(--border-color);
-  }
-
-  .exit-quiz-btn:hover {
-    background: var(--bg-tertiary);
-    border-color: var(--border-hover);
-  }
-
   .interactive-problem.correct {
     background: linear-gradient(135deg, #052e16, #14532d);
     border-color: var(--success-color);
