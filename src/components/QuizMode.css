@@ -1,4 +1,4 @@
-/* Quiz Mode Styles */
+/* Quiz Mode Styles - Apple-style fluid transitions */
 .quiz-mode {
   max-width: 800px;
   padding: var(--space-xl);
@@ -32,11 +32,12 @@
   border-radius: var(--radius-sm);
 }
 
+/* Apple-style momentum fill: slight overshoot reads as "arrived" */
 .progress-fill {
   height: 100%;
   background: linear-gradient(90deg, var(--success-color), var(--primary-color));
   border-radius: var(--radius-sm);
-  transition: width var(--transition-normal);
+  transition: width var(--transition-spring);
 }
 
 .progress-text {
@@ -64,8 +65,6 @@
 
 .exit-quiz-btn-small {
   min-width: 44px;
-
-  /* WCAG 2.2 AAA: Minimum 44px touch target */
   min-height: 44px;
   padding: var(--space-md) var(--space-lg);
   font-size: var(--font-size-sm);
@@ -74,12 +73,22 @@
   background: var(--error-color);
   border: none;
   border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
+  transition:
+    transform var(--transition-fast),
+    background-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .exit-quiz-btn-small:hover {
   background: #dc2626;
   transform: translateY(-1px);
+  box-shadow: var(--shadow-lift);
+}
+
+.exit-quiz-btn-small:active {
+  transform: scale(0.97);
+  box-shadow: var(--shadow-pressed);
+  transition: transform var(--transition-press), box-shadow var(--transition-press);
 }
 
 .quiz-content {
@@ -90,6 +99,7 @@
   margin-bottom: var(--space-lg);
   font-size: var(--font-size-xl);
   color: var(--primary-color);
+  letter-spacing: -0.01em;
 }
 
 .quiz-navigation {
@@ -103,8 +113,6 @@
   flex: 1;
   min-width: 44px;
   max-width: 150px;
-
-  /* WCAG 2.2 AAA: Minimum 44px touch target */
   min-height: 44px;
   padding: var(--space-md) var(--space-lg);
   font-size: var(--font-size-base);
@@ -113,19 +121,31 @@
   background: var(--bg-secondary);
   border: 2px solid var(--border-color);
   border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
+  transition:
+    transform var(--transition-spring),
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .nav-btn:hover:not(:disabled) {
   background: var(--primary-light);
   border-color: var(--primary-color);
   transform: translateY(-1px);
+  box-shadow: var(--shadow-lift);
+}
+
+.nav-btn:active:not(:disabled) {
+  transform: scale(0.97);
+  box-shadow: var(--shadow-pressed);
+  transition: transform var(--transition-press), box-shadow var(--transition-press);
 }
 
 .nav-btn:disabled {
   cursor: not-allowed;
   opacity: 0.5;
   transform: none;
+  box-shadow: none;
 }
 
 /* Interactive Problem Styles */
@@ -135,17 +155,35 @@
   background: var(--bg-secondary);
   border: 2px solid var(--border-color);
   border-radius: var(--radius-lg);
-  transition: all var(--transition-fast);
+  transition:
+    background-color var(--transition-spring),
+    border-color var(--transition-spring),
+    box-shadow var(--transition-spring),
+    transform var(--transition-spring);
 }
 
 .interactive-problem.correct {
   background: linear-gradient(135deg, #f0fdf4, #dcfce7);
   border-color: var(--success-color);
+  box-shadow: 0 0 0 3px rgb(74 222 128 / 15%), var(--shadow-md);
+  transform: scale(1.01);
+  transition:
+    background-color var(--transition-spring),
+    border-color var(--transition-spring),
+    box-shadow var(--transition-spring),
+    transform var(--transition-spring);
 }
 
 .interactive-problem.incorrect {
   background: linear-gradient(135deg, #fef2f2, #fee2e2);
   border-color: var(--error-color);
+  box-shadow: 0 0 0 3px rgb(239 68 68 / 15%), var(--shadow-md);
+  transform: scale(0.99);
+  transition:
+    background-color var(--transition-spring),
+    border-color var(--transition-spring),
+    box-shadow var(--transition-spring),
+    transform var(--transition-spring);
 }
 
 .problem-expression {
@@ -178,7 +216,9 @@
   background: var(--bg-primary);
   border: 2px solid var(--border-color);
   border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .answer-input:focus {
@@ -194,8 +234,6 @@
 
 .submit-answer-btn {
   min-width: 44px;
-
-  /* WCAG 2.2 AAA: Minimum 44px touch target */
   min-height: 44px;
   padding: var(--space-md) var(--space-lg);
   font-size: var(--font-size-base);
@@ -205,18 +243,29 @@
   background: var(--primary-color);
   border: none;
   border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
+  transition:
+    transform var(--transition-spring),
+    background-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .submit-answer-btn:hover:not(:disabled) {
   background: var(--primary-hover);
   transform: translateY(-1px);
+  box-shadow: var(--shadow-lift);
+}
+
+.submit-answer-btn:active:not(:disabled) {
+  transform: scale(0.97);
+  box-shadow: var(--shadow-pressed);
+  transition: transform var(--transition-press), box-shadow var(--transition-press);
 }
 
 .submit-answer-btn:disabled {
   cursor: not-allowed;
   background: var(--text-muted);
   transform: none;
+  box-shadow: none;
 }
 
 .answer-result {
@@ -262,6 +311,7 @@
   margin-bottom: var(--space-lg);
   font-size: var(--font-size-3xl);
   color: var(--primary-color);
+  letter-spacing: -0.02em;
 }
 
 .results-summary {
@@ -320,12 +370,20 @@
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
+  transition:
+    transform var(--transition-spring),
+    box-shadow var(--transition-fast);
 }
 
 .stat-item:hover {
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-lift);
   transform: translateY(-2px);
+}
+
+.stat-item:active {
+  transform: scale(0.97);
+  box-shadow: var(--shadow-pressed);
+  transition: transform var(--transition-press), box-shadow var(--transition-press);
 }
 
 .stat-icon {
@@ -375,8 +433,6 @@
 .exit-quiz-btn,
 .retry-quiz-btn {
   min-width: 140px;
-
-  /* WCAG 2.2 AAA: Minimum 44px touch target */
   min-height: 44px;
   padding: var(--space-md) var(--space-xl);
   font-size: var(--font-size-base);
@@ -384,7 +440,10 @@
   cursor: pointer;
   border: none;
   border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
+  transition:
+    transform var(--transition-spring),
+    background-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .exit-quiz-btn {
@@ -397,6 +456,13 @@
   background: var(--bg-tertiary);
   border-color: var(--border-hover);
   transform: translateY(-1px);
+  box-shadow: var(--shadow-lift);
+}
+
+.exit-quiz-btn:active {
+  transform: scale(0.97);
+  box-shadow: var(--shadow-pressed);
+  transition: transform var(--transition-press), box-shadow var(--transition-press);
 }
 
 .retry-quiz-btn {
@@ -407,6 +473,13 @@
 .retry-quiz-btn:hover {
   background: var(--primary-hover);
   transform: translateY(-1px);
+  box-shadow: var(--shadow-lift);
+}
+
+.retry-quiz-btn:active {
+  transform: scale(0.97);
+  box-shadow: var(--shadow-pressed);
+  transition: transform var(--transition-press), box-shadow var(--transition-press);
 }
 
 .detailed-results {
@@ -437,16 +510,22 @@
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
+  transition:
+    background-color var(--transition-spring),
+    border-color var(--transition-spring),
+    transform var(--transition-spring);
 }
 
 .problem-review.correct {
   background: linear-gradient(135deg, #f0fdf4, #dcfce7);
   border-color: var(--success-color);
+  box-shadow: 0 0 0 2px rgb(74 222 128 / 12%);
 }
 
 .problem-review.incorrect {
   background: linear-gradient(135deg, #fef2f2, #fee2e2);
   border-color: var(--error-color);
+  box-shadow: 0 0 0 2px rgb(239 68 68 / 12%);
 }
 
 .problem-number {
@@ -482,7 +561,6 @@
 
 /* Dark mode support - WCAG 2.2 AAA compliant */
 @media (prefers-color-scheme: dark) {
-  /* All buttons in dark theme - WCAG AA compliant */
   .submit-answer-btn,
   .retry-quiz-btn,
   .exit-quiz-btn-small {
@@ -498,64 +576,43 @@
   .exit-quiz-btn-small:hover {
     background: #b91c1c;
   }
-}
 
-/* Responsive Design */
-@media (width <= 768px) {
-  .quiz-header {
-    flex-direction: column;
-    gap: var(--space-md);
-    align-items: stretch;
+  .exit-quiz-btn {
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
   }
 
-  .quiz-progress {
-    margin-right: 0;
+  .exit-quiz-btn:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--border-hover);
   }
 
-  .results-summary {
-    flex-direction: column;
-    gap: var(--space-md);
+  .interactive-problem.correct {
+    background: linear-gradient(135deg, #052e16, #14532d);
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 3px rgb(74 222 128 / 18%), var(--shadow-md);
   }
 
-  .score-number {
-    font-size: 3rem;
+  .interactive-problem.incorrect {
+    background: linear-gradient(135deg, #450a0a, #7f1d1d);
+    border-color: var(--error-color);
+    box-shadow: 0 0 0 3px rgb(239 68 68 / 18%), var(--shadow-md);
   }
 
-  .result-stats {
-    grid-template-columns: repeat(2, 1fr);
+  .problem-review.correct {
+    background: linear-gradient(135deg, #052e16, #14532d);
+    border-color: var(--success-color);
+    color: #f8fafc;
   }
 
-  .results-actions {
-    flex-direction: column;
+  .problem-review.incorrect {
+    background: linear-gradient(135deg, #450a0a, #7f1d1d);
+    border-color: var(--error-color);
+    color: #f8fafc;
   }
 
-  .answer-input-group {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .answer-input {
-    width: 100%;
-    max-width: 200px;
-    margin: 0 auto;
-  }
-
-  .quiz-navigation {
-    flex-direction: column;
-  }
-
-  .nav-btn {
-    max-width: none;
-  }
-
-  .problem-review {
-    grid-template-columns: 1fr;
-    gap: var(--space-xs);
-    text-align: center;
-  }
-
-  .problem-number,
-  .user-answer {
-    text-align: center;
+  .feedback-section {
+    background: var(--bg-accent);
   }
 }

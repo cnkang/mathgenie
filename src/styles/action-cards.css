@@ -1,24 +1,17 @@
 /* ===== ACTION CARDS - WCAG 2.2 AAA OPTIMIZED ===== */
 
-/* Large, card-based action buttons following modern design principles */
+/* Large, card-based action buttons following Apple-style fluid interaction */
 
 .action-cards-grid {
-  /* Fix positioning and prevent overlap - higher than preset cards */
   position: relative;
   z-index: 10;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-
-  /* Ensure proper grid behavior */
   grid-auto-rows: min-content;
   gap: var(--space-lg);
   width: 100%;
   margin: var(--space-xl) 0;
-
-  /* Prevent button overlap on mobile */
   contain: layout style;
-
-  /* Create new stacking context */
   isolation: isolate;
 }
 
@@ -29,30 +22,20 @@
   color: var(--text-primary);
 }
 
-/* WCAG 2.2 AAA: Large clickable action cards */
+/* WCAG来解决2.2 AAA + Apple-style action card */
 .action-card {
   position: relative;
-
-  /* Fix stacking and prevent overlap - higher than preset cards */
   z-index: 11;
   box-sizing: border-box;
   display: flex;
   align-items: stretch;
-
-  /* Ensure proper sizing */
   width: 100%;
   min-width: 320px;
-
-  /* WCAG 2.2 AAA: Large touch targets */
-  min-height: 140px; /* Increase minimum height to accommodate longer text */
+  min-height: 140px;
   padding: 0;
-
-  /* Ensure buttons don't overlap */
   margin-bottom: var(--space-sm);
-
-  /* Prevent content overflow and button overlap */
   contain: layout style;
-  overflow: visible; /* Allow content to display naturally */
+  overflow: visible;
   font-family: inherit;
   font-size: inherit;
   text-align: left;
@@ -61,7 +44,11 @@
   border: 2px solid var(--border-color);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
-  transition: all var(--transition-fast);
+  transition:
+    transform var(--transition-spring),
+    box-shadow var(--transition-fast),
+    background-color var(--transition-fast),
+    border-color var(--transition-fast);
 }
 
 button.action-card,
@@ -77,8 +64,6 @@ button.action-card:active {
   gap: var(--space-md);
   align-items: center;
   width: 100%;
-
-  /* 确保内容有足够的空间 */
   min-height: 100px;
   padding: var(--space-lg);
 }
@@ -88,7 +73,9 @@ button.action-card:active {
   flex-shrink: 0;
   color: var(--primary-color);
   opacity: 0.9;
-  transition: all var(--transition-fast);
+  transition:
+    transform var(--transition-spring),
+    opacity var(--transition-fast);
 }
 
 .action-icon svg {
@@ -98,10 +85,8 @@ button.action-card:active {
 
 .action-text {
   flex-grow: 1;
-  min-width: 0; /* Allow text to shrink */
-  overflow: visible; /* 允许文本自然显示 */
-
-  /* 确保文本可以正常换行 */
+  min-width: 0;
+  overflow: visible;
   overflow-wrap: break-word;
 }
 
@@ -110,11 +95,9 @@ button.action-card:active {
   margin: 0 0 var(--space-xs) 0;
   font-size: var(--font-size-lg);
   font-weight: 600;
-  line-height: 1.3; /* 增加行高以提高可读性 */
+  line-height: 1.3;
   color: var(--text-primary);
   overflow-wrap: break-word;
-
-  /* 确保长文本可以正常显示 */
   white-space: normal;
 }
 
@@ -126,11 +109,9 @@ button.action-card:active {
   max-width: 100%;
   margin: 0;
   font-size: var(--font-size-sm);
-  line-height: 1.5; /* 增加行高以提高可读性 */
+  line-height: 1.5;
   color: var(--text-secondary);
   overflow-wrap: break-word;
-
-  /* 确保长文本可以正常显示 */
   white-space: normal;
   opacity: 0.8;
 }
@@ -145,7 +126,10 @@ button.action-card:active {
   background: rgb(79 70 229 / 10%);
   border: 1px solid rgb(79 70 229 / 20%);
   border-radius: 50%;
-  transition: all var(--transition-fast);
+  transition:
+    transform var(--transition-spring),
+    background-color var(--transition-fast),
+    border-color var(--transition-fast);
 }
 
 .action-arrow {
@@ -153,32 +137,20 @@ button.action-card:active {
   align-items: center;
   justify-content: center;
   color: var(--primary-color);
-  transition: all var(--transition-fast);
+  transition: transform var(--transition-spring);
 }
 
-/* Hover and focus effects */
-.action-card::before {
-  position: absolute;
-  top: 0;
-  left: -100%;
-  z-index: 1;
-  width: 100%;
-  height: 100%;
-  content: "";
-  pointer-events: none;
-  background: linear-gradient(90deg, transparent, rgb(79 70 229 / 5%), transparent);
-  transition: left 0.6s ease;
-}
-
-.action-card:hover::before {
-  left: 100%;
-}
-
+/* Apple-style hover: lift + shadow + scale */
 .action-card:hover {
   background: linear-gradient(135deg, var(--bg-primary), rgb(79 70 229 / 2%));
   border-color: var(--primary-color);
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-4px);
+  box-shadow: var(--shadow-lift);
+  transform: translateY(-3px) scale(1.01);
+  transition:
+    transform var(--transition-spring),
+    box-shadow var(--transition-fast),
+    background-color var(--transition-fast),
+    border-color var(--transition-fast);
 }
 
 .action-card:hover .action-icon {
@@ -200,9 +172,11 @@ button.action-card:active {
   transform: translateX(4px);
 }
 
+/* Apple-style press: immediate scale-down */
 .action-card:active {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  transform: scale(0.97);
+  box-shadow: var(--shadow-pressed);
+  transition: transform var(--transition-press), box-shadow var(--transition-press);
 }
 
 /* WCAG 2.2 AAA: Enhanced focus indicator */
@@ -222,23 +196,22 @@ button.action-card:active {
 
 /* Disabled state */
 .action-card:disabled {
-  /* Ensure disabled buttons are positioned correctly */
   position: relative;
   z-index: 1;
-
-  /* Prevent disabled buttons from intercepting clicks */
   pointer-events: none;
   cursor: not-allowed;
   background: var(--bg-secondary);
   border-color: var(--border-color);
   opacity: 0.6;
   transform: none;
+  box-shadow: none;
+  transition: none;
 }
 
 .action-card:disabled:hover {
   background: var(--bg-secondary);
   border-color: var(--border-color);
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
   transform: none;
 }
 
@@ -256,7 +229,6 @@ button.action-card:active {
   color: var(--text-muted);
 }
 
-/* Specific fix for download button overlap issue */
 /* Desktop layout optimizations */
 @media (width >= 1200px) {
   .desktop-action-grid {
@@ -307,26 +279,22 @@ button.action-card:active {
 
 @media (width <= 767px) {
   .action-cards-grid {
-    /* Ensure proper grid layout on mobile */
     grid-template-columns: 1fr;
     grid-auto-rows: minmax(140px, auto);
     gap: var(--space-xl);
   }
 
   .action-card {
-    /* Ensure buttons don't overlap */
     position: relative;
     clear: both;
     min-width: 100%;
-
-    /* WCAG 2.2 AAA: Enhanced mobile touch targets */
-    min-height: 140px; /* 增加移动端最小高度 */
+    min-height: 140px;
     margin-bottom: var(--space-lg);
   }
 
   .action-card-content {
     gap: var(--space-sm);
-    min-height: 120px; /* 确保足够的内容高度 */
+    min-height: 120px;
     padding: var(--space-md);
   }
 
@@ -336,12 +304,12 @@ button.action-card:active {
 
   .action-text h3 {
     font-size: var(--font-size-base);
-    line-height: 1.4; /* 增加行高 */
+    line-height: 1.4;
   }
 
   .action-text p {
     font-size: var(--font-size-xs);
-    line-height: 1.5; /* 增加行高 */
+    line-height: 1.5;
   }
 
   .action-indicator {
@@ -356,7 +324,6 @@ button.action-card:active {
 
 @media (width <= 480px) {
   .action-cards-grid {
-    /* Force single column layout */
     grid-template-columns: 1fr;
     grid-auto-rows: minmax(160px, auto);
     gap: var(--space-xl);
@@ -364,21 +331,16 @@ button.action-card:active {
   }
 
   .action-card {
-    /* Ensure buttons don't overlap */
     position: relative;
     clear: both;
-
-    /* Add explicit positioning to prevent overlap */
     display: block;
     min-width: 100%;
-
-    /* WCAG 2.2 AAA: Extra large touch targets for small screens */
-    min-height: 160px; /* 进一步增加小屏幕的最小高度 */
+    min-height: 160px;
     margin-bottom: var(--space-xl);
   }
 
   .action-card-content {
-    min-height: 140px; /* 确保足够的内容高度 */
+    min-height: 140px;
     padding: var(--space-lg);
   }
 
@@ -388,12 +350,12 @@ button.action-card:active {
 
   .action-text h3 {
     font-size: var(--font-size-lg);
-    line-height: 1.3; /* 优化行高 */
+    line-height: 1.3;
   }
 
   .action-text p {
     font-size: var(--font-size-sm);
-    line-height: 1.6; /* 增加行高以提高可读性 */
+    line-height: 1.6;
   }
 }
 
@@ -498,36 +460,5 @@ button.action-card:active {
   .action-icon,
   .action-arrow {
     color: buttontext;
-  }
-
-  .action-indicator {
-    background: buttonface;
-    border-color: buttontext;
-  }
-
-  .action-card:hover .action-indicator {
-    background: buttonface;
-    border-color: highlight;
-    transform: none;
-  }
-
-  .action-card:disabled {
-    color: graytext;
-    background: canvas;
-    border-color: graytext;
-    opacity: 1;
-  }
-
-  .action-card:disabled .action-icon,
-  .action-card:disabled .action-text h3,
-  .action-card:disabled .action-text p,
-  .action-card:disabled .action-arrow {
-    color: graytext;
-    opacity: 1;
-  }
-
-  .action-card:disabled .action-indicator {
-    border-color: graytext;
-    background: canvas;
   }
 }
