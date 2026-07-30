@@ -84,6 +84,16 @@
 
   /* Prevent overlap */
   isolation: isolate;
+
+  /* Grid collapse animation */
+  display: grid;
+  grid-template-rows: auto 0fr;
+  transition: grid-template-rows var(--transition-spring);
+}
+
+.advanced-settings[open],
+.pdf-settings-collapsible[open] {
+  grid-template-rows: auto 1fr;
 }
 
 .advanced-settings-toggle,
@@ -154,18 +164,6 @@
 .advanced-settings summary::-webkit-details-marker,
 .pdf-settings-collapsible summary::-webkit-details-marker {
   display: none;
-}
-
-.advanced-settings,
-.pdf-settings-collapsible {
-  display: grid;
-  grid-template-rows: auto 0fr;
-  transition: grid-template-rows var(--transition-spring);
-}
-
-.advanced-settings[open],
-.pdf-settings-collapsible[open] {
-  grid-template-rows: auto 1fr;
 }
 
 .advanced-settings-content,
