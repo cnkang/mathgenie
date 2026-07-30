@@ -47,7 +47,6 @@ textarea:focus-visible {
   box-shadow: 0 0 0 3px rgb(30 58 138 / 18%);
 }
 
-/* Keep multiple-select usable with keyboard and pointer */
 select[multiple],
 .operations-select {
   min-height: 140px;
@@ -84,12 +83,18 @@ button {
 
 button:hover {
   background: var(--button-primary-hover-bg);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-lift);
   transform: translateY(-1px);
+  transition:
+    transform var(--transition-spring),
+    background-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 button:active {
-  transform: translateY(0);
+  transform: scale(0.97);
+  box-shadow: var(--shadow-pressed);
+  transition: transform var(--transition-press), box-shadow var(--transition-press);
 }
 
 button:disabled {
@@ -134,7 +139,6 @@ button:disabled:hover {
   color: var(--text-secondary);
 }
 
-/* Shared utility button classes used by legacy tests and some components */
 .generate-btn,
 .download-btn,
 .quiz-mode-btn {
@@ -181,7 +185,6 @@ small,
   color: var(--text-secondary);
 }
 
-/* Checkbox rows used in advanced settings */
 .checkbox-group {
   display: flex;
   flex-direction: column;

@@ -124,7 +124,7 @@
   display: inline-block;
   font-size: 0.8em;
   color: var(--text-secondary);
-  transition: transform var(--transition-fast);
+  transition: transform var(--transition-spring);
 }
 
 .advanced-settings[open] .toggle-icon,
@@ -156,13 +156,36 @@
   display: none;
 }
 
-.advanced-settings:not([open]) .advanced-settings-content,
-.pdf-settings-collapsible:not([open]) .pdf-settings {
-  display: none;
+.advanced-settings-content,
+.pdf-settings {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-top-width: 0;
+  transition:
+    max-height var(--transition-spring),
+    opacity var(--transition-normal),
+    padding-top var(--transition-normal),
+    padding-bottom var(--transition-normal),
+    border-top-width var(--transition-normal);
+}
+
+.advanced-settings[open] .advanced-settings-content,
+.pdf-settings-collapsible[open] .pdf-settings {
+  max-height: 2000px;
+  opacity: 1;
 }
 
 .advanced-settings-content {
-  padding: 0 var(--space-md) var(--space-md);
+  padding-right: var(--space-md);
+  padding-left: var(--space-md);
+}
+
+.advanced-settings[open] .advanced-settings-content {
+  padding-top: var(--space-md);
+  padding-bottom: var(--space-md);
   border-top: 1px solid var(--border-color);
 }
 
