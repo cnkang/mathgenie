@@ -156,16 +156,27 @@
   display: none;
 }
 
+.advanced-settings,
+.pdf-settings-collapsible {
+  display: grid;
+  grid-template-rows: auto 0fr;
+  transition: grid-template-rows var(--transition-spring);
+}
+
+.advanced-settings[open],
+.pdf-settings-collapsible[open] {
+  grid-template-rows: auto 1fr;
+}
+
 .advanced-settings-content,
 .pdf-settings {
   overflow: hidden;
-  max-height: 0;
+  min-height: 0;
   opacity: 0;
   padding-top: 0;
   padding-bottom: 0;
   border-top-width: 0;
   transition:
-    max-height var(--transition-spring),
     opacity var(--transition-normal),
     padding-top var(--transition-normal),
     padding-bottom var(--transition-normal),
@@ -174,7 +185,6 @@
 
 .advanced-settings[open] .advanced-settings-content,
 .pdf-settings-collapsible[open] .pdf-settings {
-  max-height: 2000px;
   opacity: 1;
 }
 
@@ -184,6 +194,17 @@
 }
 
 .advanced-settings[open] .advanced-settings-content {
+  padding-top: var(--space-md);
+  padding-bottom: var(--space-md);
+  border-top: 1px solid var(--border-color);
+}
+
+.pdf-settings {
+  padding-right: var(--space-md);
+  padding-left: var(--space-md);
+}
+
+.pdf-settings-collapsible[open] .pdf-settings {
   padding-top: var(--space-md);
   padding-bottom: var(--space-md);
   border-top: 1px solid var(--border-color);
