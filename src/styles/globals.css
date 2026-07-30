@@ -27,7 +27,7 @@
   --bg-tertiary: #eef2ff;
   --bg-accent: #eff6ff;
 
-  /* Text Colors - Enhanced for better contrast */
+  /* Text Colors */
   --text-primary: #0f172a;
   --text-secondary: #1f2937;
   --text-muted: #334155;
@@ -55,6 +55,10 @@
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 10%), 0 2px 4px -2px rgb(0 0 0 / 10%);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -4px rgb(0 0 0 / 10%);
 
+  /* Apple-style depth tokens: surface lift / pressed states */
+  --shadow-lift: 0 8px 24px -8px rgb(0 0 0 / 14%), 0 2px 8px -4px rgb(0 0 0 / 8%);
+  --shadow-pressed: 0 1px 1px 0 rgb(0 0 0 / 6%), 0 1px 2px -1px rgb(0 0 0 / 4%);
+
   /* Spacing */
   --space-xs: 0.25rem;
   --space-sm: 0.5rem;
@@ -78,10 +82,12 @@
   --font-size-2xl: 1.5rem;
   --font-size-3xl: 1.875rem;
 
-  /* Transitions */
-  --transition-fast: 150ms ease-in-out;
-  --transition-normal: 250ms ease-in-out;
-  --transition-slow: 350ms ease-in-out;
+  /* Apple-style spring-like curves */
+  --transition-fast: 150ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  --transition-normal: 250ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  --transition-slow: 350ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  --transition-spring: 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-press: 80ms cubic-bezier(0.25, 0.1, 0.25, 1);
 
   /* Progress bar styles */
   --progress-height: 8px;
@@ -93,7 +99,7 @@
   --pending-opacity: 0.7;
 }
 
-/* Dark mode support - WCAG 2.2 AAA compliant */
+/* Dark mode */
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
@@ -124,14 +130,34 @@
     --button-disabled-bg: #475569;
     --button-disabled-text: #e2e8f0;
 
-    /* Better shadow definitions for dark mode */
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 30%);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 40%), 0 2px 4px -1px rgb(0 0 0 / 30%);
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 50%), 0 4px 6px -2px rgb(0 0 0 / 40%);
+    --shadow-lift: 0 8px 24px -8px rgb(0 0 0 / 55%), 0 2px 8px -4px rgb(0 0 0 / 45%);
+    --shadow-pressed: 0 1px 1px 0 rgb(0 0 0 / 20%);
   }
 }
 
-/* Reset and base styles */
+/* Reduced transparency */
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f5;
+    --bg-tertiary: #e8e8e8;
+    --bg-accent: #ebebeb;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #0b1220;
+      --bg-secondary: #111a2b;
+      --bg-tertiary: #17243a;
+      --bg-accent: #1c2f4a;
+    }
+  }
+}
+
+/* Reset */
 * {
   box-sizing: border-box;
   padding: 0;
@@ -153,7 +179,7 @@ body {
   background-color: var(--bg-secondary);
 }
 
-/* Typography */
+/* Typography — optical sizing */
 h1 {
   margin-bottom: var(--space-sm);
   font-size: var(--font-size-3xl);
@@ -161,7 +187,7 @@ h1 {
   font-family: "Baloo 2", "Nunito Sans", sans-serif;
   color: var(--text-primary);
   text-align: center;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.02em;
 }
 
 h2 {
@@ -169,6 +195,7 @@ h2 {
   font-size: var(--font-size-xl);
   font-weight: 700;
   color: var(--text-primary);
+  letter-spacing: -0.01em;
 }
 
 h3 {
@@ -179,6 +206,7 @@ h3 {
   font-size: var(--font-size-lg);
   font-weight: 600;
   color: var(--text-primary);
+  letter-spacing: 0;
 }
 
 h3::before {
@@ -197,7 +225,7 @@ h3::before {
   text-align: center;
 }
 
-/* Enhanced typography for better readability */
+/* Enhanced form labels */
 .form-section {
   margin-bottom: var(--space-lg);
 }
@@ -206,13 +234,12 @@ h3::before {
 .form-label {
   display: block;
   margin-bottom: var(--space-sm);
-  font-size: var(--font-size-base); /* 增大标签字体 */
-  font-weight: 600; /* 增加字重 */
+  font-size: var(--font-size-base);
+  font-weight: 600;
   line-height: 1.4;
   color: var(--text-primary);
 }
 
-/* Enhanced form field labels */
 .field-label {
   display: flex;
   gap: var(--space-xs);
@@ -223,7 +250,6 @@ h3::before {
   color: var(--text-primary);
 }
 
-/* Bullet point styling for form sections */
 .field-label::before {
   font-size: var(--font-size-lg);
   font-weight: bold;
@@ -231,7 +257,6 @@ h3::before {
   content: "•";
 }
 
-/* Dark mode text enhancements */
 @media (prefers-color-scheme: dark) {
   .form-section label,
   .form-label,
