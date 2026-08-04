@@ -22,7 +22,8 @@
       "picomatch@>=4.0.0 <4.0.4": "4.0.4",
       "svgo": "^4.0.2",
       "uuid": "^14.0.0",
-      "esbuild": "0.28.1"
+      "esbuild": "0.28.1",
+      "ip-address": "10.3.1"
     }
   },
   "sideEffects": [
