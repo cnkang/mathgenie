@@ -10,7 +10,7 @@
   "pnpm": {
     "overrides": {
       "glob": "^11.0.3",
-      "js-yaml": "^4.3.0",
+      "js-yaml": "^4.3.1",
       "rimraf": "^6.0.1",
       "chrome-launcher": "^1.2.0",
       "tmp": "^0.2.5",
