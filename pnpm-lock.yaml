@@ -40,8 +40,8 @@ importers:
         specifier: ^19.2.8
         version: 19.2.8(react@19.2.8)
       web-vitals:
-        specifier: ^6.0.1
-        version: 6.0.1
+        specifier: ^6.1.0
+        version: 6.1.0
     devDependencies:
       '@axe-core/playwright':
         specifier: ^4.12.1
@@ -3215,8 +3215,8 @@ packages:
       jsdom:
         optional: true
 
-  web-vitals@6.0.1:
-    resolution: {integrity: sha512-iF3+kno3Anlqi5fPVTQk9gYLfsCiL8P69Hof+AmZyVVx00E3e/BiGVvu+EsOy6jvTLqTKuiaRloPyw0JtdKbSw==}
+  web-vitals@6.1.0:
+    resolution: {integrity: sha512-ZNoJ/MbU6aaR2WjKrFVUvy5WQx+G96YvXQFSsmKTz3A/0VlAFywjUcxl00hc/S6wef2stfgQ4yWYIJCWCNudkA==}
 
   webdriver-bidi-protocol@0.4.1:
     resolution: {integrity: sha512-ARrjNjtWRRs2w4Tk7nqrf2gBI0QXWuOmMCx2hU+1jUt6d00MjMxURrhxhGbrsoiZKJrhTSTzbIrc554iKI10qw==}
@@ -6137,7 +6137,7 @@ snapshots:
       - tsx
       - yaml
 
-  web-vitals@6.0.1: {}
+  web-vitals@6.1.0: {}
 
   webdriver-bidi-protocol@0.4.1: {}
 
