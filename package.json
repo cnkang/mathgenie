@@ -142,7 +142,7 @@
     "happy-dom": "^20.11.2",
     "identity-obj-proxy": "^3.0.0",
     "jiti": "^2.7.0",
-    "postcss": "^8.5.25",
+    "postcss": "^8.5.26",
     "terser": "^5.49.2",
     "tsx": "^4.23.11",
     "typescript": "^7.0.2",
