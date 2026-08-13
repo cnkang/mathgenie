@@ -89,8 +89,8 @@ importers:
         specifier: ^8.0.5
         version: 8.0.5(postcss@8.5.26)
       cssnano-preset-advanced:
-        specifier: ^8.0.4
-        version: 8.0.4(postcss@8.5.26)
+        specifier: ^8.0.5
+        version: 8.0.5(postcss@8.5.26)
       happy-dom:
         specifier: ^20.11.2
         version: 20.11.2
@@ -1680,11 +1680,11 @@ packages:
     engines: {node: '>=4'}
     hasBin: true
 
-  cssnano-preset-advanced@8.0.4:
-    resolution: {integrity: sha512-G9WUu9LNs7tsUYqUtazQRNOAtqq8SWTh8269JmaiQq8nuFfv9co6lArH/fJKxKlVUmX21h1Q6vRsN92RK2NMyg==}
+  cssnano-preset-advanced@8.0.5:
+    resolution: {integrity: sha512-zFST7OTJjBM8NAszKB0hjzr7Y9EWIJtghn/uPt5ziHsI1R2IHPlEHPFL51VlEbs0WOBGU+pc9eHlhGGzYz0c9g==}
     engines: {node: ^22.11.0 || ^24.11.0 || >=26.0}
     peerDependencies:
-      postcss: ^8.5.25
+      postcss: ^8.5.26
 
   cssnano-preset-default@8.0.5:
     resolution: {integrity: sha512-R9O+oRNnKcVBf7GZZ7nfBcOiBZZwi3kR1HtKirBHel/gTtHLMHOCsL2H3QGy1161CPystJV4EiKniC7XyUKfcw==}
@@ -4459,7 +4459,7 @@ snapshots:
 
   cssesc@3.0.0: {}
 
-  cssnano-preset-advanced@8.0.4(postcss@8.5.26):
+  cssnano-preset-advanced@8.0.5(postcss@8.5.26):
     dependencies:
       autoprefixer: 10.5.4(postcss@8.5.26)
       css-declaration-sorter: 7.4.0(postcss@8.5.26)
