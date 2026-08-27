@@ -203,7 +203,7 @@ jobs:
           cache: "pnpm"
 
       - name: ⚡ Setup Vite+
-        uses: voidzero-dev/setup-vp@f388e2f7f5612b098eaa1e6139b4280761cc2198 # v1.12.0
+        uses: voidzero-dev/setup-vp@5af416ede120848958d85c9720e61b921ac7bca6 # v1.12.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: true
