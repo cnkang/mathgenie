@@ -51,7 +51,7 @@ jobs:
           cache: "pnpm"
 
       - name: ⚡ Setup Vite+
-        uses: voidzero-dev/setup-vp@313600b80b104eadebb9111787d37a2e83e014ca # v1.17.0
+        uses: voidzero-dev/setup-vp@1b32467adbe183473499fd9d5d372c3ed9641754 # v1.18.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: true
@@ -105,7 +105,7 @@ jobs:
           cache: "pnpm"
 
       - name: ⚡ Setup Vite+
-        uses: voidzero-dev/setup-vp@313600b80b104eadebb9111787d37a2e83e014ca # v1.17.0
+        uses: voidzero-dev/setup-vp@1b32467adbe183473499fd9d5d372c3ed9641754 # v1.18.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: true
@@ -142,7 +142,7 @@ jobs:
           cache: "pnpm"
 
       - name: ⚡ Setup Vite+
-        uses: voidzero-dev/setup-vp@313600b80b104eadebb9111787d37a2e83e014ca # v1.17.0
+        uses: voidzero-dev/setup-vp@1b32467adbe183473499fd9d5d372c3ed9641754 # v1.18.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: true
@@ -213,7 +213,7 @@ jobs:
           cache: "pnpm"
 
       - name: ⚡ Setup Vite+
-        uses: voidzero-dev/setup-vp@313600b80b104eadebb9111787d37a2e83e014ca # v1.17.0
+        uses: voidzero-dev/setup-vp@1b32467adbe183473499fd9d5d372c3ed9641754 # v1.18.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: true
@@ -252,7 +252,7 @@ jobs:
           cache: "pnpm"
 
       - name: ⚡ Setup Vite+
-        uses: voidzero-dev/setup-vp@313600b80b104eadebb9111787d37a2e83e014ca # v1.17.0
+        uses: voidzero-dev/setup-vp@1b32467adbe183473499fd9d5d372c3ed9641754 # v1.18.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: true
@@ -323,7 +323,7 @@ jobs:
           cache: "pnpm"
 
       - name: ⚡ Setup Vite+
-        uses: voidzero-dev/setup-vp@313600b80b104eadebb9111787d37a2e83e014ca # v1.17.0
+        uses: voidzero-dev/setup-vp@1b32467adbe183473499fd9d5d372c3ed9641754 # v1.18.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: true
@@ -487,7 +487,7 @@ jobs:
           cache: "pnpm"
 
       - name: ⚡ Setup Vite+
-        uses: voidzero-dev/setup-vp@313600b80b104eadebb9111787d37a2e83e014ca # v1.17.0
+        uses: voidzero-dev/setup-vp@1b32467adbe183473499fd9d5d372c3ed9641754 # v1.18.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: true
@@ -624,7 +624,7 @@ jobs:
           cache: "pnpm"
 
       - name: ⚡ Setup Vite+
-        uses: voidzero-dev/setup-vp@313600b80b104eadebb9111787d37a2e83e014ca # v1.17.0
+        uses: voidzero-dev/setup-vp@1b32467adbe183473499fd9d5d372c3ed9641754 # v1.18.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: true
@@ -738,7 +738,7 @@ jobs:
           cache: "pnpm"
 
       - name: ⚡ Setup Vite+
-        uses: voidzero-dev/setup-vp@313600b80b104eadebb9111787d37a2e83e014ca # v1.17.0
+        uses: voidzero-dev/setup-vp@1b32467adbe183473499fd9d5d372c3ed9641754 # v1.18.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: true
@@ -798,7 +798,7 @@ jobs:
           cache: "pnpm"
 
       - name: ⚡ Setup Vite+
-        uses: voidzero-dev/setup-vp@313600b80b104eadebb9111787d37a2e83e014ca # v1.17.0
+        uses: voidzero-dev/setup-vp@1b32467adbe183473499fd9d5d372c3ed9641754 # v1.18.0
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: true
