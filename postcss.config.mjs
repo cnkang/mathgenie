@@ -1,8 +1,9 @@
 /* Node.js PostCSS config */
+import cssnanoPresetAdvanced from 'cssnano-preset-advanced';
 /* global process */
 const isProduction = process.env.NODE_ENV === 'production';
 
-module.exports = {
+export default {
   plugins: {
     '@fullhuman/postcss-purgecss': isProduction
       ? {
@@ -13,7 +14,7 @@ module.exports = {
       : false,
     autoprefixer: {},
     cssnano: {
-      preset: 'advanced',
+      preset: cssnanoPresetAdvanced,
     },
   },
 };
