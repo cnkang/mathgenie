@@ -23,7 +23,7 @@
 - **Browsers**: Chromium, Firefox, WebKit (all three required)
 - **Mobile**: iPhone, iPad, Android device emulation
 - **Accessibility**: @axe-core/playwright for WCAG 2.2 AAA compliance
-- **Performance**: Lighthouse CI integration
+- **Performance**: Bundle size analysis in CI plus Vercel Speed Insights / Web Vitals RUM
 
 ### Testing Commands
 ```bash
@@ -257,12 +257,8 @@ test('should meet Core Web Vitals thresholds', async ({ page }) => {
 });
 ```
 
-### Lighthouse Integration
-```bash
-# Performance testing commands
-pnpm lighthouse      # Run Lighthouse tests
-pnpm lighthouse:ci   # CI-friendly Lighthouse tests
-```
+### Performance Monitoring
+Production performance is covered by Vercel Speed Insights and `web-vitals` RUM; CI reports bundle sizes from the `build` job. (Lab-based Lighthouse CI was removed.)
 
 ## Testing Best Practices
 

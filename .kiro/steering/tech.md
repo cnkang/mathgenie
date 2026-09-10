@@ -22,7 +22,7 @@
 - **E2E Testing**: Playwright with cross-browser support (Chrome, Firefox, Safari)
 - **Mobile Testing**: Comprehensive mobile device emulation (iPhone, iPad, Android)
 - **Accessibility Testing**: WCAG 2.2 AAA compliance with @axe-core/playwright
-- **Performance Testing**: Lighthouse CI integration for Core Web Vitals
+- **Performance Testing**: Bundle size analysis in CI plus Vercel Speed Insights / Web Vitals RUM in production
 - **Coverage**: V8 coverage provider with 90% threshold requirements
 - **Test Environment**: happy-dom for lightweight DOM simulation
 
@@ -63,10 +63,6 @@ pnpm format           # Prettier formatting
 pnpm type-check       # TypeScript compilation check
 pnpm i18n:check       # Validate i18n translations
 pnpm validate         # Full validation (lint + type-check + test + build + e2e)
-
-# Performance & Quality
-pnpm lighthouse      # Run Lighthouse performance tests
-pnpm lighthouse:ci    # CI-friendly Lighthouse tests
 
 # Utilities
 pnpm clean            # Clean node_modules and build artifacts

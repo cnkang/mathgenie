@@ -410,23 +410,7 @@ measureFeature('problem-generation', () => {
 
 ## Performance Testing
 
-### Lighthouse CI
-```yaml
-# lighthouserc.yml
-ci:
-  collect:
-    numberOfRuns: 3
-    settings:
-      chromeFlags: '--no-sandbox --headless'
-  assert:
-    assertions:
-      first-contentful-paint: ['error', { maxNumericValue: 1500 }]
-      largest-contentful-paint: ['error', { maxNumericValue: 2500 }]
-      cumulative-layout-shift: ['error', { maxNumericValue: 0.1 }]
-      first-input-delay: ['error', { maxNumericValue: 100 }]
-  upload:
-    target: temporary-public-storage
-```
+Production performance is covered by Vercel Speed Insights and `web-vitals` RUM; CI reports bundle sizes from the `build` job. (Lab-based Lighthouse CI was removed.)
 
 ### Performance Tests
 ```typescript
@@ -522,7 +506,6 @@ pnpm audit
 - [ ] Accessibility performance maintained
 
 ### Regular Monitoring
-- [ ] Weekly Lighthouse CI reports
 - [ ] Monthly bundle size analysis
 - [ ] Quarterly performance audit
 - [ ] Real user metrics tracking

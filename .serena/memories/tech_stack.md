@@ -76,7 +76,6 @@
 - **Reduced Motion**: Preference testing
 
 ### Performance Testing
-- **Lighthouse CI**: Core Web Vitals integration
 - **Performance Budgets**: Automated performance regression detection
 - **Bundle Analysis**: Size and optimization monitoring
 - **Web Vitals**: Real-time performance metrics
@@ -205,7 +204,7 @@
 - **GitHub Actions**: Automated quality assurance
 - **Cross-browser Testing**: Chromium, Firefox, WebKit
 - **Mobile Device Testing**: iPhone, iPad, Android
-- **Performance Monitoring**: Lighthouse CI integration
+- **Performance Monitoring**: Vercel Speed Insights RUM plus CI bundle size reports
 - **Security Scanning**: Automated vulnerability detection
 
 ### Development Commands

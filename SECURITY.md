@@ -17,72 +17,9 @@ MathGenie takes dependency security seriously and implements the following measu
 
 ### Current Security Overrides
 
-#### js-yaml Security Fix
+pnpm `overrides` in `package.json` force secure versions of transitive dependencies when necessary. Run `pnpm audit` before each release; see `package.json` for the current list.
 
-**Issue**: The `@lhci/utils@0.15.1` package (transitive dependency of `@lhci/cli`) depends on js-yaml 3.14.2, which contains known security vulnerabilities.
-
-**Vulnerability Details**:
-
-- **Package**: js-yaml < 4.1.1
-- **Severity**: High
-- **Impact**: Potential code execution via malicious YAML parsing
-- **CVE References**: See [js-yaml Security Advisory](https://github.com/nodeca/js-yaml/security/advisories)
-
-**Solution**: pnpm override forces all js-yaml instances to version 4.1.1 or higher
-
-**Implementation**:
-
-```json
-{
-  "pnpm": {
-    "overrides": {
-      "js-yaml": "^4.1.1"
-    }
-  }
-}
-```
-
-**Verification**:
-
-```bash
-# Verify all js-yaml instances use secure version
-pnpm why js-yaml
-
-# Run security audit
-pnpm audit
-```
-
-**Removal Criteria**:
-
-This override should be removed when one of the following conditions is met:
-
-1. **Upstream Fix**: `@lhci/utils` is updated to depend on js-yaml 4.1.1 or higher
-   - Check with: `pnpm why js-yaml`
-   - Verify no instances of js-yaml < 4.1.1 remain
-
-2. **Alternative Tool**: Project migrates to an alternative performance testing tool
-   - Remove `@lhci/cli` dependency
-   - Verify js-yaml is no longer in dependency tree
-
-3. **Dependency Removal**: js-yaml is no longer a transitive dependency
-   - Verify with: `pnpm why js-yaml` (should show no results)
-
-**Monitoring Schedule**:
-
-- **Monthly**: Run `pnpm audit` to check for new vulnerabilities
-- **Quarterly**: Run `pnpm outdated` and `pnpm why js-yaml` to review override necessity
-- **On Updates**: Check if `@lhci/utils` updates resolve the issue
-
-**Validation Process**:
-
-Before removing the override:
-
-1. Remove the override from package.json
-2. Delete pnpm-lock.yaml
-3. Run `pnpm install`
-4. Run `pnpm why js-yaml` to verify all instances are 4.1.1+
-5. Run `pnpm audit` to verify zero js-yaml vulnerabilities
-6. Run `pnpm validate` to ensure all tests pass
+> Note: The former `@lhci/cli`-specific overrides (`js-yaml`, `chrome-launcher`, `tmp`, `os-tmpdir`, `express`, `path-to-regexp`, `uuid`) were removed together with the `@lhci/cli` devDependency. `pnpm why <pkg>` confirms none of them remain in the dependency tree.
 
 ## Security Best Practices
 

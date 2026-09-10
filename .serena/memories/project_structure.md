@@ -9,7 +9,6 @@
 ├── scripts/               # Build and utility scripts
 ├── coverage/              # Test coverage reports
 ├── dist/                  # Production build output
-├── .lighthouseci/         # Lighthouse CI reports
 ├── .kiro/                 # Kiro IDE configuration
 ├── .serena/               # Serena MCP configuration and memories
 ├── .husky/                # Git hooks
@@ -189,7 +188,8 @@ src/
 
 ### Quality & Performance
 
-- **Lighthouse**: `lighthouserc.yml` - Performance testing
+- **Bundle analysis**: CI reports `dist/assets` sizes from the `build` job
+- **RUM**: Vercel Speed Insights and `web-vitals` in production
 - **SonarQube**: `sonar-project.properties` - Code quality
 - **Stylelint**: `.stylelintrc.json` - CSS linting
 - **HTML Validate**: `.htmlvalidate.json` - HTML validation

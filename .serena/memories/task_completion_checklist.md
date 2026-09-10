@@ -154,7 +154,6 @@
 
 ### Performance Testing
 
-- [ ] Lighthouse tests pass Core Web Vitals
 - [ ] Bundle analysis completed
 - [ ] Performance regression tests pass
 - [ ] Mobile performance verified

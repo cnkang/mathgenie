@@ -63,7 +63,6 @@ MathGenie is a modern web application designed to help tutors and educators gene
 - **Vercel Speed Insights**: Real-time performance metrics
 - **Web Vitals**: Core Web Vitals tracking (FCP, LCP, CLS, FID)
 - **Bundle Analysis**: Automated bundle size monitoring
-- **Lighthouse CI**: Automated performance regression detection
 - **Service Worker**: Comprehensive caching with fallback strategies
 
 ## Target Users
@@ -122,7 +121,7 @@ MathGenie is a modern web application designed to help tutors and educators gene
 - **90% Test Coverage**: Comprehensive unit and integration testing
 - **E2E Testing**: Cross-browser end-to-end test suite
 - **Accessibility Testing**: Automated WCAG 2.2 AAA compliance testing
-- **Performance Testing**: Lighthouse CI with Core Web Vitals monitoring
+- **Performance Monitoring**: Vercel Speed Insights RUM plus CI bundle size reports
 - **Code Quality**: SonarQube analysis with zero critical issues
 
 ### 👨‍💻 Developer Experience

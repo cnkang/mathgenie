@@ -71,13 +71,6 @@ pnpm lint:css:fix      # CSS-specific auto-fixing
 pnpm lint:html         # HTML-specific validation
 ```
 
-### Performance & Quality
-
-```bash
-pnpm lighthouse      # Run Lighthouse performance tests
-pnpm lighthouse:ci    # CI-friendly Lighthouse tests
-```
-
 ### Playwright Browser Management
 
 ```bash
@@ -280,10 +273,6 @@ pnpm audit
 ```bash
 # Bundle analysis
 pnpm analyze
-
-# Performance testing
-pnpm lighthouse
-pnpm lighthouse:ci
 ```
 
 ## Development Workflow Commands
@@ -327,8 +316,7 @@ pnpm validate:full   # Complete validation
 pnpm test:e2e:accessibility
 pnpm test:mobile
 
-# 5. Performance validation
-pnpm lighthouse
+# 5. Build verification
 pnpm build
 ```
 
@@ -345,7 +333,6 @@ pnpm validate:full
 pnpm sonar:scan
 pnpm test:e2e
 pnpm test:e2e:accessibility
-pnpm lighthouse:ci
 
 # Build verification
 pnpm build
@@ -358,7 +345,6 @@ pnpm build
 pnpm validate:full
 pnpm build
 pnpm test:e2e
-pnpm lighthouse:ci
 
 # Security audit
 pnpm audit
@@ -387,12 +373,6 @@ pnpm test:mobile:iphone --debug
 ```bash
 # Analyze bundle
 pnpm analyze
-
-# Debug performance
-pnpm lighthouse --view
-
-# Check Core Web Vitals
-pnpm lighthouse:ci
 ```
 
 ### Quality Debugging

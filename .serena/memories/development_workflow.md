@@ -145,7 +145,6 @@ pnpm i18n:check     # Validate all translations
 #### Performance Checks
 
 ```bash
-pnpm lighthouse     # Core Web Vitals
 pnpm build          # Production build verification
 pnpm analyze        # Bundle analysis
 ```

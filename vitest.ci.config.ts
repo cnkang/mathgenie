@@ -64,7 +64,6 @@ export default defineConfig({
         "**/src/i18n/translations/**",
         "**/src/types/**",
         "**/src/utils/serviceWorker.ts",
-        "**/lighthouserc.{js,ts,cjs}",
         "**/playwright-report/**",
         "**/test-results/**",
         "**/postcss.config.cjs",

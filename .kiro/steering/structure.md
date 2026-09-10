@@ -9,7 +9,6 @@
 ├── scripts/               # Build and utility scripts
 ├── coverage/              # Test coverage reports
 ├── dist/                  # Production build output
-├── .lighthouseci/         # Lighthouse CI reports
 ├── .kiro/                 # Kiro IDE configuration
 ├── .husky/                # Git hooks
 ├── playwright-report/     # Playwright test reports
@@ -73,7 +72,6 @@ import { useTranslation } from '@/i18n';
 - **Vite**: `vite.config.ts` with React plugin and optimization settings
 - **ESLint**: `eslint.config.ts` with TypeScript and React rules
 - **Playwright**: `playwright.config.ts` and `playwright.e2e.config.ts` for E2E testing
-- **Lighthouse**: `lighthouserc.yml` for performance testing
 - **Package**: `package.json` with pnpm as package manager
 - **PostCSS**: `postcss.config.cjs` for CSS processing
 - **Prettier**: `.prettierrc.json` for code formatting

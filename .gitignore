@@ -140,9 +140,6 @@ test-screenshot-*.png
 .sonar/
 sonar-project.properties
 
-# Lighthouse CI results
-.lighthouseci/
-
 # =============================================================================
 # Environment & Configuration
 # =============================================================================
@@ -311,7 +308,6 @@ scripts/temp-*.ts
 # =============================================================================
 
 # Temporary configuration files
-lighthouserc.ts
 babel.config.ts
 postcss.config.ts
 pnpm-workspace.yaml
@@ -322,7 +318,6 @@ playwright.*.config.ts
 !playwright.e2e.config.ts
 
 # Keep essential config files
-# lighthouserc.yml - needed for CI
 # postcss.config.cjs - needed for build
 # playwright.config.ts - main config
 # playwright.e2e.config.ts - E2E config
@@ -352,7 +347,6 @@ secrets.json
 # Performance monitoring data
 .performance/
 performance-*.json
-lighthouse-*.json
 web-vitals-*.json
 
 # =============================================================================
