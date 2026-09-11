@@ -125,7 +125,7 @@
     "@vitest/coverage-v8": "4.1.11",
     "autoprefixer": "^10.5.5",
     "cssnano": "^9.0.4",
-    "cssnano-preset-advanced": "^9.0.3",
+    "cssnano-preset-advanced": "^9.0.4",
     "happy-dom": "^20.14.0",
     "identity-obj-proxy": "^3.0.0",
     "jiti": "^2.7.0",
