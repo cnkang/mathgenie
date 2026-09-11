@@ -79,8 +79,8 @@ importers:
         specifier: ^9.0.4
         version: 9.0.4(postcss@8.5.28)
       cssnano-preset-advanced:
-        specifier: ^9.0.3
-        version: 9.0.3(postcss@8.5.28)
+        specifier: ^9.0.4
+        version: 9.0.4(postcss@8.5.28)
       happy-dom:
         specifier: ^20.14.0
         version: 20.14.0
@@ -1430,14 +1430,8 @@ packages:
     engines: {node: '>=4'}
     hasBin: true
 
-  cssnano-preset-advanced@9.0.3:
-    resolution: {integrity: sha512-XsdvuAslWQT7lKr56qDRkDZuE4zSELGlgwwjpsCeBFaZyS/VFgcEm9KKZdQ7sZY1t1hF5lO+ToNlI0QMphgbqw==}
-    engines: {node: ^22.22.3 || ^24.15.0 || >=26.0}
-    peerDependencies:
-      postcss: ^8.5.28
-
-  cssnano-preset-default@9.0.3:
-    resolution: {integrity: sha512-UxvaUk/pNqHzjctjlaq4SSARlqPOdy7kA9Dho6fb1/xt/bYcar+57BFlSWpF5AvxjIfNK3Qkop5U9VDSUnuTvg==}
+  cssnano-preset-advanced@9.0.4:
+    resolution: {integrity: sha512-VOmFg00Kypgj9oY0kUYe7mLHC6dv/7SwNsrZ+z6WU/wJYBkftndRM1sezf9RJMrO658n2bDu7qLKMhfWkSivvg==}
     engines: {node: ^22.22.3 || ^24.15.0 || >=26.0}
     peerDependencies:
       postcss: ^8.5.28
@@ -1825,12 +1819,6 @@ packages:
   pngjs@7.0.0:
     resolution: {integrity: sha512-LKWqWJRhstyYo9pGvgor/ivk2w94eSjE3RGVuzLGlr3NmD8bf7RcYGze1mNdEHRP6TRP6rMuDHk5t44hnTRyow==}
     engines: {node: '>=14.19.0'}
-
-  postcss-calc@11.0.3:
-    resolution: {integrity: sha512-G0KjDwYacZXdyG0ijvvQleSh4AOTTNcjHny34t0Fh6v76dvTOMO1kyr7eKq3MPKD8Q7rxHzUXj4lpzT3cebatw==}
-    engines: {node: ^22.22.3 || ^24.15 || >=26.0}
-    peerDependencies:
-      postcss: ^8.5.25
 
   postcss-calc@11.1.1:
     resolution: {integrity: sha512-EazB2CtQwKoBOCi8l334i/gnaObqcv418pLTvw4CmcqPLhPgP8IipVSixQO7lTRDrOBIwL72krecBfi5tpl4EA==}
@@ -3171,49 +3159,16 @@ snapshots:
 
   cssesc@3.0.0: {}
 
-  cssnano-preset-advanced@9.0.3(postcss@8.5.28):
+  cssnano-preset-advanced@9.0.4(postcss@8.5.28):
     dependencies:
       autoprefixer: 10.5.5(postcss@8.5.28)
       css-declaration-sorter: 7.4.0(postcss@8.5.28)
-      cssnano-preset-default: 9.0.3(postcss@8.5.28)
+      cssnano-preset-default: 9.0.4(postcss@8.5.28)
       postcss: 8.5.28
       postcss-discard-unused: 9.0.2(postcss@8.5.28)
       postcss-merge-idents: 9.0.2(postcss@8.5.28)
       postcss-reduce-idents: 9.0.2(postcss@8.5.28)
       postcss-zindex: 9.0.2(postcss@8.5.28)
-
-  cssnano-preset-default@9.0.3(postcss@8.5.28):
-    dependencies:
-      browserslist: 4.28.9
-      cssnano-utils: 7.0.2(postcss@8.5.28)
-      postcss: 8.5.28
-      postcss-calc: 11.0.3(postcss@8.5.28)
-      postcss-colormin: 9.0.2(postcss@8.5.28)
-      postcss-convert-values: 9.0.2(postcss@8.5.28)
-      postcss-discard-comments: 9.0.2(postcss@8.5.28)
-      postcss-discard-duplicates: 9.0.2(postcss@8.5.28)
-      postcss-discard-empty: 9.0.2(postcss@8.5.28)
-      postcss-discard-overridden: 9.0.2(postcss@8.5.28)
-      postcss-merge-longhand: 9.0.3(postcss@8.5.28)
-      postcss-merge-rules: 9.0.3(postcss@8.5.28)
-      postcss-minify-font-values: 9.0.2(postcss@8.5.28)
-      postcss-minify-gradients: 9.0.2(postcss@8.5.28)
-      postcss-minify-params: 9.0.2(postcss@8.5.28)
-      postcss-minify-selectors: 9.0.3(postcss@8.5.28)
-      postcss-normalize-charset: 9.0.2(postcss@8.5.28)
-      postcss-normalize-display-values: 9.0.2(postcss@8.5.28)
-      postcss-normalize-positions: 9.0.2(postcss@8.5.28)
-      postcss-normalize-repeat-style: 9.0.2(postcss@8.5.28)
-      postcss-normalize-string: 9.0.2(postcss@8.5.28)
-      postcss-normalize-timing-functions: 9.0.2(postcss@8.5.28)
-      postcss-normalize-unicode: 9.0.2(postcss@8.5.28)
-      postcss-normalize-url: 9.0.2(postcss@8.5.28)
-      postcss-normalize-whitespace: 9.0.2(postcss@8.5.28)
-      postcss-ordered-values: 9.0.2(postcss@8.5.28)
-      postcss-reduce-initial: 9.0.2(postcss@8.5.28)
-      postcss-reduce-transforms: 9.0.2(postcss@8.5.28)
-      postcss-svgo: 9.0.2(postcss@8.5.28)
-      postcss-unique-selectors: 9.0.2(postcss@8.5.28)
 
   cssnano-preset-default@9.0.4(postcss@8.5.28):
     dependencies:
@@ -3612,11 +3567,6 @@ snapshots:
       playwright-core: 1.63.0
 
   pngjs@7.0.0: {}
-
-  postcss-calc@11.0.3(postcss@8.5.28):
-    dependencies:
-      '@csstools/css-tokenizer': 4.0.0
-      postcss: 8.5.28
 
   postcss-calc@11.1.1(postcss@8.5.28):
     dependencies:
