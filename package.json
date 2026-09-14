@@ -112,7 +112,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
-    "@biomejs/biome": "^2.5.12",
+    "@biomejs/biome": "^2.5.13",
     "@fullhuman/postcss-purgecss": "^8.0.0",
     "@playwright/test": "^1.63.0",
     "@testing-library/dom": "^10.4.1",
