@@ -126,7 +126,7 @@
     "autoprefixer": "^10.6.0",
     "cssnano": "^9.0.4",
     "cssnano-preset-advanced": "^9.0.4",
-    "happy-dom": "^20.14.3",
+    "happy-dom": "^20.14.5",
     "identity-obj-proxy": "^3.0.0",
     "jiti": "^2.7.0",
     "postcss": "^8.5.28",
