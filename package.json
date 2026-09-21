@@ -125,7 +125,7 @@
     "@vitejs/plugin-react": "^6.1.1",
     "@vitest/coverage-v8": "4.1.11",
     "autoprefixer": "^10.6.1",
-    "cssnano": "^9.0.4",
+    "cssnano": "^9.0.5",
     "cssnano-preset-advanced": "^9.0.4",
     "happy-dom": "^20.14.5",
     "identity-obj-proxy": "^3.0.0",
