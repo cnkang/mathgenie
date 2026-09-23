@@ -132,7 +132,7 @@
     "jiti": "^2.7.0",
     "postcss": "^8.5.28",
     "terser": "^5.51.2",
-    "tsx": "^4.23.13",
+    "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vite-plus": "^0.3.3",
     "vite-plugin-compression": "^0.5.1"
