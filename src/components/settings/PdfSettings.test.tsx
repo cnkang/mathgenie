@@ -18,7 +18,7 @@ vi.mock("@/i18n", async () => {
   });
 });
 
-describe.sequential("PdfSettings", () => {
+describe("PdfSettings", { concurrent: false }, () => {
   const settings = {
     fontSize: 12,
     lineSpacing: 10,

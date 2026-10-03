@@ -8,7 +8,7 @@ const TestComponent: React.FC = () => {
   return <div data-testid="test-component">Test works</div>;
 };
 
-describe.sequential("NumberInput", () => {
+describe("NumberInput", { concurrent: false }, () => {
   const defaultProps = {
     id: "test-input",
     label: "Test Input",

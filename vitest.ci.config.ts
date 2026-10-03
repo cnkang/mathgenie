@@ -12,13 +12,7 @@ export default defineConfig({
 
     // CI环境优化配置
     pool: "threads",
-    // @ts-expect-error Vite+ config types lag Vitest's thread pool option shape.
-    poolOptions: {
-      threads: {
-        maxThreads: Math.min(4, Math.ceil(cpus().length / 2)),
-        minThreads: 1,
-      },
-    },
+    maxWorkers: Math.min(4, Math.ceil(cpus().length / 2)),
 
     // 适中的并发数以平衡速度和稳定性
     maxConcurrency: 4,

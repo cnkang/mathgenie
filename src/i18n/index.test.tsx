@@ -49,7 +49,7 @@ const TestComponent: React.FC = () => {
   );
 };
 
-describe.sequential("I18n System", () => {
+describe("I18n System", { concurrent: false }, () => {
   beforeEach(() => {
     localStorage.clear();
     vi.clearAllMocks();

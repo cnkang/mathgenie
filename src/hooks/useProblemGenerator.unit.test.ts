@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vite-plus/test";
 import { calculateExpression } from "./useProblemGenerator";
 
-describe.sequential("useProblemGenerator pure functions", () => {
+describe("useProblemGenerator pure functions", { concurrent: false }, () => {
   it("calculateExpression supports +, -, *, /", () => {
     expect(calculateExpression([1, 2], ["+"])).toBe(3);
     expect(calculateExpression([5, 3], ["-"])).toBe(2);

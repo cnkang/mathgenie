@@ -129,7 +129,7 @@ describe("App Component", () => {
   // Ensure local mocks do not leak to other test files
   afterAll(() => {
     // Reset module registry and unmock local modules to avoid cross-file pollution
-    vi.unmock("./hooks/useAppLogic");
+    vi.doUnmock("./hooks/useAppLogic");
     vi.resetModules();
   });
   test("renders without crashing", () => {

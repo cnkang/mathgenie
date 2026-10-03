@@ -18,7 +18,7 @@ vi.mock("@/i18n", async () => {
   });
 });
 
-describe.sequential("AdvancedSettings", () => {
+describe("AdvancedSettings", { concurrent: false }, () => {
   const settings = {
     allowNegative: false,
     showAnswers: false,
