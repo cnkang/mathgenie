@@ -12,7 +12,7 @@ const t = (key: string, params?: Record<string, string | number>) => {
   return result;
 };
 
-describe.sequential("ActionCards", () => {
+describe("ActionCards", { concurrent: false }, () => {
   test("renders buttons and labels", () => {
     render(
       <ActionCards

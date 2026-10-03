@@ -7,7 +7,7 @@ vi.mock("./LanguageSelector", () => ({
   default: () => <div data-testid="lang-selector" />,
 }));
 
-describe.sequential("AppHeader", () => {
+describe("AppHeader", { concurrent: false }, () => {
   const t = (key: string) => (key === "app.title" ? "MathGenie" : key);
 
   test("renders title, subtitle and language selector", () => {

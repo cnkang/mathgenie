@@ -34,7 +34,7 @@ vi.mock("./form/RangeInput", () => ({
   ),
 }));
 
-describe.sequential("SettingsSection", () => {
+describe("SettingsSection", { concurrent: false }, () => {
   const t = (key: string, params?: Record<string, string | number>) => {
     if (key === "settings.totalProblemsCalculated" && params) {
       return `Total: ${params.total}`;

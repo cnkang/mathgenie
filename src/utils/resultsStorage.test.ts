@@ -1,6 +1,6 @@
 import { saveQuizResult } from "./resultsStorage";
 
-describe.sequential("resultsStorage", () => {
+describe("resultsStorage", { concurrent: false }, () => {
   const baseResult = { score: 10, total: 10, grade: "A+" } as any;
   const baseSettings = { allowNegative: false } as any;
 

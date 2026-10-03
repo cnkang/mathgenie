@@ -3,7 +3,7 @@ import { fireEvent, render, screen, waitFor } from "../../tests/helpers/testUtil
 import { afterEach, vi } from "vite-plus/test";
 import ProblemsSection from "./ProblemsSection";
 
-describe.sequential("ProblemsSection", () => {
+describe("ProblemsSection", { concurrent: false }, () => {
   const originalClipboard = navigator.clipboard;
 
   afterEach(() => {

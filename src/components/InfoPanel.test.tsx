@@ -33,7 +33,7 @@ vi.mock("../hooks/useProgressBar", () => ({
   })),
 }));
 
-describe.sequential("InfoPanel", () => {
+describe("InfoPanel", { concurrent: false }, () => {
   const mockSettings: Settings = {
     numProblems: 10,
     operations: ["+", "-"],
