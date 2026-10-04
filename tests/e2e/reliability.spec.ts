@@ -76,6 +76,13 @@ test('large generation uses bounded pages and keeps display edits stable', async
   await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
   expect(await page.locator('.problem-text').first().textContent()).toBe(first);
 });
+test('disabled grouping does not block generation with cleared group counts', async ({ page }) => {
+  await page.locator('.grouping-label').click();
+  await page.locator('#totalGroups').fill('0');
+  await page.locator('.grouping-label').click();
+  await page.locator('#numProblems').fill('3');
+  await expect(page.locator('.problem-item')).toHaveCount(3);
+});
 test('loads PDF only on demand', async ({ page }) => {
   const pdfRequests: string[] = [];
   page.on('request', (request) => { if (/jspdf.*\.js/.test(request.url())) pdfRequests.push(request.url()); });

@@ -18,8 +18,8 @@ describe("settings boundaries", () => {
     { ...defaultSettings, fontSize: 0 },
     { ...defaultSettings, lineSpacing: Infinity },
     { ...defaultSettings, paperSize: "poster" },
-    { ...defaultSettings, problemsPerGroup: 0 },
-    { ...defaultSettings, totalGroups: 101 },
+    { ...defaultSettings, enableGrouping: true, problemsPerGroup: 0 },
+    { ...defaultSettings, enableGrouping: true, totalGroups: 101 },
     { ...defaultSettings, enableGrouping: true, problemsPerGroup: 1000, totalGroups: 51 },
   ])("rejects invalid setting %j", (value) => {
     expect(validateSettings(value)).not.toBe("");
@@ -47,5 +47,16 @@ describe("settings boundaries", () => {
   });
   it("keeps the full supported capacity", () => {
     expect(parseSettings({ ...defaultSettings, numProblems: 50000 }).numProblems).toBe(50000);
+  });
+  it.each([
+    { problemsPerGroup: 0 },
+    { totalGroups: 0 },
+    { problemsPerGroup: 1001 },
+    { totalGroups: 101 },
+  ])("ignores unused grouping bounds until grouping is enabled %j", (overrides) => {
+    const settings = { ...defaultSettings, ...overrides };
+    expect(validateSettings(settings)).toBe("");
+    expect(() => parseSettings(settings)).not.toThrow();
+    expect(validateSettings({ ...settings, enableGrouping: true })).not.toBe("");
   });
 });
