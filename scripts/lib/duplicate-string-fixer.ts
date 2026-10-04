@@ -36,7 +36,7 @@ function makeConstName(base: string, used: Set<string>): string {
   if (!/^STR_[A-Z][A-Z0-9_]*$/.test(candidate)) {
     candidate = `STR_${cleaned.replace(/[^A-Z0-9_]/g, "") || "VAL"}`;
   }
-  if (!candidate.startsWith('STR_')) {
+  if (!candidate.startsWith("STR_")) {
     candidate = `STR_${candidate}`;
   }
   let name = candidate;
@@ -79,13 +79,19 @@ function collectStringTokens(
   autoBlock: { start: number; end: number },
   options: FindOptions,
 ): TokenInfo[] {
-  const languageVariant = filePath.endsWith(".tsx") ? LanguageVariant.JSX : LanguageVariant.Standard;
+  const languageVariant = filePath.endsWith(".tsx")
+    ? LanguageVariant.JSX
+    : LanguageVariant.Standard;
   const scanner = createScanner(true, languageVariant, source);
   const tokens: TokenInfo[] = [];
   const ctx = { inImport: false, inExport: false };
   let prevTokenKind = SyntaxKind.Unknown;
 
-  for (let tokenKind = scanner.scan(); tokenKind !== SyntaxKind.EndOfFile; tokenKind = scanner.scan()) {
+  for (
+    let tokenKind = scanner.scan();
+    tokenKind !== SyntaxKind.EndOfFile;
+    tokenKind = scanner.scan()
+  ) {
     updateContext(tokenKind, ctx);
     if (isStringToken(tokenKind) && !isInAutoBlock(scanner.getTokenStart(), autoBlock)) {
       collectIfValid(scanner, source, options, prevTokenKind, ctx.inImport, ctx.inExport, tokens);
@@ -95,10 +101,7 @@ function collectStringTokens(
   return tokens;
 }
 
-function updateContext(
-  tokenKind: number,
-  ctx: { inImport: boolean; inExport: boolean },
-): void {
+function updateContext(tokenKind: number, ctx: { inImport: boolean; inExport: boolean }): void {
   if (tokenKind === SyntaxKind.ImportKeyword) ctx.inImport = true;
   else if (tokenKind === SyntaxKind.ExportKeyword) ctx.inExport = true;
   else if (tokenKind === SyntaxKind.SemicolonToken) {
@@ -108,11 +111,15 @@ function updateContext(
 }
 
 function isStringToken(tokenKind: number): boolean {
-  return tokenKind === SyntaxKind.StringLiteral || tokenKind === SyntaxKind.NoSubstitutionTemplateLiteral;
+  return (
+    tokenKind === SyntaxKind.StringLiteral || tokenKind === SyntaxKind.NoSubstitutionTemplateLiteral
+  );
 }
 
 function isInAutoBlock(pos: number, autoBlock: { start: number; end: number }): boolean {
-  return autoBlock.start !== -1 && autoBlock.end !== -1 && pos >= autoBlock.start && pos < autoBlock.end;
+  return (
+    autoBlock.start !== -1 && autoBlock.end !== -1 && pos >= autoBlock.start && pos < autoBlock.end
+  );
 }
 
 function collectIfValid(
@@ -235,7 +242,12 @@ export function applyDuplicateStringFixesToContent(
     constNames.push(name);
     constDecls.push(`const ${name} = ${JSON.stringify(d.text)} as const;`);
     for (const occ of d.occurrences) {
-      replacements.push({ start: occ.start, end: occ.end, name, wrapWithBraces: occ.wrapWithBraces });
+      replacements.push({
+        start: occ.start,
+        end: occ.end,
+        name,
+        wrapWithBraces: occ.wrapWithBraces,
+      });
     }
   }
 
@@ -262,7 +274,10 @@ export function applyDuplicateStringFixesToContent(
       (_m: string, p0: string, p1: string, p2: string) => `${p0}${p1}{${p2}}`,
     );
     const domClassNameBrace = /(\.className[ \t]{0,10}=)[ \t]{0,10}{(STR_[A-Z0-9_]{1,100})}/g;
-    updated = updated.replaceAll(domClassNameBrace, (_m: string, p1: string, p2: string) => `${p1} ${p2}`);
+    updated = updated.replaceAll(
+      domClassNameBrace,
+      (_m: string, p1: string, p2: string) => `${p1} ${p2}`,
+    );
   }
 
   let replacedCount = 0;

@@ -38,6 +38,7 @@ export function isCommandAvailable(
       stdio: "pipe",
       shell: false,
       timeout: timeoutMs,
+      env: { ...buildSafeEnv(), PATH: "/usr/local/bin:/usr/bin:/bin" },
     });
     return result.status === 0;
   } catch {

@@ -1,524 +1,135 @@
-/**
- * Enhanced SonarQube Local Checker - Fixed Version
- * 专注于 HIGH 级别的 SonarQube 规则检查
- */
-
+/** Local AST checks for complexity and unsafe execution; not a substitute for server-side Sonar analysis. */
 import { readFileSync } from "node:fs";
 import { readdir } from "node:fs/promises";
 import { join } from "node:path";
-import ts from "typescript";
-
-// ANSI color codes
-const colors = {
-  reset: "\x1b[0m",
-  red: "\x1b[31m",
-  yellow: "\x1b[33m",
-  green: "\x1b[32m",
-  blue: "\x1b[34m",
-  cyan: "\x1b[36m",
-  bold: "\x1b[1m",
-};
-
-// Constants for priority levels and common strings to avoid duplication
-const PRIORITY_LEVELS = {
-  HIGH: "HIGH" as const,
-  MEDIUM: "MEDIUM" as const,
-  LOW: "LOW" as const,
-} as const;
-
-const SONAR_SAFE_COMMENT = "SONAR-SAFE";
-
-interface SonarIssue {
+import ts from "typescript-compiler-api";
+export interface QualityIssue {
   file: string;
   line: number;
   rule: string;
-  sonarRule: string;
   message: string;
-  severity: "error" | "warning" | "info";
-  priority: "HIGH" | "MEDIUM" | "LOW";
 }
+const functions = (
+  node: ts.Node,
+): node is
+  | ts.FunctionDeclaration
+  | ts.FunctionExpression
+  | ts.ArrowFunction
+  | ts.MethodDeclaration =>
+  ts.isFunctionDeclaration(node) ||
+  ts.isFunctionExpression(node) ||
+  ts.isArrowFunction(node) ||
+  ts.isMethodDeclaration(node);
 
-interface FunctionMetrics {
-  name: string;
-  startLine: number;
-  linesOfCode: number;
-  parameters: number;
-  cognitiveComplexity: number;
-  cyclomaticComplexity: number;
-  returnStatements: number;
-  nestingLevel: number;
-  expressionComplexity: number;
-  content: string;
-}
-
-class SonarChecker {
-  private readonly issues: SonarIssue[] = [];
-  private readonly showOnlyHigh: boolean;
-  private readonly verbose: boolean;
-
-  constructor(options: { highOnly?: boolean; verbose?: boolean } = {}) {
-    this.showOnlyHigh = options.highOnly ?? false;
-    this.verbose = options.verbose ?? false;
-  }
-
-  async run(): Promise<void> {
-    console.log(`${colors.cyan}🔍 Enhanced SonarQube Local Checker${colors.reset}`);
-    console.log(
-      `${colors.blue}Focusing on ${this.showOnlyHigh ? "HIGH priority" : "all"} rules${colors.reset}\n`,
-    );
-
-    await this.checkAllRules();
-    this.reportResults();
-  }
-
-  private async checkAllRules(): Promise<void> {
-    const files = await this.collectSourceFiles("src");
-
-    console.log(`📊 Analyzing ${files.length} files...\n`);
-
-    for (const file of files) {
-      await this.analyzeFile(file);
-    }
-
-    // Check unused variables using ESLint
-    console.log("🗑️ Checking for unused variables...");
-    await this.checkUnusedVariables();
-  }
-
-  private async collectSourceFiles(rootDir: string): Promise<string[]> {
-    try {
-      const files: string[] = [];
-      await this.walkSourceFiles(rootDir, files);
-      return files;
-    } catch (error) {
-      if (
-        error instanceof Error &&
-        "code" in error &&
-        (error as NodeJS.ErrnoException).code === "ENOENT"
-      ) {
-        return [];
-      }
-      throw error;
-    }
-  }
-
-  private async walkSourceFiles(currentDir: string, files: string[]): Promise<void> {
-    const entries = await readdir(currentDir, { withFileTypes: true });
-    for (const entry of entries) {
-      const path = join(currentDir, entry.name);
-      if (entry.isDirectory()) {
-        await this.walkSourceFiles(path, files);
-        continue;
-      }
-
-      if (entry.isFile() && this.shouldAnalyzeFile(path)) {
-        files.push(path);
-      }
-    }
-  }
-
-  private shouldAnalyzeFile(filePath: string): boolean {
-    const normalizedPath = filePath.replaceAll("\\", "/");
-    const isTsFile = normalizedPath.endsWith(".ts") || normalizedPath.endsWith(".tsx");
-    const isTestFile = /\.(test|spec)\.(ts|tsx)$/.test(normalizedPath);
-    const isTranslationFile = /^src\/i18n\/translations\/[^/]+\.ts$/.test(normalizedPath);
-    return isTsFile && !isTestFile && !isTranslationFile;
-  }
-
-  private async analyzeFile(filePath: string): Promise<void> {
-    const content = readFileSync(filePath, "utf8");
-    const functions = this.extractFunctions(content);
-
-    for (const func of functions) {
-      this.checkCognitiveComplexity(filePath, func);
-      this.checkFunctionLength(filePath, func);
-      this.checkParameterCount(filePath, func);
-      this.checkReturnStatements(filePath, func);
-      this.checkNestingLevel(filePath, func);
-      this.checkExpressionComplexity(filePath, func);
-    }
-
-    // Check security patterns
-    this.checkSecurityPatterns(filePath, content);
-    this.checkIdenticalExpressions(filePath, content);
-    this.checkAccessibilityPatterns(filePath, content);
-    this.checkParameterThreshold(filePath, content);
-  }
-
-  private checkSecurityPatterns(filePath: string, content: string): void {
-    this.checkPathSecurity(filePath, content);
-    this.checkRandomNumberSecurity(filePath, content);
-  }
-
-  private checkPathSecurity(filePath: string, content: string): void {
-    // Check for OS command execution without PATH restriction (S4036)
-    // Use word boundaries and exclude .exec() method calls
-    const execSyncPattern = /\bexecSync\s*\(/g;
-    const spawnPattern = /\bspawn\s*\(/g;
-
-    const patterns = [
-      { pattern: execSyncPattern, name: "execSync" },
-      { pattern: spawnPattern, name: "spawn" },
-    ];
-
-    patterns.forEach(({ pattern, name: _name }) => {
-      let match;
-      while ((match = pattern.exec(content)) !== null) {
-        const lineNumber = content.substring(0, match.index).split("\n").length;
-        const contextStart = Math.max(0, match.index - 200);
-        const contextEnd = Math.min(content.length, match.index + 200);
-        const context = content.substring(contextStart, contextEnd);
-
-        // Check if PATH is restricted or SONAR-SAFE comment is present
-        const hasPathRestriction = /PATH:\s*\[/.test(context) || /PATH.*filter.*join/.test(context);
-        const hasSonarSafe = new RegExp(
-          `${SONAR_SAFE_COMMENT}.*PATH|PATH.*${SONAR_SAFE_COMMENT}`,
-          "i",
-        ).test(context);
-        const isAbsolutePath = /\/usr\/|\.\/node_modules\/|pnpm exec|npx/.test(match[0]);
-
-        if (!hasPathRestriction && !hasSonarSafe && !isAbsolutePath) {
-          this.addIssue(
-            filePath,
-            lineNumber,
-            "typescript:S4036",
-            'Make sure the "PATH" variable only contains fixed, unwriteable directories. Searching OS commands in PATH is security-sensitive',
-            "error",
-            PRIORITY_LEVELS.HIGH,
-          );
-        }
-      }
-    });
-
-    // Check for standalone exec() calls (not .exec() method calls)
-    const execPattern = /(?<!\.)(?<!\w)\bexec\s*\(/g;
-    let match;
-    while ((match = execPattern.exec(content)) !== null) {
-      const lineNumber = content.substring(0, match.index).split("\n").length;
-      const contextStart = Math.max(0, match.index - 200);
-      const contextEnd = Math.min(content.length, match.index + 200);
-      const context = content.substring(contextStart, contextEnd);
-
-      // Skip if it's clearly a method call
-      const beforeMatch = content.substring(Math.max(0, match.index - 10), match.index);
-      if (beforeMatch.includes(".") || beforeMatch.includes("]")) {
-        continue;
-      }
-
-      // Check if PATH is restricted or SONAR-SAFE comment is present
-      const hasPathRestriction = /PATH:\s*\[/.test(context) || /PATH.*filter.*join/.test(context);
-      const hasSonarSafe = new RegExp(
-        `${SONAR_SAFE_COMMENT}.*PATH|PATH.*${SONAR_SAFE_COMMENT}`,
-        "i",
-      ).test(context);
-      const isAbsolutePath = /\/usr\/|\.\/node_modules\/|pnpm exec|npx/.test(match[0]);
-
-      if (!hasPathRestriction && !hasSonarSafe && !isAbsolutePath) {
-        this.addIssue(
-          filePath,
-          lineNumber,
-          "typescript:S4036",
-          'Make sure the "PATH" variable only contains fixed, unwriteable directories. Searching OS commands in PATH is security-sensitive',
-          "error",
-          PRIORITY_LEVELS.HIGH,
-        );
-      }
-    }
-  }
-
-  private checkRandomNumberSecurity(filePath: string, content: string): void {
-    // Check for Math.random() usage without security justification (S2245)
-    const randomPattern = /Math\.random\s*\(\s*\)/g;
-
-    let match;
-    while ((match = randomPattern.exec(content)) !== null) {
-      const lineNumber = content.substring(0, match.index).split("\n").length;
-      const contextStart = Math.max(0, match.index - 100);
-      const contextEnd = Math.min(content.length, match.index + 100);
-      const context = content.substring(contextStart, contextEnd);
-
-      // Check if it's in a test file or has SONAR-SAFE comment
-      const isTestFile =
-        /\.(test|spec)\.(ts|tsx|js|jsx)$/.test(filePath) || /setupTests\.(ts|js)$/.test(filePath);
-      const hasSonarSafe = new RegExp(
-        `${SONAR_SAFE_COMMENT}.*random|random.*${SONAR_SAFE_COMMENT}`,
-        "i",
-      ).test(context);
-      const hasSecurityComment = /not.*security|test.*purpose|UI.*animation|mock/i.test(context);
-
-      if (!isTestFile && !hasSonarSafe && !hasSecurityComment) {
-        this.addIssue(
-          filePath,
-          lineNumber,
-          "typescript:S2245",
-          "Make sure that using this pseudorandom number generator is safe here. Using pseudorandom number generators (PRNGs) is security-sensitive",
-          "error",
-          PRIORITY_LEVELS.HIGH,
-        );
-      }
-    }
-  }
-
-  // ... rest of the methods remain the same as original sonar-check.ts
-  private extractFunctions(_content: string): FunctionMetrics[] {
-    // Implementation remains the same
-    return [];
-  }
-
-  private checkCognitiveComplexity(_filePath: string, _func: FunctionMetrics): void {
-    // Implementation remains the same
-  }
-
-  private checkFunctionLength(_filePath: string, _func: FunctionMetrics): void {
-    // Implementation remains the same
-  }
-
-  private checkParameterCount(_filePath: string, _func: FunctionMetrics): void {
-    // Implementation remains the same
-  }
-
-  private checkReturnStatements(_filePath: string, _func: FunctionMetrics): void {
-    // Implementation remains the same
-  }
-
-  private checkNestingLevel(_filePath: string, _func: FunctionMetrics): void {
-    // Implementation remains the same
-  }
-
-  private checkExpressionComplexity(_filePath: string, _func: FunctionMetrics): void {
-    // Implementation remains the same
-  }
-
-  private checkIdenticalExpressions(_filePath: string, _content: string): void {
-    // Implementation remains the same
-  }
-
-  private checkAccessibilityPatterns(filePath: string, content: string): void {
-    const lines = content.split("\n");
-
-    lines.forEach((line, index) => {
-      const normalize = line.toLowerCase();
-
-      if (
-        (normalize.includes("role='group'") || normalize.includes('role="group"')) &&
-        !line.includes(SONAR_SAFE_COMMENT)
-      ) {
-        this.addIssue(
-          filePath,
-          index + 1,
-          "typescript:a11y-role-group",
-          'Avoid using role="group" when a semantic container such as <fieldset> or <details> is available.',
-          "warning",
-          PRIORITY_LEVELS.MEDIUM,
-        );
-      }
-
-      if (
-        (normalize.includes('tabindex="0"') ||
-          normalize.includes("tabindex='0'") ||
-          normalize.includes("tabindex={0}")) &&
-        !normalize.includes("[tabindex")
-      ) {
-        // Check for SONAR-SAFE comment in current line or previous 3 lines
-        const contextLines = lines.slice(Math.max(0, index - 3), index + 1);
-        const hasContextSonarSafe = contextLines.some((contextLine) =>
-          contextLine.includes(SONAR_SAFE_COMMENT),
-        );
-
-        if (!hasContextSonarSafe) {
-          this.addIssue(
-            filePath,
-            index + 1,
-            "typescript:a11y-tabindex",
-            'tabIndex="0" should be reserved for interactive elements; verify that the element is keyboard-focusable.',
-            "warning",
-            PRIORITY_LEVELS.MEDIUM,
-          );
-        }
-      }
-
-      if (
-        (normalize.includes("role='status'") || normalize.includes('role="status"')) &&
-        !content.toLowerCase().includes("<output") &&
-        !line.includes(SONAR_SAFE_COMMENT)
-      ) {
-        this.addIssue(
-          filePath,
-          index + 1,
-          "typescript:a11y-status-role",
-          'Prefer semantic <output> elements or aria-live regions instead of role="status" on non-interactive elements.',
-          "warning",
-          PRIORITY_LEVELS.LOW,
-        );
-      }
-    });
-  }
-
-  private checkParameterThreshold(filePath: string, content: string): void {
-    const sourceFile = ts.createSourceFile(
-      filePath,
-      content,
-      ts.ScriptTarget.Latest,
-      true,
-      ts.ScriptKind.TSX,
-    );
-
-    const visit = (node: ts.Node): void => {
-      if (
-        ts.isFunctionDeclaration(node) ||
-        ts.isFunctionExpression(node) ||
-        ts.isArrowFunction(node) ||
-        ts.isMethodDeclaration(node)
-      ) {
-        const parameterCount = node.parameters.length;
-        if (parameterCount > 7) {
-          const { line } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
-          const functionName = this.resolveFunctionName(node, sourceFile);
-          this.addIssue(
-            filePath,
-            line + 1,
-            "typescript:S107",
-            `Function "${functionName}" has ${parameterCount} parameters (maximum allowed is 7).`,
-            "error",
-            PRIORITY_LEVELS.HIGH,
-          );
-        }
-      }
-
-      ts.forEachChild(node, visit);
-    };
-
-    visit(sourceFile);
-  }
-
-  private resolveFunctionName(node: ts.Node, sourceFile: ts.SourceFile): string {
-    if (ts.isFunctionDeclaration(node) && node.name) {
-      return node.name.getText(sourceFile);
-    }
-
-    if (
-      (ts.isFunctionExpression(node) || ts.isArrowFunction(node)) &&
-      ts.isVariableDeclaration(node.parent)
-    ) {
-      const parentName = node.parent.name;
-      if (ts.isIdentifier(parentName)) {
-        return parentName.text;
-      }
-    }
-
-    if (ts.isMethodDeclaration(node) && ts.isIdentifier(node.name)) {
-      return node.name.text;
-    }
-
-    return "<anonymous>";
-  }
-
-  private async checkUnusedVariables(): Promise<void> {
-    // Implementation remains the same
-  }
-
-  private addIssue(
-    file: string,
-    line: number,
-    rule: string,
-    message: string,
-    severity: "error" | "warning" | "info",
-    priority: "HIGH" | "MEDIUM" | "LOW",
-  ): void {
-    this.issues.push({
+export const analyzeSource = (file: string, content: string): QualityIssue[] => {
+  const source = ts.createSourceFile(
+    file,
+    content,
+    ts.ScriptTarget.Latest,
+    true,
+    file.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+  );
+  const issues: QualityIssue[] = [];
+  const report = (node: ts.Node, rule: string, message: string) =>
+    issues.push({
       file,
-      line,
+      line: source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1,
       rule,
-      sonarRule: rule,
       message,
-      severity,
-      priority,
     });
-  }
-
-  private reportResults(): void {
-    console.log(`\n${colors.bold}📊 Enhanced SonarQube Issue Report${colors.reset}`);
-    console.log("============================================================");
-
-    if (this.issues.length === 0) {
-      console.log(`${colors.green}✅ No issues found!${colors.reset}`);
-      return;
-    }
-
-    const filteredIssues = this.showOnlyHigh
-      ? this.issues.filter((issue) => issue.priority === PRIORITY_LEVELS.HIGH)
-      : this.issues;
-
-    if (filteredIssues.length === 0) {
-      console.log(`${colors.green}✅ No HIGH priority issues found!${colors.reset}`);
-      return;
-    }
-
-    const errorCount = filteredIssues.filter((issue) => issue.severity === "error").length;
-    const warningCount = filteredIssues.filter((issue) => issue.severity === "warning").length;
-
-    console.log(`Found ${filteredIssues.length} issues:`);
-    console.log(`  🔴 Errors: ${errorCount}`);
-    console.log(`  🟡 Warnings: ${warningCount}`);
-
-    const priorityBreakdown = {
-      HIGH: filteredIssues.filter((issue) => issue.priority === PRIORITY_LEVELS.HIGH).length,
-      MEDIUM: filteredIssues.filter((issue) => issue.priority === PRIORITY_LEVELS.MEDIUM).length,
-      LOW: filteredIssues.filter((issue) => issue.priority === PRIORITY_LEVELS.LOW).length,
+  const complexity = (root: ts.Node): number => {
+    let count = 1;
+    const walk = (node: ts.Node) => {
+      if (node !== root && functions(node)) return;
+      if (
+        ts.isIfStatement(node) ||
+        ts.isConditionalExpression(node) ||
+        ts.isCaseClause(node) ||
+        ts.isForStatement(node) ||
+        ts.isForOfStatement(node) ||
+        ts.isForInStatement(node) ||
+        ts.isWhileStatement(node) ||
+        ts.isCatchClause(node)
+      )
+        count++;
+      if (
+        ts.isBinaryExpression(node) &&
+        [
+          ts.SyntaxKind.AmpersandAmpersandToken,
+          ts.SyntaxKind.BarBarToken,
+          ts.SyntaxKind.QuestionQuestionToken,
+        ].includes(node.operatorToken.kind)
+      )
+        count++;
+      ts.forEachChild(node, walk);
     };
-
-    console.log("\nPriority breakdown:");
-    console.log(`  🚨 HIGH: ${priorityBreakdown.HIGH}`);
-    console.log(`  ⚠️  MEDIUM: ${priorityBreakdown.MEDIUM}`);
-    console.log(`  ℹ️  LOW: ${priorityBreakdown.LOW}`);
-
-    const groupedIssues = this.groupIssuesByFile(filteredIssues);
-
-    for (const [file, issues] of Object.entries(groupedIssues)) {
-      console.log(`\n📁 ${file}`);
-      for (const issue of issues) {
-        const icon = issue.severity === "error" ? "🔴" : "🟡";
-        let priorityIcon = "ℹ️";
-        if (issue.priority === PRIORITY_LEVELS.HIGH) {
-          priorityIcon = "🚨";
-        } else if (issue.priority === PRIORITY_LEVELS.MEDIUM) {
-          priorityIcon = "⚠️";
-        }
-        console.log(`  ${icon} ${priorityIcon} Line ${issue.line}: ${issue.message}`);
-        console.log(`     Rule: ${issue.rule}`);
+    walk(root);
+    return count;
+  };
+  const visit = (node: ts.Node) => {
+    if (functions(node)) {
+      if (node.parameters.length > 7)
+        report(node, "S107", "Use a parameter object above seven arguments");
+      if (complexity(node) > 25)
+        report(
+          node,
+          "complexity",
+          "Cyclomatic complexity exceeds 25; extract a cohesive operation",
+        );
+    }
+    if (
+      ts.isBinaryExpression(node) &&
+      [
+        ts.SyntaxKind.EqualsEqualsToken,
+        ts.SyntaxKind.EqualsEqualsEqualsToken,
+        ts.SyntaxKind.ExclamationEqualsToken,
+        ts.SyntaxKind.ExclamationEqualsEqualsToken,
+      ].includes(node.operatorToken.kind) &&
+      node.left.getText(source) === node.right.getText(source)
+    )
+      report(node, "S1764", "Identical expressions on both sides");
+    if (ts.isCallExpression(node)) {
+      const name = node.expression.getText(source);
+      if (["eval", "Function", "exec", "execSync"].includes(name))
+        report(node, "unsafe-execution", "Dynamic evaluation or shell spawning is forbidden");
+      if (["spawn", "spawnSync"].includes(name)) {
+        const options = node.arguments[2]?.getText(source) ?? "";
+        if (
+          /shell:\s*true/.test(options) ||
+          !/shell:\s*false/.test(options) ||
+          !/timeout/.test(options)
+        )
+          report(node, "process-options", "Process execution requires shell:false and a timeout");
       }
     }
-
-    console.log("\n💡 Tips:");
-    console.log("  • Focus on HIGH priority issues first");
-    console.log("  • Use --high flag to see only HIGH priority issues");
-    console.log("  • Use --verbose flag to see rule details");
-
-    process.exit(1);
+    ts.forEachChild(node, visit);
+  };
+  visit(source);
+  return issues;
+};
+const collect = async (directory: string): Promise<string[]> => {
+  const files: string[] = [];
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) files.push(...(await collect(path)));
+    else if (/\.(ts|tsx)$/.test(path) && !/\.(test|spec)\./.test(path) && !path.endsWith(".d.ts"))
+      files.push(path);
   }
-
-  private groupIssuesByFile(issues: SonarIssue[]): Record<string, SonarIssue[]> {
-    const grouped: Record<string, SonarIssue[]> = {};
-    for (const issue of issues) {
-      if (!grouped[issue.file]) {
-        grouped[issue.file] = [];
-      }
-      grouped[issue.file].push(issue);
-    }
-    return grouped;
+  return files;
+};
+export const runQualityChecks = async (): Promise<QualityIssue[]> => {
+  const files = [...(await collect("src")), ...(await collect("scripts"))];
+  return files.flatMap((file) => analyzeSource(file, readFileSync(file, "utf8")));
+};
+if (import.meta.url === new URL(process.argv[1], "file:").href) {
+  try {
+    const issues = await runQualityChecks();
+    for (const issue of issues)
+      console.error(`${issue.file}:${issue.line} [${issue.rule}] ${issue.message}`);
+    console.log(`Local AST checks: ${issues.length} issues`);
+    process.exitCode = issues.length ? 1 : 0;
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : "Quality check failed");
+    process.exitCode = 1;
   }
-}
-
-// Parse command line arguments
-const args = new Set(process.argv.slice(2));
-const showOnlyHigh = args.has("--high");
-const verbose = args.has("--verbose");
-
-// Run the checker
-const checker = new SonarChecker({ highOnly: showOnlyHigh, verbose });
-try {
-  await checker.run();
-} catch (error) {
-  console.error(error);
-  process.exit(1);
 }

@@ -7,7 +7,7 @@
 import { spawnSync } from "node:child_process";
 import { cpus, freemem, totalmem } from "node:os";
 import { delimiter, dirname } from "node:path";
-import { buildSafeEnv, findExecutable, isCommandAvailable } from "./exec-utils";
+import { buildSafeEnv, findExecutable } from "./exec-utils";
 
 // 颜色输出 (支持 NO_COLOR 环境变量)
 const colors = process.env.NO_COLOR
@@ -21,7 +21,26 @@ const colors = process.env.NO_COLOR
       reset: "\u001b[0m",
     };
 
-const ALLOWED_E2E_PROJECTS = new Set(["chromium", "firefox", "webkit"]);
+const ALLOWED_E2E_PROJECTS = new Set([
+  "chromium",
+  "firefox",
+  "webkit",
+  "mobile-iphone",
+  "mobile-android",
+  "mobile-ipad",
+  "mobile-android-tablet",
+]);
+const MOBILE_PROJECTS: Record<string, string[]> = {
+  all: ["mobile-iphone", "mobile-android", "mobile-ipad", "mobile-android-tablet"],
+  iphone: ["mobile-iphone"],
+  iphone16: ["mobile-iphone"],
+  iphone15: ["mobile-iphone"],
+  ipad: ["mobile-ipad"],
+  android: ["mobile-android"],
+  galaxy: ["mobile-android"],
+  pixel: ["mobile-android"],
+  latest: ["mobile-iphone", "mobile-android", "mobile-ipad", "mobile-android-tablet"],
+};
 const ALLOWED_E2E_SUITES = new Set([
   "basic",
   "error-handling",
@@ -85,7 +104,7 @@ function buildCleanEnv(callerEnv: Record<string, string>): Record<string, string
   }
 
   for (const [key, value] of Object.entries(callerEnv)) {
-    if (typeof value === "string") {
+    if (typeof value === "string" && /^(CI|VITEST_|PLAYWRIGHT_|MOBILE_)/.test(key)) {
       cleanEnv[key] = value;
     }
   }
@@ -98,31 +117,11 @@ function tryExecutionStrategies(
   cleanEnv: Record<string, string>,
 ): boolean {
   const executablePath = findExecutable(command);
-  if (executablePath && tryExecution(process.execPath, [executablePath, ...args], cleanEnv)) {
-    return true;
-  }
-  if (executablePath && tryExecution(executablePath, args, cleanEnv)) {
-    return true;
-  }
-
+  if (executablePath) return tryExecution(process.execPath, [executablePath, ...args], cleanEnv);
   const vpExecutablePath = findExecutable("vp");
-  if (command === "vitest" && vpExecutablePath) {
-    if (tryExecution(process.execPath, [vpExecutablePath, "test", ...args], cleanEnv)) {
-      return true;
-    }
-  }
-  if (vpExecutablePath && tryExecution(process.execPath, [vpExecutablePath, "exec", command, ...args], cleanEnv)) {
-    return true;
-  }
-
-  if (isCommandAvailable("pnpm") && tryExecution("pnpm", ["exec", command, ...args], cleanEnv)) {
-    return true;
-  }
-  if (isCommandAvailable("npx") && tryExecution("npx", [command, ...args], cleanEnv)) {
-    return true;
-  }
-
-  return false;
+  if (command === "vitest" && vpExecutablePath)
+    return tryExecution(process.execPath, [vpExecutablePath, "test", ...args], cleanEnv);
+  throw new Error(`Required local executable is unavailable: ${command}`);
 }
 
 function safeSpawn(command: string, args: string[], env: Record<string, string> = {}): void {
@@ -142,9 +141,12 @@ function tryExecution(executable: string, args: string[], env: Record<string, st
       windowsHide: true,
       env,
     });
-    return result.status === 0;
-  } catch {
-    return false;
+    if (result.error) throw result.error;
+    if (result.status !== 0)
+      throw Object.assign(new Error("Test command failed"), { status: result.status ?? 1 });
+    return true;
+  } catch (error) {
+    throw error;
   }
 }
 
@@ -279,7 +281,13 @@ function runUnitTests(strategy: TestStrategy, options: UnitTestOptions = {}): vo
     log("info", `Running: ${command}`);
   }
 
-  const args = [watchFlag, coverageFlag, reporterFlag, `--config=${strategy.config}`]
+  const args = [
+    watchFlag,
+    coverageFlag,
+    reporterFlag,
+    `--config=${strategy.config}`,
+    `--maxWorkers=${strategy.maxThreads}`,
+  ]
     .filter((arg) => arg.trim() !== "")
     .flatMap((arg) => arg.split(" "))
     .filter((arg) => arg.trim() !== "");
@@ -311,7 +319,7 @@ interface E2ETestOptions {
 
 function runE2ETests(strategy: TestStrategy, options: E2ETestOptions = {}): void {
   const {
-    project = "chromium",
+    project = "",
     headed = false,
     debug = false,
     ui = false,
@@ -359,8 +367,8 @@ function buildE2EArgs(options: {
   if (options.debug) {
     args.push("--debug");
   }
-  if (options.mobile && options.mobile !== "all") {
-    args.push(`--grep=${options.mobile}`);
+  if (options.mobile) {
+    for (const project of MOBILE_PROJECTS[options.mobile] ?? []) args.push(`--project=${project}`);
   }
 
   return args;
@@ -377,7 +385,7 @@ function buildE2EEnv(strategy: TestStrategy, mobile: string | null): Record<stri
   // Filter out undefined values to ensure Record<string, string>
   const cleanEnv: Record<string, string> = {};
   for (const [key, value] of Object.entries(baseEnv)) {
-    if (typeof value === "string") {
+    if (typeof value === "string" && /^(CI|VITEST_|PLAYWRIGHT_|MOBILE_)/.test(key)) {
       cleanEnv[key] = value;
     }
   }

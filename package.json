@@ -56,10 +56,10 @@
     "sonar:verbose": "tsx scripts/sonar-check.ts --verbose",
     "sonar:high:verbose": "tsx scripts/sonar-check.ts --high --verbose",
     "sonar:scan": "sonar-scanner",
-    "sonar:local": "vp run lint && vp run sonar:check && echo '✅ Local SonarJS checks passed - should align with SonarCloud'",
+    "sonar:local": "pnpm lint && pnpm sonar:check",
     "format": "biome format --write src scripts vite.config.ts vitest.ci.config.ts playwright.config.ts playwright.e2e.config.ts",
     "format:check": "biome format src scripts vite.config.ts vitest.ci.config.ts playwright.config.ts playwright.e2e.config.ts",
-    "type-check": "tsc --noEmit",
+    "type-check": "tsc --noEmit && tsc --noEmit -p tsconfig.quality.json",
     "build:types": "tsc --emitDeclarationOnly",
     "analyze": "vp run build:fast && vp dlx vite-bundle-analyzer dist/assets/*.js",
     "deps:check": "pnpm --silent outdated --no-color --format table || true",
@@ -93,10 +93,10 @@
     "playwright:debug": "./scripts/debug-playwright-browsers.sh",
     "playwright:cache:debug": "./scripts/debug-playwright-cache.sh",
     "pre-commit": "vp staged",
-    "pre-push": "pnpm lint && pnpm type-check && vp run i18n:check && vp test && vp run build",
+    "pre-push": "pnpm lint && pnpm format:check && pnpm type-check && pnpm sonar:check && pnpm i18n:check && pnpm test:unit:ci && pnpm build",
     "commit": "git-cz",
-    "validate": "pnpm lint && pnpm type-check && vp run sonar:check && vp run i18n:check && vp run build && vp run playwright:check && tsx scripts/unified-test.ts validate",
-    "validate:full": "pnpm lint && pnpm type-check && vp run sonar:check && vp run i18n:check && vp run build && vp run playwright:check && tsx scripts/unified-test.ts validate",
+    "validate": "pnpm lint && pnpm format:check && pnpm type-check && vp run sonar:check && vp run i18n:check && vp run build && vp run playwright:check && tsx scripts/unified-test.ts validate",
+    "validate:full": "pnpm lint && pnpm format:check && pnpm type-check && vp run sonar:check && vp run i18n:check && vp run build && vp run playwright:check && tsx scripts/unified-test.ts validate",
     "i18n:check": "tsx scripts/check-i18n.ts"
   },
   "browserslist": {
@@ -114,7 +114,7 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
     "@biomejs/biome": "^2.5.14",
-    "@fullhuman/postcss-purgecss": "^8.0.0",
+    "@fullhuman/postcss-purgecss": "7.0.2",
     "@playwright/test": "^1.63.0",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/react": "^16.3.3",
@@ -134,8 +134,9 @@
     "terser": "^5.51.2",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
-    "vite-plus": "^1.0.0",
-    "vite-plugin-compression": "^0.5.1"
+    "typescript-compiler-api": "npm:typescript@5.9.3",
+    "vite-plugin-compression": "^0.5.1",
+    "vite-plus": "^1.0.0"
   },
   "packageManager": "pnpm@10.30.1+sha512.3590e550d5384caa39bd5c7c739f72270234b2f6059e13018f975c313b1eb9fefcc09714048765d4d9efe961382c312e624572c0420762bdc5d5940cdf9be73a"
 }

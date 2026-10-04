@@ -18,7 +18,23 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": false
+      "recommended": false,
+      "correctness": {
+        "noUnreachable": "error",
+        "noUnusedVariables": "error",
+        "noUnknownProperty": "error"
+      },
+      "suspicious": {
+        "noDuplicateCase": "error",
+        "noDuplicateObjectKeys": "error",
+        "noDuplicateParameters": "error",
+        "noDebugger": "error",
+        "noDoubleEquals": "error",
+        "noDuplicateProperties": "error"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "error"
+      }
     }
   },
   "assist": {
