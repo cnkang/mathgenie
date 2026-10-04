@@ -29,6 +29,7 @@ export const useProblemGenerator = (
     settings.totalGroups,
   ]);
   const lastGeneratedKey = useRef<string | null>(null);
+  const settingsAreValid = validateSettings(settings) === "";
   const current = useRef({ settings, isLoading, validateSettings });
   current.current = { settings, isLoading, validateSettings };
   const cancelGeneration = useCallback(() => {
@@ -110,9 +111,9 @@ export const useProblemGenerator = (
 
   useEffect(() => {
     if (isLoading || generationKey === lastGeneratedKey.current) return;
-    lastGeneratedKey.current = generationKey;
-    generateProblems(false);
-  }, [generationKey, isLoading, generateProblems]);
+    const outcome = generateProblems(false);
+    if (settingsAreValid && !outcome.error) lastGeneratedKey.current = generationKey;
+  }, [generationKey, isLoading, generateProblems, settingsAreValid]);
   const problems = useMemo(
     () =>
       rawProblems.map((problem) => {
