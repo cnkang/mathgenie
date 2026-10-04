@@ -1,3 +1,4 @@
+import { normalizeOperator } from "@/domain/expression";
 import type { Settings } from "@/types";
 
 const getCrypto = (): Crypto => {
@@ -28,17 +29,12 @@ export const randomNonZeroInt = (
   max: number,
   cryptoObj: Crypto = getCrypto(),
 ): number | null => {
-  const values: number[] = [];
-  for (let i = min; i <= max; i++) {
-    if (i !== 0) {
-      values.push(i);
-    }
-  }
-  if (values.length === 0) {
-    return null;
-  }
-  const idx = randomInt(0, values.length - 1, cryptoObj);
-  return values[idx];
+  if (!Number.isSafeInteger(min) || !Number.isSafeInteger(max) || min > max) return null;
+  const crossesZero = min <= 0 && max >= 0;
+  const count = max - min + 1 - (crossesZero ? 1 : 0);
+  if (count === 0) return null;
+  const value = min + randomInt(0, count - 1, cryptoObj);
+  return crossesZero && value >= 0 ? value + 1 : value;
 };
 
 export const buildExpression = (
@@ -50,7 +46,7 @@ export const buildExpression = (
   const operands = [rng(settings.numRange[0], settings.numRange[1])];
   const operators: string[] = [];
   for (let i = 0; i < count - 1; i++) {
-    const operator = settings.operations[rng(0, settings.operations.length - 1)];
+    const operator = normalizeOperator(settings.operations[rng(0, settings.operations.length - 1)]);
     operators.push(operator);
     const next =
       operator === "/"

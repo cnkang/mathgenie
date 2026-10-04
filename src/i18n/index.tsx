@@ -1,3 +1,4 @@
+import { safeStorage } from "@/utils/safeStorage";
 import React, {
   ReactNode,
   createContext,
@@ -234,10 +235,7 @@ const loadFallbackTranslations = async (): Promise<Translations> => {
 };
 
 const persistLanguageSelection = (language: string): void => {
-  if (typeof globalThis === STR_UNDEFINED || !globalThis.localStorage) {
-    return;
-  }
-  globalThis.localStorage.setItem("mathgenie-language", language);
+  safeStorage.set("mathgenie-language", language);
 };
 
 const setDocumentLanguage = (language: string): void => {
@@ -350,12 +348,10 @@ interface I18nProviderProps {
 
 export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   const [currentLanguage, setCurrentLanguage] = useState<string>(() => {
-    // 优先使用用户保存的语言设置，只有在没有保存设置时才使用浏览器语言
-    if (typeof globalThis !== STR_UNDEFINED && globalThis.localStorage) {
-      const savedLanguage = localStorage.getItem("mathgenie-language");
-      return savedLanguage || getBrowserLanguage();
-    }
-    return getBrowserLanguage();
+    const savedLanguage = safeStorage.get("mathgenie-language");
+    return savedLanguage && Object.hasOwn(languages, savedLanguage)
+      ? savedLanguage
+      : getBrowserLanguage();
   });
   const { translations, isLoading, isInitialized } = useLanguageState(currentLanguage);
   const [isPending, startTransition] = useTransition();
@@ -375,7 +371,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   );
 
   const changeLanguage = (newLanguage: string): void => {
-    if (languages[newLanguage]) {
+    if (Object.hasOwn(languages, newLanguage)) {
       startTransition(() => {
         setCurrentLanguage(newLanguage);
       });

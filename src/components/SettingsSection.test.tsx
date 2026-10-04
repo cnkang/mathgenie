@@ -1,3 +1,5 @@
+import { vi } from "vite-plus/test";
+vi.mock("../i18n", () => ({ useTranslation: () => ({ t: (key: string) => key }) }));
 import { fireEvent, render, screen } from "../../tests/helpers/testUtils";
 import SettingsSection from "./SettingsSection";
 

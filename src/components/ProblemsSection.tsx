@@ -9,6 +9,13 @@ type ProblemsSectionProps = {
 };
 
 const ProblemsSection: React.FC<ProblemsSectionProps> = ({ t, problems, settings }) => {
+  const [page, setPage] = React.useState(0);
+  const pageSize = 200;
+  const pages = Math.max(1, Math.ceil(problems.length / pageSize));
+  const activePage = Math.min(page, pages - 1);
+  const startIndex = activePage * pageSize;
+  const endIndex = startIndex + pageSize;
+  React.useEffect(() => setPage(0), [problems]);
   const problemsListLabel = t("accessibility.problemsList");
   const [copyState, setCopyState] = React.useState<"idle" | "success" | "error">("idle");
   const copyStateResetTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -89,6 +96,8 @@ const ProblemsSection: React.FC<ProblemsSectionProps> = ({ t, problems, settings
         problems={problems}
         settings={settings}
         problemsListLabel={problemsListLabel}
+        startIndex={startIndex}
+        endIndex={endIndex}
       />
     );
   };
@@ -99,8 +108,8 @@ const ProblemsSection: React.FC<ProblemsSectionProps> = ({ t, problems, settings
     }
 
     return (
-      <ol className="problems-grid">
-        {problems.map((p) => (
+      <ol className="problems-grid" start={startIndex + 1}>
+        {problems.slice(startIndex, endIndex).map((p) => (
           <li key={p.id} className="problem-item">
             <span className="problem-text">{p.text}</span>
           </li>
@@ -151,7 +160,6 @@ const ProblemsSection: React.FC<ProblemsSectionProps> = ({ t, problems, settings
           aria-label={problemsListLabel}
           // SONAR-SAFE: Scrollable region must be focusable to satisfy WCAG 2.1.1 (scrollable-region-focusable).
           tabIndex={0}
-          aria-live="polite"
         >
           {problems.length === 0 ? (
             <output aria-live="polite">{t("results.noProblems")}</output>
@@ -159,6 +167,28 @@ const ProblemsSection: React.FC<ProblemsSectionProps> = ({ t, problems, settings
             renderProblemsContent()
           )}
         </div>
+        {pages > 1 && (
+          <nav
+            aria-label={t("results.title", { count: problems.length })}
+            className="problems-pagination"
+          >
+            <button
+              type="button"
+              onClick={() => setPage(activePage - 1)}
+              disabled={activePage === 0}
+            >
+              {t("results.previousPage")}
+            </button>
+            <output aria-live="polite">{t("results.page", { page: activePage + 1, pages })}</output>
+            <button
+              type="button"
+              onClick={() => setPage(activePage + 1)}
+              disabled={activePage === pages - 1}
+            >
+              {t("results.nextPage")}
+            </button>
+          </nav>
+        )}
       </div>
     </section>
   );

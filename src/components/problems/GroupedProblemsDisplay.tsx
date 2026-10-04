@@ -12,6 +12,8 @@ type GroupedProblemsDisplayProps = {
   problems: Problem[];
   settings: Settings;
   problemsListLabel: string;
+  startIndex?: number;
+  endIndex?: number;
 };
 
 const GroupedProblemsDisplay: React.FC<GroupedProblemsDisplayProps> = ({
@@ -19,12 +21,19 @@ const GroupedProblemsDisplay: React.FC<GroupedProblemsDisplayProps> = ({
   problems,
   settings,
   problemsListLabel,
+  startIndex = 0,
+  endIndex = Number.POSITIVE_INFINITY,
 }) => {
   const groups = splitProblemsIntoGroups(problems, settings);
 
   return (
     <>
-      {groups.map((group, groupIndex) => {
+      {groups.map((fullGroup, groupIndex) => {
+        const groupStart = groupIndex * settings.problemsPerGroup;
+        const localStart = Math.max(0, startIndex - groupStart);
+        const group = fullGroup.slice(localStart, Math.max(0, endIndex - groupStart));
+        if (groupStart >= endIndex || groupStart + settings.problemsPerGroup <= startIndex)
+          return null;
         const groupKey = hasProblems(group)
           ? `group-${group[0]?.id || 0}-${group.length}`
           : `empty-${settings.totalGroups}-${settings.problemsPerGroup}-${groupIndex + 1}`;
@@ -34,7 +43,7 @@ const GroupedProblemsDisplay: React.FC<GroupedProblemsDisplayProps> = ({
             <h3 className="group-title">{getGroupTitle(groupIndex, t)}</h3>
             <ol
               className="problems-grid"
-              start={groupIndex * settings.problemsPerGroup + 1}
+              start={groupStart + localStart + 1}
               aria-label={`${problemsListLabel} - ${getGroupTitle(groupIndex, t)}`}
             >
               {group.map((p) => (

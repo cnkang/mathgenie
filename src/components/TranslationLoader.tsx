@@ -7,12 +7,13 @@ const STR_SPINNER_DOT = "spinner-dot" as const;
 
 interface TranslationLoaderProps {
   children: React.ReactNode;
+  keepMounted?: boolean;
 }
 
-const TranslationLoader: React.FC<TranslationLoaderProps> = ({ children }) => {
+const TranslationLoader: React.FC<TranslationLoaderProps> = ({ children, keepMounted = false }) => {
   const { t, isLoading } = useTranslation();
 
-  if (isLoading) {
+  if (isLoading && !keepMounted) {
     return (
       <div className="translation-loader">
         <div className="translation-loader-content">

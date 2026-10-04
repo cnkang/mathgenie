@@ -1,5 +1,5 @@
 import type { MessageValue, PaperSizeOptions, Problem, QuizResult, Settings } from "@/types";
-import { generatePdf } from "@/utils/pdf";
+import { generatePdf, type PdfLabels } from "@/utils/pdf";
 import { useCallback, useEffect } from "react";
 
 type UseInitialGenerationArgs = {
@@ -64,8 +64,10 @@ export const usePdfDownload = (
   showSuccessMessage: (msg: MessageValue) => void,
   setError: (msg: MessageValue) => void,
   clearMessages: () => void,
-  isDev: boolean,
+  options: boolean | { isDev: boolean; labels: PdfLabels },
 ) => {
+  const isDev = typeof options === "boolean" ? options : options.isDev;
+  const labels = typeof options === "boolean" ? undefined : options.labels;
   const handlePdfError = useCallback(
     (err: unknown) => {
       const pdfFailedMessage = { key: "errors.pdfFailed" } as const;
@@ -89,7 +91,7 @@ export const usePdfDownload = (
     clearMessages();
 
     try {
-      await generatePdf(problems, settings, paperSizeOptions);
+      await generatePdf(problems, settings, paperSizeOptions, "problems.pdf", labels);
       showSuccessMessage(pdfGeneratedMessage);
     } catch (err) {
       handlePdfError(err);
@@ -102,6 +104,7 @@ export const usePdfDownload = (
     setError,
     clearMessages,
     handlePdfError,
+    labels,
   ]);
 };
 

@@ -50,6 +50,7 @@ export default {
     paperSize: "用紙サイズ",
   },
   buttons: {
+    cancelGeneration: "生成をキャンセル",
     generate: "問題を生成",
     generating: "問題を生成中...",
     generateDescription: "現在の設定で新しい数学問題を作成",
@@ -59,6 +60,9 @@ export default {
     downloadEmpty: "PDFをダウンロード",
   },
   results: {
+    previousPage: "前のページ",
+    nextPage: "次のページ",
+    page: "{{page}} / {{pages}} ページ",
     title: "生成された問題 ({{count}}問)",
     noProblems: "まだ問題が生成されていません",
     clickToStart: "「{{generateButton}}」をクリックして開始",

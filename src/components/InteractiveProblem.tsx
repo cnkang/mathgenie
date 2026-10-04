@@ -30,12 +30,14 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
   const { t } = useTranslation();
   const [userInput, setUserInput] = useState<string>("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
   const currentProblemId = useRef<number | null>(null);
 
   useEffect(() => {
     // Only reset if this is a new problem
     if (currentProblemId.current !== problem.id) {
       currentProblemId.current = problem.id;
+      inputRef.current?.focus();
 
       if (problem.userAnswer === undefined) {
         setUserInput("");
@@ -54,7 +56,7 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
     }
 
     const answer = Number.parseFloat(userInput.trim());
-    if (!Number.isNaN(answer)) {
+    if (Number.isFinite(answer)) {
       onAnswerSubmit(problem.id, answer);
       setIsSubmitted(true);
       setUserInput(""); // Clear input after submission
@@ -87,6 +89,8 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
       <form onSubmit={handleSubmit} className="answer-form">
         <div className="answer-input-group">
           <input
+            ref={inputRef}
+            aria-label={t("quiz.enterAnswer")}
             type="number"
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
@@ -107,7 +111,7 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
       </form>
 
       {canShowResult && (
-        <div className="answer-result">
+        <div className="answer-result" aria-live="polite" aria-atomic="true">
           <span className="result-icon" aria-hidden="true">
             {resultIcon}
           </span>

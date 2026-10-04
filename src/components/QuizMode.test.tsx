@@ -3,6 +3,7 @@ import { vi } from "vite-plus/test";
 import { fireEvent, render, screen } from "../../tests/helpers/testUtils";
 import type { Problem } from "../types";
 import QuizMode from "./QuizMode";
+import ErrorBoundary from "./ErrorBoundary";
 
 // Mock useTranslation hook
 vi.mock("../i18n", async () => {
@@ -99,7 +100,7 @@ describe("QuizMode", () => {
 
     // Setup fake timers
     vi.useFakeTimers();
-    vi.spyOn(Date, "now").mockReturnValue(1000000);
+    vi.setSystemTime(1000000);
     vi.spyOn(globalThis, "setInterval");
     vi.spyOn(globalThis, "clearInterval");
   });
@@ -153,14 +154,16 @@ describe("QuizMode", () => {
     const problemsWithError = [{ id: 1, text: "invalid expression = " }];
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const { container } = render(
-      <QuizMode
-        problems={problemsWithError}
-        onQuizComplete={mockOnQuizComplete}
-        onExitQuiz={mockOnExitQuiz}
-      />,
+      <ErrorBoundary>
+        <QuizMode
+          problems={problemsWithError}
+          onQuizComplete={mockOnQuizComplete}
+          onExitQuiz={mockOnExitQuiz}
+        />
+      </ErrorBoundary>,
     );
-    const exitButton = container.querySelector(".exit-quiz-btn-small");
-    expect(exitButton).toBeTruthy();
+    expect(container.textContent).toContain("Something went wrong");
+    expect(mockOnQuizComplete).not.toHaveBeenCalled();
     consoleSpy.mockRestore();
   });
 

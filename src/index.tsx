@@ -1,6 +1,8 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
+import ErrorBoundary from "./components/ErrorBoundary";
+import { safeStorage } from "./utils/safeStorage";
 import { I18nProvider } from "./i18n";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
@@ -20,9 +22,11 @@ performanceMonitor.logBrowserInfo();
 const root = createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    <I18nProvider>
-      <App />
-    </I18nProvider>
+    <ErrorBoundary>
+      <I18nProvider>
+        <App />
+      </I18nProvider>
+    </ErrorBoundary>
   </React.StrictMode>,
 );
 
@@ -42,5 +46,13 @@ if ("serviceWorker" in navigator && import.meta.env.PROD) {
 
 // Load web vitals reporting
 if (import.meta.env.PROD) {
-  reportWebVitals();
+  reportWebVitals((metric) => {
+    if (globalThis.gtag && !safeStorage.get("analytics-opt-out")) {
+      globalThis.gtag("event", "web_vital", {
+        name: metric.name,
+        value: metric.value,
+        metric_id: metric.id,
+      });
+    }
+  });
 }

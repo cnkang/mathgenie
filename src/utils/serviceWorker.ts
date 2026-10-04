@@ -9,8 +9,8 @@ interface ServiceWorkerConfig {
 // SONAR-SAFE: The .exec() below is a regex method call, not OS command execution
 const isLocalhost = Boolean(
   globalThis.location.hostname === "localhost" ||
-  globalThis.location.hostname === "[::1]" ||
-  /^127(?:\.(?:25[0-5]|2[0-4]\d|[01]?\d\d?)){3}$/.exec(globalThis.location.hostname),
+    globalThis.location.hostname === "[::1]" ||
+    /^127(?:\.(?:25[0-5]|2[0-4]\d|[01]?\d\d?)){3}$/.exec(globalThis.location.hostname),
 );
 
 const isServiceWorkerSupported = (): boolean => "serviceWorker" in navigator;
@@ -26,7 +26,7 @@ const handleServiceWorkerLoad = (config?: ServiceWorkerConfig): void => {
   if (isLocalhost) {
     checkValidServiceWorker(swUrl, config);
     void navigator.serviceWorker.ready.then(() => {
-      console.log("This web app is being served cache-first by a service worker.");
+      console.log("Offline assets are available through the service worker.");
     });
   } else {
     registerValidSW(swUrl, config);
@@ -110,6 +110,8 @@ const processServiceWorkerResponse = (
   swUrl: string,
   config?: ServiceWorkerConfig,
 ): void => {
+  // A temporary server failure must not unregister a working offline installation.
+  if (!response.ok && response.status !== 404) return;
   const contentType = response.headers.get("content-type");
   const isNotFound = response.status === 404;
   const isNotJavaScript = contentType !== null && !contentType.includes("javascript");

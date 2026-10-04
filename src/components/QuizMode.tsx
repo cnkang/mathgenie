@@ -117,25 +117,8 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
     formatTime,
     goToPrevious,
     goToNext,
-    setShowResults,
-    setCurrentProblemIndex,
-    setQuizProblems,
-    setTimeElapsed,
+    restartQuiz,
   } = useQuizController(problems, t, onQuizComplete);
-
-  const resetQuizState = (): void => {
-    setShowResults(false);
-    setCurrentProblemIndex(0);
-    setQuizProblems((prev) =>
-      prev.map((problem) => ({
-        ...problem,
-        userAnswer: undefined,
-        isCorrect: false,
-        isAnswered: false,
-      })),
-    );
-    setTimeElapsed(0);
-  };
 
   if (showResults && quizResult) {
     return renderResults({
@@ -145,7 +128,7 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
       timeElapsed,
       formatTime,
       onExitQuiz,
-      onRetry: resetQuizState,
+      onRetry: restartQuiz,
     });
   }
 

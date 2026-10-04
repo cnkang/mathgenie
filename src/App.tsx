@@ -1,782 +1,195 @@
-//
-import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import "./App.css";
-//
 import "./components/ProblemsDisplay.css";
 import "./components/QuizMode.css";
-//
+import "./styles/components.css";
 import ActionCards from "@/components/ActionCards";
 import AppHeader from "@/components/AppHeader";
 import ErrorMessage from "@/components/ErrorMessage";
 import InfoPanel from "@/components/InfoPanel";
 import ProblemsSection from "@/components/ProblemsSection";
-import QuizMode from "@/components/QuizMode";
 import SettingsSection from "@/components/SettingsSection";
-import { NUMERIC_CONSTANTS } from "@/constants/appConstants";
-import {
-  useAppHandlers,
-  useInitialGeneration,
-  usePdfDownload,
-  useQuizHandlers,
-} from "@/hooks/useAppLogic";
-import { saveQuizResult } from "@/utils/resultsStorage";
 import PerformanceMonitor from "./components/PerformanceMonitor";
 import TranslationLoader from "./components/TranslationLoader";
+import { useAppHandlers, usePdfDownload, useQuizHandlers } from "@/hooks/useAppLogic";
 import { useAppMessages } from "./hooks/useAppMessages";
-import { usePerformanceTracking } from "./hooks/usePerformance";
 import { useProblemGenerator } from "./hooks/useProblemGenerator";
 import { useSettings } from "./hooks/useSettings";
 import { useSettingsValidation } from "./hooks/useSettingsValidation";
 import { useTranslation } from "./i18n";
-import "./styles/components.css";
-import type { MessageValue, PaperSizeOptions, Problem, QuizResult, Settings } from "./types";
+import { saveQuizResult } from "@/utils/resultsStorage";
+import type { PaperSizeOptions, QuizResult } from "./types";
 import { setupWCAGEnforcement } from "./utils/wcagEnforcement";
-
+const QuizMode = React.lazy(() => import("./components/QuizMode"));
 const SpeedInsights = React.lazy(() =>
   import("@vercel/speed-insights/react").then((module) => ({ default: module.SpeedInsights })),
 );
-
-interface MessagesContainerProps {
-  error: MessageValue;
-  warning: MessageValue;
-  successMessage: MessageValue;
-  onDismissError: () => void;
-  onDismissWarning: () => void;
-  onDismissSuccess: () => void;
-}
-
-const MessagesContainer: React.FC<MessagesContainerProps> = ({
-  error,
-  warning,
-  successMessage,
-  onDismissError,
-  onDismissWarning,
-  onDismissSuccess,
-}) => (
-  <div className="messages-container">
-    <ErrorMessage error={error} type="error" onDismiss={onDismissError} />
-    <ErrorMessage error={warning} type="warning" onDismiss={onDismissWarning} />
-    <ErrorMessage error={successMessage} type="info" onDismiss={onDismissSuccess} />
-  </div>
-);
-
-interface MainContentProps {
-  isQuizMode: boolean;
-  problems: Problem[];
-  onQuizComplete: (result: QuizResult) => void;
-  onExitQuiz: () => void;
-  t: (key: string, params?: Record<string, string | number>) => string;
-  settings: Settings;
-  onChange: (field: keyof Settings, value: Settings[keyof Settings]) => void;
-  onApplyPreset: (preset: Settings) => void;
-  paperSizeOptions: PaperSizeOptions;
-  onGenerate: () => void;
-  onDownload: () => Promise<void>;
-  onStartQuiz: () => void;
-  quizResult: QuizResult | null;
-}
-
-const MainContent: React.FC<MainContentProps> = ({
-  isQuizMode,
-  problems,
-  onQuizComplete,
-  onExitQuiz,
-  t,
-  settings,
-  onChange,
-  onApplyPreset,
-  paperSizeOptions,
-  onGenerate,
-  onDownload,
-  onStartQuiz,
-  quizResult,
-}) => {
-  if (isQuizMode) {
-    return <QuizMode problems={problems} onQuizComplete={onQuizComplete} onExitQuiz={onExitQuiz} />;
-  }
-
-  return (
-    <div className="container">
-      <SettingsSection
-        t={t}
-        settings={settings}
-        onChange={onChange}
-        onApplyPreset={onApplyPreset}
-        paperSizeOptions={paperSizeOptions}
-      />
-
-      <div className="results-section">
-        <ActionCards
-          t={t}
-          problemsCount={problems.length}
-          onGenerate={onGenerate}
-          onDownload={onDownload}
-          onStartQuiz={onStartQuiz}
-        />
-
-        <ProblemsSection t={t} problems={problems} settings={settings} />
-
-        <InfoPanel problems={problems} settings={settings} quizResult={quizResult} />
-      </div>
-    </div>
-  );
-};
-
-const LoadingScreen: React.FC<{ title: string; message: string }> = ({ title, message }) => (
-  <div className="App">
-    <div className="loading-container">
-      <h1>{title}</h1>
-      <p>{message}</p>
-      <div className="loading-spinner" aria-label="Loading..."></div>
-    </div>
-  </div>
-);
-
-const useAppState = () => {
-  const [isQuizMode, setIsQuizMode] = useState<boolean>(false);
-  const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
-  const [hasInitialGenerated, setHasInitialGenerated] = useState<boolean>(false);
-
-  return {
-    isQuizMode,
-    setIsQuizMode,
-    quizResult,
-    setQuizResult,
-    hasInitialGenerated,
-    setHasInitialGenerated,
-  } as const;
-};
-
-const useAppConstants = (isLoading: boolean) => {
-  const paperSizeOptions: PaperSizeOptions = useMemo(
-    () => ({
-      a4: "a4",
-      letter: "letter",
-      legal: "legal",
-    }),
-    [],
-  );
-
-  const isDev = import.meta.env.DEV;
-  const isI18nReady = !isLoading;
-
-  return { paperSizeOptions, isDev, isI18nReady } as const;
-};
-
-const useAppDependencies = (isLoading: boolean) => {
-  const settingsState = useSettings();
-  const problemState = useProblemGenerator(
-    settingsState.settings,
-    isLoading,
-    settingsState.validateSettings,
-  );
-  const validationState = useSettingsValidation();
-  const appState = useAppState();
-  const constants = useAppConstants(isLoading);
-
-  return {
-    settingsState,
-    problemState,
-    validationState,
-    appState,
-    constants,
-  } as const;
-};
-
-const useSuccessMessageManager = (
-  setSuccessMessage: (message: MessageValue) => void,
-): {
-  scheduleSuccessMessage: (message: MessageValue) => void;
-  dismissSuccessMessage: () => void;
-} => {
-  const successTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const clearSuccessTimeout = useCallback(() => {
-    if (successTimeoutRef.current !== null && typeof globalThis !== "undefined") {
-      globalThis.clearTimeout(successTimeoutRef.current);
-    }
-    successTimeoutRef.current = null;
-  }, []);
-
-  useEffect(() => clearSuccessTimeout, [clearSuccessTimeout]);
-
-  const scheduleSuccessMessage = useCallback(
-    (message: MessageValue): void => {
-      setSuccessMessage(message);
-      if (!message || typeof globalThis === "undefined") {
-        clearSuccessTimeout();
-        return;
-      }
-
-      clearSuccessTimeout();
-      successTimeoutRef.current = globalThis.setTimeout(() => {
-        setSuccessMessage("");
-        successTimeoutRef.current = null;
-      }, NUMERIC_CONSTANTS.SUCCESS_MESSAGE_TIMEOUT);
-    },
-    [clearSuccessTimeout, setSuccessMessage],
-  );
-
-  const dismissSuccessMessage = useCallback(() => {
-    clearSuccessTimeout();
-    setSuccessMessage("");
-  }, [clearSuccessTimeout, setSuccessMessage]);
-
-  return { scheduleSuccessMessage, dismissSuccessMessage };
-};
-
-const useMessagesController = () => {
-  const messageState = useAppMessages();
-  const { scheduleSuccessMessage, dismissSuccessMessage } = useSuccessMessageManager(
-    messageState.setSuccessMessage,
-  );
-
-  const dismissError = useCallback(() => messageState.setError(""), [messageState]);
-  const dismissWarning = useCallback(() => messageState.setWarning(""), [messageState]);
-
-  return {
-    state: {
-      error: messageState.error,
-      warning: messageState.warning,
-      successMessage: messageState.successMessage,
-    },
-    scheduleSuccessMessage,
-    dismissSuccessMessage,
-    dismissError,
-    dismissWarning,
-    showSuccessMessage: messageState.showSuccessMessage,
-    clearMessages: messageState.clearMessages,
-    setError: messageState.setError,
-    setWarning: messageState.setWarning,
-    setSuccessMessage: messageState.setSuccessMessage,
-  } as const;
-};
-
-const useAppInitialization = (params: {
-  isI18nReady: boolean;
-  settings: Settings;
-  validateSettings: (settings: Settings) => string;
-  generateProblems: (showSuccessMessage?: boolean) => {
-    error: MessageValue;
-    warning: MessageValue;
-    successMessage: MessageValue;
-  };
-  hasInitialGenerated: boolean;
-  setHasInitialGenerated: (value: boolean) => void;
-  setError: (message: MessageValue) => void;
-  setWarning: (message: MessageValue) => void;
-  scheduleSuccessMessage: (message: MessageValue) => void;
-}) => {
-  const {
-    isI18nReady,
-    settings,
-    validateSettings,
-    generateProblems,
-    hasInitialGenerated,
-    setHasInitialGenerated,
-    setError,
-    setWarning,
-    scheduleSuccessMessage,
-  } = params;
-
-  useInitialGeneration({
-    isI18nReady,
-    settings,
-    validateSettings,
-    generateProblems,
-    hasInitialGenerated,
-    setHasInitialGenerated,
-    setError,
-    setWarning,
-    setAndScheduleSuccess: scheduleSuccessMessage,
-  });
-
-  useEffect(() => {
-    const shouldEnableRuntimeEnforcement =
-      import.meta.env.DEV && import.meta.env.VITE_WCAG_RUNTIME_ENFORCEMENT === "true";
-    if (!shouldEnableRuntimeEnforcement) {
-      return;
-    }
-    return setupWCAGEnforcement();
-  }, []);
-};
-
-const useGenerateProblemHandlers = (params: {
-  generateProblems: (showSuccessMessage?: boolean) => {
-    error: MessageValue;
-    warning: MessageValue;
-    successMessage: MessageValue;
-  };
-  problems: Problem[];
-  settings: Settings;
-  paperSizeOptions: PaperSizeOptions;
-  messageActions: {
-    showSuccessMessage: (msg: MessageValue) => void;
-    clearMessages: () => void;
-    setError: (msg: MessageValue) => void;
-    setWarning: (msg: MessageValue) => void;
-    scheduleSuccessMessage: (msg: MessageValue) => void;
-  };
-  isDev: boolean;
-  initialization: {
-    isI18nReady: boolean;
-    validateSettings: (settings: Settings) => string;
-    hasInitialGenerated: boolean;
-    setHasInitialGenerated: (value: boolean) => void;
-  };
-}) => {
-  const {
-    generateProblems,
-    problems,
-    settings,
-    paperSizeOptions,
-    messageActions,
-    isDev,
-    initialization,
-  } = params;
-
-  const handleGenerateProblems = useCallback(() => {
-    const messages = generateProblems();
-    messageActions.setError(messages.error);
-    messageActions.setWarning(messages.warning);
-    messageActions.scheduleSuccessMessage(messages.successMessage);
-  }, [generateProblems, messageActions]);
-
-  const downloadPdf = usePdfDownload(
-    problems,
-    settings,
-    paperSizeOptions,
-    messageActions.showSuccessMessage,
-    messageActions.setError,
-    messageActions.clearMessages,
-    isDev,
-  );
-
-  useAppInitialization({
-    isI18nReady: initialization.isI18nReady,
-    settings,
-    validateSettings: initialization.validateSettings,
-    generateProblems,
-    hasInitialGenerated: initialization.hasInitialGenerated,
-    setHasInitialGenerated: initialization.setHasInitialGenerated,
-    setError: messageActions.setError,
-    setWarning: messageActions.setWarning,
-    scheduleSuccessMessage: messageActions.scheduleSuccessMessage,
-  });
-
-  return { handleGenerateProblems, downloadPdf } as const;
-};
-
-const useQuizControls = (params: {
-  problems: Problem[];
-  isI18nReady: boolean;
-  setError: (msg: MessageValue) => void;
-  setIsQuizMode: (value: boolean) => void;
-  setQuizResult: (value: QuizResult | null) => void;
-  settings: Settings;
-  isDev: boolean;
-}) => {
-  const { problems, isI18nReady, setError, setIsQuizMode, setQuizResult, settings, isDev } = params;
-
-  const { startQuizMode, exitQuizMode } = useQuizHandlers(
-    problems,
-    isI18nReady,
-    setError,
-    setIsQuizMode,
-    setQuizResult,
-  );
-
-  const handleQuizComplete = useCallback(
-    (result: QuizResult): void => {
-      setQuizResult(result);
-      saveQuizResult(result, settings, isDev);
-    },
-    [setQuizResult, settings, isDev],
-  );
-
-  return { startQuizMode, exitQuizMode, handleQuizComplete } as const;
-};
-
-const useMainContent = (params: {
-  isQuizMode: boolean;
-  problems: Problem[];
-  handleQuizComplete: (result: QuizResult) => void;
-  exitQuizMode: () => void;
-  t: (key: string, params?: Record<string, string | number>) => string;
-  settings: Settings;
-  handleChange: (field: keyof Settings, value: Settings[keyof Settings]) => void;
-  handleApplyPreset: (preset: Settings) => void;
-  paperSizeOptions: PaperSizeOptions;
-  handleGenerateProblems: () => void;
-  downloadPdf: () => Promise<void>;
-  startQuizMode: () => void;
-  quizResult: QuizResult | null;
-}) => {
-  const {
-    isQuizMode,
-    problems,
-    handleQuizComplete,
-    exitQuizMode,
-    t,
-    settings,
-    handleChange,
-    handleApplyPreset,
-    paperSizeOptions,
-    handleGenerateProblems,
-    downloadPdf,
-    startQuizMode,
-    quizResult,
-  } = params;
-
-  return useMemo(
-    (): MainContentProps => ({
-      isQuizMode,
-      problems,
-      onQuizComplete: handleQuizComplete,
-      onExitQuiz: exitQuizMode,
-      t,
-      settings,
-      onChange: handleChange,
-      onApplyPreset: handleApplyPreset,
-      paperSizeOptions,
-      onGenerate: handleGenerateProblems,
-      onDownload: downloadPdf,
-      onStartQuiz: startQuizMode,
-      quizResult,
-    }),
-    [
-      exitQuizMode,
-      handleApplyPreset,
-      handleChange,
-      handleGenerateProblems,
-      handleQuizComplete,
-      downloadPdf,
-      isQuizMode,
-      paperSizeOptions,
-      problems,
-      quizResult,
-      settings,
-      startQuizMode,
-      t,
-    ],
-  );
-};
-
-const useComposeMainContentProps = (params: {
-  translate: (key: string, params?: Record<string, string | number>) => string;
-  isQuizMode: boolean;
-  problems: Problem[];
-  handleQuizComplete: (result: QuizResult) => void;
-  exitQuizMode: () => void;
-  settings: Settings;
-  handleChange: (field: keyof Settings, value: Settings[keyof Settings]) => void;
-  handleApplyPreset: (preset: Settings) => void;
-  paperSizeOptions: PaperSizeOptions;
-  handleGenerateProblems: () => void;
-  downloadPdf: () => Promise<void>;
-  startQuizMode: () => void;
-  quizResult: QuizResult | null;
-}) => {
-  return useMainContent({
-    isQuizMode: params.isQuizMode,
-    problems: params.problems,
-    handleQuizComplete: params.handleQuizComplete,
-    exitQuizMode: params.exitQuizMode,
-    t: params.translate,
-    settings: params.settings,
-    handleChange: params.handleChange,
-    handleApplyPreset: params.handleApplyPreset,
-    paperSizeOptions: params.paperSizeOptions,
-    handleGenerateProblems: params.handleGenerateProblems,
-    downloadPdf: params.downloadPdf,
-    startQuizMode: params.startQuizMode,
-    quizResult: params.quizResult,
-  });
-};
-
-const buildMessages = (controller: ReturnType<typeof useMessagesController>) => ({
-  error: controller.state.error,
-  warning: controller.state.warning,
-  successMessage: controller.state.successMessage,
-  dismissError: controller.dismissError,
-  dismissWarning: controller.dismissWarning,
-  dismissSuccess: controller.dismissSuccessMessage,
-});
-
-const createMessageActions = (controller: ReturnType<typeof useMessagesController>) => ({
-  showSuccessMessage: controller.showSuccessMessage,
-  clearMessages: controller.clearMessages,
-  setError: controller.setError,
-  setWarning: controller.setWarning,
-  scheduleSuccessMessage: controller.scheduleSuccessMessage,
-});
-
-const useFormHandlersBundle = (params: {
-  settingsState: ReturnType<typeof useSettings>;
-  validationState: ReturnType<typeof useSettingsValidation>;
-  isLoading: boolean;
-  messageActions: ReturnType<typeof createMessageActions>;
-  setSuccessMessage: (msg: MessageValue) => void;
-}): ReturnType<typeof useAppHandlers> => {
-  const { settingsState, validationState, isLoading, messageActions, setSuccessMessage } = params;
-
-  return useAppHandlers({
-    settings: settingsState.settings,
-    setSettings: settingsState.setSettings,
-    clearMessages: messageActions.clearMessages,
-    isValidationSensitiveField: validationState.isValidationSensitiveField,
-    validateSettings: settingsState.validateSettings,
-    isLoading,
-    checkRestrictiveSettings: validationState.checkRestrictiveSettings,
-    setError: messageActions.setError,
-    setWarning: messageActions.setWarning,
-    setSuccessMessage,
-  });
-};
-
-const useQuizControlsBundle = (params: {
-  appState: ReturnType<typeof useAppState>;
-  problems: Problem[];
-  isI18nReady: boolean;
-  messageActions: ReturnType<typeof createMessageActions>;
-  settings: Settings;
-  isDev: boolean;
-}) => {
-  const { appState, problems, isI18nReady, messageActions, settings, isDev } = params;
-
-  return useQuizControls({
-    problems,
-    isI18nReady,
-    setError: messageActions.setError,
-    setIsQuizMode: appState.setIsQuizMode,
-    setQuizResult: appState.setQuizResult,
-    settings,
-    isDev,
-  });
-};
-
-const useProblemAndFormHandlers = (params: {
-  settingsState: ReturnType<typeof useSettings>;
-  validationState: ReturnType<typeof useSettingsValidation>;
-  problemState: ReturnType<typeof useProblemGenerator>;
-  paperSizeOptions: PaperSizeOptions;
-  messageActions: ReturnType<typeof createMessageActions>;
-  isDev: boolean;
-  isI18nReady: boolean;
-  isLoading: boolean;
-  hasInitialGenerated: boolean;
-  setHasInitialGenerated: (value: boolean) => void;
-}): {
-  handleGenerateProblems: () => void;
-  downloadPdf: ReturnType<typeof usePdfDownload>;
-  handleChange: ReturnType<typeof useAppHandlers>["handleChange"];
-  handleApplyPreset: ReturnType<typeof useAppHandlers>["handleApplyPreset"];
-} => {
-  const {
-    problemState,
-    settingsState,
-    paperSizeOptions,
-    messageActions,
-    isDev,
-    isI18nReady,
-    validationState,
-    isLoading,
-    hasInitialGenerated,
-    setHasInitialGenerated,
-  } = params;
-
-  const problemHandlers = useGenerateProblemHandlers({
-    generateProblems: problemState.generateProblems,
-    problems: problemState.problems,
-    settings: settingsState.settings,
-    paperSizeOptions,
-    messageActions,
-    isDev,
-    initialization: {
-      isI18nReady,
-      validateSettings: settingsState.validateSettings,
-      hasInitialGenerated,
-      setHasInitialGenerated,
-    },
-  });
-
-  const formHandlers = useFormHandlersBundle({
-    settingsState,
-    validationState,
-    isLoading,
-    messageActions,
-    setSuccessMessage: messageActions.showSuccessMessage,
-  });
-
-  return {
-    handleGenerateProblems: problemHandlers.handleGenerateProblems,
-    downloadPdf: problemHandlers.downloadPdf,
-    handleChange: formHandlers.handleChange,
-    handleApplyPreset: formHandlers.handleApplyPreset,
-  } as const;
-};
-
-interface AppViewModel {
-  t: (key: string, params?: Record<string, string | number>) => string;
-  isLoading: boolean;
-  loadingMessages: { title: string; message: string };
-  messages: {
-    error: MessageValue;
-    warning: MessageValue;
-    successMessage: MessageValue;
-    dismissError: () => void;
-    dismissWarning: () => void;
-    dismissSuccess: () => void;
-  };
-  mainContentProps: MainContentProps;
-  showSpeedInsights: boolean;
-}
-
-const useAppDependenciesAndActions = (
-  isLoading: boolean,
-  messagesController: ReturnType<typeof useMessagesController>,
-) => {
-  const dependencies = useAppDependencies(isLoading);
-  const messageActions = createMessageActions(messagesController);
-  return { ...dependencies, messageActions };
-};
-
-const useAppMainHandlers = (
-  dependencies: ReturnType<typeof useAppDependenciesAndActions>,
-  isLoading: boolean,
-  hasInitialGenerated: boolean,
-  setHasInitialGenerated: (value: boolean) => void,
-): ReturnType<typeof useProblemAndFormHandlers> & ReturnType<typeof useQuizControlsBundle> => {
-  const { settingsState, problemState, validationState, constants, messageActions } = dependencies;
-  const { paperSizeOptions, isDev, isI18nReady } = constants;
-
-  const problemAndFormHandlers = useProblemAndFormHandlers({
-    settingsState,
-    validationState,
-    problemState,
-    paperSizeOptions,
-    messageActions,
-    isDev,
-    isI18nReady,
-    isLoading,
-    hasInitialGenerated,
-    setHasInitialGenerated,
-  });
-
-  const quizControlsBundle = useQuizControlsBundle({
-    appState: dependencies.appState,
-    problems: problemState.problems,
-    isI18nReady,
-    messageActions,
-    settings: settingsState.settings,
-    isDev,
-  });
-
-  return { ...problemAndFormHandlers, ...quizControlsBundle };
-};
-
-const useAppMainContentProps = (
-  translate: (key: string, params?: Record<string, string | number>) => string,
-  isLoading: boolean,
-  messagesController: ReturnType<typeof useMessagesController>,
-) => {
-  const dependencies = useAppDependenciesAndActions(isLoading, messagesController);
-  const { appState } = dependencies;
-  const { hasInitialGenerated, setHasInitialGenerated } = appState;
-
-  const handlers = useAppMainHandlers(
-    dependencies,
-    isLoading,
-    hasInitialGenerated,
-    setHasInitialGenerated,
-  );
-
-  const mainContentProps = useComposeMainContentProps({
-    translate,
-    isQuizMode: appState.isQuizMode,
-    problems: dependencies.problemState.problems,
-    handleQuizComplete: handlers.handleQuizComplete,
-    exitQuizMode: handlers.exitQuizMode,
-    settings: dependencies.settingsState.settings,
-    handleChange: handlers.handleChange,
-    handleApplyPreset: handlers.handleApplyPreset,
-    paperSizeOptions: dependencies.constants.paperSizeOptions,
-    handleGenerateProblems: handlers.handleGenerateProblems,
-    downloadPdf: handlers.downloadPdf,
-    startQuizMode: handlers.startQuizMode,
-    quizResult: appState.quizResult,
-  });
-
-  return {
-    mainContentProps,
-    showSpeedInsights: import.meta.env.PROD,
-    loadingMessages: {
-      title: translate("app.title"),
-      message: translate("loading.translations"),
-    },
-  } as const;
-};
-
-const useAppViewModel = (): AppViewModel => {
-  const { t, isLoading } = useTranslation();
-  const messagesController = useMessagesController();
-  const composition = useAppMainContentProps(t, isLoading, messagesController);
-
-  return {
-    t,
-    isLoading,
-    loadingMessages: composition.loadingMessages,
-    messages: buildMessages(messagesController),
-    mainContentProps: composition.mainContentProps,
-    showSpeedInsights: composition.showSpeedInsights,
-  };
-};
+const paperSizeOptions: PaperSizeOptions = { a4: "a4", letter: "letter", legal: "legal" };
 
 function App(): React.JSX.Element {
-  // React 19.2 Features Integration
-  const { trackRender } = usePerformanceTracking();
-
-  const { t, isLoading, loadingMessages, messages, mainContentProps, showSpeedInsights } =
-    useAppViewModel();
-
-  // Track render performance with React 19.2 features
-  React.useEffect(() => {
-    trackRender();
+  const { t, isLoading } = useTranslation();
+  const { settings, setSettings, validateSettings } = useSettings();
+  const generation = useProblemGenerator(settings, isLoading, validateSettings);
+  const { problems } = generation;
+  const {
+    error,
+    warning,
+    successMessage,
+    setError,
+    setWarning,
+    setSuccessMessage,
+    showSuccessMessage,
+    clearMessages,
+  } = useAppMessages();
+  const validation = useSettingsValidation();
+  const [isQuizMode, setIsQuizMode] = useState(false);
+  const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const formHandlers = useAppHandlers({
+    settings,
+    setSettings,
+    clearMessages,
+    ...validation,
+    validateSettings,
+    isLoading,
+    setError,
+    setWarning,
+    setSuccessMessage: showSuccessMessage,
   });
-
-  if (isLoading) {
-    return <LoadingScreen title={loadingMessages.title} message={loadingMessages.message} />;
-  }
-
-  return (
-    <TranslationLoader>
-      <div className="App">
-        <AppHeader t={t} />
-
-        <main className="main-content">
-          <MessagesContainer
-            error={messages.error}
-            warning={messages.warning}
-            successMessage={messages.successMessage}
-            onDismissError={messages.dismissError}
-            onDismissWarning={messages.dismissWarning}
-            onDismissSuccess={messages.dismissSuccess}
-          />
-
-          <MainContent {...mainContentProps} />
-
-          {showSpeedInsights && (
-            <Suspense fallback={null}>
-              <SpeedInsights />
-            </Suspense>
-          )}
-        </main>
-
-        {/* React 19.2 Performance Monitor */}
-        <PerformanceMonitor enabled={process.env.NODE_ENV === "development"} showDetails />
+  const quizHandlers = useQuizHandlers(
+    problems,
+    !isLoading,
+    setError,
+    setIsQuizMode,
+    setQuizResult,
+  );
+  const pdfLabels = useMemo(
+    () => ({
+      group: (index: number, empty: boolean) =>
+        t(empty ? "problems.emptyGroup" : "results.groupTitle", { number: index, group: index }),
+      empty: t("results.noProblems"),
+    }),
+    [t],
+  );
+  const download = usePdfDownload(
+    problems,
+    settings,
+    paperSizeOptions,
+    showSuccessMessage,
+    setError,
+    clearMessages,
+    { isDev: import.meta.env.DEV, labels: pdfLabels },
+  );
+  const downloadPdf = useCallback(async () => {
+    if (isDownloading) return;
+    setIsDownloading(true);
+    try {
+      await download();
+    } finally {
+      setIsDownloading(false);
+    }
+  }, [download, isDownloading]);
+  const handleGenerate = useCallback(() => {
+    clearMessages();
+    generation.generateProblems();
+  }, [clearMessages, generation.generateProblems]);
+  const onQuizComplete = useCallback(
+    (result: QuizResult) => {
+      setQuizResult(result);
+      saveQuizResult(result, settings, import.meta.env.DEV);
+    },
+    [settings],
+  );
+  const messages = generation.messages;
+  useEffect(() => {
+    if (!messages) return;
+    setError(messages.error);
+    setWarning(messages.warning);
+    showSuccessMessage(messages.successMessage);
+  }, [messages, setError, setWarning, showSuccessMessage]);
+  useEffect(() => {
+    if (import.meta.env.DEV && import.meta.env.VITE_WCAG_RUNTIME_ENFORCEMENT === "true")
+      return setupWCAGEnforcement();
+  }, []);
+  const loading = useMemo(
+    () => (
+      <div className="loading-container">
+        <h1>{t("app.title")}</h1>
+        <p>{t("loading.translations")}</p>
       </div>
-    </TranslationLoader>
+    ),
+    [t],
+  );
+  // Keep a running quiz mounted while a different language loads.
+  if (isLoading && problems.length === 0) return <div className="App">{loading}</div>;
+  return (
+    <PerformanceMonitor enabled={import.meta.env.DEV} showDetails>
+      <TranslationLoader keepMounted={problems.length > 0}>
+        <div className="App">
+          <AppHeader t={t} />
+          <main className="main-content">
+            <div className="messages-container">
+              <ErrorMessage error={error} type="error" onDismiss={() => setError("")} />
+              <ErrorMessage error={warning} type="warning" onDismiss={() => setWarning("")} />
+              <ErrorMessage
+                error={successMessage}
+                type="info"
+                onDismiss={() => setSuccessMessage("")}
+              />
+            </div>
+            {isQuizMode ? (
+              <Suspense fallback={loading}>
+                <QuizMode
+                  problems={problems}
+                  onQuizComplete={onQuizComplete}
+                  onExitQuiz={quizHandlers.exitQuizMode}
+                />
+              </Suspense>
+            ) : (
+              <div className="container">
+                <SettingsSection
+                  t={t}
+                  settings={settings}
+                  onChange={formHandlers.handleChange}
+                  onApplyPreset={formHandlers.handleApplyPreset}
+                  paperSizeOptions={paperSizeOptions}
+                />
+                <div className="results-section">
+                  <ActionCards
+                    t={t}
+                    problemsCount={problems.length}
+                    onGenerate={handleGenerate}
+                    onDownload={downloadPdf}
+                    onStartQuiz={quizHandlers.startQuizMode}
+                    isGenerating={generation.isGenerating}
+                    isDownloading={isDownloading}
+                  />
+                  {generation.isGenerating && (
+                    <div role="status" aria-live="polite">
+                      <progress
+                        value={generation.progress}
+                        max={100}
+                        aria-label={t("buttons.generating")}
+                      />
+                      <button type="button" onClick={generation.cancelGeneration}>
+                        {t("buttons.cancelGeneration")}
+                      </button>
+                    </div>
+                  )}
+                  <ProblemsSection t={t} problems={problems} settings={settings} />
+                  <InfoPanel problems={problems} settings={settings} quizResult={quizResult} />
+                </div>
+              </div>
+            )}
+            {import.meta.env.PROD && (
+              <Suspense fallback={null}>
+                <SpeedInsights />
+              </Suspense>
+            )}
+          </main>
+        </div>
+      </TranslationLoader>
+    </PerformanceMonitor>
   );
 }
-
 export default App;

@@ -110,7 +110,7 @@ describe("safeEvaluateExpression", () => {
   test("throws error for consecutive operators", () => {
     expect(() => safeEvaluateExpression("2 ++ 3")).toThrow("Expected number");
     expect(() => safeEvaluateExpression("2 */ 3")).toThrow("Expected number");
-    expect(() => safeEvaluateExpression("2 +- 3")).toThrow("Expected number");
+    expect(safeEvaluateExpression("2 +- 3")).toBe(-1);
   });
 
   test("handles expressions with spaces correctly", () => {
@@ -131,8 +131,8 @@ describe("safeEvaluateExpression", () => {
   });
 
   test("handles division by zero", () => {
-    expect(safeEvaluateExpression("5 / 0")).toBe(Infinity);
-    expect(safeEvaluateExpression("0 / 0")).toBeNaN();
+    expect(() => safeEvaluateExpression("5 / 0")).toThrow("finite");
+    expect(() => safeEvaluateExpression("0 / 0")).toThrow("finite");
   });
 
   test("handles very large numbers", () => {

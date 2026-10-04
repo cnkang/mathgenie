@@ -1,39 +1,33 @@
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { MessageValue } from "../types";
-
-interface UseAppMessagesReturn {
-  error: MessageValue;
-  warning: MessageValue;
-  successMessage: MessageValue;
-  setError: (error: MessageValue) => void;
-  setWarning: (warning: MessageValue) => void;
-  setSuccessMessage: (message: MessageValue) => void;
-  clearMessages: () => void;
-  showSuccessMessage: (message: MessageValue) => void;
-}
-
-export const useAppMessages = (): UseAppMessagesReturn => {
+export const useAppMessages = () => {
   const [error, setError] = useState<MessageValue>("");
   const [warning, setWarning] = useState<MessageValue>("");
   const [successMessage, setSuccessMessage] = useState<MessageValue>("");
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const clearMessages = (): void => {
+  const timeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clearTimeoutRef = useCallback(() => {
+    if (timeout.current !== null) clearTimeout(timeout.current);
+    timeout.current = null;
+  }, []);
+  useEffect(() => clearTimeoutRef, [clearTimeoutRef]);
+  const clearMessages = useCallback(() => {
+    clearTimeoutRef();
     setError("");
     setWarning("");
     setSuccessMessage("");
-  };
-
-  const showSuccessMessage = (message: MessageValue): void => {
-    // Clear any existing timeout
-    if (timeoutRef.current) {
-      globalThis.clearTimeout(timeoutRef.current);
-    }
-
-    setSuccessMessage(message);
-    timeoutRef.current = globalThis.setTimeout(() => setSuccessMessage(""), 5000);
-  };
-
+  }, [clearTimeoutRef]);
+  const showSuccessMessage = useCallback(
+    (message: MessageValue) => {
+      clearTimeoutRef();
+      setSuccessMessage(message);
+      if (message)
+        timeout.current = setTimeout(() => {
+          setSuccessMessage("");
+          timeout.current = null;
+        }, 5000);
+    },
+    [clearTimeoutRef],
+  );
   return {
     error,
     warning,

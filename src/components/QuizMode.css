@@ -88,7 +88,9 @@
 .exit-quiz-btn-small:active {
   transform: scale(0.97);
   box-shadow: var(--shadow-pressed);
-  transition: transform var(--transition-press), box-shadow var(--transition-press);
+  transition:
+    transform var(--transition-press),
+    box-shadow var(--transition-press);
 }
 
 .quiz-content {
@@ -138,7 +140,9 @@
 .nav-btn:active:not(:disabled) {
   transform: scale(0.97);
   box-shadow: var(--shadow-pressed);
-  transition: transform var(--transition-press), box-shadow var(--transition-press);
+  transition:
+    transform var(--transition-press),
+    box-shadow var(--transition-press);
 }
 
 .nav-btn:disabled {
@@ -165,7 +169,9 @@
 .interactive-problem.correct {
   background: linear-gradient(135deg, #f0fdf4, #dcfce7);
   border-color: var(--success-color);
-  box-shadow: 0 0 0 3px rgb(74 222 128 / 15%), var(--shadow-md);
+  box-shadow:
+    0 0 0 3px rgb(74 222 128 / 15%),
+    var(--shadow-md);
   transform: scale(1.01);
   transition:
     background-color var(--transition-spring),
@@ -177,7 +183,9 @@
 .interactive-problem.incorrect {
   background: linear-gradient(135deg, #fef2f2, #fee2e2);
   border-color: var(--error-color);
-  box-shadow: 0 0 0 3px rgb(239 68 68 / 15%), var(--shadow-md);
+  box-shadow:
+    0 0 0 3px rgb(239 68 68 / 15%),
+    var(--shadow-md);
   transform: scale(0.99);
   transition:
     background-color var(--transition-spring),
@@ -258,7 +266,9 @@
 .submit-answer-btn:active:not(:disabled) {
   transform: scale(0.97);
   box-shadow: var(--shadow-pressed);
-  transition: transform var(--transition-press), box-shadow var(--transition-press);
+  transition:
+    transform var(--transition-press),
+    box-shadow var(--transition-press);
 }
 
 .submit-answer-btn:disabled {
@@ -383,7 +393,9 @@
 .stat-item:active {
   transform: scale(0.97);
   box-shadow: var(--shadow-pressed);
-  transition: transform var(--transition-press), box-shadow var(--transition-press);
+  transition:
+    transform var(--transition-press),
+    box-shadow var(--transition-press);
 }
 
 .stat-icon {
@@ -462,7 +474,9 @@
 .exit-quiz-btn:active {
   transform: scale(0.97);
   box-shadow: var(--shadow-pressed);
-  transition: transform var(--transition-press), box-shadow var(--transition-press);
+  transition:
+    transform var(--transition-press),
+    box-shadow var(--transition-press);
 }
 
 .retry-quiz-btn {
@@ -479,7 +493,9 @@
 .retry-quiz-btn:active {
   transform: scale(0.97);
   box-shadow: var(--shadow-pressed);
-  transition: transform var(--transition-press), box-shadow var(--transition-press);
+  transition:
+    transform var(--transition-press),
+    box-shadow var(--transition-press);
 }
 
 .detailed-results {
@@ -581,13 +597,17 @@
   .interactive-problem.correct {
     background: linear-gradient(135deg, #052e16, #14532d);
     border-color: var(--success-color);
-    box-shadow: 0 0 0 3px rgb(74 222 128 / 18%), var(--shadow-md);
+    box-shadow:
+      0 0 0 3px rgb(74 222 128 / 18%),
+      var(--shadow-md);
   }
 
   .interactive-problem.incorrect {
     background: linear-gradient(135deg, #450a0a, #7f1d1d);
     border-color: var(--error-color);
-    box-shadow: 0 0 0 3px rgb(239 68 68 / 18%), var(--shadow-md);
+    box-shadow:
+      0 0 0 3px rgb(239 68 68 / 18%),
+      var(--shadow-md);
   }
 
   .problem-review.correct {

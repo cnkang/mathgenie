@@ -1,9 +1,5 @@
-import {
-  useConcurrentFeatures,
-  useEnhancedCache,
-  usePerformanceTracking,
-} from "@/hooks/usePerformance";
-import React, { useDeferredValue, useEffect, useState } from "react";
+import { useConcurrentFeatures, usePerformanceTracking } from "@/hooks/usePerformance";
+import React, { Profiler, useDeferredValue, useEffect, useState } from "react";
 
 interface PerformanceData {
   renderCount: number;
@@ -35,18 +31,14 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
 
   // Use React 19.2's useDeferredValue for better performance
   const deferredMemoryInfo = useDeferredValue(memoryInfo);
-  const deferredMetrics = useDeferredValue(performanceMetrics);
-
-  // Use React 19.2's enhanced caching for performance data
-  const cachedPerformanceData = useEnhancedCache<PerformanceData>("performance-data", () => ({
-    ...deferredMetrics,
+  const [measuredMetrics, setMeasuredMetrics] = useState(() => ({ ...performanceMetrics }));
+  const cachedPerformanceData: PerformanceData = {
+    ...measuredMetrics,
     memoryUsage: deferredMemoryInfo,
-  }));
+  };
 
   useEffect(() => {
     if (!enabled) return;
-
-    trackRender();
 
     // Monitor memory usage if available (Chrome DevTools)
     if (
@@ -65,6 +57,7 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
     const interval = setInterval(() => {
       // Use concurrent features for better performance
       scheduleUpdate(() => {
+        setMeasuredMetrics({ ...performanceMetrics });
         if (
           "memory" in performance &&
           (performance as { memory?: { usedJSHeapSize: number } }).memory
@@ -76,7 +69,7 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [enabled, scheduleUpdate]);
+  }, [enabled, scheduleUpdate, performanceMetrics]);
 
   if (!enabled) {
     return <>{children}</>;
@@ -84,7 +77,9 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
 
   return (
     <>
-      {children}
+      <Profiler id="monitored-content" onRender={(_id, _phase, duration) => trackRender(duration)}>
+        {children}
+      </Profiler>
       <div
         className="performance-monitor"
         style={{
