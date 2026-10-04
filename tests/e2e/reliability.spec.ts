@@ -1,5 +1,41 @@
+/// <reference types="node" />
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { createServer } from 'node:http';
+
+// An isolated origin lets the test disconnect the real network without WebKit's
+// offline-emulation bug rejecting responses fulfilled entirely by a service worker.
+const createOfflineOrigin = async (upstreamOrigin: string) => {
+  const server = createServer(async (request, response) => {
+    try {
+      const upstream = await fetch(new URL(request.url ?? '/', upstreamOrigin), {
+        signal: AbortSignal.timeout(10000),
+      });
+      const headers = Object.fromEntries(upstream.headers);
+      delete headers['content-encoding'];
+      delete headers['content-length'];
+      response.writeHead(upstream.status, headers);
+      response.end(Buffer.from(await upstream.arrayBuffer()));
+    } catch {
+      response.writeHead(502).end();
+    }
+  });
+  await new Promise<void>((resolve, reject) => {
+    server.once('error', reject);
+    server.listen(0, '127.0.0.1', resolve);
+  });
+  const address = server.address();
+  if (!address || typeof address === 'string') throw new Error('Missing offline test origin');
+  const disconnect = async () => {
+    if (!server.listening) return;
+    const closed = new Promise<void>((resolve, reject) => {
+      server.close(error => error ? reject(error) : resolve());
+    });
+    server.closeAllConnections();
+    await closed;
+  };
+  return { url: `http://127.0.0.1:${address.port}`, disconnect };
+};
 const settings = { operations: ['+'], numProblems: 1, numRange: [2, 2], resultRange: [4, 4], numOperandsRange: [2, 2], allowNegative: false, showAnswers: true, fontSize: 16, lineSpacing: 12, paperSize: 'a4', enableGrouping: false, problemsPerGroup: 20, totalGroups: 1 };
 test.beforeEach(async ({ page }) => {
   await page.addInitScript((value) => { localStorage.setItem('mathgenie-settings', JSON.stringify(value)); localStorage.setItem('mathgenie-language', 'en'); }, settings);
@@ -41,12 +77,23 @@ test('loads PDF only on demand', async ({ page }) => {
   expect((await download).suggestedFilename()).toBe('problems.pdf');
   expect(pdfRequests.length).toBeGreaterThan(0);
  });
-test('serves the application and quiz offline', async ({ page, context }) => {
-  await expect(page.locator('.problem-item')).toHaveCount(1);
-  await page.evaluate(async () => { await navigator.serviceWorker.ready; if (!navigator.serviceWorker.controller) await new Promise<void>((resolve) => navigator.serviceWorker.addEventListener('controllerchange', () => resolve(), { once: true })); });
-  await context.setOffline(true);
-  await page.reload();
-  await expect(page.locator('.problem-item')).toHaveCount(1);
-  await page.getByRole('button', { name: /Start Quiz/i }).click();
-  await expect(page.locator('.answer-input')).toBeVisible();
+test('serves the application and quiz offline', async ({ page }) => {
+  const origin = await createOfflineOrigin(new URL(page.url()).origin);
+  try {
+    await page.goto(origin.url);
+    await expect(page.locator('.problem-item')).toHaveCount(1);
+    await page.evaluate(async () => {
+      await navigator.serviceWorker.ready;
+      if (!navigator.serviceWorker.controller) {
+        await new Promise<void>(resolve => navigator.serviceWorker.addEventListener('controllerchange', () => resolve(), { once: true }));
+      }
+    });
+    await origin.disconnect();
+    await page.reload();
+    await expect(page.locator('.problem-item')).toHaveCount(1);
+    await page.getByRole('button', { name: /Start Quiz/i }).click();
+    await expect(page.locator('.answer-input')).toBeVisible();
+  } finally {
+    await origin.disconnect();
+  }
 });
