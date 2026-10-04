@@ -44,8 +44,11 @@ export const validateSettings = (value: unknown): string => {
       "errors.invalidResultRange",
     ],
     [range(value.numOperandsRange, 2, 100), "errors.invalidOperandsRange"],
-    [integer(value.problemsPerGroup, 1, 1000), "errors.invalidProblemsPerGroup"],
-    [integer(value.totalGroups, 1, 100), "errors.invalidTotalGroups"],
+    [
+      !value.enableGrouping || integer(value.problemsPerGroup, 1, 1000),
+      "errors.invalidProblemsPerGroup",
+    ],
+    [!value.enableGrouping || integer(value.totalGroups, 1, 100), "errors.invalidTotalGroups"],
     [
       typeof value.allowNegative === "boolean" &&
         typeof value.showAnswers === "boolean" &&
