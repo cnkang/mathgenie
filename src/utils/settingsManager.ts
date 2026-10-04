@@ -1,3 +1,4 @@
+import { parseSettings } from "@/domain/settings";
 import type { Settings } from "../types";
 
 export interface SettingsData {
@@ -25,31 +26,27 @@ export class SettingsParseError extends Error {
   }
 }
 
-const isValidObject = (data: unknown): data is Record<string, unknown> => {
-  return data !== null && typeof data === "object";
-};
-
-const hasSettingsProperty = (data: Record<string, unknown>): boolean => {
-  return "settings" in data;
-};
-
-const hasValidSettingsObject = (data: Record<string, unknown>): boolean => {
-  return typeof data.settings === "object" && data.settings !== null;
-};
+const isValidObject = (data: unknown): data is Record<string, unknown> =>
+  data !== null && typeof data === "object" && !Array.isArray(data);
 
 export const validateSettingsData = (data: unknown): data is SettingsData => {
-  if (!isValidObject(data)) {
+  if (
+    !isValidObject(data) ||
+    data.version !== "1.0" ||
+    typeof data.timestamp !== "string" ||
+    !Number.isFinite(Date.parse(data.timestamp))
+  )
+    return false;
+  try {
+    parseSettings(data.settings);
+    return true;
+  } catch {
     return false;
   }
-
-  if (!hasSettingsProperty(data)) {
-    return false;
-  }
-
-  return hasValidSettingsObject(data);
 };
 
 export const parseSettingsFile = (content: string): SettingsData => {
+  if (content.length > 65536) throw new SettingsParseError("Settings file is too large");
   let data: unknown;
   try {
     data = JSON.parse(content);
@@ -61,7 +58,7 @@ export const parseSettingsFile = (content: string): SettingsData => {
     throw new SettingsParseError("Settings file structure is invalid");
   }
 
-  return data;
+  return { ...data, settings: parseSettings(data.settings) };
 };
 
 export const createDownloadBlob = (data: string): Blob =>

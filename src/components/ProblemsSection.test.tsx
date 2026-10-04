@@ -145,7 +145,7 @@ describe("ProblemsSection", { concurrent: false }, () => {
     render(<ProblemsSection t={t} problems={problems as any} settings={mockSettings} />);
 
     const problemsContent = screen.getByLabelText("accessibility.problemsList");
-    expect(problemsContent).toHaveAttribute("aria-live", "polite");
+    expect(problemsContent).not.toHaveAttribute("aria-live");
     expect(problemsContent).toHaveAttribute("tabIndex", "0");
     expect(problemsContent).toHaveAttribute("aria-labelledby", "results-title");
   });

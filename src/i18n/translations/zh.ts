@@ -50,6 +50,7 @@ export default {
     paperSize: "纸张大小",
   },
   buttons: {
+    cancelGeneration: "取消生成",
     generate: "生成题目",
     generating: "正在生成题目...",
     generateDescription: "使用当前设置创建新的数学题目",
@@ -59,6 +60,9 @@ export default {
     downloadEmpty: "下载 PDF",
   },
   results: {
+    previousPage: "上一页",
+    nextPage: "下一页",
+    page: "第 {{page}} / {{pages}} 页",
     title: "生成的题目 ({{count}} 道)",
     noProblems: "尚未生成题目",
     clickToStart: '点击"{{generateButton}}"开始',

@@ -80,7 +80,9 @@ const EnhancedSuspense: React.FC<EnhancedSuspenseProps> = ({
       {showOptimisticError ? (
         <div className="error-fallback">
           <p>Something went wrong</p>
-          <button type="button" onClick={handleRetry}>Try Again</button>
+          <button type="button" onClick={handleRetry}>
+            Try Again
+          </button>
         </div>
       ) : (
         fallback

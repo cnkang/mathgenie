@@ -7,18 +7,23 @@ import { useCallback, useDeferredValue, useMemo, useRef, useTransition } from "r
 export const usePerformanceTracking = () => {
   const renderCountRef = useRef(0);
 
-  const trackRender = useCallback(() => {
+  const durations = useRef({ total: 0, last: 0 });
+  const trackRender = useCallback((duration = 0) => {
     renderCountRef.current += 1;
+    durations.current.total += duration;
+    durations.current.last = Date.now();
   }, []);
-
-  // Return a getter so consumers always read the latest count
   const performanceMetrics = useMemo(
     () => ({
       get renderCount() {
         return renderCountRef.current;
       },
-      lastRenderTime: Date.now(),
-      averageRenderTime: 0,
+      get lastRenderTime() {
+        return durations.current.last;
+      },
+      get averageRenderTime() {
+        return renderCountRef.current ? durations.current.total / renderCountRef.current : 0;
+      },
     }),
     [],
   );

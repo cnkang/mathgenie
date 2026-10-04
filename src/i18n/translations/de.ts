@@ -51,6 +51,7 @@ export default {
     paperSize: "Papiergröße",
   },
   buttons: {
+    cancelGeneration: "Generierung abbrechen",
     generate: "Aufgaben generieren",
     generating: "Aufgaben werden generiert...",
     generateDescription: "Neue Mathematikaufgaben mit Ihren aktuellen Einstellungen erstellen",
@@ -60,6 +61,9 @@ export default {
     downloadEmpty: "Leere PDF herunterladen",
   },
   results: {
+    previousPage: "Vorherige Seite",
+    nextPage: "Nächste Seite",
+    page: "Seite {{page}} von {{pages}}",
     title: "Generierte Aufgaben ({{count}})",
     noProblems: "Noch keine Aufgaben generiert",
     clickToStart: 'Klicken Sie auf "{{generateButton}}", um zu beginnen',

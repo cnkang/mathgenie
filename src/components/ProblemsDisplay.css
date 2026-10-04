@@ -535,3 +535,12 @@
     transform: scale(1);
   }
 }
+
+.problems-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+  flex-wrap: wrap;
+}

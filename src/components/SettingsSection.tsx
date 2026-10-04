@@ -1,5 +1,6 @@
 import type { Settings } from "@/types";
 import React from "react";
+import SettingsManager from "./SettingsManager";
 import SettingsPresets from "./SettingsPresets";
 import "./SettingsSection.css";
 import RangeInput from "./form/RangeInput";
@@ -95,6 +96,7 @@ const SettingsSection: React.FC<SettingsSectionProps> = ({
       />
 
       <SettingsPresets onApplyPreset={onApplyPreset} currentSettings={settings} />
+      <SettingsManager settings={settings} onImportSettings={onApplyPreset} />
       <PdfSettings settings={settings} onChange={onChange} paperSizeOptions={paperSizeOptions} />
       <AdvancedSettings settings={settings} onChange={onChange} />
     </section>

@@ -83,6 +83,10 @@ const importSettingsFromFile = async (
   onImportError: ImportErrorReporter,
 ): Promise<void> => {
   try {
+    if (file.size > 65536) {
+      onImportError(t("settings.importError"));
+      return;
+    }
     const result = await file.text();
     if (typeof result !== "string") {
       onImportError(t("settings.importError") || "Invalid settings file format");

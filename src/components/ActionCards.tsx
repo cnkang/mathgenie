@@ -61,6 +61,8 @@ type ActionCardsProps = {
   onGenerate: () => void;
   onDownload: () => Promise<void> | void;
   onStartQuiz: () => void;
+  isGenerating?: boolean;
+  isDownloading?: boolean;
 };
 
 const ActionCards: React.FC<ActionCardsProps> = ({
@@ -69,6 +71,8 @@ const ActionCards: React.FC<ActionCardsProps> = ({
   onGenerate,
   onDownload,
   onStartQuiz,
+  isGenerating = false,
+  isDownloading = false,
 }) => {
   const isEmpty = problemsCount === 0;
   const legendId = React.useId();
@@ -85,6 +89,8 @@ const ActionCards: React.FC<ActionCardsProps> = ({
           type={STR_BUTTON}
           className="action-card generate-card"
           onClick={onGenerate}
+          disabled={isGenerating}
+          aria-busy={isGenerating}
           aria-label={`${t("buttons.generate")} · ${t("accessibility.generateButton")}`}
         >
           <div className={STR_ACTION_CARD_CONTENT}>
@@ -92,7 +98,7 @@ const ActionCards: React.FC<ActionCardsProps> = ({
               <GenerateIcon />
             </span>
             <div className={STR_ACTION_TEXT}>
-              <h3>{t("buttons.generate")}</h3>
+              <h3>{t(isGenerating ? "buttons.generating" : "buttons.generate")}</h3>
               <p>{t("buttons.generateDescription")}</p>
             </div>
             <div className={STR_ACTION_INDICATOR}>
@@ -114,8 +120,8 @@ const ActionCards: React.FC<ActionCardsProps> = ({
               (p as Promise<unknown>).catch(() => {});
             }
           }}
-          disabled={isEmpty}
-          aria-disabled={isEmpty}
+          disabled={isEmpty || isGenerating || isDownloading}
+          aria-disabled={isEmpty || isGenerating || isDownloading}
           aria-label={`${t("buttons.download")} · ${t("accessibility.downloadButton")}`}
         >
           <div className={STR_ACTION_CARD_CONTENT}>
@@ -138,8 +144,8 @@ const ActionCards: React.FC<ActionCardsProps> = ({
           type={STR_BUTTON}
           className="action-card quiz-card"
           onClick={onStartQuiz}
-          disabled={isEmpty}
-          aria-disabled={isEmpty}
+          disabled={isEmpty || isGenerating || isDownloading}
+          aria-disabled={isEmpty || isGenerating || isDownloading}
           aria-label={`${t("infoPanel.quickActions.startQuiz")} · ${t("buttons.quizDescription")}`}
         >
           <div className={STR_ACTION_CARD_CONTENT}>

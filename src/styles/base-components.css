@@ -94,7 +94,9 @@ button:hover {
 button:active {
   transform: scale(0.97);
   box-shadow: var(--shadow-pressed);
-  transition: transform var(--transition-press), box-shadow var(--transition-press);
+  transition:
+    transform var(--transition-press),
+    box-shadow var(--transition-press);
 }
 
 button:disabled {

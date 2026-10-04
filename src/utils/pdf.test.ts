@@ -1,5 +1,5 @@
 import type { PaperSizeOptions, Problem, Settings } from "@/types";
-import { describe, expect, test, vi } from "vite-plus/test";
+import { beforeEach, describe, expect, test, vi } from "vite-plus/test";
 
 // Simple mock for jsPDF
 const mockJsPDFInstance = {
@@ -7,7 +7,9 @@ const mockJsPDFInstance = {
   internal: { pageSize: { getHeight: () => 1000, getWidth: () => 800 } },
   addPage: vi.fn(),
   text: vi.fn(),
+  splitTextToSize: vi.fn((text: string) => [text]),
   save: vi.fn(),
+  addImage: vi.fn(),
 };
 
 function MockJsPDF(_options?: any) {
@@ -44,10 +46,69 @@ const baseSettings: Settings = {
 };
 
 describe("pdf utils", () => {
+  beforeEach(() => vi.clearAllMocks());
+  test("wraps long expressions, replaces symbols and paginates within margins", async () => {
+    const { generatePdf } = await import("./pdf");
+    mockJsPDFInstance.splitTextToSize.mockImplementationOnce(() => Array(100).fill("1 x 2 / 2 ="));
+    await generatePdf([{ id: 1, text: "1 ✖ 2 ➗ 2 =" }], baseSettings, paperSizes);
+    expect(mockJsPDFInstance.splitTextToSize).toHaveBeenCalledWith("1 x 2 / 2 =", 358);
+    expect(mockJsPDFInstance.addPage).toHaveBeenCalled();
+    for (const [, x, y] of mockJsPDFInstance.text.mock.calls) {
+      expect(x).toBeGreaterThanOrEqual(28);
+      expect(y).toBeLessThan(972);
+    }
+  });
+  test("renders localized headings using browser fonts and separates groups", async () => {
+    const { generatePdf } = await import("./pdf");
+    const context = { measureText: () => ({ width: 120 }), fillText: vi.fn() };
+    const createElement = document.createElement.bind(document);
+    vi.spyOn(document, "createElement").mockImplementation((tag, options) =>
+      tag === "canvas"
+        ? ({
+            getContext: () => context,
+            toDataURL: () => "data:image/png;base64,test",
+          } as unknown as HTMLCanvasElement)
+        : createElement(tag, options),
+    );
+    await generatePdf(
+      [
+        { id: 1, text: "1 + 1 =" },
+        { id: 2, text: "2 + 2 =" },
+      ],
+      { ...baseSettings, enableGrouping: true, totalGroups: 2, problemsPerGroup: 1 },
+      paperSizes,
+      "localized.pdf",
+      { group: (index) => `第${index}组`, empty: "没有题目" },
+    );
+    expect(mockJsPDFInstance.addImage).toHaveBeenCalledTimes(2);
+    expect(mockJsPDFInstance.addPage).toHaveBeenCalledTimes(1);
+    await generatePdf([], baseSettings, paperSizes, "empty.pdf", {
+      group: () => "组",
+      empty: "没有题目",
+    });
+    expect(context.fillText).toHaveBeenCalledWith("没有题目", 3, expect.any(Number));
+    vi.restoreAllMocks();
+  });
+  test.each([
+    { fontSize: 5 },
+    { fontSize: 73 },
+    { fontSize: NaN },
+    { lineSpacing: 0 },
+    { lineSpacing: 145 },
+    { lineSpacing: Infinity },
+    { paperSize: "unknown" },
+  ])("rejects invalid PDF settings %j", async (patch) => {
+    const { generatePdf } = await import("./pdf");
+    await expect(
+      generatePdf([], { ...baseSettings, ...patch } as Settings, paperSizes),
+    ).rejects.toThrow("Invalid PDF settings");
+  });
   test("loadJsPDF returns a function", async () => {
-    const { loadJsPDF } = await import("./pdf");
+    const { loadJsPDF, clearJsPDFCache } = await import("./pdf");
+    clearJsPDFCache();
     const jsPDF = await loadJsPDF();
     expect(typeof jsPDF).toBe("function");
+    expect(await loadJsPDF()).toBe(jsPDF);
   });
 
   test("generatePdf executes without errors", async () => {

@@ -1,347 +1,128 @@
 import type { MessageValue, Problem, Settings } from "@/types";
-import { buildExpression, randomInt } from "@/utils/problemUtils";
-import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from "react";
-
-const applyOperation = (result: number, operator: string, operand: number): number | null => {
-  const operations: Record<string, (a: number, b: number) => number | null> = {
-    "+": (a, b) => a + b,
-    "-": (a, b) => a - b,
-    "*": (a, b) => a * b,
-    "/": (a, b) => (b === 0 || a % b !== 0 ? null : a / b),
-  };
-
-  const operation = operations[operator];
-  return operation ? operation(result, operand) : null;
-};
-
-/**
- * Calculates the result of a mathematical expression with given operands and operators
- *
- * @param operands - Array of numbers to operate on
- * @param operators - Array of operators (+, -, *, /) to apply between operands
- * @returns The calculated result or null if the operation is invalid (e.g., division by zero)
- *
- * @example
- * ```typescript
- * calculateExpression([5, 3], ['+']) // Returns 8
- * calculateExpression([10, 2], ['/']) // Returns 5
- * calculateExpression([10, 0], ['/']) // Returns null (division by zero)
- * ```
- */
-export const calculateExpression = (operands: number[], operators: string[]): number | null => {
-  let result = operands[0];
-
-  for (let i = 0; i < operators.length; i++) {
-    const newResult = applyOperation(result, operators[i], operands[i + 1]);
-    if (newResult === null) {
-      return null;
-    }
-    result = newResult;
-  }
-
-  return result;
-};
-
-const isResultNull = (result: number | null): result is null => result === null;
-
-const isResultOutOfRange = (result: number, settings: Settings): boolean => {
-  const [minResult, maxResult] = settings.resultRange;
-  return result < minResult || result > maxResult;
-};
-
-const isResultNegativeWhenNotAllowed = (result: number, settings: Settings): boolean => {
-  return !settings.allowNegative && result < 0;
-};
-
-const isResultInvalid = (result: number | null, settings: Settings): boolean => {
-  if (isResultNull(result)) {
-    return true;
-  }
-
-  return isResultOutOfRange(result, settings) || isResultNegativeWhenNotAllowed(result, settings);
-};
-
-const isAdditionOnlyInfeasible = (settings: Settings, numOperands: number): boolean => {
-  if (settings.operations.length === 0 || !settings.operations.every((op) => op === "+")) {
-    return false;
-  }
-
-  const minSum = settings.numRange[0] * numOperands;
-  const maxSum = settings.numRange[1] * numOperands;
-  return settings.resultRange[0] > maxSum || settings.resultRange[1] < minSum;
-};
-
-const formatProblemExpression = (operands: number[], operators: string[]): string => {
-  return operators
-    .reduce((expression, operator, index) => {
-      return `${expression} ${operator} ${operands[index + 1]}`;
-    }, operands[0].toString())
-    .replaceAll("*", "✖")
-    .replaceAll("/", "➗");
-};
-
-const canGenerateProblem = (settings: Settings, numOperands: number): boolean => {
-  return numOperands >= 2 && !isAdditionOnlyInfeasible(settings, numOperands);
-};
-
-const createProblemText = (
-  operands: number[],
-  operators: string[],
-  result: number,
-  settings: Settings,
-): string => {
-  const formattedProblem = formatProblemExpression(operands, operators);
-  return settings.showAnswers ? `${formattedProblem} = ${result}` : `${formattedProblem} = `;
-};
-
-const attemptGenerateProblem = (settings: Settings, numOperands: number): string | null => {
-  const expression = buildExpression(numOperands, settings);
-  if (!expression) {
-    return null;
-  }
-
-  const { operands, operators } = expression;
-  const result = calculateExpression(operands, operators);
-  if (isResultInvalid(result, settings) || result === null) {
-    return null;
-  }
-
-  return createProblemText(operands, operators, result, settings);
-};
-
-/**
- * Generates a single math problem based on the provided settings
- *
- * @param settings - Configuration object containing operation types, ranges, and display options
- * @returns A formatted math problem string, or empty string if generation fails
- *
- * @example
- * ```typescript
- * const settings = {
- *   operations: ['+', '-'],
- *   numRange: [1, 10],
- *   resultRange: [0, 20],
- *   numOperandsRange: [2, 3],
- *   allowNegative: false,
- *   showAnswers: true,
- *   // ... other settings
- * };
- *
- * generateProblem(settings) // Returns "5 + 3 = 8" or similar
- * ```
- */
-export const generateProblem = (settings: Settings): string => {
-  const numOperands = randomInt(settings.numOperandsRange[0], settings.numOperandsRange[1]);
-
-  if (!canGenerateProblem(settings, numOperands)) {
-    return "";
-  }
-
-  const MAX_ATTEMPTS = 10000;
-  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-    const problem = attemptGenerateProblem(settings, numOperands);
-    if (problem) {
-      return problem;
-    }
-  }
-
-  return "";
-};
-
-const getErrorMessage = (): MessageValue => ({ key: "errors.noProblemsGenerated" });
-
-const getWarningMessage = (generated: number, requested: number): MessageValue => ({
-  key: "errors.partialGeneration",
-  params: { generated, requested },
-});
-
-const getSuccessMessage = (count: number): MessageValue => ({
-  key: "messages.success.problemsGenerated",
-  params: { count },
-});
-
-const getEmptyMessage = (): MessageValue => "";
-
-const evaluateGeneratedProblems = (
-  generated: Problem[],
-  requested: number,
-  showSuccessMessage: boolean,
-): {
-  error: MessageValue;
-  warning: MessageValue;
-  successMessage: MessageValue;
-} => {
-  const generatedCount = generated.length;
-
-  if (generatedCount === 0) {
-    return {
-      error: showSuccessMessage ? getErrorMessage() : getEmptyMessage(),
-      warning: getEmptyMessage(),
-      successMessage: getEmptyMessage(),
-    };
-  }
-
-  if (generatedCount < requested) {
-    return {
-      error: getEmptyMessage(),
-      warning: showSuccessMessage
-        ? getWarningMessage(generatedCount, requested)
-        : getEmptyMessage(),
-      successMessage: getEmptyMessage(),
-    };
-  }
-
-  return {
-    error: getEmptyMessage(),
-    warning: getEmptyMessage(),
-    successMessage: showSuccessMessage ? getSuccessMessage(generatedCount) : getEmptyMessage(),
-  };
-};
-
-const createProblemsArray = (settings: Settings): Problem[] => {
-  // 计算实际需要生成的题目数量
-  const totalProblems = settings.enableGrouping
-    ? settings.problemsPerGroup * settings.totalGroups
-    : settings.numProblems;
-
-  return Array.from({ length: totalProblems }, () => generateProblem(settings))
-    .filter((problem) => problem !== "")
-    .map((problem, index) => ({ id: index, text: problem }));
-};
-
-const handleGenerationError = (
-  err: unknown,
-  warning: MessageValue,
-  showSuccessMessage: boolean,
-) => {
-  if (import.meta.env.DEV) {
-    console.error("Problem generation error:", err);
-  }
-  return {
-    error: showSuccessMessage ? { key: "errors.generationFailed" } : "",
-    warning,
-    successMessage: "",
-  };
-};
-
-const processValidationError = (validationError: string) => ({
-  error: { key: validationError },
-  warning: getEmptyMessage(),
-  successMessage: getEmptyMessage(),
-});
-
+import { createGenerationOutcome, evaluateGeneratedProblems } from "@/domain/generation";
+import { formatExpression } from "@/domain/expression";
+import { calculateActualTotalProblems } from "@/utils/groupingUtils";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+export { calculateExpression, generateProblem } from "@/domain/generation";
 const EMPTY_MESSAGES = { error: "", warning: "", successMessage: "" } as const;
-
-const isLargeProblemCount = (numProblems: number): boolean => numProblems > 50;
-
-const createLargeProblemWarning = (numProblems: number): MessageValue => ({
-  key: "warnings.largeNumberOfProblems",
-  params: { count: numProblems },
-});
-
-const getLargeProblemWarning = (numProblems: number): MessageValue => {
-  return isLargeProblemCount(numProblems)
-    ? createLargeProblemWarning(numProblems)
-    : getEmptyMessage();
-};
-
-const createGenerationOutcome = (params: {
-  settings: Settings;
-  showSuccessMessage: boolean;
-  setProblems: Dispatch<SetStateAction<Problem[]>>;
-}) => {
-  const { settings, showSuccessMessage, setProblems } = params;
-  const targetCount = settings.enableGrouping
-    ? settings.problemsPerGroup * settings.totalGroups
-    : settings.numProblems;
-  const fallbackWarning = getLargeProblemWarning(targetCount);
-
-  try {
-    const generatedProblems = createProblemsArray(settings);
-    const messages = evaluateGeneratedProblems(generatedProblems, targetCount, showSuccessMessage);
-
-    if (generatedProblems.length > 0) {
-      setProblems(generatedProblems);
-    }
-
-    return { ...messages, warning: messages.warning || fallbackWarning };
-  } catch (err) {
-    return handleGenerationError(err, fallbackWarning, showSuccessMessage);
-  }
-};
-
-/**
- * Hook for generating math problems based on settings
- *
- * @param settings - The settings configuration for problem generation
- * @param isLoading - Whether the app is in a loading state (prevents generation)
- * @param validateSettings - Function to validate settings before generation
- * @returns Object containing problems array and generateProblems function
- *
- * @example
- * ```typescript
- * const { problems, generateProblems } = useProblemGenerator(
- *   settings,
- *   isLoading,
- *   validateSettings
- * );
- *
- * // Generate problems with success message
- * const result = generateProblems(true);
- *
- * // Generate problems without success message (for auto-regeneration)
- * const result = generateProblems(false);
- * ```
- */
-const handleValidationError = (validationError: string) => processValidationError(validationError);
-
-const handleSuccessfulGeneration = (
-  settings: Settings,
-  showSuccessMessage: boolean,
-  setProblems: Dispatch<SetStateAction<Problem[]>>,
-) => createGenerationOutcome({ settings, showSuccessMessage, setProblems });
-
-const processGenerationLogic = (
-  settings: Settings,
-  showSuccessMessage: boolean,
-  setProblems: Dispatch<SetStateAction<Problem[]>>,
-  validateSettings: (settings: Settings) => string,
-) => {
-  const validationError = validateSettings(settings);
-  return validationError
-    ? handleValidationError(validationError)
-    : handleSuccessfulGeneration(settings, showSuccessMessage, setProblems);
-};
+type Messages = { error: MessageValue; warning: MessageValue; successMessage: MessageValue };
 
 export const useProblemGenerator = (
   settings: Settings,
   isLoading: boolean,
   validateSettings: (settings: Settings) => string,
 ) => {
-  const [problems, setProblems] = useState<Problem[]>([]);
-
-  const processGeneration = useCallback(
-    (showSuccessMessage: boolean) =>
-      processGenerationLogic(settings, showSuccessMessage, setProblems, validateSettings),
-    [settings, validateSettings, setProblems],
+  const [rawProblems, setProblems] = useState<Problem[]>([]);
+  const [messages, setMessages] = useState<Messages>(EMPTY_MESSAGES);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const workerRef = useRef<Worker | null>(null);
+  const generationKey = JSON.stringify([
+    settings.operations,
+    settings.numProblems,
+    settings.numRange,
+    settings.resultRange,
+    settings.numOperandsRange,
+    settings.allowNegative,
+    settings.enableGrouping,
+    settings.problemsPerGroup,
+    settings.totalGroups,
+  ]);
+  const lastGeneratedKey = useRef<string | null>(null);
+  const current = useRef({ settings, isLoading, validateSettings });
+  current.current = { settings, isLoading, validateSettings };
+  const cancelGeneration = useCallback(() => {
+    workerRef.current?.terminate();
+    workerRef.current = null;
+    setIsGenerating(false);
+  }, []);
+  useEffect(
+    () => () => {
+      if (workerRef.current) {
+        workerRef.current.terminate();
+        workerRef.current = null;
+        // StrictMode remounts effects; a cancelled initial worker must be started again.
+        lastGeneratedKey.current = null;
+      }
+    },
+    [],
   );
 
   const generateProblems = useCallback(
-    (showSuccessMessage: boolean = true) =>
-      isLoading ? { ...EMPTY_MESSAGES } : processGeneration(showSuccessMessage),
-    [isLoading, processGeneration],
+    (showSuccessMessage = true): Messages => {
+      const { settings: active, isLoading: loading, validateSettings: validate } = current.current;
+      if (loading) return EMPTY_MESSAGES;
+      const error = validate(active);
+      cancelGeneration();
+      if (error) {
+        const outcome = { ...EMPTY_MESSAGES, error: { key: error } };
+        setMessages(outcome);
+        return outcome;
+      }
+      const target = calculateActualTotalProblems(active);
+      if (target > 200 && typeof Worker !== "undefined") {
+        let worker: Worker;
+        try {
+          worker = new Worker(new URL("../workers/generation.worker.ts", import.meta.url), {
+            type: "module",
+          });
+        } catch {
+          const outcome = { ...EMPTY_MESSAGES, error: { key: "errors.generationFailed" } };
+          setMessages(outcome);
+          return outcome;
+        }
+        workerRef.current = worker;
+        setIsGenerating(true);
+        setProgress(0);
+        worker.onmessage = (
+          event: MessageEvent<{ problems?: Problem[]; progress?: number; error?: string }>,
+        ) => {
+          if (workerRef.current !== worker) return;
+          if (event.data.progress !== undefined) setProgress(event.data.progress);
+          if (event.data.problems) {
+            if (event.data.problems.length) setProblems(event.data.problems);
+            setMessages(evaluateGeneratedProblems(event.data.problems, target, showSuccessMessage));
+            cancelGeneration();
+          } else if (event.data.error) {
+            setMessages({ ...EMPTY_MESSAGES, error: { key: event.data.error } });
+            cancelGeneration();
+          }
+        };
+        worker.onerror = () => {
+          if (workerRef.current === worker) {
+            setMessages({ ...EMPTY_MESSAGES, error: { key: "errors.generationFailed" } });
+            cancelGeneration();
+          }
+        };
+        worker.postMessage(active);
+        return EMPTY_MESSAGES;
+      }
+      const outcome = createGenerationOutcome({
+        settings: active,
+        showSuccessMessage,
+        setProblems,
+      });
+      setMessages(outcome);
+      return outcome;
+    },
+    [cancelGeneration],
   );
 
-  // Auto-regenerate problems when settings change (no success toast)
   useEffect(() => {
-    if (!isLoading) {
-      generateProblems(false);
-    }
-    // We intentionally exclude generateProblems from deps to avoid recreation loop
-  }, [settings, isLoading, validateSettings]);
-
-  return {
-    problems,
-    generateProblems,
-  };
+    if (isLoading || generationKey === lastGeneratedKey.current) return;
+    lastGeneratedKey.current = generationKey;
+    generateProblems(false);
+  }, [generationKey, isLoading, generateProblems]);
+  const problems = useMemo(
+    () =>
+      rawProblems.map((problem) => {
+        if (!problem.operands || !problem.operators) return problem;
+        return {
+          ...problem,
+          text: `${formatExpression(problem.operands, problem.operators)} = ${settings.showAnswers ? problem.correctAnswer : ""}`,
+        };
+      }),
+    [rawProblems, settings.showAnswers],
+  );
+  return { problems, generateProblems, messages, isGenerating, progress, cancelGeneration };
 };

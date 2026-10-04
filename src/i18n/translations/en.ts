@@ -51,6 +51,7 @@ export default {
     paperSize: "Paper Size",
   },
   buttons: {
+    cancelGeneration: "Cancel generation",
     generate: "Generate Problems",
     generating: "Generating Problems...",
     generateDescription: "Create new math problems with your current settings",
@@ -60,6 +61,9 @@ export default {
     downloadEmpty: "Generate & Download PDF",
   },
   results: {
+    previousPage: "Previous page",
+    nextPage: "Next page",
+    page: "Page {{page}} of {{pages}}",
     title: "Generated Problems ({{count}})",
     noProblems: "No problems generated yet",
     clickToStart: 'Click "{{generateButton}}" to start',

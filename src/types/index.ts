@@ -30,6 +30,8 @@ export interface Settings {
 export interface Problem {
   id: number;
   text: string;
+  operands?: number[];
+  operators?: string[];
   correctAnswer?: number;
   userAnswer?: number;
   isCorrect?: boolean;
