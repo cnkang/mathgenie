@@ -165,6 +165,7 @@ const SettingsManager: React.FC<SettingsManagerProps> = ({ settings, onImportSet
           ref={fileInputRef}
           type="file"
           accept=".json"
+          aria-label={t("settings.manager.importLabel") || "Import settings from file"}
           onChange={importSettings}
           className="visually-hidden"
         />

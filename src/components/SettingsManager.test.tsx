@@ -116,6 +116,9 @@ describe("SettingsManager Component", () => {
     expect(fileInput).toBeInTheDocument();
     expect(fileInput).toHaveAttribute("accept", ".json");
     expect(fileInput).toHaveClass("visually-hidden");
+    expect(screen.getByLabelText("settings.manager.importLabel", { selector: "input" })).toBe(
+      fileInput,
+    );
   });
 
   it("has proper component structure", () => {

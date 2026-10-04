@@ -456,6 +456,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
 
               // Skip hidden or zero-size elements
               if (
+                !el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) ||
                 rect.width === 0 ||
                 rect.height === 0 ||
                 computedStyle.display === 'none' ||
