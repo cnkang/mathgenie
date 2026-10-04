@@ -2,13 +2,24 @@
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { createServer } from 'node:http';
+import { readdir } from 'node:fs/promises';
 
 // An isolated origin lets the test disconnect the real network without WebKit's
 // offline-emulation bug rejecting responses fulfilled entirely by a service worker.
 const createOfflineOrigin = async (upstreamOrigin: string) => {
+  const files = await readdir(new URL('../../dist/', import.meta.url), { recursive: true });
+  // Requests select a prebuilt URL; they cannot supply a host, protocol, or fetch path.
+  const allowedRequests = new Map(
+    ['/', ...files.map(file => `/${file}`)].map(path => [path, new URL(path, upstreamOrigin)]),
+  );
   const server = createServer(async (request, response) => {
+    const target = allowedRequests.get(request.url ?? '/');
+    if (!target) {
+      response.writeHead(404).end();
+      return;
+    }
     try {
-      const upstream = await fetch(new URL(request.url ?? '/', upstreamOrigin), {
+      const upstream = await fetch(target, {
         signal: AbortSignal.timeout(10000),
       });
       const headers = Object.fromEntries(upstream.headers);
@@ -80,6 +91,8 @@ test('loads PDF only on demand', async ({ page }) => {
 test('serves the application and quiz offline', async ({ page }) => {
   const origin = await createOfflineOrigin(new URL(page.url()).origin);
   try {
+    expect((await page.request.get(`${origin.url}/not-a-build-asset`)).status()).toBe(404);
+    expect((await page.request.get(`${origin.url}//example.invalid/`)).status()).toBe(404);
     await page.goto(origin.url);
     await expect(page.locator('.problem-item')).toHaveCount(1);
     await page.evaluate(async () => {
