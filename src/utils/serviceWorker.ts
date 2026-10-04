@@ -98,11 +98,14 @@ const validateServiceWorkerUrl = (swUrl: string): boolean => {
 };
 
 const handleInvalidServiceWorker = (): void => {
-  void navigator.serviceWorker.ready.then((registration: ServiceWorkerRegistration) => {
-    return registration.unregister().then((): void => {
+  void navigator.serviceWorker.ready
+    .then((registration: ServiceWorkerRegistration) => registration.unregister())
+    .then((): void => {
       globalThis.location.reload();
+    })
+    .catch((error: Error) => {
+      console.error("Error removing invalid service worker:", error.message);
     });
-  });
 };
 
 const processServiceWorkerResponse = (
