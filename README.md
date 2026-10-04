@@ -7,7 +7,7 @@
 [![pnpm 10.30.1](https://img.shields.io/badge/pnpm-10.30.1-orange.svg)](https://pnpm.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-MathGenie is a modern web application built with **React 19.2.0**, **TypeScript 5.9**, and **Node.js 24.14.1**, designed to help tutors generate math problems focusing on basic arithmetic operations. Enhanced with the latest React concurrent features and full TypeScript support for optimal performance, type safety, and developer experience.
+MathGenie is a modern web application built with **React 19.3.0**, **TypeScript 5.9**, and **Node.js 24.14.1**, designed to help tutors generate math problems focusing on basic arithmetic operations. Enhanced with the latest React concurrent features and full TypeScript support for optimal performance, type safety, and developer experience.
 
 ## ✨ Features
 
@@ -34,7 +34,7 @@ MathGenie is a modern web application built with **React 19.2.0**, **TypeScript 
 - **🔒 Type Safety**: Full TypeScript support with strict type checking
 - **🌍 Multi-Language Support**: Available in English, Chinese, Spanish, French, German, and Japanese
 - **📱 Mobile-Optimized**: Responsive design with React 19 performance improvements
-- **♿ Accessibility**: Full WCAG 2.2 AAA compliance with cross-browser optimizations and screen reader support
+- **♿ Accessibility**: Keyboard and screen reader support, with automated WCAG checks
 - **🛡️ Robust Error Handling**: Graceful error recovery with automatic fallback to safe defaults
 - **💾 Reliable Data Persistence**: Enhanced localStorage handling with corruption recovery
 
@@ -53,12 +53,12 @@ MathGenie is a modern web application built with **React 19.2.0**, **TypeScript 
 ## 📊 Performance Metrics
 
 - **Startup Time**: ~15% faster with Node.js 24
-- **Re-renders**: ~30% reduction with React 19 automatic batching
+- **Rendering**: Batched updates and bounded problem lists; measure changes with React Profiler
 - **Bundle Size**: Optimized with tree shaking and code splitting
-- **Core Web Vitals**: Excellent scores across all metrics
-- **Accessibility**: WCAG 2.2 AAA compliant with Firefox performance optimizations
+- **Core Web Vitals**: Collect CLS, FCP, INP, LCP and TTFB when analytics reporting is enabled
+- **Accessibility**: Automated accessibility checks across supported browsers
 - **Type Safety**: 100% TypeScript coverage with strict mode
-- **Test Execution**: Optimized E2E suite (595 tests, 2.6min runtime)
+- **Test Execution**: Unit, browser and accessibility suites; results depend on the selected projects
 
 ## 🚀 Installation
 
@@ -401,9 +401,9 @@ pnpm format
 
 MathGenie features a comprehensive, optimized test suite:
 
-- **595 E2E tests** (optimized from 623, ~7% faster execution)
-- **90% code coverage** with unit and integration tests
-- **WCAG 2.2 AAA compliance** testing across all devices and themes with Firefox performance optimizations
+- **End-to-end browser suites** for core workflows, persistence, presets and accessibility
+- **At least 80% statements, branches, functions and lines coverage** with unit and integration tests
+- **Automated accessibility** testing across all devices and themes with Firefox performance optimizations
 - **Cross-browser compatibility** (Chrome, Firefox with enhanced optimizations, Safari)
 - **Mobile device testing** (iPhone, iPad, Android)
 
@@ -414,17 +414,17 @@ MathGenie features a comprehensive, optimized test suite:
 pnpm test
 
 # Fast (no coverage) – memory-tuned
-pnpm test:unit:fast
+pnpm test:unit:no-coverage
 
 # If Node 24 triggers worker OOM, temporarily ignore unhandled errors
-pnpm test:unit:fast:ignore-errors
+pnpm test:unit:ci
 
 # Watch mode for development
 pnpm test:watch
 
 Note: On Node 24.x, Vitest’s worker pool may report “ERR_WORKER_OUT_OF_MEMORY”
 intermittently due to upstream limits. Use the memory‑tuned commands above or
-use serial mode (`pnpm test:unit:serial`) for fully stable execution.
+use serial mode (`pnpm test:unit:ci`) for fully stable execution.
 ```
 
 ### E2E Tests
@@ -440,7 +440,7 @@ pnpm test:smoke
 pnpm test:e2e:ui
 
 # Specific test suites
-pnpm test:e2e:accessibility    # WCAG 2.2 AAA compliance tests
+pnpm test:e2e:accessibility    # Automated WCAG accessibility checks
 pnpm test:e2e:integration      # Complex integration scenarios
 pnpm test:e2e:presets          # Settings presets functionality
 pnpm test:e2e:localstorage     # Data persistence tests
@@ -507,7 +507,7 @@ pnpm test:mobile:e2e:ipad
 
 ### UI Design System & AAA Contract
 
-MathGenie now uses a component-first UI contract tuned for a lively education visual style while maintaining WCAG 2.2 AAA.
+MathGenie now uses a component-first UI contract tuned for a lively education visual style with accessibility as a design target.
 
 See [`docs/UI_AAA_GUIDE.md`](docs/UI_AAA_GUIDE.md) for architecture details and enforcement boundaries.
 
@@ -557,7 +557,7 @@ pnpm build
 pnpm preview
 ```
 
-> **Note**: The build script limits `PATH` to system directories for security. Set `SAFE_PATH` if your toolchain lives elsewhere.
+> **Note**: The build script limits `PATH` to system directories for security. The build runs in process, without searching for external commands.
 
 The build process includes:
 
@@ -576,7 +576,7 @@ GitHub Actions handles quality assurance with an optimized test suite:
 - ✅ Optimized E2E testing (595 tests, ~2.6min execution)
 - ✅ Cross-browser testing (Chrome, Firefox)
 - ✅ Essential mobile device testing (iPhone, Android phone/tablet, iPad)
-- ✅ Comprehensive accessibility compliance (WCAG 2.2 AAA)
+- ✅ Automated accessibility checks (WCAG A/AA and selected AAA rules)
 - ✅ Security scanning
 - ✅ Bundle size analysis
 - ✅ i18n translation validation
@@ -596,7 +596,7 @@ GitHub Actions handles quality assurance with an optimized test suite:
 - **Cumulative Layout Shift (CLS)**: < 0.1
 - **First Input Delay (FID)**: < 100ms
 - **Type Safety**: 100% TypeScript coverage
-- **Accessibility Performance**: Firefox-optimized WCAG 2.2 AAA enforcement
+- **Accessibility Performance**: Development-only WCAG checks
 
 ## 🌍 Internationalization
 
@@ -648,7 +648,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 - 📏 Code standards and best practices
 - 🧪 Testing requirements and guidelines
 - 🌍 Internationalization requirements
-- ♿ Accessibility compliance (WCAG 2.2 AAA)
+- ♿ Accessibility checks (WCAG A/AA and selected AAA rules)
 - 📝 Commit and PR guidelines
 - 🐛 Issue reporting templates
 - 📚 Documentation maintenance requirements
@@ -672,7 +672,7 @@ pnpm validate
 
 - **React 19 + TypeScript**: Use concurrent features and strict typing
 - **Testing**: 90% coverage with optimized E2E suite (see [TESTING.md](TESTING.md))
-- **Accessibility**: WCAG 2.2 AAA compliance required
+- **Accessibility**: Keyboard, screen reader and WCAG A/AA checks required; AAA remains a design target
 - **i18n**: All user-facing text must use translation keys
 - **Mobile**: Test on iPhone, iPad, and Android devices
 - **Documentation**: Update docs immediately with code changes
@@ -749,4 +749,18 @@ Third-party dependencies and their licenses are documented in the [NOTICE](NOTIC
 
 ---
 
-**Built with ❤️ using React 19.2.0, TypeScript 5.9, and Node.js 24.14.1**
+**Built with ❤️ using React 19.3.0, TypeScript 7, and Node.js 24.16.0**
+
+### Arithmetic, large batches and offline behavior
+
+Mixed expressions use standard multiplication/division precedence. Division steps must be exact integers. Generated problems retain their operands, operators and answer; changing PDF layout, answer visibility or language preserves the problem set. Older text-only problems are parsed strictly when entering a quiz, and invalid expressions trigger recovery rather than receiving a fabricated answer.
+
+Batches above 200 problems use a cancellable Web Worker. The list shows 200 problems per page; copy and PDF export include the whole set, up to 50,000 problems. Imported settings are limited to 64 KiB, validated before application, and legacy grouping defaults are migrated. Number bounds are ±1,000,000 and expressions permit 2–100 operands. Invalid settings cannot start generation.
+
+PDF coordinates and line spacing use points, with automatic wrapping and page margins. Arithmetic uses portable print symbols. Non-ASCII headings use browser-rendered images so CJK labels remain visible.
+
+The build compiles one service-worker source and precaches application/translation resources. PDF becomes available offline after its first online use. New workers wait for old tabs to close; cache cleanup preserves other applications' caches. Both build commands generate the worker.
+
+Local AST checks cover unsafe execution, parameter count, identical comparisons and cyclomatic complexity; they are a fast subset, not a claim of SonarCloud equivalence. The isolated Compiler API dependency supports these tools while the main compiler remains TypeScript 7. CI explicitly enforces coverage, formatting, security and accessibility, and browser jobs share the verified production artifact.
+
+PurgeCSS is pinned to the compatible 7.0.2 release, which uses `glob` rather than the vulnerable `fast-glob → micromatch → braces` dependency chain. CSS pruning remains enabled. Revisit this pin when [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) has an upstream fix.
