@@ -83,6 +83,15 @@ test('disabled grouping does not block generation with cleared group counts', as
   await page.locator('#numProblems').fill('3');
   await expect(page.locator('.problem-item')).toHaveCount(3);
 });
+test('correcting PDF settings resumes pending generation', async ({ page }) => {
+  await expect(page.locator('.problem-item')).toHaveCount(1);
+  await page.locator('.pdf-settings-toggle').click();
+  await page.locator('#fontSize').fill('0');
+  await page.locator('#numProblems').fill('3');
+  await expect(page.locator('.problem-item')).toHaveCount(1);
+  await page.locator('#fontSize').fill('16');
+  await expect(page.locator('.problem-item')).toHaveCount(3);
+});
 test('loads PDF only on demand', async ({ page }) => {
   const pdfRequests: string[] = [];
   page.on('request', (request) => { if (/jspdf.*\.js/.test(request.url())) pdfRequests.push(request.url()); });

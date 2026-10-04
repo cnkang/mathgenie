@@ -21,6 +21,37 @@ afterEach(() => {
   FakeWorker.instances = [];
 });
 describe("generation sessions", () => {
+  it.each([{ fontSize: 0 }, { lineSpacing: 0 }])(
+    "retries pending generation after invalid PDF settings are corrected %j",
+    (overrides) => {
+      const initial = { ...defaultSettings, numProblems: 2 };
+      const { result, rerender } = renderHook(
+        ({ settings }) => useProblemGenerator(settings, false, validateSettings),
+        { initialProps: { settings: initial } },
+      );
+      const previous = result.current.problems;
+      rerender({ settings: { ...initial, ...overrides, numProblems: 3 } });
+      expect(result.current.messages.error).toEqual({ key: "errors.pdfFailed" });
+      expect(result.current.problems).toEqual(previous);
+      rerender({ settings: { ...initial, numProblems: 3 } });
+      expect(result.current.messages.error).toBe("");
+      expect(result.current.problems).toHaveLength(3);
+      const generated = result.current.problems;
+      rerender({ settings: { ...initial, numProblems: 3, fontSize: 18 } });
+      expect(result.current.problems).toBe(generated);
+    },
+  );
+  it("generates after correcting initially invalid PDF settings", () => {
+    const invalid = { ...defaultSettings, numProblems: 2, fontSize: 0 };
+    const { result, rerender } = renderHook(
+      ({ settings }) => useProblemGenerator(settings, false, validateSettings),
+      { initialProps: { settings: invalid } },
+    );
+    expect(result.current.problems).toHaveLength(0);
+    rerender({ settings: { ...invalid, fontSize: 16 } });
+    expect(result.current.problems).toHaveLength(2);
+    expect(result.current.messages.error).toBe("");
+  });
   it("restarts cancelled initial work when StrictMode remounts effects", () => {
     vi.stubGlobal("Worker", FakeWorker);
     const { result } = renderHook(
