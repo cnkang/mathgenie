@@ -268,24 +268,21 @@ const loadWithRetry = async (
   onAttemptFail: (attempt: number, error: unknown) => void,
   maxRetries = 3,
 ): Promise<Translations> => {
-  let lastError: Error | null = null;
-
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+  const loadAttempt = async (attempt: number): Promise<Translations> => {
     const outcome = await performLoadAttempt(attempt, action, describe, onSuccess);
     if (outcome.success) {
       return outcome.data;
     }
 
-    lastError = outcome.error;
     onAttemptFail(attempt, outcome.error);
-
-    if (attempt < maxRetries) {
-      await waitForRetry(attempt);
+    if (attempt >= maxRetries) {
+      devError("🌐 All attempts failed. Last error:", outcome.error);
+      return loadFallbackTranslations();
     }
-  }
-
-  devError("🌐 All attempts failed. Last error:", lastError);
-  return loadFallbackTranslations();
+    await waitForRetry(attempt);
+    return loadAttempt(attempt + 1);
+  };
+  return maxRetries > 0 ? loadAttempt(1) : loadFallbackTranslations();
 };
 
 const loadTranslations = async (language: string): Promise<Translations> => {
