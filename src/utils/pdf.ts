@@ -47,6 +47,62 @@ const drawHeading = (doc: jsPDF, text: string, x: number, y: number, size: numbe
     canvas.height / 3,
   );
 };
+const createPdfWriter = (doc: jsPDF, settings: Settings, labels: PdfLabels) => {
+  const margin = 28;
+  const width = doc.internal.pageSize.getWidth();
+  const bottom = doc.internal.pageSize.getHeight() - margin;
+  const columnWidth = (width - 3 * margin) / 2;
+  const spacing = Math.max(settings.lineSpacing, settings.fontSize * 1.25);
+  let positions = [margin + settings.fontSize, margin + settings.fontSize];
+  const newPage = () => {
+    doc.addPage();
+    positions = [margin + settings.fontSize, margin + settings.fontSize];
+  };
+  const heading = (index: number, empty: boolean) => {
+    doc.setFontSize(settings.fontSize + 2);
+    drawHeading(doc, labels.group(index, empty), margin, positions[0], settings.fontSize + 2);
+    positions = positions.map((position) => position + spacing * 2);
+    doc.setFontSize(settings.fontSize);
+  };
+  const problem = (item: Problem, index: number) => {
+    const column = index % 2;
+    const lines = doc.splitTextToSize(printable(item.text), columnWidth) as string[];
+    for (const line of lines) {
+      if (positions[column] + spacing > bottom) newPage();
+      doc.text(line, margin + column * (columnWidth + margin), positions[column]);
+      positions[column] += spacing;
+    }
+  };
+  const empty = () => drawHeading(doc, labels.empty, margin, positions[0], settings.fontSize);
+  return { newPage, heading, problem, empty };
+};
+
+const renderProblemBatches = (
+  problems: Problem[],
+  render: (problem: Problem, index: number) => void,
+  start = 0,
+): Promise<void> => {
+  const end = Math.min(start + 200, problems.length);
+  for (let index = start; index < end; index++) render(problems[index], index);
+  if (end === problems.length) return Promise.resolve();
+  // Continue after yielding; promise chaining preserves ordering and propagates drawing errors.
+  return new Promise<void>((resolve) => setTimeout(resolve, 0)).then(() =>
+    renderProblemBatches(problems, render, end),
+  );
+};
+const renderGroups = (
+  groups: Problem[][],
+  writer: ReturnType<typeof createPdfWriter>,
+  enableGrouping: boolean,
+  index = 0,
+): Promise<void> => {
+  if (index === groups.length) return Promise.resolve();
+  if (index > 0) writer.newPage();
+  if (enableGrouping) writer.heading(index + 1, !groups[index].length);
+  return renderProblemBatches(groups[index], writer.problem).then(() =>
+    renderGroups(groups, writer, enableGrouping, index + 1),
+  );
+};
 export const generatePdf = async (
   problems: Problem[],
   settings: Settings,
@@ -67,47 +123,15 @@ export const generatePdf = async (
   const JsPDF = await loadJsPDF();
   const doc = new JsPDF({ format: paperSizes[settings.paperSize], unit: "pt" });
   doc.setFontSize(settings.fontSize);
-  const margin = 28;
-  const width = doc.internal.pageSize.getWidth();
-  const bottom = doc.internal.pageSize.getHeight() - margin;
-  const columnWidth = (width - 3 * margin) / 2;
-  const spacing = Math.max(settings.lineSpacing, settings.fontSize * 1.25);
-  let positions = [margin + settings.fontSize, margin + settings.fontSize];
-  const newPage = () => {
-    doc.addPage();
-    positions = [margin + settings.fontSize, margin + settings.fontSize];
-  };
-  if (!problems.length) {
-    drawHeading(doc, labels.empty, margin, positions[0], settings.fontSize);
+  const writer = createPdfWriter(doc, settings, labels);
+  if (problems.length) {
+    await renderGroups(
+      splitProblemsIntoGroups(problems, settings),
+      writer,
+      settings.enableGrouping,
+    );
   } else {
-    const groups = splitProblemsIntoGroups(problems, settings);
-    for (const [groupIndex, group] of groups.entries()) {
-      if (groupIndex) newPage();
-      if (settings.enableGrouping) {
-        doc.setFontSize(settings.fontSize + 2);
-        drawHeading(
-          doc,
-          labels.group(groupIndex + 1, !group.length),
-          margin,
-          positions[0],
-          settings.fontSize + 2,
-        );
-        positions = positions.map((position) => position + spacing * 2);
-        doc.setFontSize(settings.fontSize);
-      }
-      for (const [index, problem] of group.entries()) {
-        // Yield between batches so large exports keep buttons and status responsive.
-        if (index > 0 && index % 200 === 0)
-          await new Promise<void>((resolve) => setTimeout(resolve, 0));
-        const column = index % 2;
-        const lines = doc.splitTextToSize(printable(problem.text), columnWidth) as string[];
-        for (const line of lines) {
-          if (positions[column] + spacing > bottom) newPage();
-          doc.text(line, margin + column * (columnWidth + margin), positions[column]);
-          positions[column] += spacing;
-        }
-      }
-    }
+    writer.empty();
   }
   doc.save(filename);
 };

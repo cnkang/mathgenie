@@ -17,19 +17,17 @@ const prepareProblems = (problems: Problem[]): Problem[] =>
       isAnswered: false,
     };
   });
+const gradeForScore = (score: number): string => {
+  if (score >= 90) return "excellent";
+  if (score >= 80) return "good";
+  if (score >= 70) return "average";
+  if (score >= 60) return "passing";
+  return "needsImprovement";
+};
 const computeQuizResult = (problems: Problem[], t: Translator): QuizResult => {
   const correctAnswers = problems.filter((problem) => problem.isCorrect).length;
   const score = problems.length ? Math.round((correctAnswers / problems.length) * 100) : 0;
-  const grade =
-    score >= 90
-      ? "excellent"
-      : score >= 80
-        ? "good"
-        : score >= 70
-          ? "average"
-          : score >= 60
-            ? "passing"
-            : "needsImprovement";
+  const grade = gradeForScore(score);
   return {
     totalProblems: problems.length,
     correctAnswers,
@@ -46,10 +44,10 @@ export const useQuizController = (
   onQuizComplete: (result: QuizResult) => void,
 ) => {
   const [quizProblems, setQuizProblems] = useState<Problem[]>([]);
-  const [currentProblemIndex, setIndex] = useState(0);
+  const [currentProblemIndex, setCurrentProblemIndex] = useState(0);
   const [showResults, setShowResults] = useState(false);
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
-  const [timeElapsed, setElapsed] = useState(0);
+  const [timeElapsed, setTimeElapsed] = useState(0);
   const startedAt = useRef(Date.now());
   const pending = useRef<ReturnType<typeof setTimeout> | null>(null);
   const finished = useRef(false);
@@ -68,11 +66,11 @@ export const useQuizController = (
     const prepared = prepareProblems(problems);
     state.current = prepared;
     setQuizProblems(prepared);
-    setIndex(0);
+    setCurrentProblemIndex(0);
     setShowResults(false);
     setQuizResult(null);
     startedAt.current = Date.now();
-    setElapsed(0);
+    setTimeElapsed(0);
   }, [problems, cancelAdvance]);
   useEffect(() => {
     restartQuiz();
@@ -81,7 +79,7 @@ export const useQuizController = (
   useEffect(() => {
     if (showResults) return;
     const timer = setInterval(
-      () => setElapsed(Math.floor((Date.now() - startedAt.current) / 1000)),
+      () => setTimeElapsed(Math.floor((Date.now() - startedAt.current) / 1000)),
       1000,
     );
     return () => clearInterval(timer);
@@ -91,7 +89,7 @@ export const useQuizController = (
     if (finished.current) return;
     finished.current = true;
     const result = computeQuizResult(state.current, latest.current.t);
-    setElapsed(Math.floor((Date.now() - startedAt.current) / 1000));
+    setTimeElapsed(Math.floor((Date.now() - startedAt.current) / 1000));
     setQuizResult(result);
     setShowResults(true);
     latest.current.onQuizComplete(result);
@@ -114,8 +112,7 @@ export const useQuizController = (
       if (
         !Number.isFinite(answer) ||
         finished.current ||
-        !problem ||
-        problem.id !== problemId ||
+        problem?.id !== problemId ||
         problem.isAnswered
       )
         return;
@@ -125,7 +122,7 @@ export const useQuizController = (
           ? {
               ...item,
               userAnswer: answer,
-              isCorrect: Math.abs(answer - (item.correctAnswer ?? NaN)) < 0.001,
+              isCorrect: Math.abs(answer - (item.correctAnswer ?? Number.NaN)) < 0.001,
               isAnswered: true,
             }
           : item,
@@ -135,7 +132,7 @@ export const useQuizController = (
       pending.current = setTimeout(() => {
         pending.current = null;
         if (currentProblemIndex < updated.length - 1) {
-          setIndex(currentProblemIndex + 1);
+          setCurrentProblemIndex(currentProblemIndex + 1);
           return;
         }
         finishQuiz();
@@ -146,15 +143,15 @@ export const useQuizController = (
 
   const goToPrevious = useCallback(() => {
     cancelAdvance();
-    setIndex((index) => Math.max(0, index - 1));
+    setCurrentProblemIndex((index) => Math.max(0, index - 1));
   }, [cancelAdvance]);
   const goToNext = useCallback(() => {
     cancelAdvance();
-    setIndex((index) => Math.min(state.current.length - 1, index + 1));
+    setCurrentProblemIndex((index) => Math.min(state.current.length - 1, index + 1));
   }, [cancelAdvance]);
-  const setTimeElapsed = useCallback((value: number) => {
+  const adjustTimeElapsed = useCallback((value: number) => {
     startedAt.current = Date.now() - value * 1000;
-    setElapsed(value);
+    setTimeElapsed(value);
   }, []);
   const formatTime = useCallback(
     (seconds: number) =>
@@ -165,13 +162,13 @@ export const useQuizController = (
     quizProblems,
     setQuizProblems,
     currentProblemIndex,
-    setCurrentProblemIndex: setIndex,
+    setCurrentProblemIndex,
     showResults,
     setShowResults,
     quizResult,
     setQuizResult,
     timeElapsed,
-    setTimeElapsed,
+    setTimeElapsed: adjustTimeElapsed,
     handleAnswerSubmit,
     goToPrevious,
     goToNext,

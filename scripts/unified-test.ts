@@ -133,21 +133,17 @@ function safeSpawn(command: string, args: string[], env: Record<string, string> 
 }
 
 function tryExecution(executable: string, args: string[], env: Record<string, string>): boolean {
-  try {
-    const result = spawnSync(executable, args, {
-      stdio: "inherit",
-      shell: false,
-      timeout: EXEC_TIMEOUT_MS,
-      windowsHide: true,
-      env,
-    });
-    if (result.error) throw result.error;
-    if (result.status !== 0)
-      throw Object.assign(new Error("Test command failed"), { status: result.status ?? 1 });
-    return true;
-  } catch (error) {
-    throw error;
-  }
+  const result = spawnSync(executable, args, {
+    stdio: "inherit",
+    shell: false,
+    timeout: EXEC_TIMEOUT_MS,
+    windowsHide: true,
+    env,
+  });
+  if (result.error) throw result.error;
+  if (result.status !== 0)
+    throw Object.assign(new Error("Test command failed"), { status: result.status ?? 1 });
+  return true;
 }
 
 /**
