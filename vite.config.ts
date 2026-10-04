@@ -1,3 +1,4 @@
+import { serviceWorkerPlugin } from "./scripts/service-worker-plugin";
 import react from "@vitejs/plugin-react";
 import { resolve } from "path";
 import { defineConfig } from "vite-plus";
@@ -69,6 +70,7 @@ const vpConfig = {
     },
   },
   plugins: [
+    serviceWorkerPlugin(),
     react({
       jsxRuntime: "automatic",
       jsxImportSource: undefined,
@@ -110,8 +112,9 @@ const vpConfig = {
           const packageName = getPackageName(id);
           if (packageName) {
             if (reactChunkPackages.has(packageName)) return "react-vendor";
-            if (packageName === "jspdf") return "jspdf";
-            return "vendor";
+
+            // Let the bundler keep shared helpers outside the optional PDF chunk.
+            return undefined;
           }
         },
       },
@@ -178,12 +181,7 @@ const vpConfig = {
       },
     },
     pool: "threads",
-    poolOptions: {
-      threads: {
-        maxThreads: process.env.CI ? 4 : 8,
-        minThreads: process.env.CI ? 1 : 2,
-      },
-    },
+    maxWorkers: process.env.CI ? 4 : 8,
     maxConcurrency: process.env.CI ? 4 : 12,
     sequence: { shuffle: false, concurrent: false },
     fileParallelism: true,
@@ -227,16 +225,9 @@ const vpConfig = {
         "vite/**",
         "**/dynamic-import-helper.js",
       ],
-      thresholds: {
-        global: {
-          branches: 80,
-          functions: 80,
-          lines: 80,
-          statements: 80,
-        },
-      },
+      thresholds: { branches: 80, functions: 80, lines: 80, statements: 80 },
     },
   },
-} as any;
+} satisfies Parameters<typeof defineConfig>[0];
 
 export default defineConfig(vpConfig);

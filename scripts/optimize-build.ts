@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 
 import { readFileSync, rmSync, writeFileSync } from "node:fs";
-import { dirname, join, delimiter } from "node:path";
+import { join, delimiter } from "node:path";
 import { build as viteBuild } from "vite-plus";
 
 interface BuildError extends Error {
@@ -10,8 +10,8 @@ interface BuildError extends Error {
 
 async function main(): Promise<void> {
   if (process.platform !== "win32") {
-    const defaultSafe = ["/usr/bin", "/bin", dirname(process.execPath)].join(delimiter);
-    process.env.PATH = process.env.SAFE_PATH || defaultSafe;
+    const defaultSafe = ["/usr/local/bin", "/usr/bin", "/bin"].join(delimiter);
+    process.env.PATH = defaultSafe;
   }
   process.env.NODE_ENV = "production";
   console.log("🚀 Starting optimized build process...");
@@ -48,8 +48,6 @@ async function main(): Promise<void> {
     html = html.replace(
       "<head>",
       `<head>
-  <link rel="dns-prefetch" href="//fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <meta name="robots" content="index,follow">
   <meta name="googlebot" content="index,follow">`,
     );
@@ -67,83 +65,6 @@ async function main(): Promise<void> {
   } catch (error) {
     const buildError = error as BuildError;
     console.warn("⚠️  HTML optimization failed:", buildError.message);
-  }
-
-  // Step 4: Generate service worker
-  console.log("🔧 Generating service worker...");
-  try {
-    const cacheVersion: string = `mathgenie-v${Date.now()}`;
-    const staticCacheUrls: string[] = [
-      "/",
-      "/index.html",
-      "/favicon.ico",
-      "/logo192.png",
-      "/logo512.png",
-      "/manifest.json",
-    ];
-
-    const swTemplate: string = `
-// Auto-generated service worker for MathGenie
-const CACHE_NAME = '${cacheVersion}';
-const STATIC_CACHE_URLS = ${JSON.stringify(staticCacheUrls, null, 2)};
-
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(STATIC_CACHE_URLS))
-      .then(() => self.skipWaiting())
-  );
-});
-
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys()
-      .then((cacheNames) => {
-        return Promise.all(
-          cacheNames.map((cacheName) => {
-            if (cacheName !== CACHE_NAME) {
-              return caches.delete(cacheName);
-            }
-          })
-        );
-      })
-      .then(() => self.clients.claim())
-  );
-});
-
-self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET' || !event.request.url.startsWith(self.location.origin)) {
-    return;
-  }
-
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        return response || fetch(event.request)
-          .then((fetchResponse) => {
-            if (!fetchResponse || fetchResponse.status !== 200 || fetchResponse.type !== 'basic') {
-              return fetchResponse;
-            }
-            const responseToCache = fetchResponse.clone();
-            caches.open(CACHE_NAME)
-              .then((cache) => cache.put(event.request, responseToCache));
-            return fetchResponse;
-          });
-      })
-      .catch(() => {
-        if (event.request.destination === 'document') {
-          return caches.match('/index.html');
-        }
-      })
-  );
-});
-`;
-
-    writeFileSync(join(process.cwd(), "dist", "sw.js"), swTemplate.trim());
-    console.log("✅ Service worker generated");
-  } catch (error) {
-    const buildError = error as BuildError;
-    console.warn("⚠️  Service worker generation failed:", buildError.message);
   }
 
   console.log("🎉 Build optimization complete!");

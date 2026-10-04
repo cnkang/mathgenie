@@ -19,31 +19,10 @@ if [ "$current_branch" = "main" ] || [ "$current_branch" = "develop" ]; then
   echo "Consider using pull requests for better code review"
 fi
 
-# 运行代码质量检查
-echo "🔍 Running lint and type checks..."
-if ! pnpm lint || ! pnpm type-check; then
-  echo "❌ Lint or type checks failed"
-  exit 1
-fi
-
-# 运行国际化检查
-echo "🌍 Running i18n checks..."
-if ! vp run i18n:check; then
-  echo "❌ i18n checks failed"
-  exit 1
-fi
-
-# 运行测试
-echo "🧪 Running tests..."
-if ! vp test; then
-  echo "❌ Tests failed"
-  exit 1
-fi
-
-# 检查构建
-echo "🏗️  Checking build..."
-if ! vp run build; then
-  echo "❌ Build failed"
+# Run the same enforced checks as CI, including coverage and static analysis.
+echo "🔍 Running required quality gates..."
+if ! pnpm pre-push; then
+  echo "❌ Quality gates failed"
   exit 1
 fi
 
