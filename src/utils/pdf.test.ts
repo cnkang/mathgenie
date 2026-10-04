@@ -47,6 +47,34 @@ const baseSettings: Settings = {
 
 describe("pdf utils", () => {
   beforeEach(() => vi.clearAllMocks());
+  test("keeps long grouped exports ordered while yielding between batches", async () => {
+    const { generatePdf } = await import("./pdf");
+    const timeout = vi.spyOn(globalThis, "setTimeout");
+    const problems = Array.from({ length: 402 }, (_, id) => ({ id, text: `${id} + 1 =` }));
+    await generatePdf(
+      problems,
+      { ...baseSettings, enableGrouping: true, totalGroups: 2, problemsPerGroup: 201 },
+      paperSizes,
+    );
+    const printed = mockJsPDFInstance.text.mock.calls.map(([text]) => text);
+    expect(printed.filter((text: string) => text.endsWith("+ 1 ="))).toEqual(
+      problems.map((problem) => problem.text),
+    );
+    expect(timeout).toHaveBeenCalledWith(expect.any(Function), 0);
+    expect(printed.indexOf("Group 2")).toBeGreaterThan(printed.indexOf("200 + 1 ="));
+    expect(mockJsPDFInstance.save).toHaveBeenCalledExactlyOnceWith("problems.pdf");
+    timeout.mockRestore();
+  });
+  test("rejects drawing errors in later batches without saving a partial PDF", async () => {
+    const { generatePdf } = await import("./pdf");
+    const problems = Array.from({ length: 201 }, (_, id) => ({ id, text: `${id} + 1 =` }));
+    mockJsPDFInstance.text.mockImplementation((text: string) => {
+      if (text === "200 + 1 =") throw new Error("drawing failed");
+    });
+    await expect(generatePdf(problems, baseSettings, paperSizes)).rejects.toThrow("drawing failed");
+    expect(mockJsPDFInstance.save).not.toHaveBeenCalled();
+    mockJsPDFInstance.text.mockReset();
+  });
   test("wraps long expressions, replaces symbols and paginates within margins", async () => {
     const { generatePdf } = await import("./pdf");
     mockJsPDFInstance.splitTextToSize.mockImplementationOnce(() => Array(100).fill("1 x 2 / 2 ="));

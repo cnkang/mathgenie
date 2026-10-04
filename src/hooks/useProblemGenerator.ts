@@ -12,7 +12,7 @@ export const useProblemGenerator = (
   isLoading: boolean,
   validateSettings: (settings: Settings) => string,
 ) => {
-  const [rawProblems, setProblems] = useState<Problem[]>([]);
+  const [rawProblems, setRawProblems] = useState<Problem[]>([]);
   const [messages, setMessages] = useState<Messages>(EMPTY_MESSAGES);
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -80,7 +80,7 @@ export const useProblemGenerator = (
           if (workerRef.current !== worker) return;
           if (event.data.progress !== undefined) setProgress(event.data.progress);
           if (event.data.problems) {
-            if (event.data.problems.length) setProblems(event.data.problems);
+            if (event.data.problems.length) setRawProblems(event.data.problems);
             setMessages(evaluateGeneratedProblems(event.data.problems, target, showSuccessMessage));
             cancelGeneration();
           } else if (event.data.error) {
@@ -100,7 +100,7 @@ export const useProblemGenerator = (
       const outcome = createGenerationOutcome({
         settings: active,
         showSuccessMessage,
-        setProblems,
+        setProblems: setRawProblems,
       });
       setMessages(outcome);
       return outcome;

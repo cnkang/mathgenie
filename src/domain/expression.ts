@@ -29,10 +29,14 @@ export const calculateExpression = (operands: number[], operators: string[]): nu
   return Number.isSafeInteger(answer) ? answer : null;
 };
 
+const printableOperator = (operator: string): string => {
+  if (operator === "*") return "✖";
+  if (operator === "/") return "➗";
+  return operator;
+};
 export const formatExpression = (operands: number[], operators: string[]): string =>
   operators.reduce(
-    (text, operator, index) =>
-      `${text} ${operator === "*" ? "✖" : operator === "/" ? "➗" : operator} ${operands[index + 1]}`,
+    (text, operator, index) => `${text} ${printableOperator(operator)} ${operands[index + 1]}`,
     String(operands[0]),
   );
 
@@ -78,7 +82,7 @@ export const safeEvaluateExpression = (expression: string): number => {
     throw new Error("Invalid characters in expression");
   }
   const tokens: string[] = [];
-  const tokenPattern = /\s+|\d+(?:\.\d+)?|[+\-*/()]/gy;
+  const tokenPattern = /\s+|\d+(?:\.\d+)?|[+\-*/()]/y;
   let offset = 0;
   while (offset < source.length) {
     tokenPattern.lastIndex = offset;

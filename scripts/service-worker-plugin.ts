@@ -7,9 +7,10 @@ export const serviceWorkerPlugin = (): Plugin => ({
   name: "mathgenie-service-worker",
   generateBundle(_options, bundle) {
     const files = Object.keys(bundle);
+    files.sort((left, right) => left.localeCompare(right, "en"));
     const workerSource = readFileSync("src/serviceWorker.ts", "utf8");
     const digest = createHash("sha256").update(workerSource);
-    for (const name of files.sort()) {
+    for (const name of files) {
       const entry = bundle[name];
       digest.update(name).update(entry.type === "chunk" ? entry.code : entry.source);
     }

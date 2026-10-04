@@ -108,14 +108,17 @@ export const analyzeSource = (file: string, content: string): QualityIssue[] => 
   return issues;
 };
 const collect = async (directory: string): Promise<string[]> => {
-  const files: string[] = [];
-  for (const entry of await readdir(directory, { withFileTypes: true })) {
-    const path = join(directory, entry.name);
-    if (entry.isDirectory()) files.push(...(await collect(path)));
-    else if (/\.(ts|tsx)$/.test(path) && !/\.(test|spec)\./.test(path) && !path.endsWith(".d.ts"))
-      files.push(path);
-  }
-  return files;
+  const entries = await readdir(directory, { withFileTypes: true });
+  const paths = await Promise.all(
+    entries.map((entry) => {
+      const path = join(directory, entry.name);
+      if (entry.isDirectory()) return collect(path);
+      if (/\.(ts|tsx)$/.test(path) && !/\.(test|spec)\./.test(path) && !path.endsWith(".d.ts"))
+        return [path];
+      return [];
+    }),
+  );
+  return paths.flat();
 };
 export const runQualityChecks = async (): Promise<QualityIssue[]> => {
   const files = [...(await collect("src")), ...(await collect("scripts"))];
