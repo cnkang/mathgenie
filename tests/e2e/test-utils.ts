@@ -297,17 +297,15 @@ export async function verifyFormValues(
   page: Page,
   expectedValues: Record<string, any>
 ): Promise<void> {
-  for (const [field, value] of Object.entries(expectedValues)) {
-    if (typeof value === 'boolean') {
-      if (value) {
-        await expect(page.locator(`#${field}`)).toBeChecked();
-      } else {
-        await expect(page.locator(`#${field}`)).not.toBeChecked();
+  await Promise.all(
+    Object.entries(expectedValues).map(([field, value]) => {
+      const fieldLocator = page.locator(`#${field}`);
+      if (typeof value === 'boolean') {
+        return value ? expect(fieldLocator).toBeChecked() : expect(fieldLocator).not.toBeChecked();
       }
-    } else {
-      await expect(page.locator(`#${field}`)).toHaveValue(String(value));
-    }
-  }
+      return expect(fieldLocator).toHaveValue(String(value));
+    })
+  );
 }
 
 /**
