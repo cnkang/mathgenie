@@ -35,8 +35,8 @@ importers:
         specifier: ^19.3.0
         version: 19.3.0(react@19.3.0)
       web-vitals:
-        specifier: ^6.2.2
-        version: 6.2.2
+        specifier: ^6.2.3
+        version: 6.2.3
     devDependencies:
       '@axe-core/playwright':
         specifier: ^4.13.0
@@ -2164,8 +2164,8 @@ packages:
       jsdom:
         optional: true
 
-  web-vitals@6.2.2:
-    resolution: {integrity: sha512-oto5x6dLEgrRqfcWed+pZEUb2q6ikbFmqF54CRDhI/QGbn+qxC49b4C4OkbH+kb9C3a8shpFD3SgR9kRcs80ZQ==}
+  web-vitals@6.2.3:
+    resolution: {integrity: sha512-Dmy+vdO1UPMqXiAtZSNayhl4f794Bxfd94W4HIj2HlYtczEQfEOon969memlcpcHrTuOKLa5baFjX7WbgmOq+A==}
 
   whatwg-mimetype@3.0.0:
     resolution: {integrity: sha512-nt+N2dzIutVRxARx1nghPKGv1xHikU7HKdfafKkLNLindmPU/ch3U31NOCGGA/dmPcmb1VlofO0vnKAcsm0o/Q==}
@@ -3864,7 +3864,7 @@ snapshots:
     transitivePeerDependencies:
       - msw
 
-  web-vitals@6.2.2: {}
+  web-vitals@6.2.3: {}
 
   whatwg-mimetype@3.0.0: {}
 
