@@ -117,7 +117,7 @@
     "@axe-core/playwright": "^4.13.0",
     "@biomejs/biome": "^2.5.15",
     "@fullhuman/postcss-purgecss": "7.0.2",
-    "@playwright/test": "^1.63.0",
+    "@playwright/test": "^1.64.0",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.7",
