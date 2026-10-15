@@ -182,7 +182,7 @@ jobs:
           fail_ci_if_error: false
 
       - name: 📋 Upload test results
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: test-results-unit
@@ -293,7 +293,7 @@ jobs:
           done
 
       - name: 🚀 Upload build artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: build-production
           path: dist/
@@ -422,7 +422,7 @@ jobs:
           fi
 
       - name: 📊 Upload accessibility report
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: accessibility-report
@@ -433,7 +433,7 @@ jobs:
           retention-days: 30
 
       - name: 📊 Upload accessibility HTML report
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always() && hashFiles('playwright-report/**/*') != ''
         with:
           name: accessibility-html-report
@@ -590,7 +590,7 @@ jobs:
           PLAYWRIGHT_OUTPUT_DIR: test-results-${{ matrix.project }}
 
       - name: 📊 Upload test results
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: playwright-results-${{ matrix.project }}
@@ -600,7 +600,7 @@ jobs:
           retention-days: 30
 
       - name: 📊 Upload Playwright HTML Report
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always() && hashFiles('playwright-report/**/*') != ''
         with:
           name: playwright-report-${{ matrix.project }}
@@ -647,7 +647,7 @@ jobs:
         continue-on-error: false
 
       - name: 📊 Upload i18n report
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: i18n-report
@@ -745,7 +745,7 @@ jobs:
         run: vp run analyze:ci
 
       - name: 📊 Upload dependency analysis
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: dependency-analysis
@@ -754,7 +754,7 @@ jobs:
           retention-days: 7
 
       - name: 📊 Upload bundle analysis
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always() && hashFiles('dist/bundle-report.html') != ''
         with:
           name: bundle-analysis
