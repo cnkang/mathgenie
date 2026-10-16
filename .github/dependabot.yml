@@ -12,6 +12,10 @@ updates:
     # Check the npm registry for updates every day (weekdays)
     schedule:
       interval: "daily"
+    # Grouping does not synchronize releases: Vite+ may bundle an older Vitest.
+    # Upgrade coverage manually with Vite+; see docs/dependabot-auto-merge.md.
+    ignore:
+      - dependency-name: "@vitest/coverage-v8"
     groups:
       # Vite Plus bundles Vitest; coverage providers must match that version.
       vite-plus:
