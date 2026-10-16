@@ -53,6 +53,27 @@ The auto-merge will wait for these checks to pass:
 
 ## Troubleshooting
 
+### Vite+ and Vitest Coverage Updates
+
+Vite+ bundles a specific Vitest version. `@vitest/coverage-v8` must be pinned
+to that exact version, including the patch number. For example, Vite+ 1.1.0
+bundles Vitest 5.0.3 and requires coverage 5.0.3; coverage 5.0.4 fails at startup.
+
+Dependabot groups the Vite+ toolchain, but a group can update coverage without
+updating Vite+. The npm configuration therefore ignores automatic updates to
+`@vitest/coverage-v8`. This is a compatibility constraint, not a security waiver:
+review coverage security advisories and upgrade the toolchain together when needed.
+
+When upgrading Vite+:
+
+1. Check the Vitest version bundled by the selected Vite+ release.
+2. Pin `@vitest/coverage-v8` to that exact version and regenerate `pnpm-lock.yaml`
+   with `pnpm install`.
+3. Run `pnpm install --frozen-lockfile` and `pnpm test:unit:ci`. The latter enables
+   coverage and checks provider compatibility; tests without coverage are insufficient.
+4. Require the PR's Tests check to pass before merging. Keep the coverage version
+   pin and Dependabot ignore rule when upgrading.
+
 ### Auto-merge Not Working?
 
 1. **Check repository settings**: Ensure "Allow auto-merge" is enabled
