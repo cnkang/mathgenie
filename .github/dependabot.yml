@@ -12,6 +12,16 @@ updates:
     # Check the npm registry for updates every day (weekdays)
     schedule:
       interval: "daily"
+    groups:
+      # Vite Plus bundles Vitest; coverage providers must match that version.
+      vite-plus:
+        patterns:
+          - "vite-plus"
+          - "vite"
+          - "@vitejs/*"
+          - "vite-plugin-*"
+          - "vitest"
+          - "@vitest/*"
 
   # Enable version updates for GitHub Actions
   - package-ecosystem: "github-actions"
