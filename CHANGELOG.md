@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **React 19.3.1 upgrade**: Upgraded `react` and `react-dom` together to 19.3.1. React requires both packages to share the exact same version; a split upgrade (react 19.3.1 / react-dom 19.3.0) throws `Incompatible React versions` while `react-dom` is imported, so the app never rendered and every Playwright suite timed out
+- **Dependabot react group**: Grouped `react`, `react-dom`, `@types/react` and `@types/react-dom` in `.github/dependabot.yml` so Dependabot always upgrades them together and cannot reintroduce a version skew
 - **Node.js baseline upgraded**: Updated runtime/tooling baseline to Node.js 24.14.1 LTS (`.nvmrc`, CI workflow, Dependabot workflow)
 - **Test toolchain refresh**: Upgraded `vitest` and `@vitest/coverage-v8` to 4.1.2
 - **InfoPanel simplified**: Removed duplicate quick-action buttons, tips section, and current config display; kept stats grid, progress bar, and conditional quiz results
