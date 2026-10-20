@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Vitest coverage provider mismatch**: Pinned `@vitest/coverage-v8` to `5.0.5` to match the Vitest version bundled by Vite+ 1.3.0. The previous pin (`5.0.3`) made every coverage-enabled test run fail at startup with `vite-plus bundles vitest@5.0.5, but @vitest/coverage-v8@5.0.3 is installed`, which broke the Tests and Quality Gate checks
 - **InfoPanel stats double-counting**: Fixed `totalGenerated` counter incrementing on component remount (e.g., entering/exiting quiz mode) by tracking previous problems reference
 - **SettingsSection aria-label**: Fixed raw translation key `"settings.title"` appearing as aria-label before translations load; now falls back to `"Settings"` when the key is unresolved
 - **usePerformance `performanceMetrics`**: Fixed `useMemo` with empty deps that caused metrics to never update; replaced with a getter-based approach for live render count

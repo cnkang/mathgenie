@@ -56,8 +56,8 @@ The auto-merge will wait for these checks to pass:
 ### Vite+ and Vitest Coverage Updates
 
 Vite+ bundles a specific Vitest version. `@vitest/coverage-v8` must be pinned
-to that exact version, including the patch number. For example, Vite+ 1.1.0
-bundles Vitest 5.0.3 and requires coverage 5.0.3; coverage 5.0.4 fails at startup.
+to that exact version, including the patch number. For example, Vite+ 1.3.0
+bundles Vitest 5.0.5 and requires coverage 5.0.5; coverage 5.0.3 fails at startup.
 
 Dependabot groups the Vite+ toolchain, but a group can update coverage without
 updating Vite+. The npm configuration therefore ignores automatic updates to
