@@ -7,7 +7,7 @@
 [![pnpm 10.30.1](https://img.shields.io/badge/pnpm-10.30.1-orange.svg)](https://pnpm.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-MathGenie is a modern web application built with **React 19.3.0**, **TypeScript 5.9**, and **Node.js 24.14.1**, designed to help tutors generate math problems focusing on basic arithmetic operations. Enhanced with the latest React concurrent features and full TypeScript support for optimal performance, type safety, and developer experience.
+MathGenie is a modern web application built with **React 19.3.1**, **TypeScript 5.9**, and **Node.js 24.14.1**, designed to help tutors generate math problems focusing on basic arithmetic operations. Enhanced with the latest React concurrent features and full TypeScript support for optimal performance, type safety, and developer experience.
 
 ## ✨ Features
 
@@ -749,7 +749,7 @@ Third-party dependencies and their licenses are documented in the [NOTICE](NOTIC
 
 ---
 
-**Built with ❤️ using React 19.3.0, TypeScript 7, and Node.js 24.16.0**
+**Built with ❤️ using React 19.3.1, TypeScript 7, and Node.js 24.16.0**
 
 ### Arithmetic, large batches and offline behavior
 

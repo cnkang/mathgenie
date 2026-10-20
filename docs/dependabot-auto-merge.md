@@ -74,6 +74,36 @@ When upgrading Vite+:
 4. Require the PR's Tests check to pass before merging. Keep the coverage version
    pin and Dependabot ignore rule when upgrading.
 
+### React and React-Dom Version Parity
+
+React requires the `react` and `react-dom` packages to have the **exact same
+version**. A mismatch makes React throw at module load time:
+
+```
+Error: Incompatible React versions: The "react" and "react-dom" packages must
+have the exact same version. Instead got:
+  - react:      19.3.1
+  - react-dom:  19.3.0
+```
+
+Because the check runs while `react-dom` is imported, the whole application fails
+to render. Unit tests report every test file as failed, and the Playwright suites
+time out waiting for the first heading instead of failing fast.
+
+The npm configuration therefore groups `react`, `react-dom`, `@types/react` and
+`@types/react-dom`, so Dependabot always upgrades them together. A range such as
+`^19.3.0` is not enough on its own: it already allows the newer `react-dom`, so
+Dependabot sees no manifest change for it and the lockfile keeps the stale
+version.
+
+When upgrading React:
+
+1. Bump `react` and `react-dom` to the same version in `package.json`.
+2. Regenerate `pnpm-lock.yaml` with `pnpm install` and confirm the lockfile
+   resolves `react-dom` to the same version as `react`.
+3. Run `pnpm install --frozen-lockfile` and `pnpm test:unit:ci`.
+4. Require the PR's Tests check to pass before merging.
+
 ### Auto-merge Not Working?
 
 1. **Check repository settings**: Ensure "Allow auto-merge" is enabled

@@ -26,6 +26,14 @@ updates:
           - "vite-plugin-*"
           - "vitest"
           - "@vitest/*"
+      # React requires react and react-dom to share the exact same version.
+      # Keep them in one group so they are always upgraded together.
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
 
   # Enable version updates for GitHub Actions
   - package-ecosystem: "github-actions"
