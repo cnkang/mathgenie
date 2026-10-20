@@ -81,8 +81,8 @@ importers:
         specifier: ^9.9.0
         version: 9.9.0(postcss@8.5.30)
       cssnano-preset-advanced:
-        specifier: ^9.7.0
-        version: 9.7.0(postcss@8.5.30)
+        specifier: ^10.0.0
+        version: 10.0.0(postcss@8.5.30)
       happy-dom:
         specifier: ^21.0.3
         version: 21.0.3
@@ -1270,19 +1270,13 @@ packages:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
     engines: {node: '>= 8'}
 
-  css-declaration-sorter@7.4.0:
-    resolution: {integrity: sha512-LTuzjPoyA2vMGKKcaOqKSp7Ub2eGrNfKiZH4LpezxpNrsICGCSFvsQOI29psISxNZtaXibkC2CXzrQ5enMeGGw==}
-    engines: {node: ^14 || ^16 || >=18}
-    peerDependencies:
-      postcss: ^8.0.9
-
   cssesc@3.0.0:
     resolution: {integrity: sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==}
     engines: {node: '>=4'}
     hasBin: true
 
-  cssnano-preset-advanced@9.7.0:
-    resolution: {integrity: sha512-k7v/xRQbPEJ9ohzQfu1S4BapJ6L76XEYBVrXQKAizVz74951eWMcHTW+2LA4cKWNEIIj/u2ovw//3cqYGet86A==}
+  cssnano-preset-advanced@10.0.0:
+    resolution: {integrity: sha512-ZGJoly9X7ItUPFx5Gw7N9hkkohnownoGf4pLBkAJaH2zKbpWXJ+8eWVIDszfBvCeG1y9MKY2EbFopHo7PbcX5w==}
     engines: {node: ^22.22.3 || ^24.15.0 || >=26.0}
     peerDependencies:
       postcss: ^8.5.29
@@ -2769,16 +2763,10 @@ snapshots:
       shebang-command: 2.0.0
       which: 2.0.2
 
-  css-declaration-sorter@7.4.0(postcss@8.5.30):
-    dependencies:
-      postcss: 8.5.30
-
   cssesc@3.0.0: {}
 
-  cssnano-preset-advanced@9.7.0(postcss@8.5.30):
+  cssnano-preset-advanced@10.0.0(postcss@8.5.30):
     dependencies:
-      autoprefixer: 10.6.1(postcss@8.5.30)
-      css-declaration-sorter: 7.4.0(postcss@8.5.30)
       cssnano-preset-default: 9.8.0(postcss@8.5.30)
       postcss: 8.5.30
       postcss-discard-unused: 9.0.7(postcss@8.5.30)
