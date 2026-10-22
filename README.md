@@ -1,13 +1,13 @@
 # 🧮 MathGenie
 
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fcnkang%2Fmathgenie.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fcnkang%2Fmathgenie?ref=badge_shield)
-[![Node.js 24.14.1](https://img.shields.io/badge/Node.js-24.14.1-green.svg)](https://nodejs.org/)
+[![Node.js 24.22.1](https://img.shields.io/badge/Node.js-24.22.1-green.svg)](https://nodejs.org/)
 [![React 19.1.1](https://img.shields.io/badge/React-19.1.1-blue.svg)](https://reactjs.org/)
 [![TypeScript 5.9](https://img.shields.io/badge/TypeScript-5.9-blue.svg)](https://www.typescriptlang.org/)
-[![pnpm 10.30.1](https://img.shields.io/badge/pnpm-10.30.1-orange.svg)](https://pnpm.io/)
+[![pnpm 10.34.7](https://img.shields.io/badge/pnpm-10.34.7-orange.svg)](https://pnpm.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-MathGenie is a modern web application built with **React 19.3.1**, **TypeScript 5.9**, and **Node.js 24.14.1**, designed to help tutors generate math problems focusing on basic arithmetic operations. Enhanced with the latest React concurrent features and full TypeScript support for optimal performance, type safety, and developer experience.
+MathGenie is a modern web application built with **React 19.3.1**, **TypeScript 5.9**, and **Node.js 24.22.1**, designed to help tutors generate math problems focusing on basic arithmetic operations. Enhanced with the latest React concurrent features and full TypeScript support for optimal performance, type safety, and developer experience.
 
 ## ✨ Features
 
@@ -41,9 +41,9 @@ MathGenie is a modern web application built with **React 19.3.1**, **TypeScript 
 ## 🛠️ Tech Stack
 
 - **Frontend**: React 19.2.0 with concurrent features and TypeScript 5.9
-- **Runtime**: Node.js 24.14.1 with enhanced performance
+- **Runtime**: Node.js 24.22.1 with enhanced performance
 - **Build Tool**: Vite 7.1.4 for lightning-fast development with TypeScript support
-- **Package Manager**: pnpm 10.30.1 for optimal performance and disk efficiency
+- **Package Manager**: pnpm 10.34.7 for optimal performance and disk efficiency
 - **Testing**: Vitest + Playwright for comprehensive testing with TypeScript
 - **Styling**: Modern CSS with mobile-first responsive design
 - **PDF Generation**: jsPDF for client-side PDF creation
@@ -64,8 +64,8 @@ MathGenie is a modern web application built with **React 19.3.1**, **TypeScript 
 
 ### Prerequisites
 
-- **Node.js 24.14.1** or higher
-- **pnpm 10.30.1** or higher (install globally: `npm install -g pnpm`)
+- **Node.js 24.22.1** or higher
+- **pnpm 10.34.7** or newer within 10.x (install globally: `npm install -g pnpm@10.34.7`)
 - **TypeScript 5.9** (installed automatically with dependencies)
 
 ### Setup
@@ -80,7 +80,7 @@ MathGenie is a modern web application built with **React 19.3.1**, **TypeScript 
 2. Install pnpm globally (if not already installed):
 
    ```bash
-   npm install -g pnpm
+   npm install -g pnpm@10.34.7
    ```
 
 3. Install dependencies:
