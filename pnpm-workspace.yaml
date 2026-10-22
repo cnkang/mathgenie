@@ -12,6 +12,8 @@ enablePrePostScripts: true
 shamefullyHoist: true
 audit:
   level: moderate
+allowBuilds:
+  esbuild: true
 loglevel: info
 overrides:
   glob: ^11.0.3
