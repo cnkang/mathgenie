@@ -749,7 +749,7 @@ Third-party dependencies and their licenses are documented in the [NOTICE](NOTIC
 
 ---
 
-**Built with ❤️ using React 19.3.1, TypeScript 7, and Node.js 24.16.0**
+**Built with ❤️ using React 19.3.1, TypeScript 7, and Node.js 24.22.1**
 
 ### Arithmetic, large batches and offline behavior
 

@@ -4,7 +4,7 @@
 
 - **React 19.2.0**: Latest React with concurrent features, automatic batching, and enhanced performance
 - **TypeScript 5.9**: Strict type checking with comprehensive type definitions
-- **Node.js 22.19.1**: Latest LTS with enhanced performance
+- **Node.js 24.22.1**: Latest LTS with enhanced performance
 - **Vite 7.1.4**: Lightning-fast build tool with HMR and optimized bundling
 - **pnpm 10.29.2**: Fast, disk space efficient package manager
 

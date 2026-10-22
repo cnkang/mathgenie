@@ -171,7 +171,7 @@ lsof -i :3000         # Check what's using port 3000
 ### System Information
 
 ```bash
-node --version        # Check Node.js version (should be 22.19.1+)
+node --version        # Check Node.js version (should be 24.22.1+)
 pnpm --version        # Check pnpm version (should be 10.29.2+)
 which pnpm            # Find pnpm location
 ```
