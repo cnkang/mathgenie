@@ -310,7 +310,6 @@ scripts/temp-*.ts
 # Temporary configuration files
 babel.config.ts
 postcss.config.ts
-pnpm-workspace.yaml
 playwright.ci.config.ts
 playwright.smoke.config.ts
 playwright.*.config.ts
