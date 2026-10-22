@@ -10,7 +10,7 @@
   - Strict mode enabled with zero tolerance for type errors
   - Path aliases with `@/` prefix for clean imports
   - Comprehensive type coverage for all components and utilities
-- **Node.js 22.19.1**: Latest LTS with enhanced performance and security
+- **Node.js 24.22.1**: Latest LTS with enhanced performance and security
 - **Vite 7.1.4**: Lightning-fast build tool with HMR and optimized bundling
   - React plugin with TypeScript support
   - Code splitting and tree shaking

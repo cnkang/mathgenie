@@ -4,7 +4,7 @@
 
 ### Environment Setup
 
-- [ ] Node.js 22.19.1+ installed and verified
+- [ ] Node.js 24.22.1+ installed and verified
 - [ ] pnpm 10.29.2+ installed and verified
 - [ ] Project dependencies installed (`pnpm install`)
 - [ ] Development server starts successfully (`pnpm dev`)

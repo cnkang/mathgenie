@@ -6,7 +6,7 @@
 
 ```bash
 # Verify required versions
-node --version    # Should be 22.19.1+
+node --version    # Should be 24.22.1+
 pnpm --version    # Should be 10.29.2+
 ```
 
