@@ -119,6 +119,12 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .message-container {
+    animation: none;
+  }
+}
+
 /* Dark mode support - WCAG 2.2 AAA compliant colors */
 @media (prefers-color-scheme: dark) {
   .message-error {

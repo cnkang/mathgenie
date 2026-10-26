@@ -82,18 +82,20 @@ a[href]:focus:not(:focus-visible),
 
 /* Respect user motion preferences */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+  /* Repeat :root to raise specificity above component motion rules without !important. */
+  :root:root:root:root,
+  :root:root:root:root *,
+  :root:root:root:root *::before,
+  :root:root:root:root *::after {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+    transition-duration: 0.01ms;
+    scroll-behavior: auto;
   }
 }
 
 /* High-contrast support */
-@media (prefers-contrast: high) {
+@media (prefers-contrast: more) {
   button,
   input,
   select,
@@ -129,10 +131,10 @@ a[href]:focus:not(:focus-visible),
 
   /* Harden WebKit number input contrast under dark scheme in CI/mobile */
   input[type="number"] {
-    color: var(--text-primary, #f8fafc) !important;
-    background-color: var(--bg-primary, #0b1220) !important;
-    border-color: var(--border-color, #334155) !important;
-    -webkit-text-fill-color: var(--text-primary, #f8fafc) !important;
+    color: var(--text-primary, #f8fafc);
+    background-color: var(--bg-primary, #0b1220);
+    border-color: var(--border-color, #334155);
+    -webkit-text-fill-color: var(--text-primary, #f8fafc);
     color-scheme: dark;
     -webkit-appearance: textfield;
     appearance: textfield;
