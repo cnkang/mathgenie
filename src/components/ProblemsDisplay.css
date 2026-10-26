@@ -536,6 +536,12 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .problems-stat.success-indicator {
+    animation: none;
+  }
+}
+
 .problems-pagination {
   display: flex;
   align-items: center;
