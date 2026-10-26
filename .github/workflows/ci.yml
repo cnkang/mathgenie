@@ -344,14 +344,34 @@ jobs:
             ${{ runner.os }}-playwright-browsers-
 
       - name: 🎭 Install Playwright browsers
+        env:
+          DEBIAN_FRONTEND: noninteractive
         run: |
           echo "🎭 Installing Playwright browsers for accessibility testing..."
           echo "🎭 Cache status: ${{ steps.playwright-cache.outputs.cache-hit }}"
 
-          # Always install browsers to ensure they're available
-          # The cache will speed up the process when browsers are already present
-          echo "🔧 Installing browsers and system dependencies..."
-          vp run playwright:install:ci
+          # Accessibility tests run on all three engines, so install all of them.
+          # The cache will speed up the process when browsers are already present.
+          # Retry to absorb transient apt/package-mirror slowness.
+          installed=0
+          for attempt in 1 2 3; do
+            echo "🔧 Attempt ${attempt}/3: installing browsers and system dependencies..."
+            if vp run playwright:install:ci; then
+              installed=1
+              break
+            fi
+            echo "⚠️ Attempt ${attempt}/3 failed."
+            if [ "${attempt}" -lt 3 ]; then
+              echo "⏳ Retrying in $((attempt * 20))s..."
+              sleep $((attempt * 20))
+            fi
+          done
+
+          if [ "${installed}" -ne 1 ]; then
+            echo "❌ Browser installation failed after 3 attempts, running debug script..."
+            vp run playwright:debug || true
+            exit 1
+          fi
 
           echo "🔍 Verifying browser installation..."
           if ! vp exec playwright install --dry-run chromium firefox webkit; then
@@ -361,7 +381,7 @@ jobs:
           fi
 
           echo "✅ All browsers installed and verified successfully"
-        timeout-minutes: 25
+        timeout-minutes: 30
 
       - name: 📥 Download verified production build
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
@@ -512,15 +532,36 @@ jobs:
             ${{ runner.os }}-playwright-browsers-
 
       - name: 🎭 Install Playwright browsers
+        env:
+          DEBIAN_FRONTEND: noninteractive
         run: |
           echo "🎭 Installing Playwright browsers for ${{ matrix.name }}..."
           echo "📋 Project: ${{ matrix.project }}, Browser: ${{ matrix.browser }}"
           echo "🎭 Cache status: ${{ steps.playwright-cache.outputs.cache-hit }}"
 
-          # Always install browsers to ensure they're available
-          # The cache will speed up the process when browsers are already present
-          echo "🔧 Installing browsers and system dependencies..."
-          vp run playwright:install:ci
+          # Only install the browser required by this matrix entry. Installing all
+          # three engines in every job tripled the apt/system-dependency work and
+          # made the job vulnerable to slow package mirrors.
+          # The cache will speed up the process when browsers are already present.
+          installed=0
+          for attempt in 1 2 3; do
+            echo "🔧 Attempt ${attempt}/3: installing ${{ matrix.browser }} and system dependencies..."
+            if vp exec playwright install --with-deps ${{ matrix.browser }}; then
+              installed=1
+              break
+            fi
+            echo "⚠️ Attempt ${attempt}/3 failed."
+            if [ "${attempt}" -lt 3 ]; then
+              echo "⏳ Retrying in $((attempt * 20))s..."
+              sleep $((attempt * 20))
+            fi
+          done
+
+          if [ "${installed}" -ne 1 ]; then
+            echo "❌ Browser installation failed after 3 attempts, running debug script..."
+            vp run playwright:debug || true
+            exit 1
+          fi
 
           echo "🔍 Verifying browser installation..."
           if ! vp exec playwright install --dry-run ${{ matrix.browser }}; then
@@ -530,7 +571,7 @@ jobs:
           fi
 
           echo "✅ Browser ${{ matrix.browser }} installed and verified successfully"
-        timeout-minutes: 25
+        timeout-minutes: 30
 
       - name: 📥 Download verified production build
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
