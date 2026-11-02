@@ -1,6 +1,6 @@
 /* Node.js PostCSS config */
 import cssnanoPresetAdvanced from 'cssnano-preset-advanced';
-import { purgeCSSPlugin } from '@fullhuman/postcss-purgecss';
+import purgeCSSPlugin from '@fullhuman/postcss-purgecss';
 import autoprefixer from 'autoprefixer';
 import cssnano from 'cssnano';
 /* global process */
