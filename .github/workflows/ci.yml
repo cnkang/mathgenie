@@ -820,21 +820,38 @@ jobs:
     timeout-minutes: 5
     permissions:
       contents: read
+    env:
+      # Single source of truth for the success status value (SonarCloud S1192).
+      SUCCESS_STATUS: success
 
     steps:
       - name: 📊 Check job results
         run: |
-          echo "## 🚪 Quality Gate Results" >> $GITHUB_STEP_SUMMARY
-          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Code Quality | ${{ needs.code-quality.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Tests | ${{ needs.test.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Security | ${{ needs.security.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Build | ${{ needs.build.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Cross-browser & Mobile | ${{ needs.cross-browser.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| i18n Check | ${{ needs.i18n-check.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Accessibility | ${{ needs.accessibility.result == 'success' && '✅ Passed' || '⚠️ Issues Found' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          # Append a summary row: $1 = check name, $2 = job result, $3 = label used on failure.
+          summary_row() {
+            local label="$1"
+            local result="$2"
+            local failure_label="${3:-❌ Failed}"
+            if [[ "$result" == "$SUCCESS_STATUS" ]]; then
+              echo "| ${label} | ✅ Passed |"
+            else
+              echo "| ${label} | ${failure_label} |"
+            fi
+          }
+
+          {
+            echo "## 🚪 Quality Gate Results"
+            echo "| Check | Status |"
+            echo "|-------|--------|"
+            summary_row "Code Quality" "${{ needs.code-quality.result }}"
+            summary_row "Tests" "${{ needs.test.result }}"
+            summary_row "Security" "${{ needs.security.result }}"
+            summary_row "Build" "${{ needs.build.result }}"
+            summary_row "Cross-browser & Mobile" "${{ needs.cross-browser.result }}"
+            summary_row "i18n Check" "${{ needs.i18n-check.result }}"
+            summary_row "Accessibility" "${{ needs.accessibility.result }}" "⚠️ Issues Found"
+            echo ""
+          } >> $GITHUB_STEP_SUMMARY
 
           # Test coverage details
           echo "### 📋 Test Coverage Details" >> $GITHUB_STEP_SUMMARY
@@ -847,19 +864,27 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
 
           # Fail if any critical job failed (including security and accessibility)
-          if [[ "${{ needs.security.result }}" != "success" ]] || \
-             [[ "${{ needs.accessibility.result }}" != "success" ]] || \
-             [[ "${{ needs.code-quality.result }}" != "success" ]] || \
-             [[ "${{ needs.test.result }}" != "success" ]] || \
-             [[ "${{ needs.build.result }}" != "success" ]] || \
-             [[ "${{ needs.cross-browser.result }}" != "success" ]] || \
-             [[ "${{ needs.i18n-check.result }}" != "success" ]]; then
+          gate_failed=false
+          for result in \
+            "${{ needs.security.result }}" \
+            "${{ needs.accessibility.result }}" \
+            "${{ needs.code-quality.result }}" \
+            "${{ needs.test.result }}" \
+            "${{ needs.build.result }}" \
+            "${{ needs.cross-browser.result }}" \
+            "${{ needs.i18n-check.result }}"; do
+            if [[ "$result" != "$SUCCESS_STATUS" ]]; then
+              gate_failed=true
+            fi
+          done
+
+          if [[ "$gate_failed" == "true" ]]; then
             echo "❌ Quality gate failed! Critical checks did not pass." >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
 
           # Check accessibility test status (warning but not failure)
-          if [[ "${{ needs.accessibility.result }}" != "success" ]]; then
+          if [[ "${{ needs.accessibility.result }}" != "$SUCCESS_STATUS" ]]; then
             echo "⚠️ Note: Accessibility tests found some issues, please check the detailed report for fixes." >> $GITHUB_STEP_SUMMARY
           fi
 
