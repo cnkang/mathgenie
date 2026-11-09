@@ -22,8 +22,8 @@ importers:
   .:
     dependencies:
       '@vercel/speed-insights':
-        specifier: ^2.0.0
-        version: 2.0.0(react@19.3.1)
+        specifier: ^2.1.0
+        version: 2.1.0(react@19.3.1)
       jspdf:
         specifier: ^4.2.1
         version: 4.2.1
@@ -891,10 +891,10 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@vercel/speed-insights@2.0.0':
-    resolution: {integrity: sha512-jwkNcrTeafWxjmWq4AHBaptSqZiJkYU5adLC9QBSqeim0GcqDMgN5Ievh8OG1rJ6W3A4l1oiP7qr9CWxGuzu3w==}
+  '@vercel/speed-insights@2.1.0':
+    resolution: {integrity: sha512-tkDiIEjjmlwPpTFnOK14hBhsRLMo5yoCeK2Er3AHWlL7WTzHgFSyItps3TOW0HukErUlYlaUeHiVLCyfiE4WAA==}
     peerDependencies:
-      '@sveltejs/kit': ^1 || ^2
+      '@sveltejs/kit': ^1 || ^2 || ^3 || ^3.0.0-next.0
       next: '>= 13'
       nuxt: '>= 3'
       react: ^18 || ^19 || ^19.0.0-rc
@@ -2481,7 +2481,7 @@ snapshots:
   '@typescript/typescript-win32-x64@7.0.2':
     optional: true
 
-  '@vercel/speed-insights@2.0.0(react@19.3.1)':
+  '@vercel/speed-insights@2.1.0(react@19.3.1)':
     optionalDependencies:
       react: 19.3.1
 
