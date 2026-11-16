@@ -305,6 +305,10 @@
 
     /* Force hardware acceleration for smooth rendering */
     will-change: transform;
+
+    /* Scrollbar styling */
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) var(--bg-secondary);
   }
 
   .results-section {
@@ -536,12 +540,6 @@
   }
 
   /* (merged in the earlier .advanced-settings-toggle/.pdf-settings-toggle block) */
-
-  /* Improve settings section scrolling */
-  .settings-section {
-    scrollbar-width: thin;
-    scrollbar-color: var(--border-color) var(--bg-secondary);
-  }
 
   @supports not (scrollbar-color: auto) {
     .settings-section::-webkit-scrollbar {
