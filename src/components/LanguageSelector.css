@@ -57,8 +57,8 @@
   .language-selector {
     padding: 0.4rem 0.6rem;
     margin: 0.5rem 0;
-    background: rgb(248 250 252 / 95%);
-    border: 1px solid #cbd5e1;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
   }
 
   .language-select {
