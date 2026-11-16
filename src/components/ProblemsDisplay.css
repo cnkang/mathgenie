@@ -181,12 +181,15 @@
   animation: fadeInSuccess 0.5s ease-out;
 }
 
+/* Modern scrollbar styles */
 .problems-content {
   position: relative;
   flex: 1;
   max-height: 500px;
   padding: var(--space-lg, 1.5rem);
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color, #e2e8f0) var(--bg-secondary, #f8fafc);
 
   /* Add keyboard accessibility support */
   outline: none;
@@ -196,6 +199,27 @@
 .problems-content:focus {
   outline: 2px solid var(--primary-color, #4f46e5);
   outline-offset: 2px;
+}
+
+/* Legacy scrollbar styles for browsers without scrollbar-color support */
+@supports not (scrollbar-color: auto) {
+  .problems-content::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .problems-content::-webkit-scrollbar-track {
+    background: var(--bg-secondary, #f8fafc);
+    border-radius: var(--radius-md, 0.5rem);
+  }
+
+  .problems-content::-webkit-scrollbar-thumb {
+    background: var(--border-color, #e2e8f0);
+    border-radius: var(--radius-md, 0.5rem);
+  }
+
+  .problems-content::-webkit-scrollbar-thumb:hover {
+    background: var(--border-hover, #cbd5e1);
+  }
 }
 
 .problems-grid {
@@ -441,25 +465,6 @@
     max-height: 250px;
     padding: var(--space-xs, 0.5rem);
   }
-}
-
-/* Scrollbar styles */
-.problems-content::-webkit-scrollbar {
-  width: 8px;
-}
-
-.problems-content::-webkit-scrollbar-track {
-  background: var(--bg-secondary, #f8fafc);
-  border-radius: var(--radius-md, 0.5rem);
-}
-
-.problems-content::-webkit-scrollbar-thumb {
-  background: var(--border-color, #e2e8f0);
-  border-radius: var(--radius-md, 0.5rem);
-}
-
-.problems-content::-webkit-scrollbar-thumb:hover {
-  background: var(--border-hover, #cbd5e1);
 }
 
 /* Loading animation */

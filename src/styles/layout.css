@@ -538,22 +538,29 @@
   /* (merged in the earlier .advanced-settings-toggle/.pdf-settings-toggle block) */
 
   /* Improve settings section scrolling */
-  .settings-section::-webkit-scrollbar {
-    width: 6px;
+  .settings-section {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) var(--bg-secondary);
   }
 
-  .settings-section::-webkit-scrollbar-track {
-    background: var(--bg-secondary);
-    border-radius: var(--radius-sm);
-  }
+  @supports not (scrollbar-color: auto) {
+    .settings-section::-webkit-scrollbar {
+      width: 6px;
+    }
 
-  .settings-section::-webkit-scrollbar-thumb {
-    background: var(--border-color);
-    border-radius: var(--radius-sm);
-  }
+    .settings-section::-webkit-scrollbar-track {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-sm);
+    }
 
-  .settings-section::-webkit-scrollbar-thumb:hover {
-    background: var(--text-secondary);
+    .settings-section::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: var(--radius-sm);
+    }
+
+    .settings-section::-webkit-scrollbar-thumb:hover {
+      background: var(--text-secondary);
+    }
   }
 
   /* Keep preset cards above background layers without overriding component sizing */

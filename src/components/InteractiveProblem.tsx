@@ -64,6 +64,15 @@ const InteractiveProblem: React.FC<InteractiveProblemProps> = ({
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+    // IME-safe: ignore Enter during composition (CJK input)
+    // Use native event property via type assertion
+    const nativeEvent = e.nativeEvent as KeyboardEvent & {
+      isComposing?: boolean;
+      keyCode?: number;
+    };
+    if (nativeEvent.isComposing || nativeEvent.keyCode === 229) {
+      return;
+    }
     if (e.key === "Enter") {
       handleSubmit(e);
     }

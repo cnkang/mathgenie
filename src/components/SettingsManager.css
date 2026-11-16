@@ -71,19 +71,11 @@
   font-size: var(--font-size-sm);
   font-weight: 700;
   line-height: 1.5;
-  color: #7f1d1d;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-left: 4px solid #dc2626;
+  color: var(--text-error);
+  background: var(--error-light);
+  border: 1px solid var(--border-error);
+  border-left: 4px solid var(--accent-error);
   border-radius: var(--radius-sm);
-}
-
-@media (prefers-color-scheme: dark) {
-  .settings-manager-alert {
-    color: #fecaca;
-    background: #450a0a;
-    border-color: #7f1d1d;
-  }
 }
 
 @media (width <= 768px) {

@@ -5,16 +5,16 @@
   justify-content: center;
   padding: 0.5rem 0.75rem;
   margin: 0.5rem 0;
-  background: rgb(255 255 255 / 90%);
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
   backdrop-filter: blur(10px);
 }
 
 .language-label {
   font-weight: 500;
-  color: #333;
+  color: var(--text-secondary);
 }
 
 .language-select {
@@ -29,22 +29,22 @@
   padding: 0.75rem;
   font-size: 0.9rem;
   font-weight: 500; /* Enhance text weight */
-  color: #0f172a; /* Ensure dark text for light background */
+  color: var(--text-primary); /* Ensure dark text for light background */
   cursor: pointer;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  transition: border-color 0.2s;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--transition-fast);
 }
 
 .language-select:hover {
-  border-color: var(--primary-color, #3730a3);
+  border-color: var(--primary-color);
 }
 
 .language-select:focus {
   outline: none;
-  border-color: var(--primary-color, #3730a3);
-  box-shadow: 0 0 0 2px rgb(55 48 163 / 25%);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgb(79 70 229 / 25%);
 }
 
 .language-selector.loading {
@@ -92,33 +92,5 @@
     min-height: 44px;
     padding: 0.75rem;
     font-size: 0.8rem;
-  }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .language-selector {
-    background: rgb(30 41 59 / 90%);
-    border-color: #475569;
-  }
-
-  .language-label {
-    color: #cbd5e1;
-  }
-
-  .language-select {
-    font-weight: 500; /* Enhance text weight */
-    color: #fff; /* Pure white text for maximum contrast */
-    background: #1e293b; /* Darker background for better contrast */
-    border-color: #475569;
-  }
-
-  .language-select:hover {
-    border-color: var(--primary-color, #6366f1);
-  }
-
-  .language-select:focus {
-    border-color: var(--primary-color, #6366f1);
-    box-shadow: 0 0 0 2px rgb(99 102 241 / 25%);
   }
 }
