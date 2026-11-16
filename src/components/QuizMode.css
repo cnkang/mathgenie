@@ -70,7 +70,7 @@
   font-size: var(--font-size-sm);
   color: white;
   cursor: pointer;
-  background: var(--error-color);
+  background: var(--quiz-exit-bg);
   border: none;
   border-radius: var(--radius-md);
   transition:
@@ -80,7 +80,7 @@
 }
 
 .exit-quiz-btn-small:hover {
-  background: #dc2626;
+  background: var(--quiz-exit-bg-hover);
   transform: translateY(-1px);
   box-shadow: var(--shadow-lift);
 }

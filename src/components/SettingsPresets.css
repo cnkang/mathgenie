@@ -159,7 +159,7 @@ button.preset-card.active:hover .preset-indicator {
   font-size: var(--font-size-xs);
   font-weight: 700;
   line-height: 1;
-  color: var(--preset-indicator-active-bg);
+  color: var(--preset-indicator-active-color);
   background: var(--preset-indicator-active-hover-bg);
   border: 1px solid var(--preset-indicator-active-hover-border);
   border-radius: 999px;

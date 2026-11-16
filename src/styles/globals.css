@@ -22,6 +22,10 @@
   --warning-light: #fffbeb;
   --error-color: #991b1b;
   --error-light: #fef2f2;
+  /* Quiz exit button: needs a deep red behind white text in both schemes;
+     --error-color flips bright in dark mode for text consumers. */
+  --quiz-exit-bg: #991b1b;
+  --quiz-exit-bg-hover: #dc2626;
   --info-color: #1e40af;
   --info-light: #eff6ff;
 
@@ -98,9 +102,9 @@
   --preset-indicator-hover-color-dark: #f8fafc;
   --preset-indicator-hover-bg-dark: #1e3a8a;
   --preset-indicator-hover-border-dark: #60a5fa;
-  --preset-indicator-color: #eff6ff;
-  --preset-indicator-bg: rgb(30 58 138 / 45%);
-  --preset-indicator-border: rgb(147 197 253 / 55%);
+  --preset-indicator-color: var(--primary-color);
+  --preset-indicator-bg: rgb(30 58 138 / 9%);
+  --preset-indicator-border: rgb(30 58 138 / 25%);
   --preset-indicator-color-dark: #eff6ff;
   --preset-indicator-bg-dark: rgb(30 58 138 / 45%);
   --preset-indicator-border-dark: rgb(147 197 253 / 55%);
@@ -219,6 +223,8 @@
     --warning-light: #451a03;
     --error-color: #fca5a5;
     --error-light: #450a0a;
+    --quiz-exit-bg: #b91c1c;
+    --quiz-exit-bg-hover: #dc2626;
     --info-color: #60a5fa;
     --info-light: #1e293b;
     --border-error: #7f1d1d;
