@@ -167,10 +167,10 @@
 }
 
 .interactive-problem.correct {
-  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  background: var(--gradient-correct);
   border-color: var(--success-color);
   box-shadow:
-    0 0 0 3px rgb(74 222 128 / 15%),
+    0 0 0 3px var(--shadow-correct),
     var(--shadow-md);
   transform: scale(1.01);
   transition:
@@ -181,10 +181,10 @@
 }
 
 .interactive-problem.incorrect {
-  background: linear-gradient(135deg, #fef2f2, #fee2e2);
+  background: var(--gradient-incorrect);
   border-color: var(--error-color);
   box-shadow:
-    0 0 0 3px rgb(239 68 68 / 15%),
+    0 0 0 3px var(--shadow-incorrect),
     var(--shadow-md);
   transform: scale(0.99);
   transition:
@@ -534,15 +534,15 @@
 }
 
 .problem-review.correct {
-  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  background: var(--gradient-correct);
   border-color: var(--success-color);
-  box-shadow: 0 0 0 2px rgb(74 222 128 / 12%);
+  box-shadow: 0 0 0 2px var(--shadow-correct);
 }
 
 .problem-review.incorrect {
-  background: linear-gradient(135deg, #fef2f2, #fee2e2);
+  background: var(--gradient-incorrect);
   border-color: var(--error-color);
-  box-shadow: 0 0 0 2px rgb(239 68 68 / 12%);
+  box-shadow: 0 0 0 2px var(--shadow-incorrect);
 }
 
 .problem-number {
@@ -574,57 +574,6 @@
   font-size: var(--font-size-lg);
   color: var(--text-secondary);
   text-align: center;
-}
-
-/* Dark mode support - WCAG 2.2 AAA compliant */
-@media (prefers-color-scheme: dark) {
-  .submit-answer-btn,
-  .retry-quiz-btn,
-  .exit-quiz-btn-small {
-    color: #fff;
-    background: var(--button-primary-bg);
-  }
-
-  .submit-answer-btn:hover:not(:disabled),
-  .retry-quiz-btn:hover {
-    background: var(--button-primary-hover-bg);
-  }
-
-  .exit-quiz-btn-small:hover {
-    background: #b91c1c;
-  }
-
-  .interactive-problem.correct {
-    background: linear-gradient(135deg, #052e16, #14532d);
-    border-color: var(--success-color);
-    box-shadow:
-      0 0 0 3px rgb(74 222 128 / 18%),
-      var(--shadow-md);
-  }
-
-  .interactive-problem.incorrect {
-    background: linear-gradient(135deg, #450a0a, #7f1d1d);
-    border-color: var(--error-color);
-    box-shadow:
-      0 0 0 3px rgb(239 68 68 / 18%),
-      var(--shadow-md);
-  }
-
-  .problem-review.correct {
-    background: linear-gradient(135deg, #052e16, #14532d);
-    border-color: var(--success-color);
-    color: #f8fafc;
-  }
-
-  .problem-review.incorrect {
-    background: linear-gradient(135deg, #450a0a, #7f1d1d);
-    border-color: var(--error-color);
-    color: #f8fafc;
-  }
-
-  .feedback-section {
-    background: var(--bg-accent);
-  }
 }
 
 /* Responsive Design */

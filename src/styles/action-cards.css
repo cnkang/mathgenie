@@ -123,8 +123,8 @@ button.action-card:active {
   justify-content: center;
   width: 40px;
   height: 40px;
-  background: rgb(79 70 229 / 10%);
-  border: 1px solid rgb(79 70 229 / 20%);
+  background: var(--action-indicator-bg);
+  border: 1px solid var(--action-indicator-border);
   border-radius: 50%;
   transition:
     transform var(--transition-spring),
@@ -142,7 +142,7 @@ button.action-card:active {
 
 /* Apple-style hover: lift + shadow + scale */
 .action-card:hover {
-  background: linear-gradient(135deg, var(--bg-primary), rgb(79 70 229 / 2%));
+  background: var(--action-card-hover-bg);
   border-color: var(--primary-color);
   box-shadow: var(--shadow-lift);
   transform: translateY(-3px) scale(1.01);
@@ -163,8 +163,8 @@ button.action-card:active {
 }
 
 .action-card:hover .action-indicator {
-  background: rgb(79 70 229 / 20%);
-  border-color: rgb(79 70 229 / 36%);
+  background: var(--action-indicator-hover-bg);
+  border-color: var(--action-indicator-hover-border);
   transform: scale(1.1);
 }
 
@@ -186,7 +186,7 @@ button.action-card:active {
   outline: none;
   border-color: var(--primary-color);
   box-shadow:
-    0 0 0 3px rgb(79 70 229 / 30%),
+    0 0 0 3px var(--action-card-focus-shadow),
     var(--shadow-lg);
   transform: translateY(-2px);
 }
@@ -224,7 +224,8 @@ button.action-card:active {
 }
 
 .action-card:disabled .action-indicator {
-  background: rgb(128 128 128 / 10%);
+  background: var(--action-card-disabled-indicator-bg);
+  border-color: var(--action-card-disabled-indicator-border);
 }
 
 .action-card:disabled .action-arrow {
@@ -358,77 +359,6 @@ button.action-card:active {
   .action-text p {
     font-size: var(--font-size-sm);
     line-height: 1.6;
-  }
-}
-
-/* Dark mode optimizations - WCAG 2.2 AAA compliant */
-@media (prefers-color-scheme: dark) {
-  .action-card {
-    background: var(--bg-secondary);
-    border-color: var(--border-color);
-    box-shadow:
-      0 1px 3px 0 rgb(0 0 0 / 30%),
-      0 1px 2px 0 rgb(0 0 0 / 20%);
-  }
-
-  .action-card:hover {
-    background: linear-gradient(135deg, var(--bg-secondary), rgb(139 92 246 / 8%));
-    border-color: var(--primary-color);
-    box-shadow:
-      0 10px 15px -3px rgb(0 0 0 / 50%),
-      0 4px 6px -2px rgb(0 0 0 / 40%);
-  }
-
-  .action-card:hover .action-text h3 {
-    color: #f8fafc;
-  }
-
-  .action-card:hover .action-text p {
-    color: #cbd5e1;
-    opacity: 1;
-  }
-
-  .action-card:focus {
-    border-color: var(--primary-color);
-    box-shadow:
-      0 0 0 3px rgb(139 92 246 / 40%),
-      0 10px 15px -3px rgb(0 0 0 / 50%);
-  }
-
-  .action-text h3 {
-    color: var(--text-primary);
-  }
-
-  .action-text p {
-    color: var(--text-secondary);
-  }
-
-  .action-indicator {
-    background: rgb(139 92 246 / 20%);
-    border-color: rgb(139 92 246 / 35%);
-  }
-
-  .action-card:hover .action-indicator {
-    background: rgb(96 165 250 / 28%);
-    border-color: rgb(147 197 253 / 60%);
-  }
-
-  .action-arrow {
-    color: var(--primary-color);
-  }
-
-  .action-card:disabled {
-    background: var(--bg-tertiary);
-    border-color: var(--border-color);
-  }
-
-  .action-card:disabled .action-indicator {
-    background: rgb(148 163 184 / 15%);
-    border-color: rgb(148 163 184 / 30%);
-  }
-
-  .action-card:disabled .action-arrow {
-    color: var(--text-muted);
   }
 }
 

@@ -4,7 +4,7 @@
 
 /* CSS Custom Properties for consistent theming */
 :root {
-  color-scheme: light;
+  color-scheme: light dark;
 
   /* Performance optimization */
   --will-change: transform;
@@ -19,7 +19,11 @@
   --success-light: #dcfce7;
   --success-dark: #14532d;
   --warning-color: #92400e;
+  --warning-light: #fffbeb;
   --error-color: #991b1b;
+  --error-light: #fef2f2;
+  --info-color: #1e40af;
+  --info-light: #eff6ff;
 
   /* Backgrounds */
   --bg-primary: #fff;
@@ -36,6 +40,100 @@
   --border-color: #e2e8f0;
   --border-hover: #94a3b8;
   --border-focus: var(--primary-color);
+  --border-error: #fecaca;
+  --border-warning: #fde68a;
+  --border-info: #bfdbfe;
+  --border-error-dark: #7f1d1d;
+  --border-warning-dark: #78350f;
+  --border-info-dark: #334155;
+
+  /* Border left accent colors */
+  --accent-error: #ef4444;
+  --accent-warning: #f59e0b;
+  --accent-info: #3b82f6;
+  --accent-error-dark: #f87171;
+  --accent-warning-dark: #fbbf24;
+  --accent-info-dark: #60a5fa;
+
+  /* Text colors for messages */
+  --text-error: #991b1b;
+  --text-warning: #92400e;
+  --text-info: #1e40af;
+  --text-error-dark: #fca5a5;
+  --text-warning-dark: #fbbf24;
+  --text-info-dark: #f1f5f9;
+
+  /* State gradients for quiz feedback */
+  --gradient-correct: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  --gradient-correct-dark: linear-gradient(135deg, #052e16, #14532d);
+  --gradient-incorrect: linear-gradient(135deg, #fef2f2, #fee2e2);
+  --gradient-incorrect-dark: linear-gradient(135deg, #450a0a, #7f1d1d);
+
+  /* State box-shadow colors for quiz feedback */
+  --shadow-correct: rgb(74 222 128 / 15%);
+  --shadow-correct-dark: rgb(74 222 128 / 18%);
+  --shadow-incorrect: rgb(239 68 68 / 15%);
+  --shadow-incorrect-dark: rgb(239 68 68 / 18%);
+
+  /* Preset gradients */
+  --preset-bg-gradient: linear-gradient(145deg, rgb(219 234 254 / 45%), transparent 55%);
+  --preset-bg-gradient-dark: linear-gradient(145deg, rgb(147 197 253 / 14%), transparent 55%);
+  --preset-hover-bg-gradient: linear-gradient(135deg, var(--bg-primary), rgb(30 58 138 / 4%));
+  --preset-hover-bg-gradient-dark: linear-gradient(
+    135deg,
+    var(--bg-primary),
+    rgb(147 197 253 / 8%)
+  );
+  --preset-active-bg-gradient: linear-gradient(135deg, var(--bg-primary), rgb(16 185 129 / 6%));
+  --preset-active-hover-bg-gradient: linear-gradient(
+    135deg,
+    var(--bg-primary),
+    rgb(16 185 129 / 10%)
+  );
+
+  /* Preset indicator colors */
+  --preset-indicator-hover-color: #1e3a8a;
+  --preset-indicator-hover-bg: #dbeafe;
+  --preset-indicator-hover-border: #93c5fd;
+  --preset-indicator-hover-color-dark: #f8fafc;
+  --preset-indicator-hover-bg-dark: #1e3a8a;
+  --preset-indicator-hover-border-dark: #60a5fa;
+  --preset-indicator-color: #eff6ff;
+  --preset-indicator-bg: rgb(30 58 138 / 45%);
+  --preset-indicator-border: rgb(147 197 253 / 55%);
+  --preset-indicator-color-dark: #eff6ff;
+  --preset-indicator-bg-dark: rgb(30 58 138 / 45%);
+  --preset-indicator-border-dark: rgb(147 197 253 / 55%);
+  --preset-indicator-active-color: #ecfdf5;
+  --preset-indicator-active-bg: #065f46;
+  --preset-indicator-active-border: #34d399;
+  --preset-indicator-active-hover-color: #ecfdf5;
+  --preset-indicator-active-hover-bg: #047857;
+  --preset-indicator-active-hover-border: #6ee7b7;
+
+  /* Settings section shadows */
+  --shadow-grouping-toggle: none;
+  --shadow-grouping-toggle-dark: 0 2px 8px rgb(0 0 0 / 35%);
+  --shadow-grouping-enabled: 0 4px 12px rgb(79 70 229 / 15%);
+  --shadow-grouping-enabled-dark: 0 4px 12px rgb(99 102 241 / 25%);
+  --grouping-enabled-bg: var(--primary-light);
+  --grouping-enabled-bg-dark: linear-gradient(135deg, var(--bg-secondary), rgb(99 102 241 / 25%));
+
+  /* Action card colors */
+  --action-indicator-bg: rgb(79 70 229 / 10%);
+  --action-indicator-bg-dark: rgb(139 92 246 / 20%);
+  --action-indicator-border: rgb(79 70 229 / 20%);
+  --action-indicator-border-dark: rgb(139 92 246 / 35%);
+  --action-indicator-hover-bg: rgb(79 70 229 / 20%);
+  --action-indicator-hover-bg-dark: rgb(96 165 250 / 28%);
+  --action-indicator-hover-border: rgb(79 70 229 / 36%);
+  --action-indicator-hover-border-dark: rgb(147 197 253 / 60%);
+  --action-card-hover-bg: linear-gradient(135deg, var(--bg-primary), rgb(79 70 229 / 2%));
+  --action-card-hover-bg-dark: linear-gradient(135deg, var(--bg-secondary), rgb(139 92 246 / 8%));
+  --action-card-disabled-indicator-bg: rgb(148 163 184 / 15%);
+  --action-card-disabled-indicator-border: rgb(148 163 184 / 30%);
+  --action-card-focus-shadow: rgb(79 70 229 / 30%);
+  --action-card-focus-shadow-dark: rgb(139 92 246 / 40%);
 
   /* Semantic button tokens */
   --button-primary-bg: var(--primary-color);
@@ -102,7 +200,6 @@
 /* Dark mode */
 @media (prefers-color-scheme: dark) {
   :root {
-    color-scheme: dark;
     --bg-primary: #0b1220;
     --bg-secondary: #111a2b;
     --bg-tertiary: #17243a;
@@ -118,6 +215,44 @@
     --success-color: #4ade80;
     --success-dark: #22c55e;
     --success-light: rgb(74 222 128 / 20%);
+    --warning-color: #fbbf24;
+    --warning-light: #451a03;
+    --error-color: #fca5a5;
+    --error-light: #450a0a;
+    --info-color: #60a5fa;
+    --info-light: #1e293b;
+    --border-color: #334155;
+    --border-hover: #64748b;
+    --border-error: #7f1d1d;
+    --border-warning: #78350f;
+    --border-info: #334155;
+    --accent-error: #f87171;
+    --accent-warning: #fbbf24;
+    --accent-info: #60a5fa;
+    --text-error: #fca5a5;
+    --text-warning: #fbbf24;
+    --text-info: #f1f5f9;
+    --gradient-correct: var(--gradient-correct-dark);
+    --gradient-incorrect: var(--gradient-incorrect-dark);
+    --shadow-correct: var(--shadow-correct-dark);
+    --shadow-incorrect: var(--shadow-incorrect-dark);
+    --preset-bg-gradient: var(--preset-bg-gradient-dark);
+    --preset-hover-bg-gradient: var(--preset-hover-bg-gradient-dark);
+    --preset-indicator-hover-color: var(--preset-indicator-hover-color-dark);
+    --preset-indicator-hover-bg: var(--preset-indicator-hover-bg-dark);
+    --preset-indicator-hover-border: var(--preset-indicator-hover-border-dark);
+    --preset-indicator-color: var(--preset-indicator-color-dark);
+    --preset-indicator-bg: var(--preset-indicator-bg-dark);
+    --preset-indicator-border: var(--preset-indicator-border-dark);
+    --shadow-grouping-toggle: var(--shadow-grouping-toggle-dark);
+    --shadow-grouping-enabled: var(--shadow-grouping-enabled-dark);
+    --grouping-enabled-bg: var(--grouping-enabled-bg-dark);
+    --action-indicator-bg: var(--action-indicator-bg-dark);
+    --action-indicator-border: var(--action-indicator-border-dark);
+    --action-indicator-hover-bg: var(--action-indicator-hover-bg-dark);
+    --action-indicator-hover-border: var(--action-indicator-hover-border-dark);
+    --action-card-hover-bg: var(--action-card-hover-bg-dark);
+    --action-card-focus-shadow: var(--action-card-focus-shadow-dark);
     --button-primary-bg: #1e40af;
     --button-primary-hover-bg: #1e3a8a;
     --button-primary-text: #fff;

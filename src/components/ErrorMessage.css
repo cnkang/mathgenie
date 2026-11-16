@@ -20,24 +20,24 @@
 }
 
 .message-error {
-  color: #991b1b;
-  background-color: #fef2f2;
-  border-color: #fecaca;
-  border-left-color: #ef4444;
+  color: var(--text-error);
+  background-color: var(--error-light);
+  border-color: var(--border-error);
+  border-left-color: var(--accent-error);
 }
 
 .message-warning {
-  color: #92400e;
-  background-color: #fffbeb;
-  border-color: #fde68a;
-  border-left-color: #f59e0b;
+  color: var(--text-warning);
+  background-color: var(--warning-light);
+  border-color: var(--border-warning);
+  border-left-color: var(--accent-warning);
 }
 
 .message-info {
-  color: #1e40af;
-  background-color: #eff6ff;
-  border-color: #bfdbfe;
-  border-left-color: #3b82f6;
+  color: var(--text-info);
+  background-color: var(--info-light);
+  border-color: var(--border-info);
+  border-left-color: var(--accent-info);
 }
 
 .message-content {
@@ -122,40 +122,6 @@
 @media (prefers-reduced-motion: reduce) {
   .message-container {
     animation: none;
-  }
-}
-
-/* Dark mode support - WCAG 2.2 AAA compliant colors */
-@media (prefers-color-scheme: dark) {
-  .message-error {
-    color: #fca5a5;
-    background-color: #450a0a;
-    border-color: #7f1d1d;
-    border-left-color: #f87171;
-  }
-
-  .message-warning {
-    color: #fbbf24;
-    background-color: #451a03;
-    border-color: #78350f;
-    border-left-color: #f59e0b;
-  }
-
-  .message-info {
-    color: #f1f5f9;
-    background-color: #1e293b;
-    border-color: #334155;
-    border-left-color: #60a5fa;
-  }
-
-  .message-dismiss:hover {
-    background: rgb(255 255 255 / 14%);
-    box-shadow: 0 0 0 1px rgb(255 255 255 / 20%);
-  }
-
-  .message-dismiss:focus {
-    background: rgb(255 255 255 / 14%);
-    box-shadow: 0 0 0 3px rgb(255 255 255 / 28%);
   }
 }
 
