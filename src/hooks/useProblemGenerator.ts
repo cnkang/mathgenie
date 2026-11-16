@@ -28,7 +28,7 @@ export const useProblemGenerator = (
     settings.problemsPerGroup,
     settings.totalGroups,
   ]);
-  const lastGeneratedKey = useRef<string | null>(null);
+  const lastReportedToken = useRef<string | null>(null);
   const settingsAreValid = validateSettings(settings) === "";
   const current = useRef({ settings, isLoading, validateSettings });
   current.current = { settings, isLoading, validateSettings };
@@ -43,7 +43,7 @@ export const useProblemGenerator = (
         workerRef.current.terminate();
         workerRef.current = null;
         // StrictMode remounts effects; a cancelled initial worker must be started again.
-        lastGeneratedKey.current = null;
+        lastReportedToken.current = null;
       }
     },
     [],
@@ -110,10 +110,15 @@ export const useProblemGenerator = (
   );
 
   useEffect(() => {
-    if (isLoading || generationKey === lastGeneratedKey.current) return;
-    const outcome = generateProblems(false);
-    if (settingsAreValid && !outcome.error) lastGeneratedKey.current = generationKey;
-  }, [generationKey, isLoading, generateProblems, settingsAreValid]);
+    const reportToken = `${generationKey}:${settingsAreValid}`;
+    if (isLoading || reportToken === lastReportedToken.current) return;
+    generateProblems(false);
+    // Report each (settings key, validity) pair exactly once. Without this, a
+    // concurrent render that commits with stale settings (e.g. a language swap
+    // racing a transition) re-runs validation and re-raises the same error
+    // after the user has already corrected the input.
+    lastReportedToken.current = reportToken;
+  }, [generationKey, settingsAreValid, isLoading, generateProblems]);
   const problems = useMemo(
     () =>
       rawProblems.map((problem) => {
