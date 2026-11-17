@@ -56,7 +56,13 @@ select[multiple],
 select[multiple] option,
 .operations-select option {
   padding: var(--space-sm);
-  border-radius: var(--radius-sm);
+  border-radius: 0;
+}
+
+/* Make the selected operations read as active, not disabled */
+select[multiple] option:checked {
+  color: var(--button-primary-text);
+  background-color: var(--button-primary-bg);
 }
 
 button {

@@ -10,6 +10,11 @@
   gap: var(--space-xs, 0.5rem);
 }
 
+.field-help {
+  font-size: var(--font-size-sm, 0.875rem);
+  color: var(--text-secondary, #64748b);
+}
+
 .field-label {
   font-size: var(--font-size-sm, 0.875rem);
   font-weight: 600;

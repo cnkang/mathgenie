@@ -196,6 +196,37 @@ button.action-card:active {
   outline-offset: 2px;
 }
 
+/* Primary action: make "Generate" the single strongest affordance */
+.action-card.generate-card {
+  background: var(--bg-accent);
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-md);
+}
+
+.action-card.generate-card .action-icon {
+  opacity: 1;
+}
+
+.action-card.generate-card .action-indicator {
+  background: var(--button-primary-bg);
+  border-color: var(--button-primary-bg);
+}
+
+.action-card.generate-card .action-arrow {
+  color: var(--button-primary-text);
+}
+
+.action-card.generate-card:hover {
+  background: var(--bg-accent);
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-lift);
+}
+
+.action-card.generate-card:hover .action-indicator {
+  background: var(--button-primary-hover-bg);
+  border-color: var(--button-primary-hover-bg);
+}
+
 /* Disabled state */
 .action-card:disabled {
   position: relative;
@@ -362,11 +393,41 @@ button.action-card:active {
   }
 }
 
+/* Desktop: feature the primary action and keep the action row balanced */
+@media (width >= 1200px) {
+  .action-cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .action-cards-grid .action-card {
+    min-width: 0;
+  }
+
+  .action-cards-grid .generate-card {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (forced-colors: active) {
   .action-card {
     background: canvas;
     border-color: canvastext;
     box-shadow: none;
+  }
+
+  .action-card.generate-card {
+    background: canvas;
+    border-color: canvastext;
+    box-shadow: none;
+  }
+
+  .action-card.generate-card .action-indicator {
+    background: buttonface;
+    border-color: buttontext;
+  }
+
+  .action-card.generate-card .action-arrow {
+    color: buttontext;
   }
 
   .action-card:hover,
