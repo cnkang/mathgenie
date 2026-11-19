@@ -111,7 +111,7 @@ const ProblemsSection: React.FC<ProblemsSectionProps> = ({ t, problems, settings
       <ol className="problems-grid" start={startIndex + 1}>
         {problems.slice(startIndex, endIndex).map((p, index) => (
           <li key={p.id} className="problem-item">
-            <span className="problem-number">{startIndex + index + 1}</span>
+            <span className="worksheet-problem-index">{startIndex + index + 1}.</span>
             <span className="problem-text">{p.text}</span>
           </li>
         ))}

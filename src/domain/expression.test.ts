@@ -37,6 +37,7 @@ describe("arithmetic contract", () => {
   );
   it("supports unary minus and exact print symbols", () => {
     expect(safeEvaluateExpression("-2 + (-3) × 4")).toBe(-14);
-    expect(formatExpression([2, 3, 4], ["+", "*"])).toBe("2 + 3 ✖ 4");
+    expect(formatExpression([2, 3, 4], ["+", "*"])).toBe("2 + 3 × 4");
+    expect(formatExpression([8, 2], ["/"])).toBe("8 ÷ 2");
   });
 });

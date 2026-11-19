@@ -76,7 +76,7 @@
 
 @media (width <= 480px) {
   .language-selector {
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 0.25rem;
     padding: 0.4rem;
     margin: 0.25rem 0;

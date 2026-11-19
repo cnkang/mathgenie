@@ -30,8 +30,8 @@ export const calculateExpression = (operands: number[], operators: string[]): nu
 };
 
 const printableOperator = (operator: string): string => {
-  if (operator === "*") return "✖";
-  if (operator === "/") return "➗";
+  if (operator === "*") return "×";
+  if (operator === "/") return "÷";
   return operator;
 };
 export const formatExpression = (operands: number[], operators: string[]): string =>

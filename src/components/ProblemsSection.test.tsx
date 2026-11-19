@@ -54,6 +54,8 @@ describe("ProblemsSection", { concurrent: false }, () => {
     expect(screen.getByRole("heading", { name: /generated problems \(2\)/i })).toBeInTheDocument();
     const items = screen.getAllByText(/=\s*$/);
     expect(items).toHaveLength(2);
+    expect(screen.getByText("1.")).toHaveClass("worksheet-problem-index");
+    expect(screen.getByText("2.")).toHaveClass("worksheet-problem-index");
   });
 
   test("renders grouped problems when grouping is enabled", () => {
@@ -100,6 +102,8 @@ describe("ProblemsSection", { concurrent: false }, () => {
     expect(screen.getByText("3 + 4 =")).toBeInTheDocument();
     expect(screen.getByText("5 + 6 =")).toBeInTheDocument();
     expect(screen.getByText("7 + 8 =")).toBeInTheDocument();
+    expect(screen.getByText("3.")).toHaveClass("worksheet-problem-index");
+    expect(screen.getByText("4.")).toHaveClass("worksheet-problem-index");
   });
 
   test("handles empty groups when grouping is enabled", () => {
