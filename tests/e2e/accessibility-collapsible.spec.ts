@@ -109,8 +109,8 @@ test.describe('Collapsible UI Accessibility', () => {
 
     // Continue tabbing to the first operation chip (first field in SettingsSection).
     // WebKit skips checkboxes in its default tab order; skip this check on WebKit.
-    const isWebKit = await page.evaluate(() => /WebKit/.test(navigator.userAgent));
-    if (!isWebKit) {
+    const browserName = page.context().browser()?.browserType().name();
+    if (browserName !== "webkit") {
       await tabUntilFocused('#operations input[value="+"]');
       await expect(page.locator('#operations input[value="+"]')).toBeFocused();
     }
