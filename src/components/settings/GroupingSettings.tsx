@@ -1,6 +1,7 @@
 import type { Settings } from "@/types";
 import { calculateActualTotalProblems } from "@/utils/groupingUtils";
 import React from "react";
+import NumberStepper from "../form/NumberStepper";
 
 type OnChange = <K extends keyof Settings>(field: K, value: Settings[K]) => void;
 
@@ -49,16 +50,16 @@ const GroupingSettings: React.FC<GroupingSettingsProps> = ({ t, settings, onChan
                 <label htmlFor="problemsPerGroup" className="field-label">
                   {t("settings.problemsPerGroup")}
                 </label>
-                <input
+                <NumberStepper
                   id="problemsPerGroup"
-                  type="number"
-                  inputMode="numeric"
                   value={settings.problemsPerGroup}
-                  onChange={(e) => onChange("problemsPerGroup", Number(e.target.value))}
-                  aria-label={t("accessibility.problemsPerGroupInput")}
+                  onCommit={(next) => onChange("problemsPerGroup", next)}
+                  ariaLabel={t("accessibility.problemsPerGroupInput")}
+                  decreaseLabel={t("accessibility.decreaseValue")}
+                  increaseLabel={t("accessibility.increaseValue")}
                   min={1}
                   max={1000}
-                  className="grouping-input"
+                  inputClassName="grouping-input"
                 />
               </div>
 
@@ -66,16 +67,16 @@ const GroupingSettings: React.FC<GroupingSettingsProps> = ({ t, settings, onChan
                 <label htmlFor="totalGroups" className="field-label">
                   {t("settings.totalGroups")}
                 </label>
-                <input
+                <NumberStepper
                   id="totalGroups"
-                  type="number"
-                  inputMode="numeric"
                   value={settings.totalGroups}
-                  onChange={(e) => onChange("totalGroups", Number(e.target.value))}
-                  aria-label={t("accessibility.totalGroupsInput")}
+                  onCommit={(next) => onChange("totalGroups", next)}
+                  ariaLabel={t("accessibility.totalGroupsInput")}
+                  decreaseLabel={t("accessibility.decreaseValue")}
+                  increaseLabel={t("accessibility.increaseValue")}
                   min={1}
                   max={100}
-                  className="grouping-input"
+                  inputClassName="grouping-input"
                 />
               </div>
             </div>

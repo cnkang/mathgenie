@@ -281,13 +281,30 @@ export async function verifyOperationsSelected(
   page: Page,
   expectedOperations: string[]
 ): Promise<void> {
-  const selectedOperations = await page.locator('#operations option:checked').allTextContents();
+  const selectedOperations = await page
+    .locator('#operations label:has(input:checked)')
+    .allTextContents();
 
   for (const operation of expectedOperations) {
     expect(selectedOperations.some(selected => selected.includes(operation))).toBe(true);
   }
 
   expect(selectedOperations).toHaveLength(expectedOperations.length);
+}
+
+/**
+ * Set the operation toggle chips to exactly the given operations.
+ * Replaces the legacy native multi-select interaction.
+ */
+export async function setOperations(page: Page, operations: string[]): Promise<void> {
+  const allOperations = ['+', '-', '*', '/'];
+  for (const operation of allOperations) {
+    const input = page.locator(`#operations input[value="${operation}"]`);
+    const wantChecked = operations.includes(operation);
+    if ((await input.isChecked()) !== wantChecked) {
+      await page.locator(`#operations label:has(input[value="${operation}"])`).click();
+    }
+  }
 }
 
 /**
@@ -328,7 +345,7 @@ export async function createValidationError(
       await page.click('.generate-card');
       break;
     case 'operations':
-      await page.locator('#operations').selectOption([]);
+      await setOperations(page, []);
       await page.click('.generate-card');
       break;
   }

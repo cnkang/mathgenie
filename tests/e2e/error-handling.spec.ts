@@ -1,6 +1,7 @@
 // Error handling and validation e2e tests
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
+import { setOperations } from './test-utils';
 
 test.describe('Error Handling and Validation', () => {
   test.beforeEach(async ({ page }: { page: Page }) => {
@@ -16,7 +17,7 @@ test.describe('Error Handling and Validation', () => {
     page: Page;
   }) => {
     // Clear all operations by deselecting them
-    await page.locator('#operations').selectOption([]);
+    await setOperations(page, []);
 
     // Trigger validation by clicking generate button
     const generateButton = page.locator('button').filter({ hasText: 'Generate Problems' }).first();

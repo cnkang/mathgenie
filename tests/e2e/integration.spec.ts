@@ -1,7 +1,7 @@
 // Integration tests for error handling, localStorage, and presets
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
-import { ensureElementVisible, expandAdvancedSettings, expandPdfSettings } from './test-utils';
+import { ensureElementVisible, expandAdvancedSettings, expandPdfSettings, setOperations } from './test-utils';
 
 test.describe('Integration Tests', () => {
   test.beforeEach(async ({ page }: { page: Page }) => {
@@ -245,7 +245,7 @@ test.describe('Integration Tests', () => {
     await page.fill('#numProblems', '0'); // Invalid count
     await page.fill('#numRangeFrom', '20');
     await page.fill('#numRangeTo', '10'); // Invalid range
-    await page.locator('#operations').selectOption([]); // No operations
+    await setOperations(page, []); // No operations
 
     // Trigger validation
     const generateButton = page.locator('button').filter({ hasText: 'Generate Problems' }).first();
@@ -273,7 +273,7 @@ test.describe('Integration Tests', () => {
     await expect(page.locator('.error-message')).not.toBeVisible();
 
     // Operations should be selected
-    const selectedOperations = await page.locator('#operations option:checked').allTextContents();
+    const selectedOperations = await page.locator('#operations label:has(input:checked)').allTextContents();
     expect(selectedOperations.length).toBeGreaterThan(0);
 
     // Problems should be generated

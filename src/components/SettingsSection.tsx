@@ -15,6 +15,13 @@ const STR_OPERATIONS = "operations" as const;
 const STR_FROM = "From" as const;
 const STR_TO = "To" as const;
 
+const OPERATION_OPTIONS = [
+  { value: "+", labelKey: "operations.addition" },
+  { value: "-", labelKey: "operations.subtraction" },
+  { value: "*", labelKey: "operations.multiplication" },
+  { value: "/", labelKey: "operations.division" },
+] as const;
+
 type OnChange = <K extends keyof Settings>(field: K, value: Settings[K]) => void;
 
 type SettingsSectionProps = {
@@ -40,26 +47,35 @@ const SettingsSection: React.FC<SettingsSectionProps> = ({
   return (
     <section className="settings-section" aria-label={sectionLabel}>
       <div className="field">
-        <label htmlFor={STR_OPERATIONS} className="field-label">
+        <span className="field-label" id="operations-label">
           {t("operations.title")}
-        </label>
-        <select
+        </span>
+        <div
           id={STR_OPERATIONS}
-          multiple
-          aria-label={t("accessibility.selectOperations")}
-          value={settings.operations}
-          onChange={(e) => {
-            const options = Array.from(e.target.selectedOptions).map(
-              (o) => o.value as Settings["operations"][number],
-            );
-            onChange(STR_OPERATIONS, options);
-          }}
+          role="group"
+          aria-labelledby="operations-label"
+          className="operations-chips"
         >
-          <option value="+">{t("operations.addition") || "Addition (+)"}</option>
-          <option value="-">{t("operations.subtraction") || "Subtraction (-)"}</option>
-          <option value="*">{t("operations.multiplication") || "Multiplication (×)"}</option>
-          <option value="/">{t("operations.division") || "Division (÷)"}</option>
-        </select>
+          {OPERATION_OPTIONS.map((option) => {
+            const checked = settings.operations.includes(option.value);
+            return (
+              <label key={option.value} className={`operation-chip${checked ? " checked" : ""}`}>
+                <input
+                  type="checkbox"
+                  value={option.value}
+                  checked={checked}
+                  onChange={(e) => {
+                    const next = e.target.checked
+                      ? [...settings.operations, option.value]
+                      : settings.operations.filter((operation) => operation !== option.value);
+                    onChange(STR_OPERATIONS, next);
+                  }}
+                />
+                <span className="operation-chip-text">{t(option.labelKey)}</span>
+              </label>
+            );
+          })}
+        </div>
         <small className="field-help">{t("operations.help")}</small>
       </div>
 
@@ -75,6 +91,8 @@ const SettingsSection: React.FC<SettingsSectionProps> = ({
         onChange={(next) => onChange("numRange", next)}
         ariaMinLabel={MIN_LABEL}
         ariaMaxLabel={MAX_LABEL}
+        decreaseLabel={t("accessibility.decreaseValue")}
+        increaseLabel={t("accessibility.increaseValue")}
       />
 
       <RangeInput
@@ -84,6 +102,8 @@ const SettingsSection: React.FC<SettingsSectionProps> = ({
         onChange={(next) => onChange("resultRange", next)}
         ariaMinLabel={MIN_LABEL}
         ariaMaxLabel={MAX_LABEL}
+        decreaseLabel={t("accessibility.decreaseValue")}
+        increaseLabel={t("accessibility.increaseValue")}
       />
 
       <RangeInput
@@ -93,6 +113,8 @@ const SettingsSection: React.FC<SettingsSectionProps> = ({
         onChange={(next) => onChange("numOperandsRange", next)}
         ariaMinLabel={MIN_LABEL}
         ariaMaxLabel={MAX_LABEL}
+        decreaseLabel={t("accessibility.decreaseValue")}
+        increaseLabel={t("accessibility.increaseValue")}
       />
 
       <SettingsPresets onApplyPreset={onApplyPreset} currentSettings={settings} />
