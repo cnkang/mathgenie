@@ -297,14 +297,14 @@ export async function verifyOperationsSelected(
  */
 export async function setOperations(page: Page, operations: string[]): Promise<void> {
   const allOperations = ['+', '-', '*', '/'];
-  // SONAR-SAFE (S9382): clicks must be sequential. Each chip's change handler
-  // derives the next operations array from the current settings, so parallel
-  // clicks race stale closures and lose updates.
+  // Clicks must be sequential: each chip's change handler derives the next
+  // operations array from the settings captured at render time, so parallel
+  // clicks race stale closures and lose updates. NOSONAR is intentional.
   for (const operation of allOperations) {
     const input = page.locator(`#operations input[value="${operation}"]`);
     const wantChecked = operations.includes(operation);
-    if ((await input.isChecked()) !== wantChecked) {
-      await page.locator(`#operations label:has(input[value="${operation}"])`).click();
+    if ((await input.isChecked()) !== wantChecked) { // NOSONAR: sequential by design
+      await page.locator(`#operations label:has(input[value="${operation}"])`).click(); // NOSONAR
     }
   }
 }

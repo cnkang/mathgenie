@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "../i18n";
 import type { Problem, QuizResult } from "../types";
 import InteractiveProblem from "./InteractiveProblem";
@@ -17,6 +17,19 @@ interface QuizModeProps {
 }
 
 const QUIZ_LOADING_KEY = "quiz.loading";
+
+// Arrow-key navigation must not steal caret keys while the user edits a
+// non-empty answer or composes IME input, and controls that use arrow keys
+// natively keep their behavior.
+const isQuizArrowNavigationAllowed = (target: EventTarget | null): boolean => {
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+  if (target instanceof HTMLInputElement && !target.disabled && target.value !== "") {
+    return false;
+  }
+  return !target.closest("details, select, textarea, [role='radiogroup'], [role='slider']");
+};
 
 const renderLoadingState = (
   translate: (key: string, params?: Record<string, string | number>) => string,
@@ -79,36 +92,8 @@ const renderQuizLayout = (params: {
   const progressPercentage = Math.round(progress);
   const answeredCount = quizProblems.filter((problem) => problem.isAnswered).length;
 
-  // Arrow keys navigate between problems, except while the user is editing
-  // a non-empty answer (caret keys must keep working) or composing IME input.
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>): void => {
-    if (event.nativeEvent.isComposing) {
-      return;
-    }
-    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
-      return;
-    }
-    const target = event.target as HTMLElement;
-    if (target instanceof HTMLInputElement && !target.disabled && target.value !== "") {
-      return;
-    }
-    // Leave arrow keys to controls that use them natively.
-    if (target.closest("details, select, textarea, [role='radiogroup'], [role='slider']")) {
-      return;
-    }
-    event.preventDefault();
-    if (event.key === "ArrowLeft") {
-      goToPrevious();
-    } else {
-      goToNext();
-    }
-  };
-
   return (
-    // SONAR-SAFE (S6848): this is an event-delegation container, not an
-    // interactive widget; the real interactive targets (native inputs and
-    // buttons) bubble their key events here.
-    <div className="quiz-mode" onKeyDown={handleKeyDown}>
+    <div className="quiz-mode">
       <QuizHeader
         t={t}
         progressPercentage={progressPercentage}
@@ -171,6 +156,33 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
     finishEarly,
     restartQuiz,
   } = useQuizController(problems, t, onQuizComplete);
+
+  const quizVisible = !showResults && quizProblems.length > 0;
+
+  useEffect(() => {
+    if (!quizVisible) {
+      return;
+    }
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      if (event.isComposing) {
+        return;
+      }
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+        return;
+      }
+      if (!isQuizArrowNavigationAllowed(event.target)) {
+        return;
+      }
+      event.preventDefault();
+      if (event.key === "ArrowLeft") {
+        goToPrevious();
+      } else {
+        goToNext();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [quizVisible, goToPrevious, goToNext]);
 
   if (showResults && quizResult) {
     return renderResults({

@@ -41,7 +41,7 @@ export function useTheme(): {
   resolved: "light" | "dark";
   setPreference: (next: ThemePreference) => void;
 } {
-  const [preference, setPreferenceState] = useState(readStoredPreference);
+  const [preference, setPreference] = useState(readStoredPreference);
   const [systemDark, setSystemDark] = useState(systemPrefersDark);
 
   useEffect(() => {
@@ -65,12 +65,12 @@ export function useTheme(): {
     }
   }, [resolved]);
 
-  const setPreference = useCallback((next: ThemePreference): void => {
-    setPreferenceState(next);
+  const updatePreference = useCallback((next: ThemePreference): void => {
+    setPreference(next);
     safeStorage.set(STORAGE_KEY, next);
   }, []);
 
-  return { preference, resolved, setPreference };
+  return { preference, resolved, setPreference: updatePreference };
 }
 
 export default useTheme;
