@@ -16,6 +16,7 @@ export default {
         })]
       : []),
     autoprefixer(),
-    cssnano({ preset: cssnanoPresetAdvanced }),
+    // Fontsource stylesheets are processed separately from their consumers.
+    cssnano({ preset: [cssnanoPresetAdvanced, { discardUnused: { fontFace: false } }] }),
   ],
 };
