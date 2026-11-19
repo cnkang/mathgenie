@@ -2,17 +2,18 @@ import React, { Suspense, useCallback, useEffect, useMemo, useState } from "reac
 import "./App.css";
 import "./components/ProblemsDisplay.css";
 import "./components/QuizMode.css";
-import "./styles/components.css";
 import ActionCards from "@/components/ActionCards";
 import AppHeader from "@/components/AppHeader";
 import ErrorMessage from "@/components/ErrorMessage";
 import InfoPanel from "@/components/InfoPanel";
+import MobileGenerateBar from "@/components/MobileGenerateBar";
 import ProblemsSection from "@/components/ProblemsSection";
 import SettingsSection from "@/components/SettingsSection";
 import PerformanceMonitor from "./components/PerformanceMonitor";
 import TranslationLoader from "./components/TranslationLoader";
 import { useAppHandlers, usePdfDownload, useQuizHandlers } from "@/hooks/useAppLogic";
 import { useAppMessages } from "./hooks/useAppMessages";
+import { useMediaQuery } from "./hooks/useMediaQuery";
 import { useProblemGenerator } from "./hooks/useProblemGenerator";
 import { useSettings } from "./hooks/useSettings";
 import { useSettingsValidation } from "./hooks/useSettingsValidation";
@@ -42,6 +43,7 @@ function App(): React.JSX.Element {
     clearMessages,
   } = useAppMessages();
   const validation = useSettingsValidation();
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const [isQuizMode, setIsQuizMode] = useState(false);
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -187,6 +189,13 @@ function App(): React.JSX.Element {
               </Suspense>
             )}
           </main>
+          {!isQuizMode && isMobile && (
+            <MobileGenerateBar
+              t={t}
+              isGenerating={generation.isGenerating}
+              onGenerate={handleGenerate}
+            />
+          )}
         </div>
       </TranslationLoader>
     </PerformanceMonitor>

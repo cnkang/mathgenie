@@ -1,126 +1,34 @@
 /* ===== APP-SPECIFIC STYLES ===== */
 
-/* Problems display area */
-.problems {
-  position: relative;
-  max-height: 500px;
-  padding: var(--space-xl);
-  margin-top: var(--space-xl);
-  overflow-y: auto;
-  background: var(--bg-primary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-}
-
-.problems::before {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  height: 3px;
-  content: "";
-  background: linear-gradient(90deg, var(--success-color), var(--primary-color));
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-}
-
-.problems h3 {
-  display: flex;
-  gap: var(--space-sm);
-  align-items: center;
-  margin-top: 0;
-  margin-bottom: var(--space-lg);
-  color: var(--text-primary);
-}
-
-.problems h3::before {
-  width: auto;
-  height: auto;
-  font-size: var(--font-size-sm);
-  font-weight: 700;
-  content: "#";
-  background: none;
-  border-radius: 0;
-}
-
-.problem-item {
-  display: flex;
-  align-items: center;
-
-  /* WCAG 2.2 AAA: Large touch targets for clickable problem items */
-  min-height: 44px;
-  padding: var(--space-md);
-  margin-bottom: var(--space-sm);
-  contain: layout style;
-  font-family: "SF Mono", Monaco, Inconsolata, "Roboto Mono", monospace;
-  font-size: var(--font-size-lg);
-  font-weight: 500;
-  color: var(--text-primary);
-  cursor: default;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-left: 4px solid var(--primary-color);
-  border-radius: var(--radius-md);
-  transition: border-color var(--transition-fast);
-}
-
-.problem-item:last-child {
-  margin-bottom: 0;
-}
-
-/* Problem display styles moved to ProblemsDisplay.css for better organization */
-
-@media (width <= 768px) {
-  .problems {
-    max-height: 350px;
-  }
-
-  .problem-item {
-    font-size: var(--font-size-base);
-  }
-}
-
-@media (width <= 480px) {
-  .problems {
-    max-height: 300px;
-    padding: var(--space-md);
-  }
-
-  .problem-item {
-    /* WCAG 2.2 AAA: Maintain minimum touch targets on mobile */
-    min-height: 48px;
-    padding: var(--space-sm);
-    font-size: var(--font-size-sm);
-  }
-}
-
-@media (width <= 320px) {
-  .problems {
-    max-height: 250px;
-    padding: var(--space-sm);
-  }
-
-  .problem-item {
-    /* WCAG 2.2 AAA: Maintain minimum touch targets even on very small screens */
-    min-height: 44px;
-    padding: var(--space-xs);
-    font-size: var(--font-size-xs);
-  }
-}
-
 /* List styles for problems */
 ul {
   padding: 0;
   list-style-type: none;
 }
 
-ul li {
-  padding: 10px;
-  margin: 10px 0;
-  line-height: 1.5;
-  color: var(--text-primary);
-  background-color: var(--bg-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 5px;
-  box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
+/* Sticky mobile generate bar: keeps the primary action reachable while
+   the settings-first layout scrolls. Rendered only on matching viewports. */
+.mobile-generate-bar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 40;
+  padding: var(--space-sm) var(--space-md);
+  padding-bottom: calc(var(--space-sm) + env(safe-area-inset-bottom, 0px));
+  background: var(--bg-primary);
+  border-top: 1px solid var(--border-color);
+  box-shadow: 0 -4px 12px rgb(0 0 0 / 8%);
+}
+
+.mobile-generate-btn {
+  width: 100%;
+  min-height: 48px;
+}
+
+@media (width <= 768px) {
+  /* Reserve space so the bar never permanently covers page content. */
+  .App {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
 }
