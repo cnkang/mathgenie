@@ -73,7 +73,7 @@ describe("SettingsSection", { concurrent: false }, () => {
     );
 
     expect(screen.getByRole("region", { name: "Settings" })).toBeInTheDocument();
-    expect(screen.getByLabelText("accessibility.selectOperations")).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "operations.title" })).toBeInTheDocument();
     expect(screen.getByLabelText("accessibility.numProblemsInput")).toBeInTheDocument();
   });
 
@@ -94,20 +94,15 @@ describe("SettingsSection", { concurrent: false }, () => {
     fireEvent.change(numInput, { target: { value: "20" } });
     expect(onChange).toHaveBeenCalledWith("numProblems", 20);
 
-    const select = screen.getByLabelText("accessibility.selectOperations") as HTMLSelectElement;
-    const optPlus = document.createElement("option");
-    optPlus.value = "+";
-    optPlus.selected = true;
-    const optMinus = document.createElement("option");
-    optMinus.value = "-";
-    optMinus.selected = true;
-    select.append(optPlus, optMinus);
-    // Simulate change event with selectedOptions
-    Object.defineProperty(select, "selectedOptions", {
-      value: [optPlus, optMinus],
-    });
-    fireEvent.change(select);
+    // Toggle chips: clicking an unchecked operation appends it.
+    const minusChip = screen.getByRole("checkbox", { name: "operations.subtraction" });
+    fireEvent.click(minusChip);
     expect(onChange).toHaveBeenCalledWith("operations", ["+", "-"]);
+
+    // Clicking a checked operation removes it.
+    const plusChip = screen.getByRole("checkbox", { name: "operations.addition" });
+    fireEvent.click(plusChip);
+    expect(onChange).toHaveBeenCalledWith("operations", []);
   });
 
   test("handles grouping toggle", () => {
@@ -201,16 +196,18 @@ describe("SettingsSection", { concurrent: false }, () => {
       />,
     );
 
-    const select = screen.getByLabelText("accessibility.selectOperations");
-    expect(select).toBeInTheDocument();
+    const group = screen.getByRole("group", { name: "operations.title" });
+    expect(group).toBeInTheDocument();
 
-    // Check that all operation options are present
-    const options = select.querySelectorAll("option");
-    expect(options).toHaveLength(4);
-    expect(options[0]).toHaveValue("+");
-    expect(options[1]).toHaveValue("-");
-    expect(options[2]).toHaveValue("*");
-    expect(options[3]).toHaveValue("/");
+    // All four operations are present as toggle chips.
+    const checkboxes = group.querySelectorAll<HTMLInputElement>("input[type='checkbox']");
+    expect(checkboxes).toHaveLength(4);
+    expect(checkboxes[0]).toHaveValue("+");
+    expect(checkboxes[1]).toHaveValue("-");
+    expect(checkboxes[2]).toHaveValue("*");
+    expect(checkboxes[3]).toHaveValue("/");
+    expect(checkboxes[0].checked).toBe(true);
+    expect(checkboxes[1].checked).toBe(false);
   });
 
   test("renders range inputs with correct props", () => {

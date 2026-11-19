@@ -106,9 +106,9 @@ test.describe('Collapsible UI Accessibility', () => {
     await page.keyboard.press('Tab');
     await expect(page.locator('#language-select')).toBeFocused();
 
-    // Continue tabbing to the operations select (first field in SettingsSection).
-    await tabUntilFocused('#operations');
-    await expect(page.locator('#operations')).toBeFocused();
+    // Continue tabbing to the first operation chip (first field in SettingsSection).
+    await tabUntilFocused('#operations input[value="+"]');
+    await expect(page.locator('#operations input[value="+"]')).toBeFocused();
 
     // Continue to the number of problems input.
     await tabUntilFocused('#numProblems');

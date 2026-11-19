@@ -1,6 +1,7 @@
 // Basic end-to-end tests for MathGenie with TypeScript support
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
+import { setOperations } from './test-utils';
 
 test.describe('MathGenie Basic Functionality', () => {
   test.beforeEach(async ({ page }: { page: Page }) => {
@@ -87,10 +88,10 @@ test.describe('MathGenie Basic Functionality', () => {
 
   test('should show loading states during transitions', async ({ page }: { page: Page }) => {
     // Change settings that trigger transitions
-    await page.selectOption('#operations', ['+', '-', '*']);
+    await setOperations(page, ['+', '-', '*']);
 
     // Verify the change took effect
-    const selectedOptions = await page.locator('#operations option:checked').count();
+    const selectedOptions = await page.locator('#operations input:checked').count();
     expect(selectedOptions).toBe(3);
   });
 

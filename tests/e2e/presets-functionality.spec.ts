@@ -102,7 +102,7 @@ test.describe('Presets Functionality', () => {
     await expect(page.locator('#paperSize')).toHaveValue('a4');
 
     // Check operations selection
-    const selectedOperations = await page.locator('#operations option:checked').allTextContents();
+    const selectedOperations = await page.locator('#operations label:has(input:checked)').allTextContents();
     expect(selectedOperations).toContain('Addition (+)');
     expect(selectedOperations).toContain('Subtraction (-)');
     expect(selectedOperations).toHaveLength(2);
@@ -122,7 +122,7 @@ test.describe('Presets Functionality', () => {
     await expect(page.locator('#operands-range-to')).toHaveValue('3');
 
     // Check operations selection (should include +, -, *)
-    const selectedOperations = await page.locator('#operations option:checked').allTextContents();
+    const selectedOperations = await page.locator('#operations label:has(input:checked)').allTextContents();
     expect(selectedOperations).toContain('Addition (+)');
     expect(selectedOperations).toContain('Subtraction (-)');
     expect(selectedOperations).toContain('Multiplication (×)');
@@ -145,7 +145,7 @@ test.describe('Presets Functionality', () => {
     await expect(page.locator('#allowNegative')).toBeChecked();
 
     // Check operations selection (should include all operations)
-    const selectedOperations = await page.locator('#operations option:checked').allTextContents();
+    const selectedOperations = await page.locator('#operations label:has(input:checked)').allTextContents();
     expect(selectedOperations).toContain('Addition (+)');
     expect(selectedOperations).toContain('Subtraction (-)');
     expect(selectedOperations).toContain('Multiplication (×)');
@@ -169,7 +169,7 @@ test.describe('Presets Functionality', () => {
     await expect(page.locator('#allowNegative')).not.toBeChecked();
 
     // Check operations selection (should only include multiplication)
-    const selectedOperations = await page.locator('#operations option:checked').allTextContents();
+    const selectedOperations = await page.locator('#operations label:has(input:checked)').allTextContents();
     expect(selectedOperations).toContain('Multiplication (×)');
     expect(selectedOperations).toHaveLength(1);
   });
@@ -276,7 +276,7 @@ test.describe('Presets Functionality', () => {
     await applyPresetWebkitSafe(page, 3);
 
     // Check operations selection
-    const selectedOperations = await page.locator('#operations option:checked').allTextContents();
+    const selectedOperations = await page.locator('#operations label:has(input:checked)').allTextContents();
     expect(selectedOperations).toContain('Multiplication (×)');
     expect(selectedOperations).toHaveLength(1);
   });

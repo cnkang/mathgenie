@@ -6,6 +6,7 @@ import { expect, test } from '@playwright/test';
 import {
   createValidationError,
   expandAdvancedSettings,
+  setOperations,
   waitForAppLoad,
   waitForErrorMessage,
 } from './test-utils';
@@ -364,7 +365,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
 
     test('should pass accessibility with form interactions', async ({ page }: { page: Page }) => {
       await page.fill('#numProblems', '25');
-      await page.selectOption('#operations', ['+', '-']);
+      await setOperations(page, ['+', '-']);
       await expandAdvancedSettings(page);
       await page.check('#allowNegative');
       await page.click('.generate-card');
@@ -743,7 +744,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
     test('should maintain visible focus indicators', async ({ page }: { page: Page }) => {
       const focusableSelectors = [
         '#numProblems',
-        '#operations',
+        '#operations input[value="+"]',
         '#allowNegative',
         '.generate-card',
       ];
@@ -753,7 +754,10 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
 
         const focusedElement = page.locator(selector);
         const styles = await focusedElement.evaluate(el => {
-          const computed = globalThis.getComputedStyle(el);
+          // Operation chips carry the focus ring on the label, not the
+          // visually-hidden checkbox.
+          const target = el.closest('.operation-chip') ?? el;
+          const computed = globalThis.getComputedStyle(target);
           return {
             outline: computed.outline,
             outlineWidth: computed.outlineWidth,
@@ -910,7 +914,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
         } else if (type === 'range') {
           await page.fill('#numRangeTo', '30');
         } else if (type === 'operations') {
-          await page.locator('#operations').selectOption(['+', '-']);
+          await setOperations(page, ['+', '-']);
         }
       }
     });

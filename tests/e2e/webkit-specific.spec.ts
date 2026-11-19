@@ -5,6 +5,7 @@ import {
   applyPresetWebkitSafe,
   changeLanguage,
   isWebKit,
+  setOperations,
   waitForAppLoad,
   waitForPresetsLoad,
 } from './test-utils';
@@ -49,8 +50,8 @@ test.describe('WebKit (Safari) Specific Tests', () => {
     await expect(page.locator('#numProblems')).toHaveValue('25', { timeout: 5000 });
 
     // Test select dropdown
-    await page.selectOption('#operations', ['+', '-']);
-    const selectedOptions = await page.locator('#operations option:checked').allTextContents();
+    await setOperations(page, ['+', '-']);
+    const selectedOptions = await page.locator('#operations label:has(input:checked)').allTextContents();
     expect(selectedOptions).toHaveLength(2);
 
     // Test checkbox interactions

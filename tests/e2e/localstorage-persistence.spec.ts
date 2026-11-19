@@ -6,6 +6,7 @@ import {
   ensureElementVisible,
   expandAdvancedSettings,
   expandPdfSettings,
+  setOperations,
 } from './test-utils';
 
 test.describe('localStorage Persistence', () => {
@@ -25,8 +26,11 @@ test.describe('localStorage Persistence', () => {
     await page.fill('#numProblems', '25');
     await expect(page.locator('#numProblems')).toHaveValue('25');
 
-    await page.selectOption('#operations', ['+', '-', '*']);
-    await expect(page.locator('#operations')).toHaveValues(['+', '-', '*']);
+    await setOperations(page, ['+', '-', '*']);
+    const checkedOperations = await page
+      .locator('#operations input:checked')
+      .evaluateAll(inputs => inputs.map(input => (input as HTMLInputElement).value));
+    expect(checkedOperations).toEqual(['+', '-', '*']);
 
     // Verify settings are saved in localStorage
     const savedSettings = await page.evaluate(() => {
@@ -107,7 +111,7 @@ test.describe('localStorage Persistence', () => {
   test('should restore settings after page reload', async ({ page }: { page: Page }) => {
     // Set specific settings
     await page.fill('#numProblems', '30');
-    await page.selectOption('#operations', ['+', '*']);
+    await setOperations(page, ['+', '*']);
     await expandAdvancedSettings(page);
     await page.check('#allowNegative');
     await expandPdfSettings(page);
@@ -130,7 +134,7 @@ test.describe('localStorage Persistence', () => {
     await expect(page.locator('#paperSize')).toHaveValue('legal');
 
     // Check operations selection
-    const selectedOperations = await page.locator('#operations option:checked').allTextContents();
+    const selectedOperations = await page.locator('#operations label:has(input:checked)').allTextContents();
     expect(selectedOperations).toContain('Addition (+)');
     expect(selectedOperations).toContain('Multiplication (×)');
   });

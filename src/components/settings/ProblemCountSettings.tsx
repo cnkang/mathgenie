@@ -1,5 +1,6 @@
 import type { Settings } from "@/types";
 import React from "react";
+import NumberStepper from "../form/NumberStepper";
 
 type OnChange = <K extends keyof Settings>(field: K, value: Settings[K]) => void;
 
@@ -21,16 +22,16 @@ const ProblemCountSettings: React.FC<ProblemCountSettingsProps> = ({ t, settings
         <label htmlFor="numProblems" className="field-label">
           {t("settings.numProblems")}
         </label>
-        <input
+        <NumberStepper
           id="numProblems"
-          type="number"
-          inputMode="numeric"
           value={settings.numProblems}
-          onChange={(e) => onChange("numProblems", Number(e.target.value))}
-          aria-label={t("accessibility.numProblemsInput")}
+          onCommit={(next) => onChange("numProblems", next)}
+          ariaLabel={t("accessibility.numProblemsInput")}
+          decreaseLabel={t("accessibility.decreaseValue")}
+          increaseLabel={t("accessibility.increaseValue")}
           min={1}
           max={50000}
-          className="single-input"
+          inputClassName="single-input"
         />
       </div>
     </div>

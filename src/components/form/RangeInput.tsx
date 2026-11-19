@@ -1,4 +1,5 @@
 import React from "react";
+import NumberStepper from "./NumberStepper";
 import "./RangeInput.css";
 
 type RangeInputProps = {
@@ -13,10 +14,15 @@ type RangeInputProps = {
   step?: number;
   ariaMinLabel?: string;
   ariaMaxLabel?: string;
+  decreaseLabel?: string;
+  increaseLabel?: string;
   fromPlaceholder?: string;
   toPlaceholder?: string;
   className?: string;
 };
+
+const STR_DECREASE = "Decrease value" as const;
+const STR_INCREASE = "Increase value" as const;
 
 const RangeInput: React.FC<RangeInputProps> = ({
   id,
@@ -30,19 +36,13 @@ const RangeInput: React.FC<RangeInputProps> = ({
   step = 1,
   ariaMinLabel,
   ariaMaxLabel,
+  decreaseLabel = STR_DECREASE,
+  increaseLabel = STR_INCREASE,
   fromPlaceholder,
   toPlaceholder,
   className,
 }) => {
   const [from, to] = value;
-  const handleFrom = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const next = Number(e.target.value);
-    onChange([next, to]);
-  };
-  const handleTo = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const next = Number(e.target.value);
-    onChange([from, next]);
-  };
 
   return (
     <div className={className || "range-input"}>
@@ -50,34 +50,34 @@ const RangeInput: React.FC<RangeInputProps> = ({
         {label}
       </label>
       <div className="range-fields">
-        <input
+        <NumberStepper
           id={idFrom ?? `${id}-from`}
-          type="number"
-          inputMode="numeric"
           value={from}
-          onChange={handleFrom}
+          onCommit={(next) => onChange([next, to])}
+          ariaLabel={ariaMinLabel || `${label} from`}
+          decreaseLabel={decreaseLabel}
+          increaseLabel={increaseLabel}
           min={min}
           max={max}
           step={step}
-          aria-label={ariaMinLabel || `${label} from`}
           placeholder={fromPlaceholder}
-          className="range-from"
+          inputClassName="range-from"
         />
         <span className="range-sep" aria-hidden>
           –
         </span>
-        <input
+        <NumberStepper
           id={idTo ?? `${id}-to`}
-          type="number"
-          inputMode="numeric"
           value={to}
-          onChange={handleTo}
+          onCommit={(next) => onChange([from, next])}
+          ariaLabel={ariaMaxLabel || `${label} to`}
+          decreaseLabel={decreaseLabel}
+          increaseLabel={increaseLabel}
           min={min}
           max={max}
           step={step}
-          aria-label={ariaMaxLabel || `${label} to`}
           placeholder={toPlaceholder}
-          className="range-to"
+          inputClassName="range-to"
         />
       </div>
     </div>
