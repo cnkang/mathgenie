@@ -48,6 +48,7 @@ export const useQuizController = (
   const [showResults, setShowResults] = useState(false);
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
   const [timeElapsed, setTimeElapsed] = useState(0);
+  const [isAdvancing, setIsAdvancing] = useState(false);
   const startedAt = useRef(Date.now());
   const pending = useRef<ReturnType<typeof setTimeout> | null>(null);
   const finished = useRef(false);
@@ -59,6 +60,7 @@ export const useQuizController = (
   const cancelAdvance = useCallback(() => {
     if (pending.current !== null) clearTimeout(pending.current);
     pending.current = null;
+    setIsAdvancing(false);
   }, []);
   const restartQuiz = useCallback(() => {
     cancelAdvance();
@@ -101,6 +103,7 @@ export const useQuizController = (
       state.current[currentProblemIndex]?.isAnswered
     ) {
       cancelAdvance();
+      setIsAdvancing(true);
       pending.current = setTimeout(finishQuiz, 1500);
     }
     return cancelAdvance;
@@ -129,8 +132,10 @@ export const useQuizController = (
       );
       state.current = updated;
       setQuizProblems(updated);
+      setIsAdvancing(true);
       pending.current = setTimeout(() => {
         pending.current = null;
+        setIsAdvancing(false);
         if (currentProblemIndex < updated.length - 1) {
           setCurrentProblemIndex(currentProblemIndex + 1);
           return;
@@ -149,6 +154,17 @@ export const useQuizController = (
     cancelAdvance();
     setCurrentProblemIndex((index) => Math.min(state.current.length - 1, index + 1));
   }, [cancelAdvance]);
+  const goToIndex = useCallback(
+    (index: number) => {
+      cancelAdvance();
+      setCurrentProblemIndex(Math.max(0, Math.min(state.current.length - 1, index)));
+    },
+    [cancelAdvance],
+  );
+  const finishEarly = useCallback(() => {
+    cancelAdvance();
+    finishQuiz();
+  }, [cancelAdvance, finishQuiz]);
   const adjustTimeElapsed = useCallback((value: number) => {
     startedAt.current = Date.now() - value * 1000;
     setTimeElapsed(value);
@@ -169,9 +185,12 @@ export const useQuizController = (
     setQuizResult,
     timeElapsed,
     setTimeElapsed: adjustTimeElapsed,
+    isAdvancing,
     handleAnswerSubmit,
     goToPrevious,
     goToNext,
+    goToIndex,
+    finishEarly,
     formatTime,
     restartQuiz,
   };

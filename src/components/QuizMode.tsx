@@ -5,6 +5,7 @@ import InteractiveProblem from "./InteractiveProblem";
 import QuizResults from "@/components/quiz/QuizResults";
 import QuizHeader from "@/components/quiz/QuizHeader";
 import QuizNavigation from "@/components/quiz/QuizNavigation";
+import QuizPalette from "@/components/quiz/QuizPalette";
 import { useQuizController } from "@/components/quiz/useQuizController";
 
 // math evaluation moved to quiz/expression.ts
@@ -49,44 +50,75 @@ const renderQuizLayout = (params: {
   quizProblems: Problem[];
   currentProblemIndex: number;
   timeElapsed: number;
+  isAdvancing: boolean;
   formatTime: (seconds: number) => string;
   onExitQuiz: () => void;
   handleAnswerSubmit: (problemId: number, answer: number) => void;
   goToPrevious: () => void;
   goToNext: () => void;
+  goToIndex: (index: number) => void;
+  finishEarly: () => void;
 }) => {
   const {
     t,
     quizProblems,
     currentProblemIndex,
     timeElapsed,
+    isAdvancing,
     formatTime,
     onExitQuiz,
     handleAnswerSubmit,
     goToPrevious,
     goToNext,
+    goToIndex,
+    finishEarly,
   } = params;
 
   const currentProblem = quizProblems[currentProblemIndex];
   const progress = ((currentProblemIndex + 1) / quizProblems.length) * 100;
   const progressPercentage = Math.round(progress);
+  const answeredCount = quizProblems.filter((problem) => problem.isAnswered).length;
+
+  // Arrow keys navigate between problems, except while the user is editing
+  // a non-empty answer (caret keys must keep working) or composing IME input.
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>): void => {
+    if (event.nativeEvent.isComposing) return;
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+    const target = event.target as HTMLElement;
+    if (target instanceof HTMLInputElement && !target.disabled && target.value !== "") return;
+    event.preventDefault();
+    if (event.key === "ArrowLeft") {
+      goToPrevious();
+    } else {
+      goToNext();
+    }
+  };
 
   return (
-    <div className="quiz-mode">
+    <div className="quiz-mode" onKeyDown={handleKeyDown}>
       <QuizHeader
         t={t}
         progressPercentage={progressPercentage}
         current={currentProblemIndex + 1}
         total={quizProblems.length}
         timeElapsed={timeElapsed}
+        answeredCount={answeredCount}
         formatTime={formatTime}
         onExit={onExitQuiz}
+      />
+
+      <QuizPalette
+        t={t}
+        problems={quizProblems}
+        currentIndex={currentProblemIndex}
+        onSelect={goToIndex}
       />
 
       <div className="quiz-content">
         <div className="current-problem">
           <h3>{t("quiz.problemNumber", { number: currentProblemIndex + 1 })}</h3>
           <InteractiveProblem
+            key={currentProblem.id}
             problem={currentProblem}
             onAnswerSubmit={handleAnswerSubmit}
             showResult={currentProblem?.isAnswered || false}
@@ -97,9 +129,13 @@ const renderQuizLayout = (params: {
           t={t}
           canPrev={currentProblemIndex > 0}
           canNext={currentProblemIndex < quizProblems.length - 1}
+          canFinish={answeredCount > 0}
+          isAdvancing={isAdvancing}
           onPrev={goToPrevious}
           onNext={goToNext}
+          onFinish={finishEarly}
         />
+        <p className="quiz-keyboard-hint">{t("quiz.keyboardHint")}</p>
       </div>
     </div>
   );
@@ -113,10 +149,13 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
     showResults,
     quizResult,
     timeElapsed,
+    isAdvancing,
     handleAnswerSubmit,
     formatTime,
     goToPrevious,
     goToNext,
+    goToIndex,
+    finishEarly,
     restartQuiz,
   } = useQuizController(problems, t, onQuizComplete);
 
@@ -146,11 +185,14 @@ const QuizMode: React.FC<QuizModeProps> = ({ problems, onQuizComplete, onExitQui
     quizProblems,
     currentProblemIndex,
     timeElapsed,
+    isAdvancing,
     formatTime,
     onExitQuiz,
     handleAnswerSubmit,
     goToPrevious,
     goToNext,
+    goToIndex,
+    finishEarly,
   });
 };
 

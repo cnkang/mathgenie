@@ -91,3 +91,50 @@ describe("quiz lifecycle regressions", () => {
     expect(result.current.currentProblemIndex).toBe(1);
   });
 });
+
+describe("quiz navigation extensions", () => {
+  const problems = [
+    { id: 0, text: "2 + 3 = " },
+    { id: 1, text: "1 + 1 = " },
+    { id: 2, text: "2 + 2 = " },
+  ];
+
+  it("goToIndex jumps within bounds and cancels auto-advance", () => {
+    vi.useFakeTimers();
+    const { result } = renderHook(() => useQuizController(problems, t, vi.fn()));
+    act(() => result.current.handleAnswerSubmit(0, 5));
+    expect(result.current.isAdvancing).toBe(true);
+    act(() => result.current.goToIndex(2));
+    expect(result.current.currentProblemIndex).toBe(2);
+    expect(result.current.isAdvancing).toBe(false);
+    act(() => vi.advanceTimersByTime(2000));
+    expect(result.current.currentProblemIndex).toBe(2);
+    act(() => result.current.goToIndex(99));
+    expect(result.current.currentProblemIndex).toBe(2);
+    act(() => result.current.goToIndex(-5));
+    expect(result.current.currentProblemIndex).toBe(0);
+  });
+
+  it("finishEarly completes immediately and counts unanswered as incorrect", () => {
+    vi.useFakeTimers();
+    const complete = vi.fn();
+    const { result } = renderHook(() => useQuizController(problems, t, complete));
+    act(() => result.current.handleAnswerSubmit(0, 5));
+    act(() => result.current.finishEarly());
+    expect(complete).toHaveBeenCalledTimes(1);
+    expect(result.current.showResults).toBe(true);
+    expect(result.current.quizResult?.score).toBe(33);
+    act(() => vi.advanceTimersByTime(2000));
+    expect(complete).toHaveBeenCalledTimes(1);
+  });
+
+  it("isAdvancing clears when the auto-advance fires", () => {
+    vi.useFakeTimers();
+    const { result } = renderHook(() => useQuizController(problems, t, vi.fn()));
+    act(() => result.current.handleAnswerSubmit(0, 5));
+    expect(result.current.isAdvancing).toBe(true);
+    act(() => vi.advanceTimersByTime(1600));
+    expect(result.current.isAdvancing).toBe(false);
+    expect(result.current.currentProblemIndex).toBe(1);
+  });
+});

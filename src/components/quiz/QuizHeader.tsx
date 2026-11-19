@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 type Props = {
   t: (key: string, params?: Record<string, string | number>) => string;
@@ -6,6 +6,7 @@ type Props = {
   current: number;
   total: number;
   timeElapsed: number;
+  answeredCount: number;
   formatTime: (seconds: number) => string;
   onExit: () => void;
 };
@@ -23,32 +24,59 @@ const QuizHeader: React.FC<Props> = ({
   current,
   total,
   timeElapsed,
+  answeredCount,
   formatTime,
   onExit,
-}) => (
-  <div className="quiz-header">
-    <div className="quiz-progress">
-      <div className="progress-bar">
-        <progress
-          className="progress-native"
-          max={100}
-          value={progressPercentage}
-          aria-label={t("quiz.progress", { current, total })}
-        />
-        <div className="progress-fill" style={{ width: `${progressPercentage}%` }}></div>
+}) => {
+  // Two-step exit once answers exist, so a stray tap cannot discard progress.
+  const [confirmingExit, setConfirmingExit] = useState(false);
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (resetTimer.current !== null) clearTimeout(resetTimer.current);
+    };
+  }, []);
+
+  const handleExit = (): void => {
+    if (answeredCount === 0 || confirmingExit) {
+      if (resetTimer.current !== null) clearTimeout(resetTimer.current);
+      onExit();
+      return;
+    }
+    setConfirmingExit(true);
+    resetTimer.current = setTimeout(() => setConfirmingExit(false), 3000);
+  };
+
+  return (
+    <div className="quiz-header">
+      <div className="quiz-progress">
+        <div className="progress-bar">
+          <progress
+            className="progress-native"
+            max={100}
+            value={progressPercentage}
+            aria-label={t("quiz.progress", { current, total })}
+          />
+          <div className="progress-fill" style={{ width: `${progressPercentage}%` }}></div>
+        </div>
+        <span className="progress-text">{t("quiz.progress", { current, total })}</span>
       </div>
-      <span className="progress-text">{t("quiz.progress", { current, total })}</span>
+      <div className="quiz-timer">
+        <span className="timer-icon" aria-hidden="true">
+          <TimerIcon />
+        </span>
+        <span className="timer-text">{formatTime(timeElapsed)}</span>
+      </div>
+      <button
+        type="button"
+        onClick={handleExit}
+        className={`exit-quiz-btn-small${confirmingExit ? " exit-confirming" : ""}`}
+      >
+        {t(confirmingExit ? "quiz.exitConfirm" : "quiz.exit")}
+      </button>
     </div>
-    <div className="quiz-timer">
-      <span className="timer-icon" aria-hidden="true">
-        <TimerIcon />
-      </span>
-      <span className="timer-text">{formatTime(timeElapsed)}</span>
-    </div>
-    <button type="button" onClick={onExit} className="exit-quiz-btn-small">
-      {t("quiz.exit")}
-    </button>
-  </div>
-);
+  );
+};
 
 export default QuizHeader;

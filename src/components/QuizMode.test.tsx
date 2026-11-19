@@ -629,8 +629,85 @@ describe("QuizMode", () => {
 
     // Should show quiz completed - use container to avoid multiple elements
     expect(container.querySelector(".results-header h2")?.textContent).toContain("Quiz Completed!");
-
     // Clean up
     unmount();
+  });
+
+  test("navigates with arrow keys", () => {
+    const { container } = render(
+      <QuizMode
+        problems={mockProblems}
+        onQuizComplete={mockOnQuizComplete}
+        onExitQuiz={mockOnExitQuiz}
+      />,
+    );
+    const quiz = getRequiredElement<HTMLDivElement>(container, ".quiz-mode");
+    fireEvent.keyDown(quiz, { key: "ArrowRight" });
+    expect(container.textContent).toContain("Problem 2");
+    fireEvent.keyDown(quiz, { key: "ArrowLeft" });
+    expect(container.textContent).toContain("Problem 1");
+  });
+
+  test("arrow keys keep caret behavior while editing a non-empty answer", () => {
+    const { container } = render(
+      <QuizMode
+        problems={mockProblems}
+        onQuizComplete={mockOnQuizComplete}
+        onExitQuiz={mockOnExitQuiz}
+      />,
+    );
+    const quiz = getRequiredElement<HTMLDivElement>(container, ".quiz-mode");
+    const input = document.createElement("input");
+    input.value = "12";
+    quiz.appendChild(input);
+    fireEvent.keyDown(input, { key: "ArrowRight" });
+    expect(container.textContent).toContain("Problem 1");
+  });
+
+  test("requires confirmation to exit after answering", () => {
+    const { container } = render(
+      <QuizMode
+        problems={mockProblems}
+        onQuizComplete={mockOnQuizComplete}
+        onExitQuiz={mockOnExitQuiz}
+      />,
+    );
+    fireEvent.click(getRequiredElement(container, '[data-testid="submit-1"]'));
+    const exitButton = getRequiredElement<HTMLButtonElement>(container, ".exit-quiz-btn-small");
+    fireEvent.click(exitButton);
+    expect(mockOnExitQuiz).not.toHaveBeenCalled();
+    expect(exitButton.textContent).toBe("quiz.exitConfirm");
+    fireEvent.click(exitButton);
+    expect(mockOnExitQuiz).toHaveBeenCalledTimes(1);
+  });
+
+  test("jumps via the question palette", () => {
+    const { container } = render(
+      <QuizMode
+        problems={mockProblems}
+        onQuizComplete={mockOnQuizComplete}
+        onExitQuiz={mockOnExitQuiz}
+      />,
+    );
+    const items = container.querySelectorAll(".palette-item");
+    expect(items).toHaveLength(3);
+    fireEvent.click(items[2]);
+    expect(container.textContent).toContain("Problem 3");
+    expect(container.textContent).toContain("3 / 3");
+  });
+
+  test("finishes early with the finish button", () => {
+    render(
+      <QuizMode
+        problems={mockProblems}
+        onQuizComplete={mockOnQuizComplete}
+        onExitQuiz={mockOnExitQuiz}
+      />,
+    );
+    fireEvent.click(screen.getAllByTestId("submit-1")[0]);
+    const finishButton = screen.getByText("quiz.finishEarly");
+    fireEvent.click(finishButton);
+    expect(screen.getByText("Quiz Completed!")).toBeDefined();
+    expect(mockOnQuizComplete).toHaveBeenCalledTimes(1);
   });
 });
