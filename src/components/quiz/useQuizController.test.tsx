@@ -5,7 +5,7 @@ import { useQuizController } from "./useQuizController";
 const t = (key: string) => key;
 afterEach(() => vi.useRealTimers());
 describe("quiz lifecycle regressions", () => {
-  it("can finish after leaving and revisiting an answered final problem", () => {
+  it("continues after answering the last question first and completes after all answers", () => {
     vi.useFakeTimers();
     const complete = vi.fn();
     const problems = [
@@ -15,13 +15,17 @@ describe("quiz lifecycle regressions", () => {
     const { result } = renderHook(() => useQuizController(problems, t, complete));
     act(() => result.current.goToNext());
     act(() => result.current.handleAnswerSubmit(1, 4));
-    act(() => result.current.goToPrevious());
     act(() => vi.advanceTimersByTime(2000));
     expect(complete).not.toHaveBeenCalled();
+    expect(result.current.currentProblemIndex).toBe(0);
     act(() => result.current.goToNext());
+    act(() => vi.advanceTimersByTime(2000));
+    expect(complete).not.toHaveBeenCalled();
+    act(() => result.current.goToPrevious());
+    act(() => result.current.handleAnswerSubmit(0, 2));
     act(() => vi.advanceTimersByTime(1600));
     expect(complete).toHaveBeenCalledTimes(1);
-    expect(result.current.quizResult?.score).toBe(50);
+    expect(result.current.quizResult?.score).toBe(100);
   });
   it("hides printed answers, honors stored answers and parses negative legacy operands", () => {
     const problems = [
@@ -142,7 +146,14 @@ describe("quiz navigation extensions", () => {
     vi.useFakeTimers();
     const complete = vi.fn();
     const { result } = renderHook(() => useQuizController(problems, t, complete));
-    act(() => result.current.goToIndex(2));
+    act(() => result.current.handleAnswerSubmit(0, 5));
+    act(() => vi.advanceTimersByTime(1600));
+    act(() => result.current.handleAnswerSubmit(1, 2));
+    act(() => vi.advanceTimersByTime(1600));
+    act(() => {
+      result.current.goToIndex(2);
+      result.current.goToNext();
+    });
     act(() => result.current.handleAnswerSubmit(2, 4));
     expect(result.current.isAdvancing).toBe(true);
     // Palette click on the already-current final problem must not cancel
