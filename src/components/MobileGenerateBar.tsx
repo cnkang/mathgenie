@@ -17,6 +17,8 @@ const MobileGenerateBar: React.FC<MobileGenerateBarProps> = ({ t, isGenerating, 
   const [cardVisible, setCardVisible] = useState(false);
 
   useEffect(() => {
+    // The generate card is rendered in the same non-quiz tree as this bar
+    // (never lazy), so it exists by the time effects run.
     const card = document.querySelector(".generate-card");
     if (!card || typeof IntersectionObserver === "undefined") {
       return;
@@ -45,7 +47,7 @@ const MobileGenerateBar: React.FC<MobileGenerateBarProps> = ({ t, isGenerating, 
         onClick={onGenerate}
         disabled={isGenerating}
         aria-busy={isGenerating}
-        aria-label={`${t("buttons.generate")} · ${t("accessibility.generateButton")}`}
+        aria-label={`${t(isGenerating ? "buttons.generating" : "buttons.generate")} · ${t("accessibility.generateButton")}`}
       >
         {t(isGenerating ? "buttons.generating" : "buttons.generate")}
       </button>

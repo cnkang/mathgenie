@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useProgressBar } from "../hooks/useProgressBar";
 import { useTranslation } from "../i18n";
 import type { Problem, QuizResult, Settings } from "../types";
@@ -9,6 +9,9 @@ interface InfoPanelProps {
   problems: Problem[];
   settings: Settings;
   quizResult?: QuizResult | null;
+  /** Monotonic counter of explicit user generations (App-owned). Settings
+   * edits auto-regenerate problems but must not inflate lifetime stats. */
+  explicitGenerations?: number;
 }
 
 const SESSION_STATS_KEY = "mathgenie-session-stats";
@@ -16,26 +19,36 @@ const SESSION_STATS_KEY = "mathgenie-session-stats";
 type SessionStats = {
   totalGenerated: number;
   sessionsCount: number;
+  lastCountedGeneration: number;
 };
+
+// Module-level so remounts (e.g. leaving and re-entering quiz mode) cannot
+// count the same problem batch twice; WeakSet keeps no arrays alive.
+const countedBatches = new WeakSet<Problem[]>();
 
 const readStoredStats = (): SessionStats => {
   const raw = safeStorage.get(SESSION_STATS_KEY);
   if (raw) {
     try {
       const parsed: unknown = JSON.parse(raw);
-      if (
-        typeof parsed === "object" &&
-        parsed !== null &&
-        typeof (parsed as SessionStats).totalGenerated === "number" &&
-        typeof (parsed as SessionStats).sessionsCount === "number"
-      ) {
-        return parsed as SessionStats;
+      if (typeof parsed === "object" && parsed !== null) {
+        const candidate = parsed as SessionStats;
+        if (
+          Number.isFinite(candidate.totalGenerated) &&
+          candidate.totalGenerated >= 0 &&
+          Number.isFinite(candidate.sessionsCount) &&
+          candidate.sessionsCount >= 0 &&
+          Number.isFinite(candidate.lastCountedGeneration) &&
+          candidate.lastCountedGeneration >= 0
+        ) {
+          return candidate;
+        }
       }
     } catch {
       /* Corrupt storage: start fresh. */
     }
   }
-  return { totalGenerated: 0, sessionsCount: 0 };
+  return { totalGenerated: 0, sessionsCount: 0, lastCountedGeneration: 0 };
 };
 
 // Extracted to top-level to avoid redefining on each render (Sonar S6478)
@@ -79,22 +92,31 @@ const TrophyIcon: React.FC = () => (
   </svg>
 );
 
-const InfoPanel: React.FC<InfoPanelProps> = ({ problems, settings, quizResult }) => {
+const InfoPanel: React.FC<InfoPanelProps> = ({
+  problems,
+  settings,
+  quizResult,
+  explicitGenerations = 0,
+}) => {
   const { t } = useTranslation();
   const [sessionStats, setSessionStats] = useState<SessionStats>(readStoredStats);
-  // Track previous problems reference to avoid double-counting on remount
-  const prevProblemsRef = useRef<Problem[]>([]);
 
   useEffect(() => {
-    // Only count when problems actually change (new generation), not on remount
-    if (problems.length > 0 && problems !== prevProblemsRef.current) {
-      prevProblemsRef.current = problems;
+    // Count a batch only when it came from an explicit generation the user
+    // has not been credited for yet, and never the same array twice.
+    if (
+      problems.length > 0 &&
+      explicitGenerations > sessionStats.lastCountedGeneration &&
+      !countedBatches.has(problems)
+    ) {
+      countedBatches.add(problems);
       setSessionStats((prev) => ({
         totalGenerated: prev.totalGenerated + problems.length,
         sessionsCount: prev.sessionsCount + 1,
+        lastCountedGeneration: prev.lastCountedGeneration + 1,
       }));
     }
-  }, [problems]);
+  }, [problems, explicitGenerations, sessionStats.lastCountedGeneration]);
 
   // Persist lifetime generation stats so "Total Generated" survives reloads.
   useEffect(() => {

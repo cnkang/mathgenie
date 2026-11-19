@@ -27,8 +27,13 @@ ul {
 }
 
 @media (width <= 768px) {
-  /* Reserve space so the bar never permanently covers page content. */
+  /* Reserve space so the bar never permanently covers page content, and
+     keep keyboard-focused elements clear of it when scrolling (WCAG 2.4.11). */
   .App {
     padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+
+  html {
+    scroll-padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
   }
 }

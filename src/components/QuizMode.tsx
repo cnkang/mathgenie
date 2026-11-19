@@ -82,10 +82,20 @@ const renderQuizLayout = (params: {
   // Arrow keys navigate between problems, except while the user is editing
   // a non-empty answer (caret keys must keep working) or composing IME input.
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>): void => {
-    if (event.nativeEvent.isComposing) return;
-    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+    if (event.nativeEvent.isComposing) {
+      return;
+    }
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+      return;
+    }
     const target = event.target as HTMLElement;
-    if (target instanceof HTMLInputElement && !target.disabled && target.value !== "") return;
+    if (target instanceof HTMLInputElement && !target.disabled && target.value !== "") {
+      return;
+    }
+    // Leave arrow keys to controls that use them natively.
+    if (target.closest("details, select, textarea, [role='radiogroup'], [role='slider']")) {
+      return;
+    }
     event.preventDefault();
     if (event.key === "ArrowLeft") {
       goToPrevious();

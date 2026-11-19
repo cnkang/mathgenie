@@ -117,11 +117,52 @@ describe("InfoPanel", { concurrent: false }, () => {
 
   test("persists generation stats across remounts", () => {
     const mockProblems = [{ id: 1, text: "2 + 2 = " }];
-    const first = render(<InfoPanel problems={mockProblems} settings={mockSettings} />);
+    const first = render(
+      <InfoPanel problems={mockProblems} settings={mockSettings} explicitGenerations={1} />,
+    );
     expect(screen.getAllByLabelText("Total Generated: 1")[0]).toBeInTheDocument();
     first.unmount();
 
-    render(<InfoPanel problems={[]} settings={mockSettings} />);
+    render(<InfoPanel problems={[]} settings={mockSettings} explicitGenerations={1} />);
     expect(screen.getAllByLabelText("Total Generated: 1")[0]).toBeInTheDocument();
+  });
+
+  test("does not double-count the same batch when remounted with it", () => {
+    const mockProblems = [{ id: 1, text: "2 + 2 = " }];
+    const first = render(
+      <InfoPanel problems={mockProblems} settings={mockSettings} explicitGenerations={1} />,
+    );
+    expect(screen.getAllByLabelText("Total Generated: 1")[0]).toBeInTheDocument();
+    first.unmount();
+
+    // Same array reference (quiz-mode exit remounts InfoPanel with the
+    // current problems): must not count again.
+    render(<InfoPanel problems={mockProblems} settings={mockSettings} explicitGenerations={1} />);
+    expect(screen.getAllByLabelText("Total Generated: 1")[0]).toBeInTheDocument();
+  });
+
+  test("does not count auto-regenerations from settings edits", () => {
+    const firstBatch = [{ id: 1, text: "2 + 2 = " }];
+    const { rerender } = render(
+      <InfoPanel problems={firstBatch} settings={mockSettings} explicitGenerations={1} />,
+    );
+    expect(screen.getAllByLabelText("Total Generated: 1")[0]).toBeInTheDocument();
+
+    // Settings edit auto-regenerates a new array without an explicit click.
+    const autoBatch = [
+      { id: 2, text: "3 + 3 = " },
+      { id: 3, text: "4 + 4 = " },
+    ];
+    rerender(<InfoPanel problems={autoBatch} settings={mockSettings} explicitGenerations={1} />);
+    expect(screen.getAllByLabelText("Total Generated: 1")[0]).toBeInTheDocument();
+  });
+
+  test("rejects corrupt stored stats", () => {
+    localStorage.setItem(
+      "mathgenie-session-stats",
+      JSON.stringify({ totalGenerated: -5, sessionsCount: 0, lastCountedGeneration: 0 }),
+    );
+    render(<InfoPanel problems={[]} settings={mockSettings} />);
+    expect(screen.getAllByLabelText("Total Generated: 0")[0]).toBeInTheDocument();
   });
 });

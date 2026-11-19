@@ -13,15 +13,19 @@ MathGenie is a modern web application built with **React 19.3.1**, **TypeScript 
 
 ### 🎯 Core Functionality
 
-- **Select Operations**: Choose which operations (+, -, ✖, ➗) to include in the generated problems
+- **Select Operations**: Toggle operation chips (+, -, ✖, ➗) to choose which operations the generated problems include
 - **Customize Number Range**: Define the range of numbers used as operands
 - **Set Result Range**: Define the acceptable range for results
-- **Number of Problems**: Specify how many problems to generate
+- **Set Number of Problems**: Specify how many problems to generate, with touch-friendly steppers
 - **Operands Range**: Set the range for the number of operands per problem
 - **Negative Results**: Optionally allow negative results
 - **Show Answers**: Choose whether to display answers next to the problems
 - **PDF Customization**: Specify the font size, line spacing, and paper size of the generated PDF
 - **Download PDF**: Generate and download a PDF file with the customized problems
+- **Quick Presets**: One-tap configurations for beginner, intermediate, advanced, and multiplication-table practice
+- **Interactive Quiz**: Answer the generated problems with auto-advance, arrow-key navigation, a question palette for jumping, early finish, and a scored results review
+- **Theme Selection**: Light, dark, or system-following appearance, remembered across visits
+- **Mobile Generate Bar**: A sticky generate action on small screens so the primary action is always reachable
 
 ### 🚀 React 19 & TypeScript Enhancements
 

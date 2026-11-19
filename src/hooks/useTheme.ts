@@ -5,6 +5,8 @@ export type ThemePreference = "light" | "dark" | "system";
 
 const STORAGE_KEY = "mathgenie-theme";
 const DARK_QUERY = "(prefers-color-scheme: dark)";
+// Keep in sync with the pre-paint script in index.html.
+const THEME_COLORS = { light: "#1e3a8a", dark: "#0b1220" } as const;
 
 const readStoredPreference = (): ThemePreference => {
   const stored = safeStorage.get(STORAGE_KEY);
@@ -51,6 +53,10 @@ export function useTheme(): {
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", resolved);
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) {
+      meta.setAttribute("content", THEME_COLORS[resolved]);
+    }
   }, [resolved]);
 
   const setPreference = useCallback((next: ThemePreference): void => {

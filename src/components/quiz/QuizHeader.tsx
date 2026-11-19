@@ -40,12 +40,15 @@ const QuizHeader: React.FC<Props> = ({
 
   const handleExit = (): void => {
     if (answeredCount === 0 || confirmingExit) {
-      if (resetTimer.current !== null) clearTimeout(resetTimer.current);
+      if (resetTimer.current !== null) {
+        clearTimeout(resetTimer.current);
+      }
       onExit();
       return;
     }
     setConfirmingExit(true);
-    resetTimer.current = setTimeout(() => setConfirmingExit(false), 3000);
+    // Generous window for assistive-tech users; re-clicking re-arms it.
+    resetTimer.current = setTimeout(() => setConfirmingExit(false), 5000);
   };
 
   return (
@@ -75,6 +78,11 @@ const QuizHeader: React.FC<Props> = ({
       >
         {t(confirmingExit ? "quiz.exitConfirm" : "quiz.exit")}
       </button>
+      {confirmingExit && (
+        <span className="sr-only" role="status">
+          {t("quiz.exitConfirm")}
+        </span>
+      )}
     </div>
   );
 };

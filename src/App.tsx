@@ -47,6 +47,9 @@ function App(): React.JSX.Element {
   const [isQuizMode, setIsQuizMode] = useState(false);
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  // Explicit generations only: settings edits auto-regenerate problems but
+  // must not inflate the lifetime stats shown in InfoPanel.
+  const [explicitGenerations, setExplicitGenerations] = useState(0);
   const formHandlers = useAppHandlers({
     settings,
     setSettings,
@@ -93,6 +96,7 @@ function App(): React.JSX.Element {
   }, [download, isDownloading]);
   const handleGenerate = useCallback(() => {
     clearMessages();
+    setExplicitGenerations((count) => count + 1);
     generation.generateProblems();
   }, [clearMessages, generation.generateProblems]);
   const onQuizComplete = useCallback(
@@ -179,7 +183,12 @@ function App(): React.JSX.Element {
                     </div>
                   )}
                   <ProblemsSection t={t} problems={problems} settings={settings} />
-                  <InfoPanel problems={problems} settings={settings} quizResult={quizResult} />
+                  <InfoPanel
+                    problems={problems}
+                    settings={settings}
+                    quizResult={quizResult}
+                    explicitGenerations={explicitGenerations}
+                  />
                 </div>
               </div>
             )}
