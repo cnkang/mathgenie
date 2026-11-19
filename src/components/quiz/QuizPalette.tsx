@@ -13,8 +13,12 @@ type QuizPaletteProps = {
 const MAX_PALETTE_ITEMS = 200;
 
 const stateOf = (problem: Problem): "correct" | "incorrect" | "unanswered" => {
-  if (!problem.isAnswered) return "unanswered";
-  if (problem.isCorrect) return "correct";
+  if (!problem.isAnswered) {
+    return "unanswered";
+  }
+  if (problem.isCorrect) {
+    return "correct";
+  }
   return "incorrect";
 };
 

@@ -91,7 +91,7 @@ const ActionCards: React.FC<ActionCardsProps> = ({
           onClick={onGenerate}
           disabled={isGenerating}
           aria-busy={isGenerating}
-          aria-label={`${t("buttons.generate")} · ${t("accessibility.generateButton")}`}
+          aria-label={`${t(isGenerating ? "buttons.generating" : "buttons.generate")} · ${t("accessibility.generateButton")}`}
         >
           <div className={STR_ACTION_CARD_CONTENT}>
             <span className={STR_ACTION_ICON} aria-hidden="true">

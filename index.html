@@ -4,8 +4,9 @@
     <meta charset="utf-8" />
     <link rel="icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#1e3a8a" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)" />
+    <!-- Content is rewritten by the pre-paint script and useTheme so the
+         browser chrome follows the resolved (possibly manual) theme. -->
+    <meta name="theme-color" content="#1e3a8a" />
     <meta name="keywords" content="math,problem generator,education,practice,PDF" />
     <meta
       name="description"
@@ -16,21 +17,29 @@
     <title>MathGenie - Math Problem Generator</title>
 
     <!-- Resolve the theme before first paint: stored preference wins,
-         otherwise follow the system. Keep in sync with src/hooks/useTheme.ts. -->
+         otherwise follow the system. Keep in sync with src/hooks/useTheme.ts
+         (including the theme-color values). -->
     <script>
       (function () {
-        var theme = "light";
+        var stored = null;
         try {
-          var stored = localStorage.getItem("mathgenie-theme");
-          var followsSystem = stored === null || stored === "system";
-          var dark =
-            stored === "dark" ||
-            (followsSystem && window.matchMedia("(prefers-color-scheme: dark)").matches);
-          theme = dark ? "dark" : "light";
+          stored = localStorage.getItem("mathgenie-theme");
         } catch (error) {
-          /* Storage or matchMedia unavailable: fall back to light. */
+          /* Storage unavailable: fall back to the system preference. */
         }
-        document.documentElement.setAttribute("data-theme", theme);
+        var dark = stored === "dark";
+        if (stored !== "light" && stored !== "dark") {
+          try {
+            dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          } catch (error) {
+            dark = false;
+          }
+        }
+        document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) {
+          meta.setAttribute("content", dark ? "#0b1220" : "#1e3a8a");
+        }
       })();
     </script>
 

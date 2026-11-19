@@ -25,6 +25,8 @@ const setup = ({ initial = [1, 10], min, max }: SetupOptions = {}) => {
         }}
         ariaMinLabel="From"
         ariaMaxLabel="To"
+        decreaseLabel="Decrease value"
+        increaseLabel="Increase value"
         min={min}
         max={max}
       />

@@ -18,10 +18,11 @@ describe("MobileGenerateBar", () => {
   it("shows the generating label and disables the button while busy", () => {
     const onGenerate = vi.fn();
     render(<MobileGenerateBar t={t} isGenerating onGenerate={onGenerate} />);
-    const button = screen.getByRole("button", { name: /buttons\.generate/ }) as HTMLButtonElement;
+    const button = screen.getByRole("button", { name: /buttons\.generat/ }) as HTMLButtonElement;
     expect(button.disabled).toBe(true);
     expect(button).toHaveAttribute("aria-busy", "true");
     expect(button).toHaveTextContent("buttons.generating");
+    expect(button.getAttribute("aria-label")).toContain("buttons.generating");
     fireEvent.click(button);
     expect(onGenerate).not.toHaveBeenCalled();
   });

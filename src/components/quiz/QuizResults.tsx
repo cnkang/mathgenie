@@ -59,7 +59,10 @@ const QuizResults: React.FC<Props> = ({
   formatTime,
 }) => {
   const displayedScore = useCountUp(quizResult.score);
-  const isPerfect = quizResult.score === 100 && quizResult.totalProblems > 0;
+  // Rounded scores can hit 100 with a wrong answer; confetti requires a
+  // genuinely perfect run.
+  const isPerfect =
+    quizResult.totalProblems > 0 && quizResult.correctAnswers === quizResult.totalProblems;
 
   return (
     <div className="quiz-results">

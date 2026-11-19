@@ -69,6 +69,11 @@ export function useNumericDraft(
       return;
     }
     setDraft(String(parsed));
+    // Reconcile with the latest committed value: an external update (preset,
+    // import) may have landed while editing; the user's final draft wins.
+    if (parsed !== value) {
+      onCommit(parsed);
+    }
   };
 
   const stepBy = (direction: 1 | -1): void => {

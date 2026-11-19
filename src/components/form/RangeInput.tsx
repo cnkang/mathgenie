@@ -14,15 +14,12 @@ type RangeInputProps = {
   step?: number;
   ariaMinLabel?: string;
   ariaMaxLabel?: string;
-  decreaseLabel?: string;
-  increaseLabel?: string;
+  decreaseLabel: string;
+  increaseLabel: string;
   fromPlaceholder?: string;
   toPlaceholder?: string;
   className?: string;
 };
-
-const STR_DECREASE = "Decrease value" as const;
-const STR_INCREASE = "Increase value" as const;
 
 const RangeInput: React.FC<RangeInputProps> = ({
   id,
@@ -36,8 +33,8 @@ const RangeInput: React.FC<RangeInputProps> = ({
   step = 1,
   ariaMinLabel,
   ariaMaxLabel,
-  decreaseLabel = STR_DECREASE,
-  increaseLabel = STR_INCREASE,
+  decreaseLabel,
+  increaseLabel,
   fromPlaceholder,
   toPlaceholder,
   className,

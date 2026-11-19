@@ -137,4 +137,19 @@ describe("quiz navigation extensions", () => {
     expect(result.current.isAdvancing).toBe(false);
     expect(result.current.currentProblemIndex).toBe(1);
   });
+
+  it("selecting the current final question keeps pending completion", () => {
+    vi.useFakeTimers();
+    const complete = vi.fn();
+    const { result } = renderHook(() => useQuizController(problems, t, complete));
+    act(() => result.current.goToIndex(2));
+    act(() => result.current.handleAnswerSubmit(2, 4));
+    expect(result.current.isAdvancing).toBe(true);
+    // Palette click on the already-current final problem must not cancel
+    // the scheduled completion.
+    act(() => result.current.goToIndex(2));
+    expect(result.current.isAdvancing).toBe(true);
+    act(() => vi.advanceTimersByTime(1600));
+    expect(complete).toHaveBeenCalledTimes(1);
+  });
 });

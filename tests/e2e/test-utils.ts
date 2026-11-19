@@ -275,21 +275,18 @@ export async function fillAndSave(page: Page, selector: string, value: string): 
 }
 
 /**
- * Check if operations are selected correctly
+ * Check if operations are selected correctly.
+ * Compares the checked inputs' canonical values (locale-independent).
  */
 export async function verifyOperationsSelected(
   page: Page,
   expectedOperations: string[]
 ): Promise<void> {
   const selectedOperations = await page
-    .locator('#operations label:has(input:checked)')
-    .allTextContents();
+    .locator('#operations input:checked')
+    .evaluateAll(inputs => inputs.map(input => (input as HTMLInputElement).value));
 
-  for (const operation of expectedOperations) {
-    expect(selectedOperations.some(selected => selected.includes(operation))).toBe(true);
-  }
-
-  expect(selectedOperations).toHaveLength(expectedOperations.length);
+  expect([...selectedOperations].sort()).toEqual([...expectedOperations].sort());
 }
 
 /**

@@ -53,8 +53,10 @@ export const useQuizController = (
   const pending = useRef<ReturnType<typeof setTimeout> | null>(null);
   const finished = useRef(false);
   const state = useRef(quizProblems);
+  const indexRef = useRef(currentProblemIndex);
   const latest = useRef({ t, onQuizComplete });
   state.current = quizProblems;
+  indexRef.current = currentProblemIndex;
   latest.current = { t, onQuizComplete };
 
   const cancelAdvance = useCallback(() => {
@@ -156,8 +158,13 @@ export const useQuizController = (
   }, [cancelAdvance]);
   const goToIndex = useCallback(
     (index: number) => {
+      const target = Math.max(0, Math.min(state.current.length - 1, index));
+      // Selecting the current problem must not cancel a pending completion.
+      if (target === indexRef.current) {
+        return;
+      }
       cancelAdvance();
-      setCurrentProblemIndex(Math.max(0, Math.min(state.current.length - 1, index)));
+      setCurrentProblemIndex(target);
     },
     [cancelAdvance],
   );
