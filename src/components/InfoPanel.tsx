@@ -26,22 +26,31 @@ type SessionStats = {
 // count the same problem batch twice; WeakSet keeps no arrays alive.
 const countedBatches = new WeakSet<Problem[]>();
 
-const readStoredStats = (): SessionStats => {
+const isValidCount = (value: unknown): value is number =>
+  typeof value === "number" && Number.isFinite(value) && value >= 0;
+
+/**
+ * Read persisted stats. Accepts the current format and legacy records
+ * (no lastCountedGeneration); negative/nonfinite totals are rejected.
+ * Legacy records adopt the current explicit-generation counter as their
+ * cursor so the auto-generated batch on load is not counted as explicit.
+ * A missing or corrupt record starts fresh with cursor 0.
+ */
+const readStoredStats = (legacyCursor: number): SessionStats => {
   const raw = safeStorage.get(SESSION_STATS_KEY);
   if (raw) {
     try {
       const parsed: unknown = JSON.parse(raw);
       if (typeof parsed === "object" && parsed !== null) {
-        const candidate = parsed as SessionStats;
-        if (
-          Number.isFinite(candidate.totalGenerated) &&
-          candidate.totalGenerated >= 0 &&
-          Number.isFinite(candidate.sessionsCount) &&
-          candidate.sessionsCount >= 0 &&
-          Number.isFinite(candidate.lastCountedGeneration) &&
-          candidate.lastCountedGeneration >= 0
-        ) {
-          return candidate;
+        const candidate = parsed as Partial<SessionStats>;
+        if (isValidCount(candidate.totalGenerated) && isValidCount(candidate.sessionsCount)) {
+          return {
+            totalGenerated: candidate.totalGenerated,
+            sessionsCount: candidate.sessionsCount,
+            lastCountedGeneration: isValidCount(candidate.lastCountedGeneration)
+              ? candidate.lastCountedGeneration
+              : legacyCursor,
+          };
         }
       }
     } catch {
@@ -99,7 +108,9 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
   explicitGenerations = 0,
 }) => {
   const { t } = useTranslation();
-  const [sessionStats, setSessionStats] = useState<SessionStats>(readStoredStats);
+  const [sessionStats, setSessionStats] = useState<SessionStats>(() =>
+    readStoredStats(explicitGenerations),
+  );
 
   useEffect(() => {
     // Count a batch only when it came from an explicit generation the user

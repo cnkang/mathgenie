@@ -36,6 +36,7 @@ vi.mock("../hooks/useProgressBar", () => ({
 describe("InfoPanel", { concurrent: false }, () => {
   beforeEach(() => {
     localStorage.removeItem("mathgenie-session-stats");
+    localStorage.removeItem("mathgenie-explicit-generations");
   });
 
   const mockSettings: Settings = {
@@ -164,5 +165,34 @@ describe("InfoPanel", { concurrent: false }, () => {
     );
     render(<InfoPanel problems={[]} settings={mockSettings} />);
     expect(screen.getAllByLabelText("Total Generated: 0")[0]).toBeInTheDocument();
+  });
+
+  test("preserves legacy stats without the generation cursor", () => {
+    localStorage.setItem(
+      "mathgenie-session-stats",
+      JSON.stringify({ totalGenerated: 40, sessionsCount: 2 }),
+    );
+    // Counter restored from a previous session: the auto-generated batch on
+    // load must not be counted, and the legacy totals must survive.
+    const problems = [{ id: 1, text: "2 + 2 = " }];
+    render(<InfoPanel problems={problems} settings={mockSettings} explicitGenerations={2} />);
+    expect(screen.getAllByLabelText("Total Generated: 40")[0]).toBeInTheDocument();
+  });
+
+  test("counts the next explicit generation after a reload with stored cursor", () => {
+    localStorage.setItem(
+      "mathgenie-session-stats",
+      JSON.stringify({ totalGenerated: 40, sessionsCount: 2, lastCountedGeneration: 2 }),
+    );
+    const problems = [{ id: 1, text: "2 + 2 = " }];
+    const { rerender } = render(
+      <InfoPanel problems={problems} settings={mockSettings} explicitGenerations={2} />,
+    );
+    expect(screen.getAllByLabelText("Total Generated: 40")[0]).toBeInTheDocument();
+
+    // User clicks Generate after reload: counter advances, new batch counts.
+    const nextBatch = [{ id: 2, text: "3 + 3 = " }];
+    rerender(<InfoPanel problems={nextBatch} settings={mockSettings} explicitGenerations={3} />);
+    expect(screen.getAllByLabelText("Total Generated: 41")[0]).toBeInTheDocument();
   });
 });

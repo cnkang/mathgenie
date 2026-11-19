@@ -19,6 +19,7 @@ import { useSettings } from "./hooks/useSettings";
 import { useSettingsValidation } from "./hooks/useSettingsValidation";
 import { useTranslation } from "./i18n";
 import { saveQuizResult } from "@/utils/resultsStorage";
+import { safeStorage } from "@/utils/safeStorage";
 import type { PaperSizeOptions, QuizResult } from "./types";
 import { setupWCAGEnforcement } from "./utils/wcagEnforcement";
 const QuizMode = React.lazy(() => import("./components/QuizMode"));
@@ -48,8 +49,23 @@ function App(): React.JSX.Element {
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
   // Explicit generations only: settings edits auto-regenerate problems but
-  // must not inflate the lifetime stats shown in InfoPanel.
-  const [explicitGenerations, setExplicitGenerations] = useState(0);
+  // must not inflate the lifetime stats shown in InfoPanel. The counter is
+  // persisted so it survives reloads and stays in sync with the stats cursor.
+  const [explicitGenerations, setExplicitGenerations] = useState<number>(() => {
+    const stored = safeStorage.get("mathgenie-explicit-generations");
+    if (stored !== null) {
+      const parsed = Number.parseInt(stored, 10);
+      if (Number.isFinite(parsed) && parsed >= 0) {
+        return parsed;
+      }
+    }
+    return 0;
+  });
+
+  const saveExplicitGenerations = useCallback((next: number): void => {
+    setExplicitGenerations(next);
+    safeStorage.set("mathgenie-explicit-generations", String(next));
+  }, []);
   const formHandlers = useAppHandlers({
     settings,
     setSettings,
@@ -96,9 +112,9 @@ function App(): React.JSX.Element {
   }, [download, isDownloading]);
   const handleGenerate = useCallback(() => {
     clearMessages();
-    setExplicitGenerations((count) => count + 1);
+    saveExplicitGenerations(explicitGenerations + 1);
     generation.generateProblems();
-  }, [clearMessages, generation.generateProblems]);
+  }, [clearMessages, generation.generateProblems, saveExplicitGenerations, explicitGenerations]);
   const onQuizComplete = useCallback(
     (result: QuizResult) => {
       setQuizResult(result);
