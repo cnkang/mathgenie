@@ -1,7 +1,9 @@
 .theme-selector {
   display: inline-flex;
-  gap: 2px;
+  margin: 0;
   padding: 2px;
+  min-inline-size: 0;
+  gap: 2px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);

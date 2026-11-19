@@ -5,7 +5,7 @@
 
 /* CSS Custom Properties for consistent theming */
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
 
   /* Performance optimization */
   --will-change: transform;
@@ -203,16 +203,9 @@
   --pending-opacity: 0.7;
 }
 
-:root[data-theme="light"] {
-  color-scheme: light;
-}
-
+/* Dark mode (color-scheme moves with the manual theme) */
 :root[data-theme="dark"] {
   color-scheme: dark;
-}
-
-/* Dark mode */
-:root[data-theme="dark"] {
   --bg-primary: #0b1220;
   --bg-secondary: #111a2b;
   --bg-tertiary: #17243a;

@@ -78,11 +78,7 @@ const QuizHeader: React.FC<Props> = ({
       >
         {t(confirmingExit ? "quiz.exitConfirm" : "quiz.exit")}
       </button>
-      {confirmingExit && (
-        <span className="sr-only" role="status">
-          {t("quiz.exitConfirm")}
-        </span>
-      )}
+      {confirmingExit && <output className="sr-only">{t("quiz.exitConfirm")}</output>}
     </div>
   );
 };

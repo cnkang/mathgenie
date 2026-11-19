@@ -34,7 +34,7 @@ const QuizPalette: React.FC<QuizPaletteProps> = ({ t, problems, currentIndex, on
   return (
     <details className="quiz-palette">
       <summary className="quiz-palette-toggle">{title}</summary>
-      <div className="quiz-palette-grid" role="group" aria-label={title}>
+      <fieldset className="quiz-palette-grid" aria-label={title}>
         {visible.map((problem, index) => {
           const state = stateOf(problem);
           const isCurrent = index === currentIndex;
@@ -54,7 +54,7 @@ const QuizPalette: React.FC<QuizPaletteProps> = ({ t, problems, currentIndex, on
             </button>
           );
         })}
-      </div>
+      </fieldset>
       {problems.length > MAX_PALETTE_ITEMS && (
         <p className="quiz-palette-note">
           {t("quiz.palette.truncated", { count: MAX_PALETTE_ITEMS })}
