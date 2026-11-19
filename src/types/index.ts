@@ -39,23 +39,6 @@ export interface Problem {
 }
 
 // Component Props interfaces
-export interface NumberInputProps {
-  id: string;
-  label?: string;
-  value: number;
-  onChange: (value: number) => void;
-  min?: number;
-  max?: number;
-  required?: boolean;
-  className?: string;
-  "data-testid"?: string;
-}
-
-export interface ProblemPreviewProps {
-  settings: Settings;
-  generateSampleProblem?: () => string;
-}
-
 export interface SettingsPresetsProps {
   onApplyPreset: (settings: Settings) => void;
   currentSettings?: Settings;

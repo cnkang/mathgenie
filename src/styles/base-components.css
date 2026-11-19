@@ -47,24 +47,6 @@ textarea:focus-visible {
   box-shadow: var(--focus-ring);
 }
 
-select[multiple],
-.operations-select {
-  min-height: 140px;
-  padding: var(--space-sm);
-}
-
-select[multiple] option,
-.operations-select option {
-  padding: var(--space-sm);
-  border-radius: 0;
-}
-
-/* Make the selected operations read as active, not disabled */
-select[multiple] option:checked {
-  color: var(--button-primary-text);
-  background-color: var(--button-primary-bg);
-}
-
 button {
   display: inline-flex;
   gap: var(--space-sm);
@@ -129,61 +111,6 @@ button:disabled:hover {
   border-radius: var(--radius-lg);
 }
 
-.range-inputs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-md);
-  align-items: center;
-}
-
-.range-inputs input {
-  flex: 1;
-  min-width: 120px;
-}
-
-.range-inputs span {
-  padding: 0 var(--space-sm);
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-
-.generate-btn,
-.download-btn,
-.quiz-mode-btn {
-  min-width: 160px;
-  min-height: 44px;
-}
-
-.download-btn {
-  color: var(--button-success-text);
-  background: var(--button-success-bg);
-}
-
-.download-btn:hover:not(:disabled) {
-  background: var(--button-success-hover-bg);
-}
-
-.quiz-mode-btn {
-  color: var(--button-warning-text);
-  background: var(--button-warning-bg);
-}
-
-.quiz-mode-btn:hover:not(:disabled) {
-  background: var(--button-warning-hover-bg);
-}
-
-.button-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-md);
-  justify-content: center;
-  margin: var(--space-xl) 0;
-}
-
-.button-group button {
-  min-width: 160px;
-}
-
 small,
 .help-text {
   display: block;
@@ -245,15 +172,6 @@ small,
 @media (width <= 768px) {
   .form-row {
     padding: var(--space-md);
-  }
-
-  .button-group {
-    flex-direction: column;
-  }
-
-  .button-group button {
-    width: 100%;
-    min-width: auto;
   }
 
   input,
