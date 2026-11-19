@@ -46,8 +46,9 @@ const GroupedProblemsDisplay: React.FC<GroupedProblemsDisplayProps> = ({
               start={groupStart + localStart + 1}
               aria-label={`${problemsListLabel} - ${getGroupTitle(groupIndex, t)}`}
             >
-              {group.map((p) => (
+              {group.map((p, index) => (
                 <li key={p.id} className="problem-item">
+                  <span className="problem-number">{groupStart + localStart + index + 1}</span>
                   <span className="problem-text">{p.text}</span>
                 </li>
               ))}

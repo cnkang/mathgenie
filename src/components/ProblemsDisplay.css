@@ -62,16 +62,6 @@
   box-shadow: var(--shadow-md, 0 4px 6px -1px rgb(0 0 0 / 10%), 0 2px 4px -2px rgb(0 0 0 / 10%));
 }
 
-.problems-container::before {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  height: 4px;
-  content: "";
-  background: linear-gradient(90deg, var(--primary-color, #4f46e5), var(--success-color, #10b981));
-}
-
 .problems-header {
   display: flex;
   flex-wrap: wrap;
@@ -141,46 +131,6 @@
   color: var(--error-color, #ef4444);
 }
 
-.problems-title {
-  display: flex;
-  gap: var(--space-sm, 0.5rem);
-  align-items: center;
-  margin: 0;
-  font-size: var(--font-size-xl, 1.25rem);
-  font-weight: 600;
-  color: var(--text-primary, #1e293b);
-}
-
-.problems-stats {
-  display: flex;
-  gap: var(--space-lg, 1.5rem);
-  align-items: center;
-  font-size: var(--font-size-sm, 0.875rem);
-  color: var(--text-secondary, #64748b);
-}
-
-.problems-stat {
-  display: flex;
-  gap: var(--space-xs, 0.25rem);
-  align-items: center;
-  min-width: 44px;
-
-  /* WCAG 2.2 AAA: Minimum 44px touch target */
-  min-height: 44px;
-  padding: var(--space-md, 1rem) var(--space-lg, 1.5rem);
-  background: var(--bg-primary, #fff);
-  border: 1px solid var(--border-color, #e2e8f0);
-  border-radius: var(--radius-md, 0.5rem);
-  transition: border-color var(--transition-fast);
-}
-
-.problems-stat.success-indicator {
-  color: var(--success-dark, #065f46);
-  background: var(--success-light, #dcfce7);
-  border-color: var(--success-color, #10b981);
-  animation: fadeInSuccess 0.5s ease-out;
-}
-
 /* Modern scrollbar styles */
 .problems-content {
   position: relative;
@@ -235,6 +185,7 @@
   position: relative;
   box-sizing: border-box;
   display: flex;
+  gap: var(--space-sm, 0.5rem);
   align-items: center;
   justify-content: center;
   width: 100%;
@@ -252,6 +203,17 @@
   border: 2px solid var(--border-color, #e2e8f0);
   border-radius: var(--radius-md, 0.5rem);
   transition: border-color var(--transition-fast);
+}
+
+/* Visible numbering: grid items suppress the ol ::marker, so the number
+   is rendered explicitly (matches copy/PDF numbering). */
+.problem-number {
+  flex-shrink: 0;
+  min-width: 2.5ch;
+  font-size: var(--font-size-sm, 0.875rem);
+  font-weight: 600;
+  color: var(--text-muted, #334155);
+  text-align: right;
 }
 
 .no-problems {
@@ -468,31 +430,6 @@
 }
 
 /* Loading animation */
-.problems-loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-2xl, 3rem);
-  color: var(--text-secondary, #64748b);
-}
-
-.loading-spinner {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  margin-right: var(--space-sm, 0.5rem);
-  border: 2px solid var(--border-color, #e2e8f0);
-  border-top-color: var(--primary-color, #4f46e5);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 /* Grouping styles */
 .grouping-info {
   margin: 0;
@@ -521,30 +458,6 @@
   background: var(--primary-light, #e0e7ff);
   border: 1px solid var(--primary-color, #4f46e5);
   border-radius: var(--radius-md, 0.5rem);
-}
-
-.group-title::before {
-  content: "#";
-  font-size: var(--font-size-sm, 0.875rem);
-  font-weight: 700;
-}
-
-@keyframes fadeInSuccess {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .problems-stat.success-indicator {
-    animation: none;
-  }
 }
 
 .problems-pagination {

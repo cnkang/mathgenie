@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useProgressBar } from "../hooks/useProgressBar";
 import { useTranslation } from "../i18n";
 import type { Problem, QuizResult, Settings } from "../types";
+import { safeStorage } from "../utils/safeStorage";
 import "./InfoPanel.css";
 
 interface InfoPanelProps {
@@ -9,6 +10,33 @@ interface InfoPanelProps {
   settings: Settings;
   quizResult?: QuizResult | null;
 }
+
+const SESSION_STATS_KEY = "mathgenie-session-stats";
+
+type SessionStats = {
+  totalGenerated: number;
+  sessionsCount: number;
+};
+
+const readStoredStats = (): SessionStats => {
+  const raw = safeStorage.get(SESSION_STATS_KEY);
+  if (raw) {
+    try {
+      const parsed: unknown = JSON.parse(raw);
+      if (
+        typeof parsed === "object" &&
+        parsed !== null &&
+        typeof (parsed as SessionStats).totalGenerated === "number" &&
+        typeof (parsed as SessionStats).sessionsCount === "number"
+      ) {
+        return parsed as SessionStats;
+      }
+    } catch {
+      /* Corrupt storage: start fresh. */
+    }
+  }
+  return { totalGenerated: 0, sessionsCount: 0 };
+};
 
 // Extracted to top-level to avoid redefining on each render (Sonar S6478)
 const ProgressBar: React.FC<{ value: number }> = ({ value }) => {
@@ -53,10 +81,7 @@ const TrophyIcon: React.FC = () => (
 
 const InfoPanel: React.FC<InfoPanelProps> = ({ problems, settings, quizResult }) => {
   const { t } = useTranslation();
-  const [sessionStats, setSessionStats] = useState({
-    totalGenerated: 0,
-    sessionsCount: 0,
-  });
+  const [sessionStats, setSessionStats] = useState<SessionStats>(readStoredStats);
   // Track previous problems reference to avoid double-counting on remount
   const prevProblemsRef = useRef<Problem[]>([]);
 
@@ -70,6 +95,11 @@ const InfoPanel: React.FC<InfoPanelProps> = ({ problems, settings, quizResult })
       }));
     }
   }, [problems]);
+
+  // Persist lifetime generation stats so "Total Generated" survives reloads.
+  useEffect(() => {
+    safeStorage.set(SESSION_STATS_KEY, JSON.stringify(sessionStats));
+  }, [sessionStats]);
 
   interface StatsResult {
     totalProblems: number;

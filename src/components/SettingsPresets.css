@@ -13,17 +13,6 @@
   box-shadow: var(--shadow-md);
 }
 
-.settings-presets::before {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  height: 4px;
-  content: "";
-  background: linear-gradient(90deg, var(--primary-color), var(--success-color));
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-}
-
 .settings-presets h2 {
   margin: 0;
   font-size: var(--font-size-xl);
