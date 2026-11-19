@@ -98,11 +98,12 @@ export const useQuizController = (
     setShowResults(true);
     latest.current.onQuizComplete(result);
   }, []);
-  // Returning to an answered final problem must still allow completion.
+  // Manual navigation may interrupt the feedback timer after the final answer.
   useEffect(() => {
     if (
-      currentProblemIndex === state.current.length - 1 &&
-      state.current[currentProblemIndex]?.isAnswered
+      !finished.current &&
+      state.current.length > 0 &&
+      state.current.every((problem) => problem.isAnswered)
     ) {
       cancelAdvance();
       setIsAdvancing(true);
@@ -138,21 +139,24 @@ export const useQuizController = (
       pending.current = setTimeout(() => {
         pending.current = null;
         setIsAdvancing(false);
-        if (currentProblemIndex < updated.length - 1) {
-          setCurrentProblemIndex(currentProblemIndex + 1);
-          return;
-        }
-        finishQuiz();
+        const next = updated.findIndex(
+          (item, index) => index > currentProblemIndex && !item.isAnswered,
+        );
+        const unanswered = next >= 0 ? next : updated.findIndex((item) => !item.isAnswered);
+        if (unanswered < 0) finishQuiz();
+        else setCurrentProblemIndex(unanswered);
       }, 1500);
     },
     [currentProblemIndex, cancelAdvance, finishQuiz],
   );
 
   const goToPrevious = useCallback(() => {
+    if (indexRef.current === 0) return;
     cancelAdvance();
     setCurrentProblemIndex((index) => Math.max(0, index - 1));
   }, [cancelAdvance]);
   const goToNext = useCallback(() => {
+    if (indexRef.current >= state.current.length - 1) return;
     cancelAdvance();
     setCurrentProblemIndex((index) => Math.min(state.current.length - 1, index + 1));
   }, [cancelAdvance]);
