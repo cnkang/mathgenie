@@ -71,6 +71,23 @@ const vpConfig = {
   },
   plugins: [
     serviceWorkerPlugin(),
+    {
+      name: "jspdf-unused-html-plugins",
+      apply: "serve",
+      enforce: "pre",
+      // Like the production externals, this keeps jsPDF's unused HTML renderer
+      // out of the worksheet download path when optional packages are absent.
+      resolveId(id, importer) {
+        if (jspdfOptionalHtmlDeps.includes(id) && importer?.includes("/jspdf")) {
+          return `\0jspdf-unused-html:${id}`;
+        }
+      },
+      load(id) {
+        if (id.startsWith("\0jspdf-unused-html:")) {
+          return 'throw new Error("The jsPDF HTML renderer is unavailable"); export default null;';
+        }
+      },
+    },
     react({
       jsxRuntime: "automatic",
       jsxImportSource: undefined,
