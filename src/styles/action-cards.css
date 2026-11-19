@@ -267,40 +267,6 @@ button.action-card:active {
   color: var(--text-muted);
 }
 
-/* Desktop layout optimizations */
-@media (width >= 1200px) {
-  .desktop-action-grid {
-    grid-template-columns: 1fr;
-    gap: var(--space-sm);
-    margin: var(--space-md) 0;
-  }
-
-  .desktop-action-grid .action-card {
-    min-width: 100%;
-    max-width: none;
-    min-height: 80px;
-  }
-
-  .desktop-action-grid .action-card-content {
-    gap: var(--space-sm);
-    padding: var(--space-md);
-  }
-
-  .desktop-action-grid .action-icon {
-    font-size: 1.5rem;
-  }
-
-  .desktop-action-grid .action-text h3 {
-    margin-bottom: var(--space-xs);
-    font-size: var(--font-size-base);
-  }
-
-  .desktop-action-grid .action-text p {
-    font-size: var(--font-size-xs);
-    line-height: 1.3;
-  }
-}
-
 /* WCAG 2.2 AAA: Responsive design */
 @media (width <= 1199px) {
   .action-cards-grid {
