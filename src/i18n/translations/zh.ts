@@ -10,7 +10,7 @@ export default {
     subtraction: "减法 (-)",
     multiplication: "乘法 (×)",
     division: "除法 (÷)",
-    help: "按住 Ctrl/Cmd 键选择多个运算",
+    help: "点击切换各运算的选中状态",
   },
   settings: {
     numProblems: "题目数量",
@@ -121,6 +121,8 @@ export default {
     },
   },
   accessibility: {
+    decreaseValue: "减小数值",
+    increaseValue: "增大数值",
     selectOperations: "选择要包含的数学运算",
     numProblemsInput: "要生成的题目数量",
     enableGroupingLabel: "启用分组模式",
@@ -153,6 +155,12 @@ export default {
     pdfSettingsExpanded: "PDF设置已展开",
     pdfSettingsCollapsed: "PDF设置已折叠",
     pdfSettingsDesc: "PDF导出设置，包括字体大小、行间距和纸张大小选项",
+  },
+  theme: {
+    label: "主题",
+    light: "浅色",
+    dark: "深色",
+    system: "跟随系统",
   },
   language: {
     select: "语言",
@@ -189,6 +197,17 @@ export default {
     info: "基于当前设置的示例题目",
   },
   quiz: {
+    finishEarly: "提前交卷",
+    exitConfirm: "确认退出？",
+    keyboardHint: "提示：用 ← / → 切换题目",
+    palette: {
+      title: "跳题（已答 {{answered}}/{{total}}）",
+      correct: "答对",
+      incorrect: "答错",
+      unanswered: "未作答",
+      jumpLabel: "第 {{number}} 题，{{state}}",
+      truncated: "仅显示前 {{count}} 题",
+    },
     loading: "准备答题中...",
     exit: "退出",
     previousProblem: "← 上一题",
@@ -242,7 +261,7 @@ export default {
       expert: "专家",
     },
     progress: {
-      title: "学习进度",
+      title: "生成目标",
       completed: "已完成 {{percent}}% (目标: 100题)",
     },
     quickActions: {

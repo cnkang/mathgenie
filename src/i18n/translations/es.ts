@@ -10,7 +10,7 @@ export default {
     subtraction: "Resta (-)",
     multiplication: "Multiplicación (×)",
     division: "División (÷)",
-    help: "Mantén presionado Ctrl/Cmd para seleccionar múltiples operaciones",
+    help: "Toca para activar o desactivar cada operación",
   },
   settings: {
     numProblems: "Número de Problemas",
@@ -130,6 +130,8 @@ export default {
     },
   },
   accessibility: {
+    decreaseValue: "Disminuir valor",
+    increaseValue: "Aumentar valor",
     selectOperations: "Seleccionar operaciones matemáticas a incluir",
     numProblemsInput: "Número de problemas a generar",
     enableGroupingLabel: "Habilitar modo de agrupación",
@@ -164,6 +166,12 @@ export default {
       "Configuración de exportación PDF incluyendo tamaño de fuente, espaciado de líneas y opciones de tamaño de papel",
     dismissMessage: "Descartar mensaje",
     problemsList: "Lista de problemas matemáticos generados",
+  },
+  theme: {
+    label: "Tema",
+    light: "Claro",
+    dark: "Oscuro",
+    system: "Sistema",
   },
   language: {
     select: "Idioma",
@@ -200,6 +208,17 @@ export default {
     info: "Problemas de muestra basados en la configuración actual",
   },
   quiz: {
+    finishEarly: "Terminar",
+    exitConfirm: "¿Confirmar salida?",
+    keyboardHint: "Consejo: usa ← / → para moverte entre problemas",
+    palette: {
+      title: "Ir a la pregunta ({{answered}}/{{total}} respondidas)",
+      correct: "correcta",
+      incorrect: "incorrecta",
+      unanswered: "sin responder",
+      jumpLabel: "Pregunta {{number}}, {{state}}",
+      truncated: "Mostrando solo las primeras {{count}} preguntas",
+    },
     loading: "Preparando cuestionario...",
     exit: "Salir",
     previousProblem: "← Anterior",
@@ -253,7 +272,7 @@ export default {
       expert: "Experto",
     },
     progress: {
-      title: "Progreso de Aprendizaje",
+      title: "Objetivo de generación",
       completed: "Completado {{percent}}% (Meta: 100 problemas)",
     },
     quickActions: {

@@ -10,7 +10,7 @@ export default {
     subtraction: "引き算 (-)",
     multiplication: "かけ算 (×)",
     division: "わり算 (÷)",
-    help: "Ctrl/Cmdキーを押しながら複数の演算を選択",
+    help: "タップして各演算のオン・オフを切り替え",
   },
   settings: {
     numProblems: "問題数",
@@ -123,6 +123,8 @@ export default {
     },
   },
   accessibility: {
+    decreaseValue: "値を減らす",
+    increaseValue: "値を増やす",
     selectOperations: "含める数学演算を選択",
     numProblemsInput: "生成する問題数",
     enableGroupingLabel: "グループ化モードを有効にする",
@@ -155,6 +157,12 @@ export default {
     pdfSettingsExpanded: "PDF設定が展開されました",
     pdfSettingsCollapsed: "PDF設定が折りたたまれました",
     pdfSettingsDesc: "フォントサイズ、行間、用紙サイズオプションを含むPDFエクスポート設定",
+  },
+  theme: {
+    label: "テーマ",
+    light: "ライト",
+    dark: "ダーク",
+    system: "システム",
   },
   language: {
     select: "言語",
@@ -191,6 +199,17 @@ export default {
     info: "現在の設定に基づくサンプル問題",
   },
   quiz: {
+    finishEarly: "終了する",
+    exitConfirm: "終了しますか？",
+    keyboardHint: "ヒント: ← / → キーで問題を移動",
+    palette: {
+      title: "問題へジャンプ（回答済み {{answered}}/{{total}}）",
+      correct: "正解",
+      incorrect: "不正解",
+      unanswered: "未回答",
+      jumpLabel: "第 {{number}} 問、{{state}}",
+      truncated: "先頭の {{count}} 問のみ表示",
+    },
     loading: "クイズを準備中...",
     exit: "終了",
     previousProblem: "← 前へ",
@@ -244,7 +263,7 @@ export default {
       expert: "エキスパート",
     },
     progress: {
-      title: "学習進度",
+      title: "生成目標",
       completed: "完了 {{percent}}% (目標: 100問)",
     },
     quickActions: {

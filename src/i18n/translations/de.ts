@@ -10,7 +10,7 @@ export default {
     subtraction: "Subtraktion (-)",
     multiplication: "Multiplikation (×)",
     division: "Division (÷)",
-    help: "Halten Sie Strg/Cmd gedrückt, um mehrere Operationen auszuwählen",
+    help: "Tippen, um jede Operation ein- oder auszuschalten",
   },
   settings: {
     numProblems: "Anzahl der Aufgaben",
@@ -130,6 +130,8 @@ export default {
     },
   },
   accessibility: {
+    decreaseValue: "Wert verringern",
+    increaseValue: "Wert erhöhen",
     selectOperations: "Mathematische Operationen zum Einschließen auswählen",
     numProblemsInput: "Anzahl der zu generierenden Aufgaben",
     enableGroupingLabel: "Gruppierungsmodus aktivieren",
@@ -164,6 +166,12 @@ export default {
       "PDF-Exporteinstellungen einschließlich Schriftgröße, Zeilenabstand und Papiergrößenoptionen",
     dismissMessage: "Meldung schließen",
     problemsList: "Liste der generierten Mathematikaufgaben",
+  },
+  theme: {
+    label: "Design",
+    light: "Hell",
+    dark: "Dunkel",
+    system: "System",
   },
   language: {
     select: "Sprache",
@@ -200,6 +208,17 @@ export default {
     info: "Beispielaufgaben basierend auf aktuellen Einstellungen",
   },
   quiz: {
+    finishEarly: "Beenden",
+    exitConfirm: "Beenden bestätigen?",
+    keyboardHint: "Tipp: Mit ← / → zwischen Aufgaben wechseln",
+    palette: {
+      title: "Zu Aufgabe springen ({{answered}}/{{total}} beantwortet)",
+      correct: "richtig",
+      incorrect: "falsch",
+      unanswered: "unbeantwortet",
+      jumpLabel: "Aufgabe {{number}}, {{state}}",
+      truncated: "Nur die ersten {{count}} Aufgaben werden angezeigt",
+    },
     loading: "Quiz wird vorbereitet...",
     exit: "Beenden",
     previousProblem: "← Vorherige",
@@ -253,7 +272,7 @@ export default {
       expert: "Experte",
     },
     progress: {
-      title: "Lernfortschritt",
+      title: "Generierungsziel",
       completed: "{{percent}}% abgeschlossen (Ziel: 100 Aufgaben)",
     },
     quickActions: {
