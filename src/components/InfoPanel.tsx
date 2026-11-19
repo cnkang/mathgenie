@@ -32,9 +32,9 @@ const isValidCount = (value: unknown): value is number =>
 /**
  * Read persisted stats. Accepts the current format and legacy records
  * (no lastCountedGeneration); negative/nonfinite totals are rejected.
- * Legacy records adopt the current explicit-generation counter as their
- * cursor so the auto-generated batch on load is not counted as explicit.
- * A missing or corrupt record starts fresh with cursor 0.
+ * Records without a cursor (legacy or missing field) adopt the current
+ * explicit-generation counter, as do missing/corrupt records, so the
+ * batch auto-generated on load is never miscounted as explicit.
  */
 const readStoredStats = (legacyCursor: number): SessionStats => {
   const raw = safeStorage.get(SESSION_STATS_KEY);
@@ -54,10 +54,10 @@ const readStoredStats = (legacyCursor: number): SessionStats => {
         }
       }
     } catch {
-      /* Corrupt storage: start fresh. */
+      /* Corrupt storage: fall through to a fresh cursor. */
     }
   }
-  return { totalGenerated: 0, sessionsCount: 0, lastCountedGeneration: 0 };
+  return { totalGenerated: 0, sessionsCount: 0, lastCountedGeneration: legacyCursor };
 };
 
 // Extracted to top-level to avoid redefining on each render (Sonar S6478)
@@ -114,7 +114,9 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
 
   useEffect(() => {
     // Count a batch only when it came from an explicit generation the user
-    // has not been credited for yet, and never the same array twice.
+    // has not been credited for yet, and never the same array twice. The
+    // cursor jumps to the current counter on credit so uncredited clicks
+    // (validation failures) leave no lag for auto batches to slip into.
     if (
       problems.length > 0 &&
       explicitGenerations > sessionStats.lastCountedGeneration &&
@@ -124,7 +126,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
       setSessionStats((prev) => ({
         totalGenerated: prev.totalGenerated + problems.length,
         sessionsCount: prev.sessionsCount + 1,
-        lastCountedGeneration: prev.lastCountedGeneration + 1,
+        lastCountedGeneration: explicitGenerations,
       }));
     }
   }, [problems, explicitGenerations, sessionStats.lastCountedGeneration]);
