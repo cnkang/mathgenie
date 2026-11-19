@@ -167,6 +167,138 @@
   box-shadow: none;
 }
 
+/* During the auto-advance window the Next button doubles as an explicit
+   "skip the wait" affordance: give it the primary fill so it is findable. */
+.nav-btn.nav-btn-urgent {
+  color: var(--button-primary-text);
+  background: var(--button-primary-bg);
+  border-color: var(--button-primary-bg);
+}
+
+.nav-btn.nav-btn-urgent:hover:not(:disabled) {
+  color: var(--button-primary-text);
+  background: var(--button-primary-hover-bg);
+  border-color: var(--button-primary-hover-bg);
+}
+
+.finish-btn {
+  max-width: 180px;
+}
+
+.quiz-keyboard-hint {
+  margin-top: var(--space-sm);
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+@media (hover: none) {
+  .quiz-keyboard-hint {
+    display: none;
+  }
+}
+
+/* Question palette */
+.quiz-palette {
+  margin-bottom: var(--space-lg);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+.quiz-palette-toggle {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  list-style: none;
+}
+
+.quiz-palette-toggle::-webkit-details-marker {
+  display: none;
+}
+
+.quiz-palette-toggle::after {
+  margin-left: auto;
+  content: "▾";
+  transition: transform var(--transition-fast);
+}
+
+.quiz-palette[open] .quiz-palette-toggle::after {
+  transform: rotate(180deg);
+}
+
+.quiz-palette-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(2.75rem, 1fr));
+  gap: var(--space-xs);
+  padding: 0 var(--space-md) var(--space-md);
+}
+
+.palette-item {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+}
+
+.palette-item:hover {
+  background: var(--bg-accent);
+  border-color: var(--border-hover);
+  box-shadow: none;
+  transform: none;
+}
+
+.palette-item.correct {
+  color: var(--success-color);
+  background: var(--success-light);
+  border-color: var(--success-color);
+}
+
+.palette-item.incorrect {
+  color: var(--text-error);
+  background: var(--error-light);
+  border-color: var(--error-color);
+}
+
+.palette-item.current {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 1px;
+}
+
+.quiz-palette-note {
+  margin: 0;
+  padding: 0 var(--space-md) var(--space-md);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+/* Two-step exit confirmation pulse */
+.exit-confirming {
+  animation: exit-pulse 1s ease-in-out infinite;
+}
+
+@keyframes exit-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.65;
+  }
+}
+
 /* Interactive Problem Styles */
 .interactive-problem {
   padding: var(--space-xl);
@@ -174,11 +306,26 @@
   background: var(--bg-secondary);
   border: 2px solid var(--border-color);
   border-radius: var(--radius-lg);
+  /* Keyed remount per problem: a short bridge so content does not teleport.
+     Kept under 200ms because advancing is frequent within a quiz session. */
+  animation: problem-enter 160ms ease-out;
   transition:
     background-color var(--transition-spring),
     border-color var(--transition-spring),
     box-shadow var(--transition-spring),
     transform var(--transition-spring);
+}
+
+@keyframes problem-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .interactive-problem.correct {
@@ -329,6 +476,7 @@
 }
 
 .results-header {
+  position: relative;
   margin-bottom: var(--space-xl);
   text-align: center;
 }
@@ -375,6 +523,50 @@
   background: linear-gradient(135deg, var(--button-primary-bg), var(--button-success-bg));
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
+  animation: grade-pop 350ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes grade-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Perfect-score confetti: short, deterministic, pointer-transparent.
+   The global reduced-motion rule collapses it to an instant no-op. */
+.confetti-burst {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -12px;
+  width: 8px;
+  height: 12px;
+  border-radius: 2px;
+  opacity: 0;
+  animation: confetti-fall 1.8s ease-in forwards;
+}
+
+@keyframes confetti-fall {
+  0% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(240px) rotate(280deg);
+  }
 }
 
 .results-details {
@@ -396,22 +588,32 @@
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  transition:
-    transform var(--transition-spring),
-    box-shadow var(--transition-fast);
+  animation: stat-enter 300ms ease-out both;
 }
 
-.stat-item:hover {
-  box-shadow: var(--shadow-lift);
-  transform: translateY(-2px);
+/* Staggered entrance for the results summary (rare, celebratory moment). */
+.result-stats .stat-item:nth-child(2) {
+  animation-delay: 40ms;
 }
 
-.stat-item:active {
-  transform: scale(0.97);
-  box-shadow: var(--shadow-pressed);
-  transition:
-    transform var(--transition-press),
-    box-shadow var(--transition-press);
+.result-stats .stat-item:nth-child(3) {
+  animation-delay: 80ms;
+}
+
+.result-stats .stat-item:nth-child(4) {
+  animation-delay: 120ms;
+}
+
+@keyframes stat-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .stat-icon {
