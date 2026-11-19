@@ -13,13 +13,13 @@ import PerformanceMonitor from "./components/PerformanceMonitor";
 import TranslationLoader from "./components/TranslationLoader";
 import { useAppHandlers, usePdfDownload, useQuizHandlers } from "@/hooks/useAppLogic";
 import { useAppMessages } from "./hooks/useAppMessages";
+import { recordGeneratedProblems } from "./hooks/useGenerationStats";
 import { useMediaQuery } from "./hooks/useMediaQuery";
 import { useProblemGenerator } from "./hooks/useProblemGenerator";
 import { useSettings } from "./hooks/useSettings";
 import { useSettingsValidation } from "./hooks/useSettingsValidation";
 import { useTranslation } from "./i18n";
 import { saveQuizResult } from "@/utils/resultsStorage";
-import { safeStorage } from "@/utils/safeStorage";
 import type { PaperSizeOptions, QuizResult } from "./types";
 import { setupWCAGEnforcement } from "./utils/wcagEnforcement";
 const QuizMode = React.lazy(() => import("./components/QuizMode"));
@@ -31,7 +31,12 @@ const paperSizeOptions: PaperSizeOptions = { a4: "a4", letter: "letter", legal: 
 function App(): React.JSX.Element {
   const { t, isLoading } = useTranslation();
   const { settings, setSettings, validateSettings } = useSettings();
-  const generation = useProblemGenerator(settings, isLoading, validateSettings);
+  const generation = useProblemGenerator(
+    settings,
+    isLoading,
+    validateSettings,
+    recordGeneratedProblems,
+  );
   const { problems } = generation;
   const {
     error,
@@ -48,19 +53,6 @@ function App(): React.JSX.Element {
   const [isQuizMode, setIsQuizMode] = useState(false);
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
-  // Explicit generations only: settings edits auto-regenerate problems but
-  // must not inflate the lifetime stats shown in InfoPanel. The counter is
-  // persisted so it survives reloads and stays in sync with the stats cursor.
-  const [explicitGenerations, setExplicitGenerations] = useState<number>(() => {
-    const stored = safeStorage.get("mathgenie-explicit-generations");
-    if (stored !== null) {
-      const parsed = Number.parseInt(stored, 10);
-      if (Number.isFinite(parsed) && parsed >= 0) {
-        return parsed;
-      }
-    }
-    return 0;
-  });
   const formHandlers = useAppHandlers({
     settings,
     setSettings,
@@ -107,14 +99,6 @@ function App(): React.JSX.Element {
   }, [download, isDownloading]);
   const handleGenerate = useCallback(() => {
     clearMessages();
-    // Functional update: rapid double clicks each get their own increment.
-    // The storage write inside the updater is idempotent, which makes it
-    // safe under StrictMode's double-invoked updaters.
-    setExplicitGenerations((prev) => {
-      const next = prev + 1;
-      safeStorage.set("mathgenie-explicit-generations", String(next));
-      return next;
-    });
     generation.generateProblems();
   }, [clearMessages, generation.generateProblems]);
   const onQuizComplete = useCallback(
@@ -201,12 +185,7 @@ function App(): React.JSX.Element {
                     </div>
                   )}
                   <ProblemsSection t={t} problems={problems} settings={settings} />
-                  <InfoPanel
-                    problems={problems}
-                    settings={settings}
-                    quizResult={quizResult}
-                    explicitGenerations={explicitGenerations}
-                  />
+                  <InfoPanel problems={problems} settings={settings} quizResult={quizResult} />
                 </div>
               </div>
             )}

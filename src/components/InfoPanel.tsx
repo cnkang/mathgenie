@@ -1,66 +1,15 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
+import { useGeneratedTotal } from "../hooks/useGenerationStats";
 import { useProgressBar } from "../hooks/useProgressBar";
 import { useTranslation } from "../i18n";
 import type { Problem, QuizResult, Settings } from "../types";
-import { safeStorage } from "../utils/safeStorage";
 import "./InfoPanel.css";
 
 interface InfoPanelProps {
   problems: Problem[];
   settings: Settings;
   quizResult?: QuizResult | null;
-  /** Monotonic counter of explicit user generations (App-owned). Settings
-   * edits auto-regenerate problems but must not inflate lifetime stats. */
-  explicitGenerations?: number;
 }
-
-const SESSION_STATS_KEY = "mathgenie-session-stats";
-
-type SessionStats = {
-  totalGenerated: number;
-  sessionsCount: number;
-  lastCountedGeneration: number;
-};
-
-// Module-level so remounts (e.g. leaving and re-entering quiz mode) cannot
-// count the same problem batch twice; WeakSet keeps no arrays alive.
-const countedBatches = new WeakSet<Problem[]>();
-
-const isValidCount = (value: unknown): value is number =>
-  typeof value === "number" && Number.isFinite(value) && value >= 0;
-
-/**
- * Read persisted stats. Accepts the current format and legacy records
- * (no lastCountedGeneration); negative/nonfinite totals are rejected.
- * Records without a cursor (legacy or missing field) adopt the current
- * explicit-generation counter, as do missing/corrupt records, so the
- * batch auto-generated on load is never miscounted as explicit. A stored
- * cursor above the restored counter is clamped so crediting cannot be
- * suppressed by a stale or lost counter key.
- */
-const readStoredStats = (legacyCursor: number): SessionStats => {
-  const raw = safeStorage.get(SESSION_STATS_KEY);
-  if (raw) {
-    try {
-      const parsed: unknown = JSON.parse(raw);
-      if (typeof parsed === "object" && parsed !== null) {
-        const candidate = parsed as Partial<SessionStats>;
-        if (isValidCount(candidate.totalGenerated) && isValidCount(candidate.sessionsCount)) {
-          return {
-            totalGenerated: candidate.totalGenerated,
-            sessionsCount: candidate.sessionsCount,
-            lastCountedGeneration: isValidCount(candidate.lastCountedGeneration)
-              ? Math.min(candidate.lastCountedGeneration, legacyCursor)
-              : legacyCursor,
-          };
-        }
-      }
-    } catch {
-      /* Corrupt storage: fall through to a fresh cursor. */
-    }
-  }
-  return { totalGenerated: 0, sessionsCount: 0, lastCountedGeneration: legacyCursor };
-};
 
 // Extracted to top-level to avoid redefining on each render (Sonar S6478)
 const ProgressBar: React.FC<{ value: number }> = ({ value }) => {
@@ -103,48 +52,9 @@ const TrophyIcon: React.FC = () => (
   </svg>
 );
 
-const InfoPanel: React.FC<InfoPanelProps> = ({
-  problems,
-  settings,
-  quizResult,
-  explicitGenerations = 0,
-}) => {
+const InfoPanel: React.FC<InfoPanelProps> = ({ problems, settings, quizResult }) => {
   const { t } = useTranslation();
-  const [sessionStats, setSessionStats] = useState<SessionStats>(() =>
-    readStoredStats(explicitGenerations),
-  );
-  // The batch present at mount is "already seen": only arrays arriving in
-  // later renders are eligible for credit, so a click that produces no new
-  // batch (validation failure) can never credit what is already on screen,
-  // and the auto-generated batch after a reload is never miscounted.
-  const prevProblemsRef = useRef<Problem[]>(problems);
-
-  useEffect(() => {
-    const isNewArrival = problems !== prevProblemsRef.current;
-    prevProblemsRef.current = problems;
-    // Credit only a newly arrived batch from an explicit generation the
-    // user has not been credited for yet, and never the same array twice.
-    // The cursor jumps to the current counter on credit so uncredited
-    // clicks leave no lag for auto batches to slip into.
-    if (
-      problems.length > 0 &&
-      isNewArrival &&
-      explicitGenerations > sessionStats.lastCountedGeneration &&
-      !countedBatches.has(problems)
-    ) {
-      countedBatches.add(problems);
-      setSessionStats((prev) => ({
-        totalGenerated: prev.totalGenerated + problems.length,
-        sessionsCount: prev.sessionsCount + 1,
-        lastCountedGeneration: explicitGenerations,
-      }));
-    }
-  }, [problems, explicitGenerations, sessionStats.lastCountedGeneration]);
-
-  // Persist lifetime generation stats so "Total Generated" survives reloads.
-  useEffect(() => {
-    safeStorage.set(SESSION_STATS_KEY, JSON.stringify(sessionStats));
-  }, [sessionStats]);
+  const totalGenerated = useGeneratedTotal();
 
   interface StatsResult {
     totalProblems: number;
@@ -189,7 +99,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
   };
 
   const stats = calculateStats();
-  const learningProgress = Math.min((sessionStats.totalGenerated / 100) * 100, 100);
+  const learningProgress = Math.min(totalGenerated, 100);
 
   return (
     <div className="info-panel">
@@ -211,9 +121,9 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
 
         <div
           className="stat-card"
-          aria-label={`${t("infoPanel.stats.totalGenerated")}: ${sessionStats.totalGenerated}`}
+          aria-label={`${t("infoPanel.stats.totalGenerated")}: ${totalGenerated}`}
         >
-          <span className="stat-value">{sessionStats.totalGenerated}</span>
+          <span className="stat-value">{totalGenerated}</span>
           <div className="stat-label">{t("infoPanel.stats.totalGenerated")}</div>
         </div>
 

@@ -1,4 +1,4 @@
-import { generateStructuredProblem } from "@/domain/generation";
+import { createProblemGenerator } from "@/domain/generation";
 import { validateSettings } from "@/domain/settings";
 import { calculateActualTotalProblems } from "@/utils/groupingUtils";
 import type { Problem, Settings } from "@/types";
@@ -13,8 +13,9 @@ self.onmessage = (event: MessageEvent<Settings>) => {
   const maxAttempts = Math.max(1, Math.min(10000, Math.floor(1000000 / total)));
   const problems: Problem[] = [];
   try {
+    const nextProblem = createProblemGenerator(settings, maxAttempts);
     for (let index = 0; index < total; index++) {
-      const problem = generateStructuredProblem(settings, maxAttempts);
+      const problem = nextProblem();
       if (problem) problems.push({ ...problem, id: problems.length });
       if (index % 100 === 0) self.postMessage({ progress: Math.floor((index / total) * 100) });
     }

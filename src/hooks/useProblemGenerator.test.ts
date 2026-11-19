@@ -1,4 +1,5 @@
 import type { Settings } from "@/types";
+import { validateSettings as validate } from "@/domain/settings";
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 import { act, renderHook } from "../../tests/helpers/testUtils";
 import { calculateExpression, generateProblem, useProblemGenerator } from "./useProblemGenerator";
@@ -76,6 +77,28 @@ describe("useProblemGenerator hook", () => {
     problemsPerGroup: 20,
     totalGroups: 1,
   };
+
+  it("credits accepted explicit batches only and hides a worksheet after its settings change", () => {
+    const credit = vi.fn();
+    const { result, rerender } = renderHook(
+      (settings: Settings) => useProblemGenerator(settings, false, validate, credit),
+      { initialProps: baseSettings },
+    );
+    expect(result.current.problems).toHaveLength(2);
+    expect(credit).not.toHaveBeenCalled();
+
+    const impossible: Settings = { ...baseSettings, resultRange: [100, 200] };
+    rerender(impossible);
+    expect(result.current.problems).toHaveLength(0);
+    act(() => result.current.generateProblems());
+    expect(credit).not.toHaveBeenCalled();
+
+    rerender(baseSettings);
+    expect(result.current.problems).toHaveLength(2);
+    expect(credit).not.toHaveBeenCalled();
+    act(() => result.current.generateProblems());
+    expect(credit).toHaveBeenCalledExactlyOnceWith(2);
+  });
 
   it("generates problems and returns success message", () => {
     const validateSettings = vi.fn(() => "");
