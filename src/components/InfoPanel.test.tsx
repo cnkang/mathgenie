@@ -188,6 +188,44 @@ describe("InfoPanel", { concurrent: false }, () => {
     expect(screen.getAllByLabelText("Total Generated: 40")[0]).toBeInTheDocument();
   });
 
+  test("a stored cursor above the counter does not suppress crediting", () => {
+    // Counter key lost/corrupt while the stats record survived: the stale
+    // cursor must be clamped so the very next generation is credited.
+    localStorage.setItem(
+      "mathgenie-session-stats",
+      JSON.stringify({ totalGenerated: 40, sessionsCount: 2, lastCountedGeneration: 5 }),
+    );
+    const { rerender } = render(<InfoPanel problems={[]} settings={mockSettings} />);
+    expect(screen.getAllByLabelText("Total Generated: 40")[0]).toBeInTheDocument();
+
+    const batch = [{ id: 1, text: "2 + 2 = " }];
+    rerender(<InfoPanel problems={batch} settings={mockSettings} explicitGenerations={1} />);
+    expect(screen.getAllByLabelText("Total Generated: 41")[0]).toBeInTheDocument();
+  });
+
+  test("a click that produces no batch does not credit what is already on screen", () => {
+    const { rerender } = render(<InfoPanel problems={[]} settings={mockSettings} />);
+    const batch = [{ id: 1, text: "2 + 2 = " }];
+    rerender(<InfoPanel problems={batch} settings={mockSettings} explicitGenerations={1} />);
+    expect(screen.getAllByLabelText("Total Generated: 1")[0]).toBeInTheDocument();
+
+    // Validation failure: the counter advances but no new batch arrives.
+    rerender(<InfoPanel problems={batch} settings={mockSettings} explicitGenerations={2} />);
+    expect(screen.getAllByLabelText("Total Generated: 1")[0]).toBeInTheDocument();
+  });
+
+  test("the batch present at mount is never credited, even if the counter is ahead", () => {
+    // Reload after a no-batch click left the counter ahead of the cursor:
+    // the auto-generated batch arriving with the mount must not be counted.
+    localStorage.setItem(
+      "mathgenie-session-stats",
+      JSON.stringify({ totalGenerated: 20, sessionsCount: 1, lastCountedGeneration: 1 }),
+    );
+    const batch = [{ id: 1, text: "2 + 2 = " }];
+    render(<InfoPanel problems={batch} settings={mockSettings} explicitGenerations={2} />);
+    expect(screen.getAllByLabelText("Total Generated: 20")[0]).toBeInTheDocument();
+  });
+
   test("counts the next explicit generation after a reload with stored cursor", () => {
     localStorage.setItem(
       "mathgenie-session-stats",
