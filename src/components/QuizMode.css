@@ -778,7 +778,7 @@
   box-shadow: 0 0 0 2px var(--shadow-incorrect);
 }
 
-.problem-number {
+.problem-review .problem-number {
   min-width: 30px;
   font-weight: 600;
   color: var(--text-secondary);
@@ -863,7 +863,7 @@
     text-align: center;
   }
 
-  .problem-number,
+  .problem-review .problem-number,
   .user-answer {
     text-align: center;
   }
