@@ -55,25 +55,6 @@
 }
 
 /* Message styles */
-.error-message {
-  position: relative;
-  padding: var(--space-lg);
-  margin: var(--space-lg) 0;
-  font-weight: 500;
-  color: var(--error-color);
-  text-align: center;
-  background: linear-gradient(135deg, #fef2f2, #fee2e2);
-  border: 1px solid #fecaca;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-}
-
-.error-message::before {
-  margin-right: var(--space-sm);
-  font-size: var(--font-size-lg);
-  content: "!";
-}
-
 .success-message {
   padding: var(--space-lg);
   margin: var(--space-lg) 0;
@@ -228,7 +209,6 @@
 
 /* Mobile-specific improvements */
 @media (width <= 768px) {
-  .error-message,
   .success-message {
     padding: var(--space-md);
     font-size: var(--font-size-sm);
@@ -236,7 +216,6 @@
 }
 
 @media (width <= 480px) {
-  .error-message,
   .success-message {
     padding: var(--space-md);
     font-size: var(--font-size-sm);

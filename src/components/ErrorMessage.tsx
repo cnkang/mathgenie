@@ -97,6 +97,8 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({
 
   return (
     <div
+      // "error-message" is a stable test hook only; all styling comes from
+      // message-container/message-{type} (legacy utilities styles removed).
       className={`message-container message-${type} ${type === "error" ? "error-message" : ""}`}
       role="alert"
       aria-live="polite"
