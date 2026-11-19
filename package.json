@@ -14,6 +14,8 @@
     "./src/utils/serviceWorker.ts"
   ],
   "dependencies": {
+    "@fontsource-variable/baloo-2": "^5.3.0",
+    "@fontsource-variable/nunito-sans": "^5.3.0",
     "@vercel/speed-insights": "^2.1.0",
     "jspdf": "^4.2.1",
     "react": "^19.3.1",

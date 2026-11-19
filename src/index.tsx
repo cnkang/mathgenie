@@ -1,5 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
+import "@fontsource-variable/baloo-2";
+import "@fontsource-variable/nunito-sans";
 import App from "./App";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { safeStorage } from "./utils/safeStorage";
