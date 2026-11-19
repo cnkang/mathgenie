@@ -10,7 +10,7 @@ export default {
     subtraction: "Subtraction (-)",
     multiplication: "Multiplication (×)",
     division: "Division (÷)",
-    help: "Hold Ctrl/Cmd to select multiple operations",
+    help: "Tap to toggle each operation on or off",
   },
   settings: {
     numProblems: "Number of Problems",
@@ -125,6 +125,8 @@ export default {
     },
   },
   accessibility: {
+    decreaseValue: "Decrease value",
+    increaseValue: "Increase value",
     selectOperations: "Select mathematical operations to include",
     numProblemsInput: "Number of problems to generate",
     enableGroupingLabel: "Enable grouping mode",
@@ -159,6 +161,12 @@ export default {
       "PDF export settings including font size, line spacing, and paper size options",
     dismissMessage: "Dismiss message",
     problemsList: "List of generated math problems",
+  },
+  theme: {
+    label: "Theme",
+    light: "Light",
+    dark: "Dark",
+    system: "System",
   },
   language: {
     select: "Language",
@@ -195,6 +203,17 @@ export default {
     info: "Sample problems based on current settings",
   },
   quiz: {
+    finishEarly: "Finish Quiz",
+    exitConfirm: "Confirm exit?",
+    keyboardHint: "Tip: use ← / → to move between problems",
+    palette: {
+      title: "Jump to question ({{answered}}/{{total}} answered)",
+      correct: "correct",
+      incorrect: "incorrect",
+      unanswered: "unanswered",
+      jumpLabel: "Question {{number}}, {{state}}",
+      truncated: "Showing the first {{count}} questions only",
+    },
     loading: "Preparing quiz...",
     exit: "Exit",
     previousProblem: "← Previous",
@@ -248,7 +267,7 @@ export default {
       expert: "Expert",
     },
     progress: {
-      title: "Learning Progress",
+      title: "Generation Goal",
       completed: "Completed {{percent}}% (Target: 100 problems)",
     },
     quickActions: {

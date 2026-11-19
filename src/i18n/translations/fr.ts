@@ -11,7 +11,7 @@ export default {
     subtraction: "Soustraction (-)",
     multiplication: "Multiplication (×)",
     division: "Division (÷)",
-    help: "Maintenez Ctrl/Cmd pour sélectionner plusieurs opérations",
+    help: "Touchez pour activer ou désactiver chaque opération",
   },
   settings: {
     numProblems: "Nombre de problèmes",
@@ -134,6 +134,8 @@ export default {
     },
   },
   accessibility: {
+    decreaseValue: "Diminuer la valeur",
+    increaseValue: "Augmenter la valeur",
     selectOperations: "Sélectionner les opérations mathématiques à inclure",
     numProblemsInput: "Nombre de problèmes à générer",
     enableGroupingLabel: "Activer le mode de groupement",
@@ -168,6 +170,12 @@ export default {
     pdfSettingsCollapsed: "Paramètres PDF réduits",
     pdfSettingsDesc:
       "Paramètres d'exportation PDF incluant la taille de police, l'espacement des lignes et les options de taille de papier",
+  },
+  theme: {
+    label: "Thème",
+    light: "Clair",
+    dark: "Sombre",
+    system: "Système",
   },
   language: {
     select: "Langue",
@@ -204,6 +212,17 @@ export default {
     info: "Exemples de problèmes basés sur les paramètres actuels",
   },
   quiz: {
+    finishEarly: "Terminer",
+    exitConfirm: "Confirmer la sortie ?",
+    keyboardHint: "Astuce : utilisez ← / → pour naviguer entre les problèmes",
+    palette: {
+      title: "Aller à la question ({{answered}}/{{total}} répondues)",
+      correct: "correcte",
+      incorrect: "incorrecte",
+      unanswered: "non répondue",
+      jumpLabel: "Question {{number}}, {{state}}",
+      truncated: "Affichage des {{count}} premières questions uniquement",
+    },
     loading: "Préparation du quiz...",
     exit: "Quitter",
     previousProblem: "← Précédent",
@@ -257,7 +276,7 @@ export default {
       expert: "Expert",
     },
     progress: {
-      title: "Progrès d'Apprentissage",
+      title: "Objectif de génération",
       completed: "Complété {{percent}}% (Objectif: 100 problèmes)",
     },
     quickActions: {
