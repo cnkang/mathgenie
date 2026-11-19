@@ -1,5 +1,6 @@
 import React from "react";
 import LanguageSelector from "./LanguageSelector";
+import ThemeSelector from "./ThemeSelector";
 import "./AppHeader.css";
 
 type AppHeaderProps = {
@@ -14,7 +15,10 @@ const AppHeader: React.FC<AppHeaderProps> = ({ t }) => {
           {t("app.title")}
         </h1>
         <p className="app-subtitle">{t("app.subtitle")}</p>
-        <LanguageSelector />
+        <div className="header-controls">
+          <ThemeSelector />
+          <LanguageSelector />
+        </div>
       </div>
     </header>
   );

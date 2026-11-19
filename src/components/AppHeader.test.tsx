@@ -7,6 +7,11 @@ vi.mock("./LanguageSelector", () => ({
   default: () => <div data-testid="lang-selector" />,
 }));
 
+vi.mock("./ThemeSelector", () => ({
+  __esModule: true,
+  default: () => <div data-testid="theme-selector" />,
+}));
+
 describe("AppHeader", { concurrent: false }, () => {
   const t = (key: string) => (key === "app.title" ? "MathGenie" : key);
 
@@ -17,5 +22,6 @@ describe("AppHeader", { concurrent: false }, () => {
     expect(screen.getByRole("heading", { level: 1, name: /mathgenie/i })).toBeInTheDocument();
     expect(screen.getByText("app.subtitle")).toBeInTheDocument();
     expect(screen.getByTestId("lang-selector")).toBeInTheDocument();
+    expect(screen.getByTestId("theme-selector")).toBeInTheDocument();
   });
 });

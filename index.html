@@ -15,6 +15,25 @@
     <link rel="manifest" href="/manifest.json" />
     <title>MathGenie - Math Problem Generator</title>
 
+    <!-- Resolve the theme before first paint: stored preference wins,
+         otherwise follow the system. Keep in sync with src/hooks/useTheme.ts. -->
+    <script>
+      (function () {
+        var theme = "light";
+        try {
+          var stored = localStorage.getItem("mathgenie-theme");
+          var followsSystem = stored === null || stored === "system";
+          var dark =
+            stored === "dark" ||
+            (followsSystem && window.matchMedia("(prefers-color-scheme: dark)").matches);
+          theme = dark ? "dark" : "light";
+        } catch (error) {
+          /* Storage or matchMedia unavailable: fall back to light. */
+        }
+        document.documentElement.setAttribute("data-theme", theme);
+      })();
+    </script>
+
     <!-- Critical CSS: pre-hydration shell only. Keep tokens in sync with
          src/styles/globals.css; component styles live in the bundle. -->
     <style>
@@ -30,13 +49,11 @@
         --bg-tertiary: #eef2ff;
         --text-primary: #0f172a;
       }
-      @media (prefers-color-scheme: dark) {
-        :root {
-          --primary-color: #93c5fd;
-          --bg-secondary: #111a2b;
-          --bg-tertiary: #17243a;
-          --text-primary: #f8fafc;
-        }
+      :root[data-theme="dark"] {
+        --primary-color: #93c5fd;
+        --bg-secondary: #111a2b;
+        --bg-tertiary: #17243a;
+        --text-primary: #f8fafc;
       }
 
       * {
