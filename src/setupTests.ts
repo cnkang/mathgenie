@@ -421,6 +421,10 @@ Object.defineProperty(window, "crypto", {
 let mockStore: Record<string, string> = {};
 
 const localStorageMock = {
+  get length(): number {
+    return Object.keys(mockStore).length;
+  },
+  key: vi.fn((index: number): string | null => Object.keys(mockStore)[index] ?? null),
   getItem: vi.fn((key: string): string | null => mockStore[key] || null),
   setItem: vi.fn((key: string, value: string): void => {
     mockStore[key] = value;

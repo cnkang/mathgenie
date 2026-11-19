@@ -2,10 +2,23 @@ import { describe, expect, it, vi } from "vite-plus/test";
 import { defaultSettings } from "./settings";
 import {
   createGenerationOutcome,
+  createProblemsArray,
   generateStructuredProblem,
   evaluateGeneratedProblems,
 } from "./generation";
 describe("bounded generation", () => {
+  it("fills the batch when only one allowed addition operand count is feasible", () => {
+    const problems = createProblemsArray({
+      ...defaultSettings,
+      operations: ["+"],
+      numProblems: 200,
+      numRange: [1, 1],
+      numOperandsRange: [2, 100],
+      resultRange: [2, 2],
+    });
+    expect(problems).toHaveLength(200);
+    expect(problems.every((problem) => problem.operands?.length === 2)).toBe(true);
+  });
   it.each([
     { operations: ["+"], numRange: [1, 1], resultRange: [10, 20] },
     { operations: ["/"], numRange: [0, 0] },

@@ -88,9 +88,32 @@ test('correcting PDF settings resumes pending generation', async ({ page }) => {
   await page.locator('.pdf-settings-toggle').click();
   await page.locator('#fontSize').fill('0');
   await page.locator('#numProblems').fill('3');
-  await expect(page.locator('.problem-item')).toHaveCount(1);
+  await expect(page.locator('.problem-item')).toHaveCount(0);
   await page.locator('#fontSize').fill('16');
   await expect(page.locator('.problem-item')).toHaveCount(3);
+});
+test('only successful Generate clicks count across tabs and reloads', async ({ context, page }) => {
+  const total = (tab: typeof page, count: number) => tab.getByLabel(`Total Generated: ${count}`, { exact: true });
+  const other = await context.newPage();
+  await other.goto(page.url());
+  await expect(total(page, 0)).toBeVisible();
+  await expect(total(other, 0)).toBeVisible();
+
+  await page.locator('#result-range-from').fill('5');
+  await page.locator('#result-range-to').fill('5');
+  await page.locator('.generate-card').click();
+  await expect(page.locator('.quiz-card')).toBeDisabled();
+  await expect(page.locator('.download-card')).toBeDisabled();
+  await page.locator('#result-range-from').fill('4');
+  await expect(page.locator('.problem-item')).toHaveCount(1);
+  await expect(total(page, 0)).toBeVisible();
+
+  await page.locator('.generate-card').click();
+  await expect(total(other, 1)).toBeVisible();
+  await other.locator('.generate-card').click();
+  await expect(total(page, 2)).toBeVisible();
+  await page.reload();
+  await expect(total(page, 2)).toBeVisible();
 });
 test('loads PDF only on demand', async ({ page }) => {
   const pdfRequests: string[] = [];

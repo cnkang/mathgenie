@@ -1,6 +1,5 @@
 import type { MessageValue, Problem, Settings } from "@/types";
 import { buildExpression, randomInt } from "@/utils/problemUtils";
-import type { Dispatch, SetStateAction } from "react";
 
 import { calculateExpression, formatExpression } from "@/domain/expression";
 export { calculateExpression } from "@/domain/expression";
@@ -31,11 +30,10 @@ const isAdditionOnlyInfeasible = (settings: Settings, numOperands: number): bool
 
   const minSum = settings.numRange[0] * numOperands;
   const maxSum = settings.numRange[1] * numOperands;
-  return settings.resultRange[0] > maxSum || settings.resultRange[1] < minSum;
-};
-
-const canGenerateProblem = (settings: Settings, numOperands: number): boolean => {
-  return numOperands >= 2 && !isAdditionOnlyInfeasible(settings, numOperands);
+  const minimum = settings.allowNegative
+    ? settings.resultRange[0]
+    : Math.max(0, settings.resultRange[0]);
+  return Math.max(minimum, minSum) > Math.min(maxSum, settings.resultRange[1]);
 };
 
 const createProblemText = (
@@ -71,45 +69,30 @@ const attemptGenerateProblem = (
   };
 };
 
-/**
- * Generates a single math problem based on the provided settings
- *
- * @param settings - Configuration object containing operation types, ranges, and display options
- * @returns A formatted math problem string, or empty string if generation fails
- *
- * @example
- * ```typescript
- * const settings = {
- *   operations: ['+', '-'],
- *   numRange: [1, 10],
- *   resultRange: [0, 20],
- *   numOperandsRange: [2, 3],
- *   allowNegative: false,
- *   showAnswers: true,
- *   // ... other settings
- * };
- *
- * generateProblem(settings) // Returns "5 + 3 = 8" or similar
- * ```
- */
+/** Precompute feasible operand counts for reuse throughout a batch. */
+export const createProblemGenerator = (settings: Settings, maxAttempts = 10000) => {
+  const counts: number[] = [];
+  const [min, max] = settings.numOperandsRange;
+  if (!Number.isInteger(min) || !Number.isInteger(max) || min < 2 || max > 100) {
+    return () => null;
+  }
+  for (let count = min; count <= max; count++) {
+    if (!isAdditionOnlyInfeasible(settings, count)) counts.push(count);
+  }
+  return (): Omit<Problem, "id"> | null => {
+    if (counts.length === 0) return null;
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      const problem = attemptGenerateProblem(settings, counts[randomInt(0, counts.length - 1)]);
+      if (problem) return problem;
+    }
+    return null;
+  };
+};
+
 export const generateStructuredProblem = (
   settings: Settings,
-  maxAttempts = 10000,
-): Omit<Problem, "id"> | null => {
-  const numOperands = randomInt(settings.numOperandsRange[0], settings.numOperandsRange[1]);
-
-  if (!canGenerateProblem(settings, numOperands)) {
-    return null;
-  }
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    const problem = attemptGenerateProblem(settings, numOperands);
-    if (problem) {
-      return problem;
-    }
-  }
-
-  return null;
-};
+  maxAttempts?: number,
+): Omit<Problem, "id"> | null => createProblemGenerator(settings, maxAttempts)();
 
 export const generateProblem = (settings: Settings): string =>
   generateStructuredProblem(settings)?.text ?? "";
@@ -173,8 +156,9 @@ export const createProblemsArray = (settings: Settings): Problem[] => {
   const generated: Problem[] = [];
   // A batch-wide candidate budget bounds impossible configurations without reducing the 50k limit.
   const maxAttempts = Math.max(1, Math.min(10000, Math.floor(1000000 / totalProblems)));
+  const nextProblem = createProblemGenerator(settings, maxAttempts);
   for (let index = 0; index < totalProblems; index++) {
-    const problem = generateStructuredProblem(settings, maxAttempts);
+    const problem = nextProblem();
     if (problem) generated.push({ ...problem, id: generated.length });
   }
   return generated;
@@ -211,7 +195,7 @@ const getLargeProblemWarning = (numProblems: number): MessageValue => {
 export const createGenerationOutcome = (params: {
   settings: Settings;
   showSuccessMessage: boolean;
-  setProblems: Dispatch<SetStateAction<Problem[]>>;
+  setProblems: (problems: Problem[]) => void;
 }) => {
   const { settings, showSuccessMessage, setProblems } = params;
   const targetCount = settings.enableGrouping

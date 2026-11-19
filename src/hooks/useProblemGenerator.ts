@@ -5,14 +5,16 @@ import { calculateActualTotalProblems } from "@/utils/groupingUtils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 export { calculateExpression, generateProblem } from "@/domain/generation";
 const EMPTY_MESSAGES = { error: "", warning: "", successMessage: "" } as const;
+const EMPTY_PROBLEMS: Problem[] = [];
 type Messages = { error: MessageValue; warning: MessageValue; successMessage: MessageValue };
 
 export const useProblemGenerator = (
   settings: Settings,
   isLoading: boolean,
   validateSettings: (settings: Settings) => string,
+  onExplicitGeneration?: (problemCount: number) => void,
 ) => {
-  const [rawProblems, setRawProblems] = useState<Problem[]>([]);
+  const [batch, setBatch] = useState<{ key: string; problems: Problem[] } | null>(null);
   const [messages, setMessages] = useState<Messages>(EMPTY_MESSAGES);
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -30,8 +32,8 @@ export const useProblemGenerator = (
   ]);
   const lastReportedToken = useRef<string | null>(null);
   const settingsAreValid = validateSettings(settings) === "";
-  const current = useRef({ settings, isLoading, validateSettings });
-  current.current = { settings, isLoading, validateSettings };
+  const current = useRef({ settings, isLoading, validateSettings, generationKey });
+  current.current = { settings, isLoading, validateSettings, generationKey };
   const cancelGeneration = useCallback(() => {
     workerRef.current?.terminate();
     workerRef.current = null;
@@ -51,7 +53,12 @@ export const useProblemGenerator = (
 
   const generateProblems = useCallback(
     (showSuccessMessage = true): Messages => {
-      const { settings: active, isLoading: loading, validateSettings: validate } = current.current;
+      const {
+        settings: active,
+        isLoading: loading,
+        validateSettings: validate,
+        generationKey: key,
+      } = current.current;
       if (loading) return EMPTY_MESSAGES;
       const error = validate(active);
       cancelGeneration();
@@ -60,6 +67,10 @@ export const useProblemGenerator = (
         setMessages(outcome);
         return outcome;
       }
+      const acceptProblems = (problems: Problem[]): void => {
+        setBatch(problems.length > 0 ? { key, problems } : null);
+        if (showSuccessMessage && problems.length > 0) onExplicitGeneration?.(problems.length);
+      };
       const target = calculateActualTotalProblems(active);
       if (target > 200 && typeof Worker !== "undefined") {
         let worker: Worker;
@@ -68,6 +79,7 @@ export const useProblemGenerator = (
             type: "module",
           });
         } catch {
+          setBatch(null);
           const outcome = { ...EMPTY_MESSAGES, error: { key: "errors.generationFailed" } };
           setMessages(outcome);
           return outcome;
@@ -79,34 +91,42 @@ export const useProblemGenerator = (
           event: MessageEvent<{ problems?: Problem[]; progress?: number; error?: string }>,
         ) => {
           if (workerRef.current !== worker) return;
+          if (current.current.generationKey !== key) {
+            cancelGeneration();
+            return;
+          }
           if (event.data.progress !== undefined) setProgress(event.data.progress);
           if (event.data.problems) {
-            if (event.data.problems.length) setRawProblems(event.data.problems);
+            acceptProblems(event.data.problems);
             setMessages(evaluateGeneratedProblems(event.data.problems, target, showSuccessMessage));
             cancelGeneration();
           } else if (event.data.error) {
+            setBatch(null);
             setMessages({ ...EMPTY_MESSAGES, error: { key: event.data.error } });
             cancelGeneration();
           }
         };
         worker.onerror = () => {
-          if (workerRef.current === worker) {
+          if (workerRef.current !== worker) return;
+          if (current.current.generationKey === key) {
+            setBatch(null);
             setMessages({ ...EMPTY_MESSAGES, error: { key: "errors.generationFailed" } });
-            cancelGeneration();
           }
+          cancelGeneration();
         };
         worker.postMessage(active);
         return EMPTY_MESSAGES;
       }
+      setBatch(null);
       const outcome = createGenerationOutcome({
         settings: active,
         showSuccessMessage,
-        setProblems: setRawProblems,
+        setProblems: acceptProblems,
       });
       setMessages(outcome);
       return outcome;
     },
-    [cancelGeneration],
+    [cancelGeneration, onExplicitGeneration],
   );
 
   useEffect(() => {
@@ -119,6 +139,7 @@ export const useProblemGenerator = (
     // after the user has already corrected the input.
     lastReportedToken.current = reportToken;
   }, [generationKey, settingsAreValid, isLoading, generateProblems]);
+  const rawProblems = batch?.key === generationKey ? batch.problems : EMPTY_PROBLEMS;
   const problems = useMemo(
     () =>
       rawProblems.map((problem) => {

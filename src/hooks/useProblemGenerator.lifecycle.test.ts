@@ -29,10 +29,10 @@ describe("generation sessions", () => {
         ({ settings }) => useProblemGenerator(settings, false, validateSettings),
         { initialProps: { settings: initial } },
       );
-      const previous = result.current.problems;
+      expect(result.current.problems).toHaveLength(2);
       rerender({ settings: { ...initial, ...overrides, numProblems: 3 } });
       expect(result.current.messages.error).toEqual({ key: "errors.pdfFailed" });
-      expect(result.current.problems).toEqual(previous);
+      expect(result.current.problems).toHaveLength(0);
       rerender({ settings: { ...initial, numProblems: 3 } });
       expect(result.current.messages.error).toBe("");
       expect(result.current.problems).toHaveLength(3);
@@ -100,8 +100,14 @@ describe("generation sessions", () => {
   });
   it("tracks worker progress, ignores cancelled replies, completes current work", () => {
     vi.stubGlobal("Worker", FakeWorker);
+    const credit = vi.fn();
     const { result } = renderHook(() =>
-      useProblemGenerator({ ...defaultSettings, numProblems: 50000 }, false, validateSettings),
+      useProblemGenerator(
+        { ...defaultSettings, numProblems: 50000 },
+        false,
+        validateSettings,
+        credit,
+      ),
     );
     const first = FakeWorker.instances[0];
     act(() => first.send({ progress: 20 }));
@@ -111,12 +117,14 @@ describe("generation sessions", () => {
     expect(first.terminate).toHaveBeenCalled();
     act(() => first.send({ problems: [{ id: 0, text: "stale" }] }));
     expect(result.current.problems).toHaveLength(0);
+    expect(credit).not.toHaveBeenCalled();
     act(() =>
       second.send({ progress: 100, problems: [{ id: 0, text: "1 + 1 = ", correctAnswer: 2 }] }),
     );
     expect(result.current.isGenerating).toBe(false);
     expect(result.current.problems[0].correctAnswer).toBe(2);
     expect(result.current.messages.warning).toMatchObject({ key: "errors.partialGeneration" });
+    expect(credit).toHaveBeenCalledExactlyOnceWith(1);
   });
   it("reports worker errors and terminates on unmount", () => {
     vi.stubGlobal("Worker", FakeWorker);
@@ -133,17 +141,17 @@ describe("generation sessions", () => {
     unmount();
     expect(FakeWorker.instances[2].terminate).toHaveBeenCalled();
   });
-  it("keeps previous problems when new constraints cannot produce any", () => {
+  it("clears the previous worksheet when new constraints cannot produce any", () => {
     const initial = { ...defaultSettings, numProblems: 2 };
     const { result, rerender } = renderHook(
       ({ settings }) => useProblemGenerator(settings, false, validateSettings),
       { initialProps: { settings: initial } },
     );
-    const previous = result.current.problems;
+    expect(result.current.problems).toHaveLength(2);
     rerender({
       settings: { ...initial, operations: ["+"], numRange: [1, 1], resultRange: [100, 200] },
     });
-    expect(result.current.problems).toEqual(previous);
+    expect(result.current.problems).toHaveLength(0);
     act(() => result.current.generateProblems());
     expect(result.current.messages.error).toMatchObject({ key: "errors.noProblemsGenerated" });
   });
