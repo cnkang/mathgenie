@@ -3,20 +3,25 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-lg, 1.5rem);
+  width: 100%;
+  padding: var(--space-md, 1rem) 0;
   background: var(--bg-primary, #fff);
   border-bottom: 1px solid var(--border-color, #e2e8f0);
 }
 
+/* Horizontal padding mirrors .container at each breakpoint so the title
+   aligns with the main content's left edge. */
 .app-header-inner {
   display: grid;
   grid-template-areas:
-    "title language"
-    "subtitle language";
+    "title controls"
+    "subtitle controls";
   grid-template-columns: minmax(0, 1fr) auto;
   gap: var(--space-xs) var(--space-lg);
   align-items: center;
-  width: min(1100px, 100%);
+  width: 100%;
+  max-width: 1600px;
+  padding-inline: var(--space-2xl);
 }
 
 .app-title {
@@ -36,9 +41,31 @@
   text-align: left;
 }
 
-.app-header-inner > .language-selector {
-  grid-area: language;
+.header-controls {
+  display: flex;
+  grid-area: controls;
+  gap: var(--space-sm);
+  align-items: center;
   justify-self: end;
+}
+
+@media (width <= 1199px) {
+  .app-header-inner {
+    max-width: 1200px;
+  }
+}
+
+@media (width <= 991px) {
+  .app-header-inner {
+    max-width: none;
+    padding-inline: calc(var(--space-lg) + var(--space-xl));
+  }
+}
+
+@media (width <= 768px) {
+  .app-header-inner {
+    padding-inline: var(--space-lg);
+  }
 }
 
 @media (max-width: 640px) {
@@ -46,12 +73,19 @@
     grid-template-areas:
       "title"
       "subtitle"
-      "language";
+      "controls";
     grid-template-columns: minmax(0, 1fr);
     justify-items: start;
   }
 
-  .app-header-inner > .language-selector {
+  .header-controls {
+    flex-wrap: wrap;
     justify-self: start;
+  }
+}
+
+@media (width <= 480px) {
+  .app-header-inner {
+    padding-inline: var(--space-md);
   }
 }

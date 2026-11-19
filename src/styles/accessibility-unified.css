@@ -23,9 +23,6 @@ textarea,
 a[href],
 .action-card,
 .preset-card,
-.generate-btn,
-.download-btn,
-.quiz-mode-btn,
 .exit-quiz-btn,
 .retry-quiz-btn,
 .submit-answer-btn,
@@ -118,25 +115,24 @@ a[href]:focus:not(:focus-visible),
 }
 
 /* Enforce dark-theme form control contrast on Safari/WebKit */
-@media (prefers-color-scheme: dark) {
-  input,
-  select,
-  textarea {
-    color: var(--text-primary, #f8fafc);
-    background-color: var(--bg-primary, #0b1220);
-    border-color: var(--border-color, #334155);
-    -webkit-text-fill-color: var(--text-primary, #f8fafc);
-    color-scheme: dark;
-  }
+/* Dark-theme form control contrast (manual or system dark) */
+:root[data-theme="dark"] input,
+:root[data-theme="dark"] select,
+:root[data-theme="dark"] textarea {
+  color: var(--text-primary, #f8fafc);
+  background-color: var(--bg-primary, #0b1220);
+  border-color: var(--border-color, #334155);
+  -webkit-text-fill-color: var(--text-primary, #f8fafc);
+  color-scheme: dark;
+}
 
-  /* Harden WebKit number input contrast under dark scheme in CI/mobile */
-  input[type="number"] {
-    color: var(--text-primary, #f8fafc);
-    background-color: var(--bg-primary, #0b1220);
-    border-color: var(--border-color, #334155);
-    -webkit-text-fill-color: var(--text-primary, #f8fafc);
-    color-scheme: dark;
-    -webkit-appearance: textfield;
-    appearance: textfield;
-  }
+/* Harden WebKit number input contrast under dark scheme in CI/mobile */
+:root[data-theme="dark"] input[type="number"] {
+  color: var(--text-primary, #f8fafc);
+  background-color: var(--bg-primary, #0b1220);
+  border-color: var(--border-color, #334155);
+  -webkit-text-fill-color: var(--text-primary, #f8fafc);
+  color-scheme: dark;
+  -webkit-appearance: textfield;
+  appearance: textfield;
 }
