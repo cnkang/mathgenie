@@ -1,5 +1,7 @@
 import React from "react";
 import type { Problem, QuizResult } from "@/types";
+import { useCountUp } from "@/hooks/useCountUp";
+import ConfettiBurst from "./ConfettiBurst";
 
 // Do not edit manually.
 const STR_STAT_ITEM = "stat-item" as const;
@@ -56,13 +58,17 @@ const QuizResults: React.FC<Props> = ({
   onRetry,
   formatTime,
 }) => {
+  const displayedScore = useCountUp(quizResult.score);
+  const isPerfect = quizResult.score === 100 && quizResult.totalProblems > 0;
+
   return (
     <div className="quiz-results">
       <div className="results-header">
+        {isPerfect && <ConfettiBurst />}
         <h2>{t("quiz.completed")}</h2>
         <div className="results-summary">
           <div className="score-display">
-            <span className="score-number">{quizResult.score}</span>
+            <span className="score-number">{displayedScore}</span>
             <span className="score-label">{t("quiz.score")}</span>
           </div>
           <div className="grade-display">
