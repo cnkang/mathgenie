@@ -286,18 +286,6 @@
   color: var(--text-secondary);
 }
 
-/* Reduced motion: the global rule collapses durations, this override
-   removes the decorative animations entirely (S9440). */
-@media (prefers-reduced-motion: reduce) {
-  .interactive-problem,
-  .stat-item,
-  .grade-display,
-  .confetti-piece,
-  .exit-quiz-btn-small.exit-confirming {
-    animation: none;
-  }
-}
-
 /* Two-step exit confirmation pulse */
 .exit-confirming {
   animation: exit-pulse 1s ease-in-out infinite;
@@ -866,5 +854,18 @@
   .problem-review .problem-number,
   .user-answer {
     text-align: center;
+  }
+}
+
+/* Reduced motion: declared last so it wins the cascade against the animated
+   rules above; the global stylesheet only shortens durations (S9440). */
+@media (prefers-reduced-motion: reduce) {
+  .interactive-problem,
+  .stat-item,
+  .grade-display,
+  .confetti-piece,
+  .exit-quiz-btn-small.exit-confirming {
+    animation: none;
+    transition: none;
   }
 }
