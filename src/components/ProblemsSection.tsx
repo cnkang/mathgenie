@@ -109,8 +109,9 @@ const ProblemsSection: React.FC<ProblemsSectionProps> = ({ t, problems, settings
 
     return (
       <ol className="problems-grid" start={startIndex + 1}>
-        {problems.slice(startIndex, endIndex).map((p) => (
+        {problems.slice(startIndex, endIndex).map((p, index) => (
           <li key={p.id} className="problem-item">
+            <span className="problem-number">{startIndex + index + 1}</span>
             <span className="problem-text">{p.text}</span>
           </li>
         ))}
@@ -162,7 +163,31 @@ const ProblemsSection: React.FC<ProblemsSectionProps> = ({ t, problems, settings
           tabIndex={0}
         >
           {problems.length === 0 ? (
-            <output aria-live="polite">{t("results.noProblems")}</output>
+            <output className="no-problems" aria-live="polite">
+              <span className="no-problems-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="48" height="48" fill="none">
+                  <rect
+                    x="4"
+                    y="3"
+                    width="16"
+                    height="18"
+                    rx="2"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
+                  <path
+                    d="M8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </span>
+              <span className="no-problems-text">{t("results.noProblems")}</span>
+              <span className="no-problems-hint">
+                {t("results.clickToStart", { generateButton: t("buttons.generate") })}
+              </span>
+            </output>
           ) : (
             renderProblemsContent()
           )}

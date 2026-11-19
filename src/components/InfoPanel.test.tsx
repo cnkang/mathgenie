@@ -34,6 +34,10 @@ vi.mock("../hooks/useProgressBar", () => ({
 }));
 
 describe("InfoPanel", { concurrent: false }, () => {
+  beforeEach(() => {
+    localStorage.removeItem("mathgenie-session-stats");
+  });
+
   const mockSettings: Settings = {
     numProblems: 10,
     operations: ["+", "-"],
@@ -109,5 +113,15 @@ describe("InfoPanel", { concurrent: false }, () => {
   test("does not show quiz results when not provided", () => {
     render(<InfoPanel problems={[]} settings={mockSettings} />);
     expect(screen.queryByText(/Recent Results/)).not.toBeInTheDocument();
+  });
+
+  test("persists generation stats across remounts", () => {
+    const mockProblems = [{ id: 1, text: "2 + 2 = " }];
+    const first = render(<InfoPanel problems={mockProblems} settings={mockSettings} />);
+    expect(screen.getAllByLabelText("Total Generated: 1")[0]).toBeInTheDocument();
+    first.unmount();
+
+    render(<InfoPanel problems={[]} settings={mockSettings} />);
+    expect(screen.getAllByLabelText("Total Generated: 1")[0]).toBeInTheDocument();
   });
 });
