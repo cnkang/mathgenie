@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useProgressBar } from "../hooks/useProgressBar";
 import { useTranslation } from "../i18n";
 import type { Problem, QuizResult, Settings } from "../types";
@@ -34,7 +34,9 @@ const isValidCount = (value: unknown): value is number =>
  * (no lastCountedGeneration); negative/nonfinite totals are rejected.
  * Records without a cursor (legacy or missing field) adopt the current
  * explicit-generation counter, as do missing/corrupt records, so the
- * batch auto-generated on load is never miscounted as explicit.
+ * batch auto-generated on load is never miscounted as explicit. A stored
+ * cursor above the restored counter is clamped so crediting cannot be
+ * suppressed by a stale or lost counter key.
  */
 const readStoredStats = (legacyCursor: number): SessionStats => {
   const raw = safeStorage.get(SESSION_STATS_KEY);
@@ -48,7 +50,7 @@ const readStoredStats = (legacyCursor: number): SessionStats => {
             totalGenerated: candidate.totalGenerated,
             sessionsCount: candidate.sessionsCount,
             lastCountedGeneration: isValidCount(candidate.lastCountedGeneration)
-              ? candidate.lastCountedGeneration
+              ? Math.min(candidate.lastCountedGeneration, legacyCursor)
               : legacyCursor,
           };
         }
@@ -111,14 +113,22 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
   const [sessionStats, setSessionStats] = useState<SessionStats>(() =>
     readStoredStats(explicitGenerations),
   );
+  // The batch present at mount is "already seen": only arrays arriving in
+  // later renders are eligible for credit, so a click that produces no new
+  // batch (validation failure) can never credit what is already on screen,
+  // and the auto-generated batch after a reload is never miscounted.
+  const prevProblemsRef = useRef<Problem[]>(problems);
 
   useEffect(() => {
-    // Count a batch only when it came from an explicit generation the user
-    // has not been credited for yet, and never the same array twice. The
-    // cursor jumps to the current counter on credit so uncredited clicks
-    // (validation failures) leave no lag for auto batches to slip into.
+    const isNewArrival = problems !== prevProblemsRef.current;
+    prevProblemsRef.current = problems;
+    // Credit only a newly arrived batch from an explicit generation the
+    // user has not been credited for yet, and never the same array twice.
+    // The cursor jumps to the current counter on credit so uncredited
+    // clicks leave no lag for auto batches to slip into.
     if (
       problems.length > 0 &&
+      isNewArrival &&
       explicitGenerations > sessionStats.lastCountedGeneration &&
       !countedBatches.has(problems)
     ) {
