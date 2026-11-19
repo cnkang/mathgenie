@@ -11,6 +11,10 @@
   gap: var(--space-lg);
   width: 100%;
   margin: var(--space-xl) 0;
+  /* Reset UA fieldset chrome: the default groove border draws a stray
+     box around the cards and min-content sizing can force overflow. */
+  border: 0;
+  min-inline-size: 0;
   contain: layout style;
   isolation: isolate;
 }

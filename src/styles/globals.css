@@ -44,6 +44,7 @@
   --border-color: #e2e8f0;
   --border-hover: #94a3b8;
   --border-focus: var(--primary-color);
+  --focus-ring: 0 0 0 3px rgb(30 58 138 / 18%);
   --border-error: #fecaca;
   --border-warning: #fde68a;
   --border-info: #bfdbfe;
@@ -213,6 +214,7 @@
     --text-muted: #cbd5e1;
     --border-color: #334155;
     --border-hover: #64748b;
+    --focus-ring: 0 0 0 3px rgb(147 197 253 / 30%);
     --primary-color: #93c5fd;
     --primary-hover: #bfdbfe;
     --primary-light: rgb(147 197 253 / 20%);

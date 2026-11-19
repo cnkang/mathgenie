@@ -13,7 +13,9 @@
 }
 
 .language-label {
+  flex-shrink: 0;
   font-weight: 500;
+  white-space: nowrap;
   color: var(--text-secondary);
 }
 
@@ -41,10 +43,10 @@
   border-color: var(--primary-color);
 }
 
-.language-select:focus {
+.language-select:focus-visible {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgb(79 70 229 / 25%);
+  box-shadow: var(--focus-ring);
 }
 
 .language-selector.loading {
