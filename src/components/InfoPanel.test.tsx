@@ -118,23 +118,23 @@ describe("InfoPanel", { concurrent: false }, () => {
 
   test("persists generation stats across remounts", () => {
     const mockProblems = [{ id: 1, text: "2 + 2 = " }];
-    const first = render(
-      <InfoPanel problems={mockProblems} settings={mockSettings} explicitGenerations={1} />,
-    );
+    // Real sequence: InfoPanel mounts before any click, then the counter
+    // advances with the explicit generation's batch.
+    const { rerender } = render(<InfoPanel problems={[]} settings={mockSettings} />);
+    rerender(<InfoPanel problems={mockProblems} settings={mockSettings} explicitGenerations={1} />);
     expect(screen.getAllByLabelText("Total Generated: 1")[0]).toBeInTheDocument();
-    first.unmount();
 
+    // Unmount happens on quiz entry; remount keeps the persisted totals.
     render(<InfoPanel problems={[]} settings={mockSettings} explicitGenerations={1} />);
     expect(screen.getAllByLabelText("Total Generated: 1")[0]).toBeInTheDocument();
   });
 
   test("does not double-count the same batch when remounted with it", () => {
     const mockProblems = [{ id: 1, text: "2 + 2 = " }];
-    const first = render(
-      <InfoPanel problems={mockProblems} settings={mockSettings} explicitGenerations={1} />,
-    );
+    const { unmount, rerender } = render(<InfoPanel problems={[]} settings={mockSettings} />);
+    rerender(<InfoPanel problems={mockProblems} settings={mockSettings} explicitGenerations={1} />);
     expect(screen.getAllByLabelText("Total Generated: 1")[0]).toBeInTheDocument();
-    first.unmount();
+    unmount();
 
     // Same array reference (quiz-mode exit remounts InfoPanel with the
     // current problems): must not count again.
@@ -143,9 +143,10 @@ describe("InfoPanel", { concurrent: false }, () => {
   });
 
   test("does not count auto-regenerations from settings edits", () => {
-    const firstBatch = [{ id: 1, text: "2 + 2 = " }];
-    const { rerender } = render(
-      <InfoPanel problems={firstBatch} settings={mockSettings} explicitGenerations={1} />,
+    const { rerender } = render(<InfoPanel problems={[]} settings={mockSettings} />);
+    const explicitBatch = [{ id: 1, text: "2 + 2 = " }];
+    rerender(
+      <InfoPanel problems={explicitBatch} settings={mockSettings} explicitGenerations={1} />,
     );
     expect(screen.getAllByLabelText("Total Generated: 1")[0]).toBeInTheDocument();
 
@@ -156,6 +157,14 @@ describe("InfoPanel", { concurrent: false }, () => {
     ];
     rerender(<InfoPanel problems={autoBatch} settings={mockSettings} explicitGenerations={1} />);
     expect(screen.getAllByLabelText("Total Generated: 1")[0]).toBeInTheDocument();
+  });
+
+  test("auto batch is not counted when a persisted counter has no stats record", () => {
+    // Counter survived (e.g. stats record corrupted or cleared): the batch
+    // auto-generated on load must still not be credited.
+    const autoBatch = [{ id: 1, text: "2 + 2 = " }];
+    render(<InfoPanel problems={autoBatch} settings={mockSettings} explicitGenerations={5} />);
+    expect(screen.getAllByLabelText("Total Generated: 0")[0]).toBeInTheDocument();
   });
 
   test("rejects corrupt stored stats", () => {

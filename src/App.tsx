@@ -61,11 +61,6 @@ function App(): React.JSX.Element {
     }
     return 0;
   });
-
-  const saveExplicitGenerations = useCallback((next: number): void => {
-    setExplicitGenerations(next);
-    safeStorage.set("mathgenie-explicit-generations", String(next));
-  }, []);
   const formHandlers = useAppHandlers({
     settings,
     setSettings,
@@ -112,9 +107,16 @@ function App(): React.JSX.Element {
   }, [download, isDownloading]);
   const handleGenerate = useCallback(() => {
     clearMessages();
-    saveExplicitGenerations(explicitGenerations + 1);
+    // Functional update: rapid double clicks each get their own increment.
+    // The storage write inside the updater is idempotent, which makes it
+    // safe under StrictMode's double-invoked updaters.
+    setExplicitGenerations((prev) => {
+      const next = prev + 1;
+      safeStorage.set("mathgenie-explicit-generations", String(next));
+      return next;
+    });
     generation.generateProblems();
-  }, [clearMessages, generation.generateProblems, saveExplicitGenerations, explicitGenerations]);
+  }, [clearMessages, generation.generateProblems]);
   const onQuizComplete = useCallback(
     (result: QuizResult) => {
       setQuizResult(result);
