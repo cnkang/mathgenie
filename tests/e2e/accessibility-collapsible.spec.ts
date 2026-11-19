@@ -102,8 +102,12 @@ test.describe('Collapsible UI Accessibility', () => {
       await expect(page.locator(selector)).toBeFocused();
     };
 
-    // First Tab reaches the language select.
+    // First Tab reaches the theme selector (first header control).
     await page.keyboard.press('Tab');
+    await expect(page.locator('.theme-option').first()).toBeFocused();
+
+    // Continue tabbing to the language select.
+    await tabUntilFocused('#language-select');
     await expect(page.locator('#language-select')).toBeFocused();
 
     // Continue tabbing to the first operation chip (first field in SettingsSection).

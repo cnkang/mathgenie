@@ -660,6 +660,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
         className: string;
         type: string | null;
         role: string | null;
+        ariaLabel: string | null;
       }
 
       const focusableElements: FocusableElement[] = [];
@@ -672,6 +673,7 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
               className: active.className,
               type: active.getAttribute('type'),
               role: active.getAttribute('role'),
+              ariaLabel: active.getAttribute('aria-label'),
             }
           : null;
       });
@@ -690,16 +692,20 @@ test.describe('WCAG 2.2 AAA Accessibility Compliance', () => {
                 className: active.className,
                 type: active.getAttribute('type'),
                 role: active.getAttribute('role'),
+                ariaLabel: active.getAttribute('aria-label'),
               }
             : null;
         });
 
-        // Break if we've cycled back to the same element or reached the end
+        // Break if we've cycled back to the same element or reached the end.
+        // Compare aria-label too: sibling controls (e.g. theme options) share
+        // tag/id/class but are distinct tab stops.
         if (
           !nextElement ||
           (nextElement.tagName === currentElement.tagName &&
             nextElement.id === currentElement.id &&
-            nextElement.className === currentElement.className)
+            nextElement.className === currentElement.className &&
+            nextElement.ariaLabel === currentElement.ariaLabel)
         ) {
           break;
         }
