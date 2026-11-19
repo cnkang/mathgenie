@@ -45,7 +45,7 @@ const ThemeSelector: React.FC = () => {
   const { preference, setPreference } = useTheme();
 
   return (
-    <div className="theme-selector" role="group" aria-label={t("theme.label")}>
+    <fieldset className="theme-selector" aria-label={t("theme.label")}>
       {OPTIONS.map(({ value, labelKey, Icon }) => (
         <button
           key={value}
@@ -59,7 +59,7 @@ const ThemeSelector: React.FC = () => {
           <Icon />
         </button>
       ))}
-    </div>
+    </fieldset>
   );
 };
 

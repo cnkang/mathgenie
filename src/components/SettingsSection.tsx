@@ -50,9 +50,8 @@ const SettingsSection: React.FC<SettingsSectionProps> = ({
         <span className="field-label" id="operations-label">
           {t("operations.title")}
         </span>
-        <div
+        <fieldset
           id={STR_OPERATIONS}
-          role="group"
           aria-labelledby="operations-label"
           className="operations-chips"
         >
@@ -75,7 +74,7 @@ const SettingsSection: React.FC<SettingsSectionProps> = ({
               </label>
             );
           })}
-        </div>
+        </fieldset>
         <small className="field-help">{t("operations.help")}</small>
       </div>
 

@@ -105,6 +105,9 @@ const renderQuizLayout = (params: {
   };
 
   return (
+    // SONAR-SAFE (S6848): this is an event-delegation container, not an
+    // interactive widget; the real interactive targets (native inputs and
+    // buttons) bubble their key events here.
     <div className="quiz-mode" onKeyDown={handleKeyDown}>
       <QuizHeader
         t={t}

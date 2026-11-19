@@ -23,6 +23,13 @@ const systemPrefersDark = (): boolean => {
   return window.matchMedia(DARK_QUERY).matches;
 };
 
+const resolveTheme = (preference: ThemePreference, systemDark: boolean): "light" | "dark" => {
+  if (preference !== "system") {
+    return preference;
+  }
+  return systemDark ? "dark" : "light";
+};
+
 /**
  * Manual light/dark/system theme preference.
  * The resolved theme is written to <html data-theme>, which is the single
@@ -34,8 +41,8 @@ export function useTheme(): {
   resolved: "light" | "dark";
   setPreference: (next: ThemePreference) => void;
 } {
-  const [preference, setPreferenceState] = useState<ThemePreference>(readStoredPreference);
-  const [systemDark, setSystemDark] = useState<boolean>(systemPrefersDark);
+  const [preference, setPreferenceState] = useState(readStoredPreference);
+  const [systemDark, setSystemDark] = useState(systemPrefersDark);
 
   useEffect(() => {
     if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
@@ -48,11 +55,10 @@ export function useTheme(): {
     return () => mql.removeEventListener("change", onChange);
   }, []);
 
-  const resolved: "light" | "dark" =
-    preference === "system" ? (systemDark ? "dark" : "light") : preference;
+  const resolved = resolveTheme(preference, systemDark);
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", resolved);
+    document.documentElement.dataset.theme = resolved;
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) {
       meta.setAttribute("content", THEME_COLORS[resolved]);

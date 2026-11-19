@@ -286,7 +286,9 @@ export async function verifyOperationsSelected(
     .locator('#operations input:checked')
     .evaluateAll(inputs => inputs.map(input => (input as HTMLInputElement).value));
 
-  expect([...selectedOperations].sort()).toEqual([...expectedOperations].sort());
+  expect([...selectedOperations].sort((a, b) => a.localeCompare(b))).toEqual(
+    [...expectedOperations].sort((a, b) => a.localeCompare(b)),
+  );
 }
 
 /**
@@ -295,6 +297,9 @@ export async function verifyOperationsSelected(
  */
 export async function setOperations(page: Page, operations: string[]): Promise<void> {
   const allOperations = ['+', '-', '*', '/'];
+  // SONAR-SAFE (S9382): clicks must be sequential. Each chip's change handler
+  // derives the next operations array from the current settings, so parallel
+  // clicks race stale closures and lose updates.
   for (const operation of allOperations) {
     const input = page.locator(`#operations input[value="${operation}"]`);
     const wantChecked = operations.includes(operation);

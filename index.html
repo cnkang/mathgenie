@@ -35,7 +35,7 @@
             dark = false;
           }
         }
-        document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+        document.documentElement.dataset.theme = dark ? "dark" : "light";
         var meta = document.querySelector('meta[name="theme-color"]');
         if (meta) {
           meta.setAttribute("content", dark ? "#0b1220" : "#1e3a8a");

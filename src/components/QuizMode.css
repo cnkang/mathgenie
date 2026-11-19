@@ -234,9 +234,12 @@
 
 .quiz-palette-grid {
   display: grid;
+  margin: 0;
+  border: 0;
+  padding: 0 var(--space-md) var(--space-md);
+  min-inline-size: 0;
   grid-template-columns: repeat(auto-fill, minmax(2.75rem, 1fr));
   gap: var(--space-xs);
-  padding: 0 var(--space-md) var(--space-md);
 }
 
 .palette-item {
@@ -281,6 +284,18 @@
   padding: 0 var(--space-md) var(--space-md);
   font-size: var(--font-size-xs);
   color: var(--text-secondary);
+}
+
+/* Reduced motion: the global rule collapses durations, this override
+   removes the decorative animations entirely (S9440). */
+@media (prefers-reduced-motion: reduce) {
+  .interactive-problem,
+  .stat-item,
+  .grade-display,
+  .confetti-piece,
+  .exit-quiz-btn-small.exit-confirming {
+    animation: none;
+  }
 }
 
 /* Two-step exit confirmation pulse */
