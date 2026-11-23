@@ -351,6 +351,7 @@ describe("PdfPreview", () => {
     mockedPreparePdf.mockReturnValueOnce(pending.promise);
     const { unmount } = render(<PdfPreview {...defaultProps()} />);
     unmount();
+    expect(mockedPreparePdf.mock.calls[0]?.[5]?.aborted).toBe(true);
     pending.resolve(worksheetPdf);
     await new Promise((resolve) => setTimeout(resolve, 0));
   });
