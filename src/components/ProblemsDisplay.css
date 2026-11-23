@@ -246,7 +246,6 @@
 
 .no-problems-hint {
   font-size: var(--font-size-sm, 0.875rem);
-  opacity: 0.8;
 }
 
 /* Responsive design with precise column control */
