@@ -72,6 +72,7 @@
     radial-gradient(ellipse at 90% 82%, rgb(76 202 191 / 23%), transparent 43%),
     radial-gradient(ellipse at 73% 0%, rgb(132 97 255 / 45%), transparent 56%),
     linear-gradient(110deg, #201c45, #2b2259 66%, #252858);
+  background-color: #201c45;
   border-radius: 1.375rem;
   box-shadow: 0 14px 32px rgb(39 32 93 / 16%);
 }

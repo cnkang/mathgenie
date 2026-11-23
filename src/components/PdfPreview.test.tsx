@@ -182,6 +182,9 @@ describe("PdfPreview", () => {
 
     const canvas = document.querySelector(".pdf-preview-canvas");
     expect(canvas?.getAttribute("data-zoomed")).toBe("false");
+    expect(document.querySelectorAll(".pdf-preview-answer-rule")).toHaveLength(1);
+    expect(document.querySelectorAll(".pdf-preview-student-rule")).toHaveLength(1);
+    expect(document.querySelectorAll(".pdf-preview-decoration-rule")).toHaveLength(1);
     fireEvent.click(screen.getByLabelText("Zoom"));
     expect(canvas?.getAttribute("data-zoomed")).toBe("true");
     fireEvent.click(screen.getByLabelText("Fit"));

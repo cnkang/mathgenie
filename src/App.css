@@ -13,8 +13,8 @@ ul {
   --studio-background: #f5f6fc;
   --studio-line: #dedff0;
   --studio-ink: #1d2040;
-  --studio-muted: #505574;
-  --studio-accent: #5141bb;
+  --studio-muted: #4b506d;
+  --studio-accent: #4835a8;
   --studio-tint: #f0edff;
   --studio-shadow: 0 12px 32px rgb(39 32 93 / 6%);
 
@@ -217,6 +217,7 @@ ul {
 
   color: #fff;
   background: linear-gradient(110deg, #4e38be, #5944c8);
+  background-color: #4e38be;
   border-color: #4e38be;
 }
 

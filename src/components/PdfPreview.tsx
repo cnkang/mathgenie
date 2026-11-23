@@ -240,13 +240,22 @@ function PdfPreview({
                   </span>
                 ))}
                 {[
-                  ...(page.studentInfo?.rules ?? []),
-                  ...page.answerRules,
-                  ...(page.decorativeRules ?? []),
-                ].map(({ x, y, width }) => (
+                  ...(page.studentInfo?.rules ?? []).map((rule) => ({
+                    rule,
+                    className: "pdf-preview-student-rule",
+                  })),
+                  ...page.answerRules.map((rule) => ({
+                    rule,
+                    className: "pdf-preview-answer-rule",
+                  })),
+                  ...(page.decorativeRules ?? []).map((rule) => ({
+                    rule,
+                    className: "pdf-preview-decoration-rule",
+                  })),
+                ].map(({ rule: { x, y, width }, className }) => (
                   <span
-                    key={`rule-${x}-${y}`}
-                    className="pdf-preview-answer-rule"
+                    key={`${className}-${x}-${y}`}
+                    className={`pdf-preview-rule ${className}`}
                     aria-hidden="true"
                     style={{
                       left: `${(x / pdf.width) * 100}%`,
