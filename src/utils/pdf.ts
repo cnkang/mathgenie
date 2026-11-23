@@ -139,7 +139,8 @@ const createPdfWriter = (
       page?.studentInfo?.lines.push({ text: label, x, y, size });
       page?.studentInfo?.rules.push(rule);
     }
-    const firstProblemY = y + Math.max(18, size * 1.6);
+    const contentSize = settings.enableGrouping ? settings.fontSize + 2 : settings.fontSize;
+    const firstProblemY = y + Math.max(18, contentSize * 1.6);
     positions = positions.map(() => firstProblemY);
     doc.setFontSize(settings.fontSize);
   };
