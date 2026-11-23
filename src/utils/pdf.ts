@@ -73,7 +73,7 @@ const defaultLabels: PdfLabels = {
 const printable = (text: string): string => text.replaceAll(/[✖×]/g, "x").replaceAll(/[➗÷]/g, "/");
 /** Browser fonts cover CJK headings; arithmetic remains selectable PDF text. */
 const drawHeading = (doc: jsPDF, text: string, x: number, y: number, size: number): number => {
-  if (/^[\\x20-\\x7E]*$/.test(text)) {
+  if (/^[\x20-\x7E]*$/.test(text)) {
     doc.text(text, x, y);
     return doc.getTextWidth(text);
   }
@@ -192,7 +192,7 @@ const createPdfWriter = (
   const problem = (item: Problem, index: number) => {
     const column = index % 2;
     const text = printable(item.text);
-    const blank = text.trimEnd().replace(/\\?$/, "").trimEnd();
+    const blank = text.trimEnd().replace(/\?$/, "").trimEnd();
     const needsRule = kind === "worksheet" && blank.endsWith("=");
     const lines = doc.splitTextToSize(needsRule ? blank : text, columnWidth) as string[];
     const lastLine = lines.at(-1);
