@@ -121,7 +121,7 @@
     "identity-obj-proxy": "^3.0.0",
     "jiti": "^2.7.0",
     "postcss": "^8.5.33",
-    "terser": "^5.51.2",
+    "terser": "^5.51.4",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "typescript-compiler-api": "npm:typescript@5.9.3",
