@@ -7,6 +7,7 @@
 import { spawnSync } from "node:child_process";
 import { cpus, freemem, totalmem } from "node:os";
 import { delimiter, dirname } from "node:path";
+import { pathToFileURL } from "node:url";
 import { buildSafeEnv, findExecutable } from "./exec-utils";
 
 // 颜色输出 (支持 NO_COLOR 环境变量)
@@ -657,7 +658,7 @@ function main(): void {
 }
 
 // 检查是否作为主模块运行
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   main();
 }
 
