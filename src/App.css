@@ -6,6 +6,296 @@ ul {
   list-style-type: none;
 }
 
+:root .App {
+  --studio-width: 84rem;
+  --studio-gutter: clamp(1rem, 4vw, 3rem);
+  --studio-surface: #fff;
+  --studio-background: #f5f6fc;
+  --studio-line: #dedff0;
+  --studio-ink: #1d2040;
+  --studio-muted: #505574;
+  --studio-accent: #5141bb;
+  --studio-tint: #f0edff;
+  --studio-shadow: 0 12px 32px rgb(39 32 93 / 6%);
+
+  padding: 0 0 2rem;
+  color: var(--studio-ink);
+  background: var(--studio-background);
+}
+
+:root[data-theme="dark"] .App {
+  --studio-surface: #181b31;
+  --studio-background: #111326;
+  --studio-line: #373b59;
+  --studio-ink: #f4f2ff;
+  --studio-muted: #c3c7df;
+  --studio-accent: #c0b5ff;
+  --studio-tint: #282347;
+  --studio-shadow: 0 12px 32px rgb(0 0 0 / 15%);
+}
+
+.App .main-content {
+  width: min(100%, var(--studio-width));
+  padding-inline: var(--studio-gutter);
+}
+
+.App .messages-container {
+  margin: 0;
+}
+
+.App .container {
+  display: grid;
+  grid-template: auto / minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 1.25rem;
+  padding: 0;
+  margin: 0;
+  contain: none;
+  background: none;
+  border: 0;
+  box-shadow: none;
+}
+
+.App .container::before {
+  content: none;
+}
+
+.App .settings-section {
+  gap: 1.25rem;
+  max-width: none;
+  padding: clamp(1rem, 2.2vw, 1.5rem);
+  margin: 0;
+}
+
+.App .settings-section,
+.App .results-section > section {
+  min-inline-size: 0;
+  background: var(--studio-surface);
+  border: 1px solid var(--studio-line);
+  border-radius: 1.25rem;
+  box-shadow: var(--studio-shadow);
+}
+
+.App .settings-presets {
+  gap: 0.75rem;
+  padding: 0 0 1.25rem;
+  margin: 0;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--studio-line);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.App .presets-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.625rem;
+}
+
+.App .preset-card {
+  min-inline-size: 0;
+  min-height: 5rem;
+  background: var(--studio-background);
+  border: 1px solid var(--studio-line);
+  border-radius: 0.875rem;
+  box-shadow: none;
+}
+
+.App .preset-card:hover,
+.App .preset-card.active {
+  background: var(--studio-tint);
+  border-color: var(--studio-accent);
+}
+
+.App .preset-content {
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: center;
+  min-inline-size: 0;
+  padding: 0.75rem;
+}
+
+.App .preset-indicator {
+  display: inline-grid;
+  width: 1.75rem;
+  min-width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  place-items: center;
+  color: var(--studio-accent);
+  background: var(--studio-tint);
+  border: 0;
+  border-radius: 50%;
+}
+
+.App .preset-action {
+  display: none;
+}
+
+.App .preset-info p {
+  color: var(--studio-muted);
+}
+
+.App .operation-chip.checked {
+  color: var(--studio-accent);
+  background: var(--studio-tint);
+  border-color: var(--studio-accent);
+}
+
+.App .operation-chip.checked .operation-chip-text {
+  color: inherit;
+}
+
+.App .results-section {
+  gap: 1.25rem;
+  min-height: 0;
+}
+
+.App .results-section > section {
+  padding: clamp(1rem, 2.2vw, 1.5rem);
+  margin: 0;
+}
+
+.App .action-cards-heading {
+  margin: 0 0 0.75rem;
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+}
+
+.App .action-cards-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.625rem;
+  padding: 0;
+  margin: 0;
+}
+
+.App .action-cards-grid .action-card {
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  border-width: 1px;
+  border-radius: 0.875rem;
+  box-shadow: none;
+}
+
+.App .action-cards-grid .generate-card {
+  grid-column: 1 / -1;
+}
+
+.App .action-card .action-card-content {
+  flex-direction: row;
+  gap: 0.75rem;
+  min-height: 4.5rem;
+  padding: 0.75rem;
+  text-align: start;
+}
+
+.App .action-text h3 {
+  font-size: var(--font-size-base);
+}
+
+.App .action-icon {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  color: var(--studio-accent);
+  background: var(--studio-tint);
+  border-radius: 0.625rem;
+}
+
+.App .action-icon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.App .action-card:not(.generate-card) .action-indicator {
+  display: none;
+}
+
+.App .action-card.generate-card {
+  --action-indicator-bg: rgb(255 255 255 / 16%);
+
+  color: #fff;
+  background: linear-gradient(110deg, #4e38be, #5944c8);
+  border-color: #4e38be;
+}
+
+.App .action-card.generate-card:hover {
+  background: #4230a4;
+}
+
+.App .generate-card .action-text :is(h3, p) {
+  color: inherit;
+  opacity: 1;
+}
+
+.App .action-card.generate-card :is(.action-icon, .action-indicator) {
+  color: #fff;
+  background: var(--action-indicator-bg);
+  border-color: transparent;
+}
+
+.App .generate-card .action-arrow {
+  color: inherit;
+}
+
+.App .problems-section .problems-container {
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.App .problems-header {
+  gap: 0.625rem;
+  padding: 0 0 0.75rem;
+  background: none;
+  border-color: var(--studio-line);
+}
+
+.App .problems-header h2 {
+  margin: 0;
+}
+
+.App .problems-content {
+  padding: 0.75rem 0 0;
+}
+
+.App .problem-item {
+  color: var(--studio-ink);
+  background: var(--studio-background);
+  border: 1px solid var(--studio-line);
+  border-radius: 0.625rem;
+  box-shadow: none;
+}
+
+@media (width <= 58rem) {
+  .App .container {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (width <= 28rem) {
+  .App .presets-grid,
+  .App .action-cards-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (forced-colors: active) {
+  .App .action-card.generate-card {
+    color: ButtonText;
+    background: ButtonFace;
+    border-color: ButtonText;
+  }
+
+  .App .action-card.generate-card :is(.action-icon, .action-indicator) {
+    color: ButtonText;
+  }
+}
+
 /* Sticky mobile generate bar: keeps the primary action reachable while
    the settings-first layout scrolls. Rendered only on matching viewports. */
 .mobile-generate-bar {
@@ -29,7 +319,7 @@ ul {
 @media (width <= 768px) {
   /* Reserve space so the bar never permanently covers page content, and
      keep keyboard-focused elements clear of it when scrolling (WCAG 2.4.11). */
-  .App {
+  :root .App {
     padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
   }
 

@@ -59,20 +59,18 @@ type ActionCardsProps = {
   t: (key: string, params?: Record<string, string | number>) => string;
   problemsCount: number;
   onGenerate: () => void;
-  onDownload: () => Promise<void> | void;
+  onPreviewPdf: () => void;
   onStartQuiz: () => void;
   isGenerating?: boolean;
-  isDownloading?: boolean;
 };
 
 const ActionCards: React.FC<ActionCardsProps> = ({
   t,
   problemsCount,
   onGenerate,
-  onDownload,
+  onPreviewPdf,
   onStartQuiz,
   isGenerating = false,
-  isDownloading = false,
 }) => {
   const isEmpty = problemsCount === 0;
   const legendId = React.useId();
@@ -112,25 +110,17 @@ const ActionCards: React.FC<ActionCardsProps> = ({
         <button
           type={STR_BUTTON}
           className="action-card download-card"
-          onClick={() => {
-            // Intentionally not awaiting to keep UI responsive
-            const p = onDownload();
-            // Best-effort: silence unhandled rejections in tests
-            if (p && typeof (p as Promise<unknown>).catch === "function") {
-              (p as Promise<unknown>).catch(() => {});
-            }
-          }}
-          disabled={isEmpty || isGenerating || isDownloading}
-          aria-disabled={isEmpty || isGenerating || isDownloading}
-          aria-label={`${t("buttons.download")} · ${t("accessibility.downloadButton")}`}
+          onClick={onPreviewPdf}
+          disabled={isEmpty || isGenerating}
+          aria-haspopup="dialog"
         >
           <div className={STR_ACTION_CARD_CONTENT}>
             <span className={STR_ACTION_ICON} aria-hidden="true">
               <DownloadIcon />
             </span>
             <div className={STR_ACTION_TEXT}>
-              <h3>{t("buttons.download")}</h3>
-              <p>{t("buttons.downloadDescription")}</p>
+              <h3>{t("pdf.previewTitle")}</h3>
+              <p>{t("pdf.previewDescription")}</p>
             </div>
             <div className={STR_ACTION_INDICATOR}>
               <span className={STR_ACTION_ARROW}>
@@ -144,8 +134,8 @@ const ActionCards: React.FC<ActionCardsProps> = ({
           type={STR_BUTTON}
           className="action-card quiz-card"
           onClick={onStartQuiz}
-          disabled={isEmpty || isGenerating || isDownloading}
-          aria-disabled={isEmpty || isGenerating || isDownloading}
+          disabled={isEmpty || isGenerating}
+          aria-disabled={isEmpty || isGenerating}
           aria-label={`${t("infoPanel.quickActions.startQuiz")} · ${t("buttons.quizDescription")}`}
         >
           <div className={STR_ACTION_CARD_CONTENT}>

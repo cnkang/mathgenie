@@ -2,7 +2,8 @@
 export default {
   app: {
     title: "数学精灵",
-    subtitle: "生成定制化数学题目，用于练习和学习",
+    practiceTitle: "给孩子做一份专属数学练习",
+    subtitle: "选一套适合孩子的题目，按需调整后，可打印或在线练习。",
   },
   operations: {
     title: "选择运算",
@@ -13,6 +14,7 @@ export default {
     help: "点击切换各运算的选中状态",
   },
   settings: {
+    title: "练习设置",
     numProblems: "题目数量",
     numberRange: "数字范围",
     resultRange: "结果范围",
@@ -44,6 +46,26 @@ export default {
     importError: "读取设置文件时出错",
   },
   pdf: {
+    pageNumber: "页码",
+    goToPage: "跳转",
+    previewSize: "预览大小",
+    fitPage: "整页",
+    zoomPage: "放大",
+    largePrint: "大字练习",
+    largePrintDetails: "{{font}} pt 字号 · {{spacing}} pt 行距",
+    previewTitle: "打印预览",
+    previewDescription: "下载前查看分页效果",
+    closePreview: "关闭",
+    preparingPreview: "正在准备页面…",
+    worksheet: "练习页",
+    answerKey: "答案页",
+    downloadAnswerKeyOnly: "只下载答案页",
+    preparingAnswerKey: "正在准备答案页…",
+    answerKeySubtitle: "家长核对",
+    name: "姓名",
+    date: "日期",
+    includeAnswerKey: "附上独立答案页",
+    answerKeyHelp: "答案集中放在 PDF 末尾，练习页保留答题空白。",
     title: "PDF 设置",
     fontSize: "字体大小 (pt)",
     lineSpacing: "行间距 (pt)",
@@ -171,25 +193,26 @@ export default {
     translations: "正在加载翻译...",
   },
   presets: {
-    title: "快速预设",
+    title: "按学习阶段选题",
     apply: "应用",
+    applyDescription: "应用{{name}}：{{description}}",
     clickToApply: "点击应用",
     applied: "已应用",
     beginner: {
       name: "初级 (1-10)",
-      description: "简单的加法和减法",
+      description: "会数到 10？从简单的加减法开始。",
     },
     intermediate: {
       name: "中级 (1-50)",
-      description: "包含中等数字的所有运算",
+      description: "加减法已经熟练？试试更大的数，再加入乘法。",
     },
     advanced: {
       name: "高级 (1-100)",
-      description: "包括除法在内的所有运算",
+      description: "乘除法已经熟练？挑战四则运算，答案可能是负数。",
     },
     multiplication: {
       name: "乘法表",
-      description: "专注于乘法练习",
+      description: "理解每组数量相同？练习 1–12 的乘法表。",
     },
   },
   preview: {

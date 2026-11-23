@@ -1,0 +1,340 @@
+.pdf-preview {
+  --pdf-preview-sheet-height: min(52dvh, 31rem);
+
+  width: min(54rem, calc(100% - 2rem));
+  max-height: calc(100dvh - 2rem);
+  padding: 0;
+  margin: auto;
+  color: var(--studio-ink);
+  background: var(--studio-surface);
+  border: 1px solid var(--studio-line);
+  border-radius: 1.25rem;
+  box-shadow: 0 24px 72px rgb(17 15 40 / 32%);
+}
+
+.pdf-preview:modal,
+.pdf-preview::backdrop {
+  overscroll-behavior: contain;
+}
+
+.pdf-preview::backdrop {
+  overflow: hidden;
+  background: rgb(18 17 42 / 64%);
+}
+
+.pdf-preview-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--studio-line);
+}
+
+.pdf-preview-header h2 {
+  margin: 0;
+  font-size: var(--font-size-xl);
+}
+
+.pdf-preview-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(14rem, 34%);
+  gap: 1.25rem;
+  padding: 1.25rem;
+}
+
+.pdf-preview-stage,
+.pdf-preview-options {
+  min-inline-size: 0;
+}
+
+.pdf-preview-stage {
+  display: grid;
+  grid-template-rows: auto auto minmax(44px, auto);
+  align-content: start;
+  gap: 0.75rem;
+}
+
+.pdf-preview-view {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  justify-self: start;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  padding: 0.25rem;
+  margin: 0;
+  background: var(--studio-background);
+  border: 1px solid var(--studio-line);
+  border-radius: 0.75rem;
+}
+
+.pdf-preview-view label {
+  position: relative;
+  margin: 0;
+  cursor: pointer;
+}
+
+.pdf-preview-view label span {
+  display: grid;
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  padding: 0.375rem 0.75rem;
+  place-items: center;
+  color: var(--studio-muted);
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+}
+
+.pdf-preview-view input:checked + span {
+  font-weight: 800;
+  color: var(--studio-accent);
+  background: var(--studio-surface);
+  border-color: var(--studio-line);
+}
+
+.pdf-preview-view input:focus-visible + span {
+  outline: 2px solid var(--studio-accent);
+  outline-offset: -2px;
+}
+
+.pdf-preview-canvas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  align-content: start;
+  min-block-size: 12rem;
+  block-size: min(57dvh, 33rem);
+  padding: clamp(0.625rem, 2vw, 1.25rem);
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: var(--studio-background);
+  border: 1px solid var(--studio-line);
+  border-radius: 0.875rem;
+}
+
+.pdf-preview-canvas[data-zoomed="true"] {
+  justify-items: start;
+}
+
+.pdf-preview-canvas[data-zoomed="true"] .pdf-preview-page {
+  width: min(200%, 50rem);
+}
+
+.pdf-preview-page {
+  position: relative;
+  width: min(100%, 25rem);
+  overflow: hidden;
+  container-type: inline-size;
+  color: #171717;
+  background: #fff;
+  border: 1px solid #d5d7e0;
+  box-shadow: 0 6px 18px rgb(25 22 65 / 13%);
+}
+
+.pdf-preview-line {
+  position: absolute;
+  font-family: Helvetica, Arial, sans-serif;
+  font-weight: 400;
+  line-height: 1;
+  white-space: pre;
+  transform: translateY(-0.82em);
+}
+
+.pdf-preview-answer-rule {
+  position: absolute;
+  border-top: 1px solid currentColor;
+}
+
+.pdf-preview-pagination {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  gap: 0.5rem;
+  align-items: center;
+  text-align: center;
+}
+
+.pdf-preview-page-navigation,
+.pdf-preview-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 0;
+}
+
+.pdf-preview-page-navigation {
+  column-gap: 0.75rem;
+}
+
+.pdf-preview-jump input {
+  inline-size: 4.25rem;
+  max-inline-size: 100%;
+  padding: 0.375rem;
+  text-align: center;
+}
+
+.pdf-preview-header button,
+.pdf-preview-pagination button {
+  min-block-size: 44px;
+  padding: 0.375rem 0.625rem;
+  color: var(--studio-ink);
+  background: var(--studio-background);
+  border: 1px solid var(--studio-line);
+  box-shadow: none;
+}
+
+.pdf-preview-header button:hover,
+.pdf-preview-pagination button:hover:not(:disabled) {
+  color: var(--studio-ink);
+  background: var(--studio-tint);
+  transform: none;
+}
+
+.pdf-preview-pagination button:disabled {
+  color: var(--studio-muted);
+  background: var(--studio-background);
+  opacity: 0.55;
+}
+
+.pdf-preview-options {
+  display: grid;
+  align-content: start;
+  gap: 0.75rem;
+}
+
+.pdf-preview .pdf-preview-large-print {
+  flex-direction: column;
+  gap: 0.125rem;
+  align-items: start;
+  padding: 0.625rem 0.75rem;
+  color: var(--studio-accent);
+  text-align: start;
+  background: var(--studio-tint);
+  border: 1px solid var(--studio-line);
+  border-radius: 0.75rem;
+  box-shadow: none;
+}
+
+.pdf-preview .pdf-preview-large-print:hover {
+  color: var(--studio-accent);
+  background: var(--studio-tint);
+  border-color: var(--studio-accent);
+  transform: none;
+}
+
+.pdf-preview-large-print span {
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  color: var(--studio-muted);
+}
+
+.pdf-preview-type-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.625rem;
+  align-items: end;
+}
+
+.pdf-preview-type-options label {
+  overflow-wrap: anywhere;
+}
+
+.pdf-preview-paper-select select,
+.pdf-preview-type-options input {
+  padding-block: 0.5rem;
+  color: var(--studio-ink);
+  background-color: var(--studio-background);
+  border-color: var(--studio-line);
+  border-radius: 0.75rem;
+}
+
+.pdf-preview-help {
+  margin: 0;
+  color: var(--studio-muted);
+}
+
+.pdf-preview-answer-option {
+  display: flex;
+  gap: 0.625rem;
+  align-items: center;
+  min-block-size: 44px;
+  padding: 0.5rem 0.75rem;
+  color: var(--studio-ink);
+  cursor: pointer;
+  background: var(--studio-tint);
+  border: 1px solid var(--studio-line);
+  border-radius: 0.75rem;
+}
+
+.pdf-preview .pdf-preview-answer-option input[type="checkbox"] {
+  flex-shrink: 0;
+  inline-size: 1.25rem;
+  min-inline-size: 1.25rem;
+  block-size: 1.25rem;
+  min-block-size: 1.25rem;
+  margin: 0;
+  accent-color: var(--studio-accent);
+}
+
+.pdf-preview .pdf-preview-download {
+  min-block-size: 48px;
+  color: #fff;
+  background: #4e38be;
+}
+
+.pdf-preview .pdf-preview-download:hover:not(:disabled) {
+  background: #4230a4;
+}
+
+@media (width <= 43rem) {
+  .pdf-preview {
+    --pdf-preview-sheet-height: min(34dvh, 19rem);
+  }
+
+  .pdf-preview-layout {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0.875rem;
+  }
+
+  .pdf-preview-canvas {
+    block-size: min(38dvh, 21rem);
+  }
+}
+
+.pdf-preview .pdf-preview-download-answer-key {
+  min-block-size: 44px;
+  margin-block-start: 0.625rem;
+  color: #4e38be;
+  background: #f5f2ff;
+  border: 1px solid #d8d1f5;
+}
+
+.pdf-preview .pdf-preview-download-answer-key:hover:not(:disabled) {
+  background: #ebe6ff;
+}
+
+.pdf-preview-download-error {
+  margin: 0.5rem 0 0;
+  color: #b42318;
+  font-size: 0.875rem;
+}
+
+@media (forced-colors: active) {
+  .pdf-preview .pdf-preview-download {
+    color: ButtonText;
+    background: ButtonFace;
+  }
+
+  .pdf-preview .pdf-preview-download-answer-key {
+    color: ButtonText;
+    background: ButtonFace;
+    border-color: ButtonText;
+  }
+
+  .pdf-preview-download-error {
+    color: Mark;
+  }
+}

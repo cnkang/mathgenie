@@ -2,7 +2,9 @@
 export default {
   app: {
     title: "MathGenie",
-    subtitle: "Generate customized math problems for practice and learning",
+    practiceTitle: "Make math practice fit your child",
+    subtitle:
+      "Choose a practice set, then make it your own. Print the worksheet or let your child practice online.",
   },
   operations: {
     title: "Select Operations",
@@ -13,6 +15,7 @@ export default {
     help: "Tap to toggle each operation on or off",
   },
   settings: {
+    title: "Settings",
     numProblems: "Number of Problems",
     numberRange: "Number Range",
     resultRange: "Result Range",
@@ -45,6 +48,26 @@ export default {
     importError: "Error reading settings file",
   },
   pdf: {
+    pageNumber: "Page number",
+    goToPage: "Go",
+    previewSize: "Preview size",
+    fitPage: "Full page",
+    zoomPage: "Zoom in",
+    largePrint: "Large print",
+    largePrintDetails: "{{font}} pt font · {{spacing}} pt line spacing",
+    previewTitle: "Print preview",
+    previewDescription: "Review the pages before downloading",
+    closePreview: "Close",
+    preparingPreview: "Preparing pages…",
+    worksheet: "Worksheet",
+    answerKey: "Answer key",
+    downloadAnswerKeyOnly: "Download answer key only",
+    preparingAnswerKey: "Preparing answer key…",
+    answerKeySubtitle: "For parents",
+    name: "Name",
+    date: "Date",
+    includeAnswerKey: "Include a separate answer key",
+    answerKeyHelp: "Adds the answers at the end of the PDF and leaves the worksheet blank.",
     title: "PDF Settings",
     fontSize: "Font Size (pt)",
     lineSpacing: "Line Spacing (pt)",
@@ -177,25 +200,28 @@ export default {
     translations: "Loading translations...",
   },
   presets: {
-    title: "Quick Presets",
+    title: "Choose by skill",
     apply: "Apply",
+    applyDescription: "Apply {{name}}: {{description}}",
     clickToApply: "Apply",
     applied: "Applied",
     beginner: {
       name: "Beginner (1-10)",
-      description: "Simple addition and subtraction",
+      description: "Can count to 10? Start with simple addition and subtraction.",
     },
     intermediate: {
       name: "Intermediate (1-50)",
-      description: "All operations with medium numbers",
+      description:
+        "Comfortable with addition and subtraction? Try larger numbers and add multiplication.",
     },
     advanced: {
       name: "Advanced (1-100)",
-      description: "All operations including division",
+      description:
+        "Comfortable multiplying and dividing? Try all four operations, with some negative answers.",
     },
     multiplication: {
       name: "Multiplication Tables",
-      description: "Focus on multiplication practice",
+      description: "Understands equal groups? Practise the 1–12 times tables.",
     },
   },
   preview: {

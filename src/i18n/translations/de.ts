@@ -2,7 +2,9 @@
 export default {
   app: {
     title: "MathGenie",
-    subtitle: "Erstellen Sie angepasste Mathematikaufgaben zum Üben und Lernen",
+    practiceTitle: "Matheübungen, die zu Ihrem Kind passen",
+    subtitle:
+      "Wählen Sie passende Aufgaben und passen Sie sie bei Bedarf an. Ihr Kind kann auf Papier oder online üben.",
   },
   operations: {
     title: "Operationen auswählen",
@@ -13,6 +15,7 @@ export default {
     help: "Tippen, um jede Operation ein- oder auszuschalten",
   },
   settings: {
+    title: "Übungseinstellungen",
     numProblems: "Anzahl der Aufgaben",
     numberRange: "Zahlenbereich",
     resultRange: "Ergebnisbereich",
@@ -45,6 +48,27 @@ export default {
     importError: "Fehler beim Lesen der Einstellungsdatei",
   },
   pdf: {
+    pageNumber: "Seitennummer",
+    goToPage: "Springen",
+    previewSize: "Vorschaugröße",
+    fitPage: "Ganze Seite",
+    zoomPage: "Vergrößert",
+    largePrint: "Großdruck",
+    largePrintDetails: "Schrift {{font}} pt · Zeilenabstand {{spacing}} pt",
+    previewTitle: "Druckvorschau",
+    previewDescription: "Seiten vor dem Download prüfen",
+    closePreview: "Schließen",
+    preparingPreview: "Seiten werden vorbereitet…",
+    worksheet: "Arbeitsblatt",
+    answerKey: "Lösungen",
+    downloadAnswerKeyOnly: "Nur Lösungsseiten herunterladen",
+    preparingAnswerKey: "Lösungsseiten werden vorbereitet…",
+    answerKeySubtitle: "Für Eltern",
+    name: "Name",
+    date: "Datum",
+    includeAnswerKey: "Separate Lösungsseiten anhängen",
+    answerKeyHelp:
+      "Die Lösungen stehen am Ende der PDF-Datei. Auf dem Arbeitsblatt bleiben die Antworten frei.",
     title: "PDF-Einstellungen",
     fontSize: "Schriftgröße (pt)",
     lineSpacing: "Zeilenabstand (pt)",
@@ -182,25 +206,27 @@ export default {
     translations: "Übersetzungen werden geladen...",
   },
   presets: {
-    title: "Schnellvorlagen",
+    title: "Nach Kenntnisstand wählen",
     apply: "Anwenden",
+    applyDescription: "{{name}} anwenden: {{description}}",
     clickToApply: "Anwenden",
     applied: "Angewendet",
     beginner: {
       name: "Anfänger (1-10)",
-      description: "Einfache Addition und Subtraktion",
+      description: "Zählt Ihr Kind bis 10? Starten Sie mit einfachen Plus- und Minusaufgaben.",
     },
     intermediate: {
       name: "Fortgeschritten (1-50)",
-      description: "Alle Operationen mit mittleren Zahlen",
+      description: "Plus und Minus klappen schon? Wechseln Sie zu größeren Zahlen und Malaufgaben.",
     },
     advanced: {
       name: "Experte (1-100)",
-      description: "Alle Operationen einschließlich Division",
+      description:
+        "Mal und geteilt klappen schon? Üben Sie alle vier Rechenarten, auch mit negativen Ergebnissen.",
     },
     multiplication: {
       name: "Multiplikationstabellen",
-      description: "Fokus auf Multiplikationsübung",
+      description: "Versteht Ihr Kind gleich große Gruppen? Üben Sie die Malreihen von 1 bis 12.",
     },
   },
   preview: {

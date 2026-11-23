@@ -1,5 +1,5 @@
 import type { MessageValue, PaperSizeOptions, Problem, QuizResult, Settings } from "@/types";
-import { generatePdf, type PdfLabels } from "@/utils/pdf";
+import { generatePdf, type PdfLabels, type PreparedPdf } from "@/utils/pdf";
 import { useCallback, useEffect } from "react";
 
 type UseInitialGenerationArgs = {
@@ -79,33 +79,37 @@ export const usePdfDownload = (
     [setError, isDev],
   );
 
-  return useCallback(async (): Promise<void> => {
-    const emptyProblemsMessage = { key: "errors.noProblemsToPdf" } as const;
-    const pdfGeneratedMessage = { key: "messages.success.pdfGenerated" } as const;
+  return useCallback(
+    async (prepared?: PreparedPdf, filename = "problems.pdf"): Promise<void> => {
+      const emptyProblemsMessage = { key: "errors.noProblemsToPdf" } as const;
+      const pdfGeneratedMessage = { key: "messages.success.pdfGenerated" } as const;
 
-    if (problems.length === 0) {
-      setError(emptyProblemsMessage);
-      return;
-    }
+      if (problems.length === 0) {
+        setError(emptyProblemsMessage);
+        return;
+      }
 
-    clearMessages();
+      clearMessages();
 
-    try {
-      await generatePdf(problems, settings, paperSizeOptions, "problems.pdf", labels);
-      showSuccessMessage(pdfGeneratedMessage);
-    } catch (err) {
-      handlePdfError(err);
-    }
-  }, [
-    problems,
-    settings,
-    paperSizeOptions,
-    showSuccessMessage,
-    setError,
-    clearMessages,
-    handlePdfError,
-    labels,
-  ]);
+      try {
+        if (prepared) prepared.save(filename);
+        else await generatePdf(problems, settings, paperSizeOptions, filename, labels);
+        showSuccessMessage(pdfGeneratedMessage);
+      } catch (err) {
+        handlePdfError(err);
+      }
+    },
+    [
+      problems,
+      settings,
+      paperSizeOptions,
+      showSuccessMessage,
+      setError,
+      clearMessages,
+      handlePdfError,
+      labels,
+    ],
+  );
 };
 
 const startQuizModeLogic = (
