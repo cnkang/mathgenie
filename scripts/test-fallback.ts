@@ -3,6 +3,7 @@
  * Test script to verify fallback strategies work correctly
  */
 
+import { pathToFileURL } from "node:url";
 import { findExecutable, isCommandAvailable } from "./exec-utils";
 
 function main(): void {
@@ -34,6 +35,6 @@ function main(): void {
   console.log("\n✅ Fallback test completed!");
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   main();
 }
