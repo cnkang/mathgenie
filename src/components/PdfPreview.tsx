@@ -12,6 +12,11 @@ import { useEffect, useId, useRef, useState } from "react";
 import "./PdfPreview.css";
 
 const largePrint = { font: 24, spacing: 40 };
+const paperSizeNames: Record<string, string> = {
+  a4: "A4",
+  letter: "Letter",
+  legal: "Legal",
+};
 
 type PdfPreviewProps = {
   t: (key: string, params?: Record<string, string | number>) => string;
@@ -31,7 +36,7 @@ type PreviewMeasureProps = {
   onChange: (value: number) => void;
 };
 
-function PreviewMeasure({ label, value, min, max, onChange }: PreviewMeasureProps) {
+function PreviewMeasure({ label, value, min, max, onChange }: Readonly<PreviewMeasureProps>) {
   const id = useId();
   const [draft, setDraft] = useState<string | null>(null);
   return (
@@ -67,7 +72,7 @@ function PdfPreview({
   labels,
   onClose,
   onDownload,
-}: PdfPreviewProps) {
+}: Readonly<PdfPreviewProps>) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const pageViewportRef = useRef<HTMLElement>(null);
   const pageInputRef = useRef<HTMLInputElement>(null);
@@ -205,9 +210,9 @@ function PdfPreview({
             data-zoomed={isZoomed}
             ref={pageViewportRef}
             aria-label={pageLabel}
-            tabIndex={0}
+            tabIndex={-1}
           >
-            {prepared === null && <p role="status">{t("pdf.preparingPreview")}</p>}
+            {prepared === null && <output>{t("pdf.preparingPreview")}</output>}
             {prepared === "error" && <p role="alert">{t("errors.pdfFailed")}</p>}
             {pdf && page && (
               <div
@@ -326,7 +331,7 @@ function PdfPreview({
             >
               {Object.values(paperSizes).map((size) => (
                 <option key={size} value={size}>
-                  {size === "a4" ? "A4" : size === "letter" ? "Letter" : "Legal"}
+                  {paperSizeNames[size] ?? size}
                 </option>
               ))}
             </select>
