@@ -63,7 +63,7 @@ async function loadTranslationFile(language: string): Promise<Record<string, str
       throw new Error(`Invalid file path: ${filePath}`);
     }
 
-    const module = await import(filePath);
+    const module = await import(pathToFileURL(filePath).href);
     const translations = module.default as TranslationObject;
 
     // Validate the imported object structure

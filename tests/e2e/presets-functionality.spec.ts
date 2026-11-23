@@ -65,7 +65,9 @@ test.describe('Presets Functionality', () => {
     await expect(advancedCard.locator('p')).toContainText('Comfortable multiplying and dividing?');
 
     // Check multiplication preset - use more specific selector
-    const multiplicationCard = page.locator('.preset-card:has-text("Multiplication Tables")');
+    const multiplicationCard = page
+      .locator('.preset-card')
+      .filter({ has: page.getByRole('heading', { name: 'Multiplication Tables', exact: true }) });
     await expect(multiplicationCard.locator('h3')).toContainText('Multiplication', {
       timeout: 8000,
     });

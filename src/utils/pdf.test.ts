@@ -123,6 +123,21 @@ describe("pdf utils", () => {
       lines[1].y + 1.5,
     ]);
   });
+  test("keeps large print clear of the student information", async () => {
+    const { preparePdf } = await import("./pdf");
+    const fontSize = 24;
+    const pdf = await preparePdf(
+      [{ id: 1, text: "1 + 1 =" }],
+      { ...baseSettings, fontSize, lineSpacing: 40 },
+      paperSizes,
+      { group: () => "", empty: "" },
+      false,
+    );
+
+    const page = pdf.pages[0];
+    const labelY = page.studentInfo?.lines[0]?.y ?? 0;
+    expect(page.lines[0].y - labelY).toBeGreaterThanOrEqual(fontSize * 1.6);
+  });
   test("keeps long grouped exports ordered while yielding between batches", async () => {
     const { generatePdf } = await import("./pdf");
     const timeout = vi.spyOn(globalThis, "setTimeout");
