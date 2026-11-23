@@ -56,7 +56,7 @@ describe("translation retry ordering", () => {
   });
 
   it("falls back to English after exactly three failed attempts", async () => {
-    await import("./translations/en");
+    const { default: english } = await import("./translations/en");
     french.load.mockImplementation(() => {
       throw new Error("unavailable");
     });
@@ -67,8 +67,6 @@ describe("translation retry ordering", () => {
     );
     await act(async () => vi.advanceTimersByTimeAsync(600));
     expect(french.load).toHaveBeenCalledTimes(3);
-    expect(screen.getByRole("status").textContent).toBe(
-      "Generate customized math problems for practice and learning",
-    );
+    expect(screen.getByRole("status").textContent).toBe(english.app.subtitle);
   });
 });

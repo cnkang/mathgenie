@@ -36,7 +36,7 @@ test.describe('Presets Functionality', () => {
     // Check that presets title is displayed (use h2 for the main title)
     const presetsTitle = page.locator('.settings-presets h2');
     await expect(presetsTitle).toBeVisible();
-    await expect(presetsTitle).toContainText('Quick Presets');
+    await expect(presetsTitle).toContainText('Choose by skill');
   });
 
   test('should display all preset cards with correct content', async ({ page }: { page: Page }) => {
@@ -51,25 +51,25 @@ test.describe('Presets Functionality', () => {
     // Check beginner preset - use first() instead of nth(0) for better performance
     const beginnerCard = page.locator('.preset-card').first();
     await expect(beginnerCard.locator('h3')).toContainText('Beginner', { timeout: 8000 });
-    await expect(beginnerCard.locator('p')).toContainText('Simple addition and subtraction');
+    await expect(beginnerCard.locator('p')).toContainText('Can count to 10?');
     await expect(beginnerCard.locator('.preset-action')).toContainText('Apply');
 
     // Check intermediate preset - use more specific selector
     const intermediateCard = page.locator('.preset-card:has-text("Intermediate")');
     await expect(intermediateCard.locator('h3')).toContainText('Intermediate', { timeout: 8000 });
-    await expect(intermediateCard.locator('p')).toContainText('All operations with medium numbers');
+    await expect(intermediateCard.locator('p')).toContainText('Comfortable with addition and subtraction?');
 
     // Check advanced preset - use more specific selector
     const advancedCard = page.locator('.preset-card:has-text("Advanced")');
     await expect(advancedCard.locator('h3')).toContainText('Advanced', { timeout: 8000 });
-    await expect(advancedCard.locator('p')).toContainText('All operations including division');
+    await expect(advancedCard.locator('p')).toContainText('Comfortable multiplying and dividing?');
 
     // Check multiplication preset - use more specific selector
     const multiplicationCard = page.locator('.preset-card:has-text("Multiplication")');
     await expect(multiplicationCard.locator('h3')).toContainText('Multiplication', {
       timeout: 8000,
     });
-    await expect(multiplicationCard.locator('p')).toContainText('Focus on multiplication practice');
+    await expect(multiplicationCard.locator('p')).toContainText('Understands equal groups?');
   });
 
   test('should apply beginner preset correctly', async ({ page }: { page: Page }) => {

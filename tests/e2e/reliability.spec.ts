@@ -122,8 +122,9 @@ test('loads PDF only on demand', async ({ page }) => {
   await expect(page.locator('.problem-item')).toHaveCount(1);
   await page.evaluate(async () => { await navigator.serviceWorker.ready; if (!navigator.serviceWorker.controller) await new Promise<void>((resolve) => navigator.serviceWorker.addEventListener('controllerchange', () => resolve(), { once: true })); });
   expect(pdfRequests).toHaveLength(0);
+  await page.getByRole('button', { name: /Print preview/i }).click();
   const download = page.waitForEvent('download');
-  await page.getByRole('button', { name: /Download PDF/i }).click();
+  await page.getByRole('dialog').getByRole('button', { name: /Download PDF/i }).click();
   expect((await download).suggestedFilename()).toBe('problems.pdf');
   expect(pdfRequests.length).toBeGreaterThan(0);
  });

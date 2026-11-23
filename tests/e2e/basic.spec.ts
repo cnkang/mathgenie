@@ -43,9 +43,36 @@ test.describe('MathGenie Basic Functionality', () => {
     // Wait for problems to load
     await page.waitForSelector('.problems-container', { timeout: 10000 });
 
-    // Start download
+    await page.getByRole('button', { name: /Print preview/i }).click();
+    const preview = page.getByRole('dialog', { name: 'Print preview' });
+    await expect(preview.getByRole('region', { name: 'Worksheet' })).toBeVisible();
+    await preview.getByRole('combobox', { name: 'Paper Size' }).selectOption('legal');
+    await expect(preview.locator('.pdf-preview-page')).toHaveCSS('aspect-ratio', '612 / 1008');
+    await preview.getByRole('button', { name: /^Large print/ }).click();
+    await expect(preview.getByRole('spinbutton', { name: 'Font Size (pt)' })).toHaveValue('24');
+    const lineSpacing = preview.getByRole('spinbutton', { name: 'Line Spacing (pt)' });
+    await expect(lineSpacing).toHaveValue('40');
+    await lineSpacing.fill('42');
+    await expect(lineSpacing).toHaveValue('42');
+    await preview.getByRole('checkbox', { name: 'Include a separate answer key' }).check();
+    await expect(preview.getByRole('region', { name: 'Answer key' }).getByText('Answer key')).toBeVisible();
+    await expect(preview.locator('.pdf-preview-answer-rule')).toHaveCount(0);
+    await preview.getByRole('button', { name: 'Previous page' }).click();
+    await expect(preview.locator('.pdf-preview-answer-rule').first()).toBeVisible();
+    await expect(preview.getByRole('radio', { name: 'Full page' })).toBeChecked();
+    await preview.getByRole('radio', { name: 'Full page' }).focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(preview.getByRole('radio', { name: 'Zoom in' })).toBeChecked();
+    await expect(preview.locator('.pdf-preview-canvas')).toHaveAttribute('data-zoomed', 'true');
+    const pageNumber = preview.getByRole('spinbutton', { name: 'Page number' });
+    await expect(pageNumber).toHaveValue('1');
+    await pageNumber.fill('2');
+    await pageNumber.press('Enter');
+    await expect(preview.getByRole('region', { name: 'Answer key' })).toBeFocused();
+    await expect(preview.getByRole('radio', { name: 'Zoom in' })).toBeChecked();
+
     const downloadPromise = page.waitForEvent('download');
-    await page.click('button:has-text("Download PDF")');
+    await preview.getByRole('button', { name: 'Download PDF' }).click();
 
     const download = await downloadPromise;
     expect(download.suggestedFilename()).toBe('problems.pdf');

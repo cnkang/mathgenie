@@ -2,8 +2,9 @@
 export default {
   app: {
     title: "MathGenie",
+    practiceTitle: "Des exercices de maths adaptés à votre enfant",
     subtitle:
-      "Générez des problèmes de mathématiques personnalisés pour la pratique et l'apprentissage",
+      "Choisissez une série d’exercices et ajustez-la à son niveau. Imprimez la fiche ou laissez votre enfant s’entraîner en ligne.",
   },
   operations: {
     title: "Sélectionner les opérations",
@@ -14,6 +15,7 @@ export default {
     help: "Touchez pour activer ou désactiver chaque opération",
   },
   settings: {
+    title: "Paramètres des exercices",
     numProblems: "Nombre de problèmes",
     numberRange: "Plage de nombres",
     resultRange: "Plage de résultats",
@@ -46,6 +48,27 @@ export default {
     importError: "Erreur lors de la lecture du fichier de paramètres",
   },
   pdf: {
+    pageNumber: "Numéro de page",
+    goToPage: "Aller",
+    previewSize: "Taille de l’aperçu",
+    fitPage: "Page entière",
+    zoomPage: "Agrandie",
+    largePrint: "Grands caractères",
+    largePrintDetails: "Police {{font}} pt · Interligne {{spacing}} pt",
+    previewTitle: "Aperçu avant impression",
+    previewDescription: "Vérifiez les pages avant le téléchargement",
+    closePreview: "Fermer",
+    preparingPreview: "Préparation des pages…",
+    worksheet: "Fiche d’exercices",
+    answerKey: "Corrigé",
+    downloadAnswerKeyOnly: "Télécharger uniquement le corrigé",
+    preparingAnswerKey: "Préparation du corrigé…",
+    answerKeySubtitle: "Pour les parents",
+    name: "Nom",
+    date: "Date",
+    includeAnswerKey: "Ajouter un corrigé séparé",
+    answerKeyHelp:
+      "Le corrigé est ajouté à la fin du PDF. Les réponses restent à compléter sur la fiche.",
     title: "Paramètres PDF",
     fontSize: "Taille de police (pt)",
     lineSpacing: "Espacement des lignes (pt)",
@@ -186,25 +209,29 @@ export default {
     translations: "Chargement des traductions...",
   },
   presets: {
-    title: "Préréglages rapides",
+    title: "Choisir selon les acquis",
     apply: "Appliquer",
+    applyDescription: "Appliquer {{name}} : {{description}}",
     clickToApply: "Appliquer",
     applied: "Appliqué",
     beginner: {
       name: "Débutant (1-10)",
-      description: "Addition et soustraction simples",
+      description:
+        "Votre enfant compte jusqu’à 10 ? Commencez par des additions et des soustractions simples.",
     },
     intermediate: {
       name: "Intermédiaire (1-50)",
-      description: "Toutes les opérations avec des nombres moyens",
+      description:
+        "À l’aise avec l’addition et la soustraction ? Essayez de plus grands nombres et ajoutez la multiplication.",
     },
     advanced: {
       name: "Avancé (1-100)",
-      description: "Toutes les opérations y compris la division",
+      description:
+        "À l’aise avec la multiplication et la division ? Mélangez les quatre opérations, avec des résultats parfois négatifs.",
     },
     multiplication: {
       name: "Tables de multiplication",
-      description: "Focus sur la pratique de la multiplication",
+      description: "Les groupes de même taille sont compris ? Entraînez-vous aux tables de 1 à 12.",
     },
   },
   preview: {

@@ -327,19 +327,14 @@ describe("SettingsPresets", () => {
     expect(container.querySelector("button")?.textContent).toBe("presets.apply");
   });
 
-  test("covers aria-label fallback with preset name", () => {
-    const { container } = render(<SettingsPresets onApplyPreset={mockOnApplyPreset} />);
+  test("uses the preset name and description in the accessible label fallback", () => {
+    render(<SettingsPresets onApplyPreset={mockOnApplyPreset} />);
 
-    const buttons = container.querySelectorAll("button");
-
-    // Check that aria-label includes preset name (this tests the template literal)
-    buttons.forEach((button) => {
-      const ariaLabel = button.getAttribute("aria-label");
-      if (ariaLabel) {
-        expect(ariaLabel).toContain("Apply");
-        expect(ariaLabel).toContain("preset");
-      }
-    });
+    expect(
+      screen.getByRole("button", {
+        name: "Apply Beginner (1-10): Simple addition and subtraction",
+      }),
+    ).toBeInTheDocument();
   });
 
   test("verifies all preset configurations are complete", () => {

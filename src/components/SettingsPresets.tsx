@@ -88,7 +88,8 @@ const SettingsPresets: React.FC<SettingsPresetsProps> = ({ onApplyPreset, curren
     },
     {
       name: t("presets.intermediate.name") || "Intermediate (1-50)",
-      description: t("presets.intermediate.description") || "All operations with medium numbers",
+      description:
+        t("presets.intermediate.description") || "Addition, subtraction, and multiplication",
       settings: {
         operations: ["+", "-", "*"],
         numProblems: 20,
@@ -175,7 +176,11 @@ const SettingsPresets: React.FC<SettingsPresetsProps> = ({ onApplyPreset, curren
               key={preset.name}
               className={`preset-card clickable-card${isActive ? " active" : ""}`}
               onClick={() => handleApplyPreset(preset.settings, preset.name)}
-              aria-label={`${t("presets.apply") || "Apply"} ${preset.name} preset: ${preset.description}`}
+              aria-label={translateWithFallback(
+                "presets.applyDescription",
+                `Apply ${preset.name}: ${preset.description}`,
+                { name: preset.name, description: preset.description },
+              )}
               aria-pressed={isActive}
             >
               <div className="preset-content">

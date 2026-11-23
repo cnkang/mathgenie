@@ -46,6 +46,7 @@ const SettingsSection: React.FC<SettingsSectionProps> = ({
 
   return (
     <section className="settings-section" aria-label={sectionLabel}>
+      <SettingsPresets onApplyPreset={onApplyPreset} currentSettings={settings} />
       <div className="field">
         <span className="field-label" id="operations-label">
           {t("operations.title")}
@@ -78,7 +79,6 @@ const SettingsSection: React.FC<SettingsSectionProps> = ({
         <small className="field-help">{t("operations.help")}</small>
       </div>
 
-      <GroupingSettings t={t} settings={settings} onChange={onChange} />
       <ProblemCountSettings t={t} settings={settings} onChange={onChange} />
 
       <RangeInput
@@ -116,7 +116,7 @@ const SettingsSection: React.FC<SettingsSectionProps> = ({
         increaseLabel={t("accessibility.increaseValue")}
       />
 
-      <SettingsPresets onApplyPreset={onApplyPreset} currentSettings={settings} />
+      <GroupingSettings t={t} settings={settings} onChange={onChange} />
       <SettingsManager settings={settings} onImportSettings={onApplyPreset} />
       <PdfSettings settings={settings} onChange={onChange} paperSizeOptions={paperSizeOptions} />
       <AdvancedSettings settings={settings} onChange={onChange} />

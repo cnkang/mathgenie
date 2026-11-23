@@ -2,7 +2,9 @@
 export default {
   app: {
     title: "MathGenie",
-    subtitle: "Genera problemas de matemáticas personalizados para practicar y aprender",
+    practiceTitle: "Práctica de matemáticas a la medida de tu hijo",
+    subtitle:
+      "Elige un conjunto de ejercicios y ajústalo a su nivel. Imprime la hoja o deja que practique en línea.",
   },
   operations: {
     title: "Seleccionar Operaciones",
@@ -13,6 +15,7 @@ export default {
     help: "Toca para activar o desactivar cada operación",
   },
   settings: {
+    title: "Ajustes de práctica",
     numProblems: "Número de Problemas",
     numberRange: "Rango de Números",
     resultRange: "Rango de Resultados",
@@ -45,6 +48,27 @@ export default {
     importError: "Error al leer el archivo de configuración",
   },
   pdf: {
+    pageNumber: "Número de página",
+    goToPage: "Ir",
+    previewSize: "Tamaño de la vista previa",
+    fitPage: "Página completa",
+    zoomPage: "Ampliada",
+    largePrint: "Letra grande",
+    largePrintDetails: "Letra de {{font}} pt · Interlineado de {{spacing}} pt",
+    previewTitle: "Vista previa de impresión",
+    previewDescription: "Revisa las páginas antes de descargar",
+    closePreview: "Cerrar",
+    preparingPreview: "Preparando las páginas…",
+    worksheet: "Hoja de ejercicios",
+    answerKey: "Soluciones",
+    downloadAnswerKeyOnly: "Descargar solo las soluciones",
+    preparingAnswerKey: "Preparando las soluciones…",
+    answerKeySubtitle: "Para madres y padres",
+    name: "Nombre",
+    date: "Fecha",
+    includeAnswerKey: "Añadir las soluciones por separado",
+    answerKeyHelp:
+      "Las soluciones se añaden al final del PDF y la hoja queda lista para responder.",
     title: "Configuración PDF",
     fontSize: "Tamaño de Fuente (pt)",
     lineSpacing: "Espaciado de Línea (pt)",
@@ -182,25 +206,28 @@ export default {
     translations: "Cargando traducciones...",
   },
   presets: {
-    title: "Presets Rápidos",
+    title: "Elegir según lo que domina",
     apply: "Aplicar",
+    applyDescription: "Aplicar {{name}}: {{description}}",
     clickToApply: "Aplicar",
     applied: "Aplicado",
     beginner: {
       name: "Principiante (1-10)",
-      description: "Suma y resta simples",
+      description: "¿Ya cuenta hasta 10? Empieza con sumas y restas sencillas.",
     },
     intermediate: {
       name: "Intermedio (1-50)",
-      description: "Todas las operaciones con números medianos",
+      description:
+        "¿Suma y resta con soltura? Prueba con números mayores e incorpora la multiplicación.",
     },
     advanced: {
       name: "Avanzado (1-100)",
-      description: "Todas las operaciones incluyendo división",
+      description:
+        "¿Multiplica y divide con soltura? Combina las cuatro operaciones, algunas con resultados negativos.",
     },
     multiplication: {
       name: "Tablas de Multiplicar",
-      description: "Enfoque en práctica de multiplicación",
+      description: "¿Entiende los grupos con la misma cantidad? Practica las tablas del 1 al 12.",
     },
   },
   preview: {

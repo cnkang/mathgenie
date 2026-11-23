@@ -19,7 +19,7 @@ describe("ActionCards", { concurrent: false }, () => {
         t={t}
         problemsCount={3}
         onGenerate={() => {}}
-        onDownload={() => {}}
+        onPreviewPdf={() => {}}
         onStartQuiz={() => {}}
       />,
     );
@@ -28,25 +28,25 @@ describe("ActionCards", { concurrent: false }, () => {
       screen.getByRole("group", { name: /infoPanel\.quickActions\.title/i }),
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /buttons\.generate/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /buttons\.download/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /pdf\.previewTitle/i })).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /infoPanel\.quickActions\.startQuiz/i }),
     ).toBeInTheDocument();
   });
 
-  test("disables download and quiz when no problems", () => {
+  test("disables print preview and quiz when no problems", () => {
     render(
       <ActionCards
         t={t}
         problemsCount={0}
         onGenerate={() => {}}
-        onDownload={() => {}}
+        onPreviewPdf={() => {}}
         onStartQuiz={() => {}}
       />,
     );
 
     const download = screen.getByRole("button", {
-      name: /buttons\.download/i,
+      name: /pdf\.previewTitle/i,
     }) as HTMLButtonElement;
     const quiz = screen.getByRole("button", {
       name: /infoPanel\.quickActions\.startQuiz/i,
@@ -58,7 +58,7 @@ describe("ActionCards", { concurrent: false }, () => {
 
   test("fires callbacks when clicked", () => {
     const onGenerate = vi.fn();
-    const onDownload = vi.fn();
+    const onPreviewPdf = vi.fn();
     const onStartQuiz = vi.fn();
 
     render(
@@ -66,32 +66,17 @@ describe("ActionCards", { concurrent: false }, () => {
         t={t}
         problemsCount={2}
         onGenerate={onGenerate}
-        onDownload={onDownload}
+        onPreviewPdf={onPreviewPdf}
         onStartQuiz={onStartQuiz}
       />,
     );
 
     fireEvent.click(screen.getByRole("button", { name: /buttons\.generate/i }));
-    fireEvent.click(screen.getByRole("button", { name: /buttons\.download/i }));
+    fireEvent.click(screen.getByRole("button", { name: /pdf\.previewTitle/i }));
     fireEvent.click(screen.getByRole("button", { name: /infoPanel\.quickActions\.startQuiz/i }));
 
     expect(onGenerate).toHaveBeenCalledTimes(1);
-    expect(onDownload).toHaveBeenCalledTimes(1);
+    expect(onPreviewPdf).toHaveBeenCalledTimes(1);
     expect(onStartQuiz).toHaveBeenCalledTimes(1);
-  });
-
-  test("handles rejected download promise without throwing", () => {
-    const onDownload = vi.fn(() => Promise.reject(new Error("fail")));
-    render(
-      <ActionCards
-        t={t}
-        problemsCount={1}
-        onGenerate={() => {}}
-        onDownload={onDownload}
-        onStartQuiz={() => {}}
-      />,
-    );
-    fireEvent.click(screen.getByRole("button", { name: /buttons\.download/i }));
-    expect(onDownload).toHaveBeenCalledTimes(1);
   });
 });

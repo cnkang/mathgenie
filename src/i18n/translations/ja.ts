@@ -2,7 +2,9 @@
 export default {
   app: {
     title: "MathGenie",
-    subtitle: "練習と学習のためのカスタマイズされた数学問題を生成",
+    practiceTitle: "お子さまにぴったりの算数練習",
+    subtitle:
+      "お子さまに合う問題セットを選び、必要に応じて調整しましょう。印刷しても、オンラインでも練習できます。",
   },
   operations: {
     title: "演算を選択",
@@ -13,6 +15,7 @@ export default {
     help: "タップして各演算のオン・オフを切り替え",
   },
   settings: {
+    title: "練習設定",
     numProblems: "問題数",
     numberRange: "数値の範囲",
     resultRange: "結果の範囲",
@@ -44,6 +47,26 @@ export default {
     importError: "設定ファイルの読み取りエラー",
   },
   pdf: {
+    pageNumber: "ページ番号",
+    goToPage: "移動",
+    previewSize: "プレビュー表示",
+    fitPage: "全体",
+    zoomPage: "拡大",
+    largePrint: "大きな文字で練習",
+    largePrintDetails: "文字 {{font}} pt · 行間 {{spacing}} pt",
+    previewTitle: "印刷プレビュー",
+    previewDescription: "ダウンロード前にページを確認",
+    closePreview: "閉じる",
+    preparingPreview: "ページを準備中…",
+    worksheet: "練習ページ",
+    answerKey: "解答ページ",
+    downloadAnswerKeyOnly: "解答ページのみをダウンロード",
+    preparingAnswerKey: "解答ページを準備中…",
+    answerKeySubtitle: "保護者用",
+    name: "名前",
+    date: "日付",
+    includeAnswerKey: "別の解答ページを付ける",
+    answerKeyHelp: "PDFの最後に解答をまとめ、練習ページの解答欄は空欄にします。",
     title: "PDF設定",
     fontSize: "フォントサイズ (pt)",
     lineSpacing: "行間 (pt)",
@@ -173,25 +196,26 @@ export default {
     translations: "翻訳を読み込み中...",
   },
   presets: {
-    title: "クイックプリセット",
+    title: "身につけた力で選ぶ",
     apply: "適用",
+    applyDescription: "{{name}}を適用：{{description}}",
     clickToApply: "適用",
     applied: "適用済み",
     beginner: {
       name: "初級 (1-10)",
-      description: "簡単な足し算と引き算",
+      description: "10まで数えられたら、簡単な足し算と引き算から。",
     },
     intermediate: {
       name: "中級 (1-50)",
-      description: "中程度の数での全演算",
+      description: "足し算と引き算に慣れたら、数を大きくしてかけ算も練習。",
     },
     advanced: {
       name: "上級 (1-100)",
-      description: "わり算を含む全演算",
+      description: "かけ算とわり算に慣れたら、答えが負になる問題も含む四則計算へ。",
     },
     multiplication: {
-      name: "かけ算九九",
-      description: "かけ算の練習に特化",
+      name: "かけ算表",
+      description: "同じ数ずつのまとまりが分かったら、1〜12のかけ算を練習。",
     },
   },
   preview: {

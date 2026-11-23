@@ -7,6 +7,7 @@ import AppHeader from "@/components/AppHeader";
 import ErrorMessage from "@/components/ErrorMessage";
 import InfoPanel from "@/components/InfoPanel";
 import MobileGenerateBar from "@/components/MobileGenerateBar";
+import PdfPreview from "@/components/PdfPreview";
 import ProblemsSection from "@/components/ProblemsSection";
 import SettingsSection from "@/components/SettingsSection";
 import PerformanceMonitor from "./components/PerformanceMonitor";
@@ -52,7 +53,7 @@ function App(): React.JSX.Element {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [isQuizMode, setIsQuizMode] = useState(false);
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [isPdfPreviewOpen, setIsPdfPreviewOpen] = useState(false);
   const formHandlers = useAppHandlers({
     settings,
     setSettings,
@@ -76,6 +77,10 @@ function App(): React.JSX.Element {
       group: (index: number, empty: boolean) =>
         t(empty ? "problems.emptyGroup" : "results.groupTitle", { number: index, group: index }),
       empty: t("results.noProblems"),
+      name: t("pdf.name"),
+      date: t("pdf.date"),
+      answerKey: t("pdf.answerKey"),
+      answerKeySubtitle: t("pdf.answerKeySubtitle"),
     }),
     [t],
   );
@@ -88,15 +93,6 @@ function App(): React.JSX.Element {
     clearMessages,
     { isDev: import.meta.env.DEV, labels: pdfLabels },
   );
-  const downloadPdf = useCallback(async () => {
-    if (isDownloading) return;
-    setIsDownloading(true);
-    try {
-      await download();
-    } finally {
-      setIsDownloading(false);
-    }
-  }, [download, isDownloading]);
   const handleGenerate = useCallback(() => {
     clearMessages();
     generation.generateProblems();
@@ -131,10 +127,13 @@ function App(): React.JSX.Element {
   // Keep a running quiz mounted while a different language loads.
   if (isLoading && problems.length === 0) return <div className="App">{loading}</div>;
   return (
-    <PerformanceMonitor enabled={import.meta.env.DEV} showDetails>
+    <PerformanceMonitor
+      enabled={import.meta.env.DEV && import.meta.env.VITE_SHOW_PERFORMANCE_MONITOR === "true"}
+      showDetails
+    >
       <TranslationLoader keepMounted={problems.length > 0}>
         <div className="App">
-          <AppHeader t={t} />
+          <AppHeader t={t} showPracticeIntro={!isQuizMode} />
           <main className="main-content">
             <div className="messages-container">
               <ErrorMessage error={error} type="error" onDismiss={() => setError("")} />
@@ -167,10 +166,9 @@ function App(): React.JSX.Element {
                     t={t}
                     problemsCount={problems.length}
                     onGenerate={handleGenerate}
-                    onDownload={downloadPdf}
+                    onPreviewPdf={() => setIsPdfPreviewOpen(true)}
                     onStartQuiz={quizHandlers.startQuizMode}
                     isGenerating={generation.isGenerating}
-                    isDownloading={isDownloading}
                   />
                   {generation.isGenerating && (
                     <div role="status" aria-live="polite">
@@ -195,6 +193,17 @@ function App(): React.JSX.Element {
               </Suspense>
             )}
           </main>
+          {isPdfPreviewOpen && (
+            <PdfPreview
+              t={t}
+              problems={problems}
+              settings={settings}
+              paperSizes={paperSizeOptions}
+              labels={pdfLabels}
+              onClose={() => setIsPdfPreviewOpen(false)}
+              onDownload={download}
+            />
+          )}
           {!isQuizMode && isMobile && (
             <MobileGenerateBar
               t={t}
